@@ -70,6 +70,7 @@ class Listener extends React.Component {
     }
 }
 
+//todo
 class Condition extends React.Component {
     static propTypes = {
         condition: ConditionModel.isRequired
