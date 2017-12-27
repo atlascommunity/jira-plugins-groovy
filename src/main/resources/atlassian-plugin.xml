@@ -1,0 +1,252 @@
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+
+        <param name="atlassian-data-center-compatible">true</param>
+    </plugin-info>
+
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="ru.mail.jira.plugins.groovy.i18n"/>
+
+    <!-- non-react resources -->
+
+    <web-resource key="workflow-registry-resources" name="groovy workflow edit Web Resources">
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-select</dependency>
+
+        <context>ru.mail.jira.plugins.groovy.workflow-registry-edit</context>
+    </web-resource>
+
+    <!-- react resources -->
+    <web-resource key="react-common">
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:dialog2</dependency>
+        <dependency>com.atlassian.auiplugin:aui-experimental-tooltips</dependency>
+        <dependency>com.atlassian.auiplugin:aui-select</dependency>
+
+        <resource type="download" name="i18n.js" location="/ru/mail/jira/plugins/groovy/i18n.js"/>
+        <resource type="download" name="common.js" location="/ru/mail/jira/plugins/groovy/js/common.js"/>
+        <resource type="download" name="common.js.map" location="/ru/mail/jira/plugins/groovy/js/common.js.map"/>
+    </web-resource>
+
+    <web-resource key="workflow" name="groovy workflow view Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="workflow.js" location="/ru/mail/jira/plugins/groovy/js/workflow.js"/>
+        <resource type="download" name="workflow.js.map" location="/ru/mail/jira/plugins/groovy/js/workflow.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.workflow</context>
+    </web-resource>
+
+    <web-resource key="console-resources" name="groovy console Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="console.js" location="/ru/mail/jira/plugins/groovy/js/console.js"/>
+        <resource type="download" name="console.js.map" location="/ru/mail/jira/plugins/groovy/js/console.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.console</context>
+    </web-resource>
+
+    <web-resource key="registry-resources" name="groovy script registry Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="repository.js" location="/ru/mail/jira/plugins/groovy/js/repository.js"/>
+        <resource type="download" name="repository.js.map" location="/ru/mail/jira/plugins/groovy/js/repository.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.registry</context>
+    </web-resource>
+
+    <web-resource key="listeners-resources" name="groovy script registry Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="listeners.js" location="/ru/mail/jira/plugins/groovy/js/listeners.js"/>
+        <resource type="download" name="listeners.js.map" location="/ru/mail/jira/plugins/groovy/js/listeners.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.listeners</context>
+    </web-resource>
+
+    <!-- end of resources -->
+
+    <rest key="groovyRest" path="/groovy" version="1.0">
+        <description>Groovy rest module</description>
+    </rest>
+
+    <servlet name="Console servlet" key="console-servlet" class="ru.mail.jira.plugins.groovy.servlet.ConsoleServlet">
+        <description>Console servlet</description>
+        <url-pattern>/groovy/console</url-pattern>
+    </servlet>
+
+    <servlet name="Registry servlet" key="registry-servlet" class="ru.mail.jira.plugins.groovy.servlet.RegistryServlet">
+        <description>Registry servlet</description>
+        <url-pattern>/groovy/registry</url-pattern>
+    </servlet>
+
+    <servlet name="Listeners servlet" key="listeners-servlet" class="ru.mail.jira.plugins.groovy.servlet.ListenersServlet">
+        <description>Listeners servlet</description>
+        <url-pattern>/groovy/listeners</url-pattern>
+    </servlet>
+
+    <ao key="ao-entities">
+        <entity>ru.mail.jira.plugins.groovy.api.entity.Script</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.ScriptDirectory</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.Changelog</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.ScriptExecution</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.EventListener</entity>
+    </ao>
+
+    <workflow-condition
+            key="inline-script-condition"
+            name="Groovy inline script"
+            class="ru.mail.jira.plugins.groovy.impl.workflow.inline.InlineScriptConditionFactory"
+    >
+        <condition-class>
+            ru.mail.jira.plugins.groovy.impl.workflow.ScriptedCondition
+        </condition-class>
+
+        <resource
+                type="velocity"
+                name="view"
+                location="ru/mail/jira/plugins/groovy/templates/inline-script-view.vm"
+        />
+        <resource
+                type="velocity"
+                name="input-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/inline-script-edit.vm"
+        />
+        <resource
+                type="velocity"
+                name="edit-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/inline-script-edit.vm"
+        />
+    </workflow-condition>
+
+    <workflow-function
+            key="inline-script-function"
+            name="Groovy inline script"
+            class="ru.mail.jira.plugins.groovy.impl.workflow.inline.InlineScriptFunctionFactory"
+    >
+        <function-class>
+            ru.mail.jira.plugins.groovy.impl.workflow.ScriptedFunction
+        </function-class>
+
+        <resource
+                type="velocity"
+                name="view"
+                location="ru/mail/jira/plugins/groovy/templates/inline-script-view.vm"
+        />
+        <resource
+                type="velocity"
+                name="input-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/inline-script-edit.vm"
+        />
+        <resource
+                type="velocity"
+                name="edit-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/inline-script-edit.vm"
+        />
+    </workflow-function>
+
+    <workflow-validator
+            key="inline-script-validator"
+            name="Groovy inline script"
+            class="ru.mail.jira.plugins.groovy.impl.workflow.inline.InlineScriptValidatorFactory"
+    >
+        <validator-class>
+            ru.mail.jira.plugins.groovy.impl.workflow.ScriptedValidator
+        </validator-class>
+
+        <resource
+                type="velocity"
+                name="view"
+                location="ru/mail/jira/plugins/groovy/templates/inline-script-view.vm"
+        />
+        <resource
+                type="velocity"
+                name="input-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/inline-script-edit.vm"
+        />
+        <resource
+                type="velocity"
+                name="edit-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/inline-script-edit.vm"
+        />
+    </workflow-validator>
+
+    <workflow-function
+            key="registry-script-function"
+            name="Groovy registry script"
+            class="ru.mail.jira.plugins.groovy.impl.workflow.registry.RegistryScriptFunctionFactory"
+    >
+        <function-class>
+            ru.mail.jira.plugins.groovy.impl.workflow.ScriptedFunction
+        </function-class>
+
+        <resource
+                type="velocity"
+                name="view"
+                location="ru/mail/jira/plugins/groovy/templates/registry-script-view.vm"
+        />
+        <resource
+                type="velocity"
+                name="input-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/registry-script-edit.vm"
+        />
+        <resource
+                type="velocity"
+                name="edit-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/registry-script-edit.vm"
+        />
+    </workflow-function>
+
+    <!-- todo: registry condition & validator -->
+
+    <web-section key="admin_mailru_groovy_section" location="admin_plugins_menu">
+        <label key="ru.mail.jira.plugins.groovy.link.section" />
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">admin</param>
+        </condition>
+    </web-section>
+
+    <web-item key="groovy-console-menu-item" name="Groovy console menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy console page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.console" />
+        <link linkId="mailru-groovy-console-link">/plugins/servlet/groovy/console</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
+    <web-item key="groovy-registry-menu-item" name="Groovy registry" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy registry page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.registry" />
+        <link linkId="mailru-groovy-registry-link">/plugins/servlet/groovy/registry</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
+    <web-item key="groovy-listeners-menu-item" name="Groovy listeners menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy listeners page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.listeners" />
+        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/groovy/listeners</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+</atlassian-plugin>

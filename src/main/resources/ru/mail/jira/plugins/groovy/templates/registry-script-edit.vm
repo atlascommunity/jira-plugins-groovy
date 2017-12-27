@@ -1,0 +1,12 @@
+<br/>
+
+<aui-select id="mailru-scriptId-field" name="scriptId" placeholder="Pick a script from registry.">
+    #foreach($script in $scripts)
+        <aui-option value="${script.id}">${script.name}</aui-option>
+    #end
+</aui-select>
+$webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.workflow-registry-edit")
+
+<script>
+    AJS.$('#mailru-scriptId-field').closest('form').addClass('aui');
+</script>

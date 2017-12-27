@@ -1,0 +1,90 @@
+package ru.mail.jira.plugins.groovy.impl.listener;
+
+import com.atlassian.event.api.EventListener;
+import com.atlassian.event.api.EventPublisher;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.lifecycle.LifecycleAware;
+import com.google.common.collect.ImmutableMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.EventListenerRepository;
+import ru.mail.jira.plugins.groovy.api.ExecutionRepository;
+import ru.mail.jira.plugins.groovy.api.ScriptService;
+import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
+
+@Component
+@ExportAsService({LifecycleAware.class})
+public class EventListenerInvoker implements LifecycleAware {
+    private final Logger logger = LoggerFactory.getLogger(EventListenerInvoker.class);
+
+    private final EventPublisher eventPublisher;
+
+    private final EventListenerRepository eventListenerRepository;
+    private final ScriptService scriptService;
+    private final ExecutionRepository executionRepository;
+
+    @Autowired
+    public EventListenerInvoker(
+        @ComponentImport EventPublisher eventPublisher,
+        EventListenerRepository eventListenerRepository,
+        ScriptService scriptService,
+        ExecutionRepository executionRepository
+    ) {
+        this.eventPublisher = eventPublisher;
+        this.eventListenerRepository = eventListenerRepository;
+        this.scriptService = scriptService;
+        this.executionRepository = executionRepository;
+    }
+
+    @Override
+    public void onStart() {
+        eventPublisher.register(this);
+    }
+
+    @Override
+    public void onStop() {
+        eventPublisher.unregister(this);
+    }
+
+    @EventListener
+    public void onEvent(Object event) {
+        if (logger.isTraceEnabled()) {
+            logger.trace("Event {}", event.getClass());
+        }
+
+        if (event == null) {
+            logger.warn("event is null");
+            return;
+        }
+
+        for (ScriptedEventListener listener : eventListenerRepository.getAllListeners()) {
+            if (listener.passesCondition(event)) {
+                String uuid = listener.getUuid();
+                long t = System.currentTimeMillis();
+                boolean successful = true;
+                String error = null;
+
+                try {
+                    scriptService.executeScript(
+                        uuid,
+                        listener.getScript(),
+                        ImmutableMap.of("event", event)
+                    );
+                } catch (Exception e) {
+                    logger.error("Was unable to execute listener {}/{}", listener.getId(), uuid, e);
+                    successful = false;
+                    error = ExceptionHelper.writeExceptionToString(e);
+                } finally {
+                    t = System.currentTimeMillis() - t;
+                }
+
+                executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
+                    "event", event.toString()
+                ));
+            }
+        }
+    }
+}

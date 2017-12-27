@@ -1,0 +1,20 @@
+#* @vtlvariable name="script" type="ru.mail.jira.plugins.groovy.api.entity.Script" *#
+#* @vtlvariable name="escapeJs" type="java.util.function.Function" *#
+
+<strong>Groovy script from registry</strong>
+<br/>
+<div id="mailru-groovy-script-react-container-$uuid"></div>
+$webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.workflow")
+
+<script>
+    require(['mailru/groovy/renderRegistryScript'], function(renderRegistryScript) {
+        #set($nameHtml = ${escapeJs.apply($extendedName)})
+        #set($scriptHtml = ${escapeJs.apply($script.scriptBody)})
+        renderRegistryScript(
+            document.getElementById("mailru-groovy-script-react-container-$uuid"),
+            "$script.iD",
+            "$nameHtml",
+            "$scriptHtml"
+        );
+    });
+</script>

@@ -1,0 +1,13 @@
+<html>
+<head>
+    <title>Groovy console</title>
+    <meta name="decorator" content="atl.admin">
+    <meta name="admin.active.section" content="mailru-groovy-console-link" />
+</head>
+<body>
+<div id="react-content">
+</div>
+
+$webResourceManager.requireResource("ru.mail.jira.plugins.groovy:console-resources")
+</body>
+</html>

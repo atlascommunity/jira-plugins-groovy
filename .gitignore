@@ -1,0 +1,5 @@
+*.iml
+.idea
+target
+.DS_Store
+src/main/resources/ru/mail/jira/plugins/groovy/js

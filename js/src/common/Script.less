@@ -1,0 +1,39 @@
+@import (reference) "../flex";
+
+.scriptRow {
+  .flex-column;
+
+  border: 1px solid grey;
+
+  padding: 3px 3px 3px 8px;
+  margin: 2px;
+
+  border-radius: 5px;
+}
+
+.scriptChangelogs {
+  .flex-none;
+
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.scriptChangelog {
+  .flex-column;
+
+  border-bottom: 1px solid grey;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: lightgray;
+  }
+
+  &.active {
+    background-color: lightgray;
+  }
+}

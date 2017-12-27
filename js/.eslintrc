@@ -1,0 +1,49 @@
+{
+  "rules": {
+    "no-cond-assign": ["error", "always"],
+    "no-constant-condition": ["warn"],
+    "no-duplicate-case": ["error"],
+    "curly": [2, "all"],
+    "block-spacing": [2, "always"],
+    "quotes": ["error", "single"],
+    "key-spacing": ["warn", { "beforeColon": false, "afterColon": true }],
+    "semi": ["warn", "always", { "omitLastInOneLineBlock" : false }],
+    "no-unused-vars": ["warn", { "vars": "all", "args": "all", "argsIgnorePattern": "^_" }],
+
+    "react/jsx-no-literals": [1, {"noStrings": true}],
+    "jsx-quotes": ["error", "prefer-double"],
+    "react/jsx-no-target-blank": 2,
+
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "sibling",
+          "parent",
+          "index"
+        ],
+        "newlines-between": "always-and-inside-groups"
+      }
+    ],
+    "import/extensions": [
+      "warn",
+      "ignorePackages",
+      {
+        "js": "never"
+      }
+    ],
+    "import/no-extraneous-dependencies": [
+      "error", {
+        "devDependencies": false,
+        "peerDependencies": false
+      }
+    ],
+    "import/no-mutable-exports": ["warn"],
+    "import/no-duplicates": ["warn"],
+    "import/newline-after-import": ["error", { "count": 2 }]
+  },
+  "extends": ["react-app"]
+}

@@ -1,0 +1,33 @@
+@import (reference) "../flex";
+
+.executionBar {
+  .flex-row;
+
+  flex-wrap: wrap;
+}
+
+.executionItem {
+  .flex-none;
+
+  cursor: pointer;
+  padding: 5px;
+
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
+  border-left: 1px solid gray;
+
+  &:hover {
+    background-color: lightgrey;
+  }
+
+  &:first-child {
+    border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px;
+  }
+
+  &:last-child {
+    border-right: 1px solid gray;
+    border-bottom-right-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+}

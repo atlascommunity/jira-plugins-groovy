@@ -1,0 +1,29 @@
+#* @vtlvariable name="inlineScript" type="java.lang.String" *#
+
+<br/>
+
+<input type="hidden" name="uuid" value="${uuid}"/>
+
+<div class="field-group">
+    <label for="mailru-inlineScriptName">Name: </label>
+    <input type="text" class="text long-field" name="inlineScriptName" id="mailru-inlineScriptName" value="${inlineScriptName}"/>
+</div>
+<textarea class="hidden" id="groovy-inline-script-field">${inlineScript}</textarea>
+
+<div class="field-group">
+    <label>Script: </label>
+    <div id="groovy-inline-script" style="min-height: 300px;"></div>
+</div>
+
+$webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.workflow")
+
+<script>
+    AJS.$('#mailru-inlineScriptName').closest('form').addClass('aui');
+    require(['mailru/groovy/renderEditor'], function(renderEditor) {
+        renderEditor(
+            document.getElementById('groovy-inline-script'),
+            'inlineScript',
+            document.getElementById('groovy-inline-script-field').value
+        );
+    });
+</script>
