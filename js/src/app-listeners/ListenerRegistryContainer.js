@@ -1,4 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import {connect} from 'react-redux';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
@@ -7,19 +10,44 @@ import {ListenerRegistry} from './ListenerRegistry';
 import {ListenerDialog} from './ListenerDialog';
 
 import {CommonMessages} from '../i18n/common.i18n';
-import {listenerService} from '../service/services';
+
+import {ListenerModel} from '../model/listener.model';
 
 
+@connect(
+    state => {
+        return {
+            listeners: state.listeners,
+            ready: state.ready
+        };
+    }
+)
 export class ListenerRegistryContainer extends React.Component {
+    static propTypes ={
+        listeners: PropTypes.arrayOf(ListenerModel).isRequired,
+        ready: PropTypes.shape({
+            listeners: PropTypes.bool.isRequired,
+            projects: PropTypes.bool.isRequired,
+            events: PropTypes.bool.isRequired
+        }).isRequired
+    };
+
     state = {
-        ready: true,
-        listeners: [],
         dialogProps: null
     };
 
-    componentDidUpdate(prevState) {
-        const readyNow = this.state.ready;
-        if (readyNow !== prevState.ready) {
+    _isReady(props=this.props) {
+        const ready = props.ready;
+        return ready.listeners && ready.projects && ready.events;
+    }
+
+    _triggerDialog = (isNew, id) => this.setState({ dialogProps: {isNew, id} });
+
+    _closeDialog = () => this.setState({ dialogProps: null });
+
+    componentDidUpdate(prevProps) {
+        const readyNow = this._isReady();
+        if (readyNow !== this._isReady(prevProps)) {
             if (readyNow) {
                 AJS.undim();
             } else {
@@ -28,27 +56,18 @@ export class ListenerRegistryContainer extends React.Component {
         }
     }
 
-    componentDidMount() {
-        this.setState({ready: false});
-
-        listenerService
-            .getAllListeners()
-            .then(listeners => this.setState({ listeners, ready: true }));
-    }
-
-    _triggerDialog = (isNew, id) => this.setState({ dialogProps: {isNew, id} });
-
-    _closeDialog = () => this.setState({ dialogProps: null });
-
     render() {
-        const {ready, dialogProps} = this.state;
+        const {dialogProps} = this.state;
+        const {listeners} = this.props;
 
         let content = null;
 
-        if (!ready) {
+        if (!this._isReady()) {
+            console.log('loading');
             content = <div>{CommonMessages.loading}</div>;
         } else {
-            content = <ListenerRegistry listeners={this.state.listeners} triggerDialog={this._triggerDialog}/>;
+            console.log(listeners);
+            content = <ListenerRegistry listeners={listeners} triggerDialog={this._triggerDialog}/>;
         }
 
         return (

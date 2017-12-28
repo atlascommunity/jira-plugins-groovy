@@ -64,8 +64,6 @@ export const RegistryActionCreators = {
 
 
 function directoriesReducer(state, action) {
-    console.log(action, state);
-
     if (state === undefined) {
         return [];
     }
@@ -80,6 +78,7 @@ function directoriesReducer(state, action) {
 
     return state.map(directory => directoryReducer(directory, action)).filter(e => e);
 }
+
 
 function directoryReducer(state, action) {
     let result = state;

@@ -19,10 +19,10 @@ export class Script extends React.Component {
     static propTypes = {
         withChangelog: PropTypes.bool.isRequired,
         script: PropTypes.shape({
-            id: PropTypes.oneOfType(
+            id: PropTypes.oneOfType([
                 PropTypes.number,
                 PropTypes.string
-            ),
+            ]),
             name: PropTypes.string,
             scriptBody: PropTypes.string,
             inline: PropTypes.bool,
@@ -32,14 +32,14 @@ export class Script extends React.Component {
         onEdit: PropTypes.func.isRequired,
         onDelete: PropTypes.func.isRequired,
 
-        title: PropTypes.oneOfType(
+        title: PropTypes.oneOfType([
             PropTypes.string,
             PropTypes.node
-        ),
-        children: PropTypes.oneOfType(
+        ]),
+        children: PropTypes.oneOfType([
             PropTypes.arrayOf(PropTypes.node),
             PropTypes.node
-        )
+        ])
     };
 
     state = {

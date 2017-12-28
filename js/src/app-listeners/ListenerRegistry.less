@@ -1,0 +1,26 @@
+@import (reference) "../flex.less";
+
+.Condition {
+  border-radius: 2px;
+  border: 1px solid black;
+  padding: 4px;
+
+  &.flex-row {
+    > .ConditionName {
+      .flex-vertical-middle;
+    }
+
+    > .ConditionBody {
+      .flex-grow;
+      margin-left: 10px;
+
+      > .Condition:not(:first-child) {
+        margin-top: 4px;
+      }
+    }
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 5px;
+  }
+}

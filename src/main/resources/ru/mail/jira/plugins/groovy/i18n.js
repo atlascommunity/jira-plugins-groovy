@@ -31,6 +31,7 @@ define('/mailru/groovy/i18n-react', function() {
             addListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.addListener'),
             createListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.createListener'),
             updateListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.updateListener'),
+            addCondition: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.addCondition')
         },
         dialog: {
             notReady: AJS.I18n.getText('ru.mail.jira.plugins.groovy.dialog.notReady')

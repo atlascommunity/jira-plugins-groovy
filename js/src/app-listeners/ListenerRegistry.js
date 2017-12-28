@@ -1,11 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {connect} from 'react-redux';
+
 import Button from 'aui-react/lib/AUIButton';
 
-import {ConditionModel, ListenerModel} from '../model/listener.model';
+import {ListenerActionCreators} from './listeners.reducer';
+
+import {ConditionModel, ListenerModel, conditions} from '../model/listener.model';
+
+import {listenerService} from '../service/services';
+
 import {ListenerMessages} from '../i18n/listener.i18n';
 import {Script} from '../common/Script';
+
+import './ListenerRegistry.less';
 
 
 //todo: redux
@@ -18,6 +27,8 @@ export class ListenerRegistry extends React.Component {
     _triggerDialog = (isNew, id) => () => this.props.triggerDialog(isNew, id);
 
     render() {
+        console.log(this.props.listeners);
+
         return (
             <div className="flex-column">
                 <div>
@@ -31,7 +42,6 @@ export class ListenerRegistry extends React.Component {
                             key={listener.id}
                             listener={listener}
                             onEdit={this._triggerDialog(false, listener.id)}
-                            onDelete={() => console.log('delete') /* todo */}
                         />
                     )}
                 </div>
@@ -40,15 +50,28 @@ export class ListenerRegistry extends React.Component {
     }
 }
 
+@connect(
+    () => { return {}; },
+    ListenerActionCreators
+)
 class Listener extends React.Component {
     static propTypes = {
         listener: ListenerModel.isRequired,
         onEdit: PropTypes.func.isRequired,
-        onDelete: PropTypes.func.isRequired
+        deleteListener: PropTypes.func.isRequired
+    };
+
+    _delete = () => {
+        const listener = this.props.listener;
+
+        // eslint-disable-next-line no-restricted-globals
+        if (confirm(`Are you sure you want to delete "${listener.name}"?`)) {
+            listenerService.deleteListener(listener.id).then(() => this.props.deleteListener(listener.id));
+        }
     };
 
     render() {
-        const {listener, onEdit, onDelete} = this.props;
+        const {listener, onEdit} = this.props;
 
         return <div className="flex-column">
             <Script
@@ -62,7 +85,7 @@ class Listener extends React.Component {
                 withChangelog={false}
                 editable={true}
                 onEdit={onEdit}
-                onDelete={onDelete}
+                onDelete={this._delete}
             >
                 <Condition condition={listener.condition}/>
             </Script>
@@ -70,13 +93,65 @@ class Listener extends React.Component {
     }
 }
 
-//todo
+
+@connect(
+    state => {
+        return {
+            projects: state.projects,
+            eventTypes: state.eventTypes
+        };
+    }
+)
 class Condition extends React.Component {
     static propTypes = {
-        condition: ConditionModel.isRequired
+        condition: ConditionModel.isRequired,
+        projects: PropTypes.object.isRequired,
+        eventTypes: PropTypes.object.isRequired
     };
 
     render() {
-        return <div>{JSON.stringify(this.props.condition)}</div>;
+        const {condition, projects, eventTypes} = this.props;
+
+        let vertical = true;
+        let conditionBody = null;
+        switch (condition.type) {
+            case 'AND':
+            case 'OR':
+                vertical = false;
+                conditionBody = condition.children
+                    .map(condition => <Condition
+                        key={condition.key}
+                        condition={condition}
+                        projects={projects}
+                        eventTypes={eventTypes}
+                    />);
+                break;
+            case 'CLASS_NAME':
+                conditionBody = condition.className;
+                break;
+            case 'ISSUE_PROJECT':
+                conditionBody = condition.entityIds.map(id =>
+                    <div key={id}>{projects[id] || id}</div>
+                );
+                break;
+            case 'ISSUE_EVENT_TYPE':
+                conditionBody = condition.entityIds.map(id =>
+                    <div key={id}>{eventTypes[id] || id}</div>
+                );
+                break;
+            default:
+                conditionBody = 'not implemented'; //todo
+        }
+
+        return (
+            <div className={`Condition ${vertical ? 'flex-column' : 'flex-row'}`}>
+                <div className="ConditionName">
+                    <strong>{conditions[condition.type].name}</strong>
+                </div>
+                <div className="ConditionBody">
+                    {conditionBody}
+                </div>
+            </div>
+        );
     }
 }

@@ -1,25 +1,38 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {connect} from 'react-redux';
+
 import {Map} from 'immutable';
 
 import Button from 'aui-react/lib/AUIButton';
 import Modal from 'aui-react/lib/AUIDialog';
 
 import {ConditionPicker} from './ConditionPicker';
+import {ListenerActionCreators} from './listeners.reducer';
 
 import {AUIRequired} from '../common/aui-components';
+
 import {ListenerMessages} from '../i18n/listener.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
+
+import {fillListenerKeys} from '../model/listener.model';
+
 import {listenerService} from '../service/services';
 import {Editor} from '../common/Editor';
 
 
+@connect(
+    () => { return{}; },
+    ListenerActionCreators
+)
 export class ListenerDialog extends React.Component {
     static propTypes = {
         isNew: PropTypes.bool.isRequired,
         onClose: PropTypes.func.isRequired,
         id: PropTypes.number,
+        updateListener: PropTypes.func.isRequired,
+        addListener: PropTypes.func.isRequired
     };
 
     state = {
@@ -33,24 +46,6 @@ export class ListenerDialog extends React.Component {
 
     componentDidMount() {
         this._init(this.props);
-    }
-
-    _fillConditionKeys(condition) {
-        if (condition.children) {
-            let i = 0;
-
-            condition.children = condition
-                .children
-                .map(child => {
-                    this._fillConditionKeys(child);
-
-                    return {
-                        ...child,
-                        key: i++
-                    };
-                });
-        }
-        return condition;
     }
 
     _init = props => {
@@ -71,16 +66,17 @@ export class ListenerDialog extends React.Component {
 
             listenerService
                 .getListener(props.id)
-                .then(listener =>
+                .then(rawListener => {
+                    const listener = fillListenerKeys(rawListener);
                     this.setState({
                         values: new Map({
                             name: listener.name,
                             script: listener.script,
-                            condition: this._fillConditionKeys(listener.condition)
+                            condition: listener.condition
                         }),
                         ready: true
-                    })
-                );
+                    });
+                });
         }
     };
 
@@ -89,17 +85,24 @@ export class ListenerDialog extends React.Component {
             e.preventDefault();
         }
 
-        const {isNew, id} = this.props;
+        const {isNew, id, onClose} = this.props;
         const data = this.state.values.toJS();
 
+        //todo: validation & error display
         if (isNew) {
             listenerService
                 .createListener(data)
-                .then(listener => console.log(listener));
+                .then(listener => {
+                    onClose();
+                    this.props.addListener(fillListenerKeys(listener));
+                });
         } else {
             listenerService
                 .updateListener(id, data)
-                .then(listener => console.log(listener));
+                .then(listener => {
+                    onClose();
+                    this.props.updateListener(fillListenerKeys(listener));
+                });
         }
     };
 
@@ -161,7 +164,6 @@ export class ListenerDialog extends React.Component {
                 </form>;
         }
 
-        //todo: add condition display
         //todo: delete
 
         return <Modal

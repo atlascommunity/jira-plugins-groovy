@@ -16,7 +16,7 @@ export class AsyncLoadingMultiSelect extends React.Component {
     componentDidMount() {
         this.setState({ready: false});
 
-        this.props.loader().then(options => this.setState({ready: true, options: options}))
+        this.props.loader().then(options => this.setState({ready: true, options: options}));
     }
 
     render() {
@@ -24,6 +24,6 @@ export class AsyncLoadingMultiSelect extends React.Component {
             return <span className="spinner"/>;
         }
 
-        return <MultiSelect options={this.state.options} value={this.props.value} onChange={this.props.onChange}/>
+        return <MultiSelect options={this.state.options} value={this.props.value} onChange={this.props.onChange}/>;
     }
 }

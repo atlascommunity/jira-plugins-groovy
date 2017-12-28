@@ -5,44 +5,16 @@ import Button from 'aui-react/lib/AUIButton';
 import Icon from 'aui-react/lib/AUIIcon';
 
 import {jiraService} from '../service/services';
-import {ConditionModel} from '../model/listener.model';
 import {SingleSelect} from '../common/SingleSelect';
-import {CommonMessages} from '../i18n/common.i18n';
-
-import './ConditionPicker.less';
 import {AsyncLoadingMultiSelect} from '../common/AsyncLoadingMultiSelect';
 
+import {ConditionModel, conditionList, conditions} from '../model/listener.model';
 
-const nestingLimit = 2;
-const listLimit = 5;
+import {CommonMessages} from '../i18n/common.i18n';
+import {ListenerMessages} from '../i18n/listener.i18n';
 
-const conditions = {
-    'AND': {
-        id: 'AND',
-        name: 'And',
-        requiresChildren: true
-    },
-    'OR': {
-        id: 'OR',
-        name: 'Or',
-        requiresChildren: true
-    },
-    'CLASS_NAME': {
-        id: 'CLASS_NAME',
-        name: 'Class name',
-        requiresChildren: false
-    },
-    'ISSUE_PROJECT': {
-        id: 'ISSUE_PROJECT',
-        name: 'Issue project',
-        requiresChildren: false
-    },
-    'ISSUE_EVENT_TYPE': {
-        id: 'ISSUE_EVENT_TYPE',
-        name: 'IssueEvent type',
-        requiresChildren: false
-    }
-};
+import './ConditionPicker.less';
+
 
 const projectsLoader = () => jiraService
     .getAllProjects()
@@ -61,8 +33,6 @@ const eventTypeLoader = () => jiraService
             name: type.name
         };
     }));
-
-const conditionList = Object.values(conditions);
 
 export class ConditionPicker extends React.Component {
     static propTypes = {
@@ -140,7 +110,7 @@ export class ConditionPicker extends React.Component {
             typeEl =
                 <div>
                     <strong>{conditions[value.type].name}</strong>
-                    <a href="#edit" onClick={this._onReset}>
+                    <a href="" onClick={this._onReset}>
                         <Icon icon="edit"/>
                     </a>
                 </div>;
@@ -272,7 +242,7 @@ class ConditionList extends React.Component {
                         isDeletable={true}
                     />
                 )}
-                <Button icon="add" type="subtle" onClick={this._addItem}>Add condition</Button>
+                <Button icon="add" type="subtle" onClick={this._addItem}>{ListenerMessages.addCondition}</Button>
             </div>
         );
     }
