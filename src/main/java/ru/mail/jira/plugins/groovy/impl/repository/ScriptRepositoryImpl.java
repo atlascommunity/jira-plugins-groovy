@@ -8,6 +8,7 @@ import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
@@ -18,8 +19,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.commons.RestFieldException;
 import ru.mail.jira.plugins.groovy.api.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.*;
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class ScriptRepositoryImpl implements ScriptRepository {
+    private final I18nHelper i18nHelper;
     private final DateTimeFormatter dateTimeFormatter;
     private final JiraAuthenticationContext authenticationContext;
     private final UserManager userManager;
@@ -46,6 +50,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     @Autowired
     public ScriptRepositoryImpl(
+        @ComponentImport I18nHelper i18nHelper,
         @ComponentImport DateTimeFormatter dateTimeFormatter,
         @ComponentImport JiraAuthenticationContext authenticationContext,
         @ComponentImport UserManager userManager,
@@ -55,6 +60,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         ScriptInvalidationService scriptInvalidationService,
         ScriptService scriptService
     ) {
+        this.i18nHelper = i18nHelper;
         this.dateTimeFormatter = dateTimeFormatter;
         this.authenticationContext = authenticationContext;
         this.userManager = userManager;
@@ -72,9 +78,9 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             parentDirectory = ao.get(ScriptDirectory.class, parentId);
 
             if (parentDirectory == null) {
-                throw new RuntimeException("Unable to find parent directory with id " + parentId); //todo
+                throw new IllegalArgumentException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.directoryNotFound", parentId));
             } else if (parentDirectory.isDeleted()) {
-                throw new RuntimeException("Parent directory is deleted");
+                throw new IllegalArgumentException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.parentDirectoryIsDeleted"));
             }
         }
 
@@ -101,6 +107,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     @Override
     public ScriptDirectoryDto createDirectory(ApplicationUser user, ScriptDirectoryForm directoryForm) {
+        validateDirectoryForm(directoryForm);
+
         return buildDirectoryDto(ao.create(
             ScriptDirectory.class,
             new DBParam("NAME", directoryForm.getName()),
@@ -170,7 +178,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             throw new RuntimeException();
         }
 
-        scriptService.validateScript(scriptForm.getScriptBody());
+        validateScriptForm(true, scriptForm);
 
         Script script = ao.create(
             Script.class,
@@ -180,7 +188,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             new DBParam("DELETED", false)
         );
 
-        String diff = generateDiff(String.valueOf(script.getID()) + ".groovy", "", scriptForm.getScriptBody());
+        String diff = generateDiff(script.getID(), "", script.getName(), "", scriptForm.getScriptBody());
 
         ao.create(
             Changelog.class,
@@ -196,7 +204,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     @Override
     public ScriptDto updateScript(ApplicationUser user, int id, ScriptForm scriptForm) {
-        scriptService.validateScript(scriptForm.getScriptBody());
+        validateScriptForm(false, scriptForm);
 
         ClusterLock lock = clusterLockService.getLockForName(getLockKey(id));
 
@@ -210,18 +218,14 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
     }
 
-    private ScriptDto doUpdateScript(ApplicationUser user, int id, ScriptForm scriptForm) {
+    private ScriptDto doUpdateScript(ApplicationUser user, int id, ScriptForm form) {
         Script script = ao.get(Script.class, id);
 
         if (script.isDeleted()) {
-            throw new RuntimeException("Script " + id + " is deleted");
+            throw new IllegalArgumentException("Script " + id + " is deleted");
         }
 
-        if (scriptForm.getComment() == null) {
-            throw new RuntimeException("Comment is required");
-        }
-
-        String diff = generateDiff(String.valueOf(id) + ".groovy", script.getScriptBody(), scriptForm.getScriptBody());
+        String diff = generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
 
         ao.create(
             Changelog.class,
@@ -229,29 +233,33 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             new DBParam("SCRIPT_ID", script.getID()),
             new DBParam("DATE", new Timestamp(System.currentTimeMillis())),
             new DBParam("DIFF", diff),
-            new DBParam("COMMENT", scriptForm.getComment())
+            new DBParam("COMMENT", form.getComment())
         );
 
-        script.setName(scriptForm.getName());
-        script.setScriptBody(scriptForm.getScriptBody());
+        script.setName(form.getName());
+        script.setScriptBody(form.getScriptBody());
         script.save();
 
         return buildScriptDto(script);
     }
 
-    private String generateDiff(String fileName, String originalSource, String newSource) {
+    private String generateDiff(int id, String originalName, String name, String originalSource, String newSource) {
         try {
             List<String> originalLines = Arrays.asList(originalSource.split("\n"));
             List<String> newLines = Arrays.asList(newSource.split("\n"));
             Patch<String> patch = DiffUtils.diff(originalLines, newLines);
 
             return UnifiedDiffUtils
-                .generateUnifiedDiff(fileName, fileName, originalLines, patch, 5)
+                .generateUnifiedDiff(genName(id, originalName), genName(id, name), originalLines, patch, 5)
                 .stream()
                 .collect(Collectors.joining("\n"));
         } catch (DiffException e) {
             throw new RuntimeException("Unable to create diff", e);
         }
+    }
+
+    private static String genName(int id, String name) {
+        return String.valueOf(id) + " - " + name + ".groovy";
     }
 
     @Override
@@ -348,6 +356,26 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             avatarService.getAvatarURL(authenticationContext.getLoggedInUser(), user).toString(),
             user.getDisplayName()
         );
+    }
+
+    private void validateDirectoryForm(ScriptDirectoryForm form) {
+        if (StringUtils.isEmpty(form.getName())) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
+        }
+    }
+
+    private void validateScriptForm(boolean isNew, ScriptForm form) {
+        scriptService.validateScript(form.getScriptBody());
+
+        if (StringUtils.isEmpty(form.getName())) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
+        }
+
+        if (!isNew) {
+            if (StringUtils.isEmpty(form.getComment())) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
+            }
+        }
     }
 
     private static ScriptDescription buildScriptDescription(Script script) {

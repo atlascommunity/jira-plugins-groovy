@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 
-//todo: adapt AUI single-select
 export class SingleSelect extends React.Component {
     static propTypes = {
         value: PropTypes.string,

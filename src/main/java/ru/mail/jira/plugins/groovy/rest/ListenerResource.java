@@ -1,16 +1,15 @@
 package ru.mail.jira.plugins.groovy.rest;
 
 import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import ru.mail.jira.plugins.groovy.api.EventListenerRepository;
-import ru.mail.jira.plugins.groovy.api.dto.EventListenerDto;
 import ru.mail.jira.plugins.groovy.api.dto.EventListenerForm;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
+import ru.mail.jira.plugins.groovy.util.RestExecutor;
 
 import javax.ws.rs.*;
-import java.util.List;
+import javax.ws.rs.core.Response;
 
 @Scanned
 @Path("/listener")
@@ -31,43 +30,53 @@ public class ListenerResource {
 
     @GET
     @Path("/all")
-    public List<EventListenerDto> getAllListeners() {
-        permissionHelper.checkIfAdmin(authenticationContext.getLoggedInUser());
+    public Response getAllListeners() {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
 
-        return listenerRepository.getListeners();
+            return listenerRepository.getListeners();
+        }).getResponse();
     }
 
     @POST
     @Path("/")
-    public EventListenerDto createListener(EventListenerForm form) {
-        ApplicationUser user = authenticationContext.getLoggedInUser();
-        permissionHelper.checkIfAdmin(user);
+    public Response createListener(EventListenerForm form) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
 
-        return listenerRepository.createEventListener(user, form);
+            return listenerRepository.createEventListener(authenticationContext.getLoggedInUser(), form);
+        }).getResponse();
     }
 
     @GET
     @Path("/{id}")
-    public EventListenerDto getListener(@PathParam("id") int id) {
-        permissionHelper.checkIfAdmin(authenticationContext.getLoggedInUser());
-        return listenerRepository.getEventListener(id);
+    public Response getListener(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return listenerRepository.getEventListener(id);
+        }).getResponse();
     }
 
     @PUT
     @Path("/{id}")
-    public EventListenerDto updateListener(@PathParam("id") int id, EventListenerForm form) {
-        ApplicationUser user = authenticationContext.getLoggedInUser();
-        permissionHelper.checkIfAdmin(user);
+    public Response updateListener(@PathParam("id") int id, EventListenerForm form) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
 
-        return listenerRepository.updateEventListener(user, id, form);
+            return listenerRepository.updateEventListener(authenticationContext.getLoggedInUser(), id, form);
+        }).getResponse();
     }
 
     @DELETE
     @Path("/{id}")
-    public void deleteListener(@PathParam("id") int id) {
-        ApplicationUser user = authenticationContext.getLoggedInUser();
-        permissionHelper.checkIfAdmin(user);
+    public Response deleteListener(@PathParam("id") int id) {
+        return new RestExecutor<Void>(() -> {
+            permissionHelper.checkIfAdmin();
 
-        listenerRepository.deleteEventListener(user, id);
+            listenerRepository.deleteEventListener(authenticationContext.getLoggedInUser(), id);
+
+            return null;
+        }).getResponse();
     }
 }

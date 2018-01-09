@@ -14,6 +14,7 @@ import ru.mail.jira.plugins.groovy.api.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptDto;
+import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
@@ -72,7 +73,7 @@ public class WorkflowHelper {
         return new ScriptDescriptor(id, fromRegistry, scriptString);
     }
 
-    public Object executeScript(ScriptDescriptor script, Issue issue, ApplicationUser user, Map transientVars) throws WorkflowException {
+    public Object executeScript(ScriptDescriptor script, ScriptType type, Issue issue, ApplicationUser user, Map transientVars) throws WorkflowException {
         Object result = null;
         WorkflowException rethrow = null;
 
@@ -85,6 +86,7 @@ public class WorkflowHelper {
             result =  scriptService.executeScript(
                 id,
                 script.getScriptBody(),
+                type,
                 ImmutableMap.of(
                     "issue", issue,
                     "user", user,
@@ -104,7 +106,8 @@ public class WorkflowHelper {
         ImmutableMap<String, String> params = ImmutableMap.of(
             "issue", Objects.toString(issue, ""),
             "user", Objects.toString(user, ""),
-            "transientVars", Objects.toString(transientVars, "")
+            "transientVars", Objects.toString(transientVars, ""),
+            "type", type.name()
         );
         if (script.isFromRegistry()) {
             Integer parsedId = Ints.tryParse(id);

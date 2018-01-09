@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
+import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
 @Component
@@ -71,6 +72,7 @@ public class EventListenerInvoker implements LifecycleAware {
                     scriptService.executeScript(
                         uuid,
                         listener.getScript(),
+                        ScriptType.LISTENER,
                         ImmutableMap.of("event", event)
                     );
                 } catch (Exception e) {
@@ -82,7 +84,8 @@ public class EventListenerInvoker implements LifecycleAware {
                 }
 
                 executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
-                    "event", event.toString()
+                    "event", event.toString(),
+                    "type", ScriptType.LISTENER.name()
                 ));
             }
         }

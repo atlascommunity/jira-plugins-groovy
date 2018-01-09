@@ -107,25 +107,32 @@ export class ScriptDialog extends React.Component {
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
 
     render() {
-        let globalError = null;
-        const values = this.state.values;
-        const error = this.state.error;
+        const {values, error} = this.state;
+        let errorMessage = null;
+        let errorField = null;
 
         let markers = null;
         let annotations = null;
-        if (error && error.field === 'scriptBody') {
-            const errors = error.error.filter(e => e);
-            markers = errors.map(error => {
-                return {
-                    startRow: error.startLine-1,
-                    endRow: error.endLine-1,
-                    startCol: error.startColumn-1,
-                    endCol: error.endColumn-1,
-                    className: 'error-marker',
-                    type: 'background'
-                };
-            });
-            globalError = errors.map(error => error.message);
+        if (error) {
+            if (error.field === 'scriptBody') {
+                const errors = error.error.filter(e => e);
+                markers = errors.map(error => {
+                    return {
+                        startRow: error.startLine - 1,
+                        endRow: error.endLine - 1,
+                        startCol: error.startColumn - 1,
+                        endCol: error.endColumn - 1,
+                        className: 'error-marker',
+                        type: 'background'
+                    };
+                });
+                errorMessage = errors
+                    .map(error => error.message)
+                    .map(error => <p key={error}>{error}</p>);
+            } else {
+                errorMessage = error.message;
+            }
+            errorField = error.field;
         }
 
         console.log(error, markers, annotations);
@@ -146,9 +153,9 @@ export class ScriptDialog extends React.Component {
                         type="modal"
                         styles={{zIndex: '3000'}}
                     >
-                        {globalError ?
+                        {error && !errorField ?
                             <Message type="error">
-                                {globalError.map(error => <p key={error}>{error}</p>)}
+                                {errorMessage}
                             </Message>
                         : null}
                         <form className="aui" onSubmit={this._onSubmit}>
@@ -164,6 +171,7 @@ export class ScriptDialog extends React.Component {
                                     value={values.get('name') || ''}
                                     onChange={this._setTextValue('name')}
                                 />
+                                {errorField === 'name' && <div className="error">{errorMessage}</div>}
                             </div>
                             <div className="field-group">
                                 <label>
@@ -179,6 +187,7 @@ export class ScriptDialog extends React.Component {
                                     markers={markers}
                                     annotations={annotations}
                                 />
+                                {errorField === 'scriptBody' && <div className="error">{errorMessage}</div>}
                             </div>
                             {this.state.id ? <div className="field-group">
                                 <label htmlFor="directory-dialog-comment">
@@ -192,6 +201,7 @@ export class ScriptDialog extends React.Component {
                                     value={values.get('comment')}
                                     onChange={this._setTextValue('comment')}
                                 />
+                                {errorField === 'comment' && <div className="error">{errorMessage}</div>}
                             </div> : null}
                         </form>
                     </Dialog>

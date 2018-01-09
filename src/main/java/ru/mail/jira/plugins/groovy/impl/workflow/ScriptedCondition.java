@@ -6,6 +6,7 @@ import com.opensymphony.module.propertyset.PropertySet;
 import com.opensymphony.workflow.WorkflowException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class ScriptedCondition extends AbstractJiraCondition {
             return false;
         }
 
-        Object result = workflowHelper.executeScript(script, getIssue(transientVars), getCallerUser(transientVars, args), transientVars);
+        Object result = workflowHelper.executeScript(script, ScriptType.WORKFLOW_CONDITION, getIssue(transientVars), getCallerUser(transientVars, args), transientVars);
 
         if (result instanceof Boolean) {
             return (boolean) result;

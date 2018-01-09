@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 
 import Dialog from 'aui-react/lib/AUIDialog';
 import Button from 'aui-react/lib/AUIButton';
+import Message from 'aui-react/lib/AUIMessage';
 
 import {RegistryActionCreators} from './registry.reducer';
 
@@ -18,7 +19,8 @@ export class ScriptDirectoryDialog extends React.Component {
         active: false,
         name: '',
         parentId: null,
-        id: null
+        id: null,
+        error: null
     };
 
     activateCreate = (parentId) => {
@@ -26,7 +28,8 @@ export class ScriptDirectoryDialog extends React.Component {
             active: true,
             name: '',
             parentId: parentId,
-            id: null
+            id: null,
+            error: null
         });
     };
 
@@ -37,8 +40,19 @@ export class ScriptDirectoryDialog extends React.Component {
                 active: true,
                 id: id,
                 parentId: null,
-                name: data.name
+                name: data.name,
+                error: null
             }));
+    };
+
+    _handleError = (error) => {
+        const {response} = error;
+
+        if (response.status === 400) {
+            this.setState({error: response.data});
+        } else {
+            throw error;
+        }
     };
 
     _onSubmit = (e) => {
@@ -56,17 +70,22 @@ export class ScriptDirectoryDialog extends React.Component {
         if (id) {
             registryService
                 .updateDirectory(id, data)
-                .then(result => {
-                    this.props.updateDirectory(result);
-                    this.setState({active: false});
-                });
+                .then(
+                    result => {
+                        this.props.updateDirectory(result);
+                        this.setState({active: false});
+                    },
+                    this._handleError);
         } else {
             registryService
                 .createDirectory(data)
-                .then(result => {
-                    this.props.addDirectory(result);
-                    this.setState({active: false});
-                });
+                .then(
+                    result => {
+                        this.props.addDirectory(result);
+                        this.setState({active: false});
+                    },
+                    this._handleError
+                );
         }
     };
 
@@ -75,6 +94,15 @@ export class ScriptDirectoryDialog extends React.Component {
     _setName = (event) => this.setState({ name: event.target.value });
 
     render() {
+        const {error} = this.state;
+
+        let errorMessage = null;
+        let errorField = null;
+
+        if (error) {
+            ({field: errorField, message: errorMessage} = error);
+        }
+
         return (
             <div>
                 {this.state.active ?
@@ -89,6 +117,11 @@ export class ScriptDirectoryDialog extends React.Component {
                         type="modal"
                         styles={{zIndex: '3000'}}
                     >
+                        {error && !errorField ?
+                            <Message type="error">
+                                {errorMessage}
+                            </Message>
+                        : null}
                         <form className="aui" onSubmit={this._onSubmit}>
                             <div className="field-group">
                                 <label htmlFor="directory-dialog-name">
@@ -101,6 +134,7 @@ export class ScriptDirectoryDialog extends React.Component {
                                     value={this.state.name}
                                     onChange={this._setName}
                                 />
+                                {errorField === 'name' && <div className="error">{errorMessage}</div>}
                             </div>
                         </form>
                     </Dialog>

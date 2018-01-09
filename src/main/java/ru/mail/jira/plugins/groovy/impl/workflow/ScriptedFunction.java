@@ -6,6 +6,7 @@ import com.opensymphony.module.propertyset.PropertySet;
 import com.opensymphony.workflow.WorkflowException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 
 import java.util.Map;
 
@@ -27,6 +28,6 @@ public class ScriptedFunction extends AbstractJiraFunctionProvider {
             return;
         }
 
-        workflowHelper.executeScript(script, getIssue(transientVars), getCallerUser(transientVars, args), transientVars);
+        workflowHelper.executeScript(script, ScriptType.WORKFLOW_FUNCTION, getIssue(transientVars), getCallerUser(transientVars, args), transientVars);
     }
 }

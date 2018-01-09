@@ -16,9 +16,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.Script;
-import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilerConfiguration;
-import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.slf4j.Logger;
@@ -26,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
+import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.groovy.ScriptInjection;
 import ru.mail.jira.plugins.groovy.impl.groovy.InjectionExtension;
 import ru.mail.jira.plugins.groovy.impl.groovy.LoadClassesExtension;
@@ -43,9 +42,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-//todo: add rest for invalidation
-//todo: exclude module-info.class
-//todo: test for leaks after building with groovy 3.5
 @ExportAsService({ScriptService.class, LifecycleAware.class})
 @Component
 public class ScriptServiceImpl implements ScriptService, LifecycleAware {
@@ -79,9 +75,10 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         this.classLoader = classLoader;
         CompilerConfiguration config = new CompilerConfiguration()
             .addCompilationCustomizers(
-                new ImportCustomizer().addStarImports(
-                    "ru.mail.jira.plugins.groovy.api.script"
-                ),
+                new ImportCustomizer()
+                    .addStarImports("ru.mail.jira.plugins.groovy.api.script")
+                    .addStaticStars("ru.mail.jira.plugins.groovy.api.script.ScriptType")
+                ,
                 new WithPluginGroovyExtension(parseContextHolder),
                 new LoadClassesExtension(parseContextHolder, pluginAccessor, classLoader),
                 new InjectionExtension(parseContextHolder)
@@ -94,9 +91,9 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     }
 
     @Override
-    public Object executeScript(String scriptId, String scriptString, Map<String, Object> bindings) {
+    public Object executeScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> bindings) {
         try {
-            return doExecuteScript(scriptId, scriptString, bindings);
+            return doExecuteScript(scriptId, scriptString, type, bindings);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -112,7 +109,13 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         scriptCache.invalidate(id);
     }
 
-    private Object doExecuteScript(String scriptId, String scriptString, Map<String, Object> additionalBindings) throws Exception {
+    @Override
+    public void invalidateAll() {
+        scriptCache.invalidateAll();
+        gcl.clearCache();
+    }
+
+    private Object doExecuteScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> additionalBindings) throws Exception {
         //todo: r lock
 
         logger.info("started execution");
@@ -150,6 +153,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         logger.info("created class");
 
         HashMap<String, Object> bindings = new HashMap<>(additionalBindings);
+        bindings.put("scriptType", type);
 
         for (ScriptInjection injection : compiledScript.getParseContext().getInjections()) {
             if (injection.getPlugin() != null) {
@@ -249,14 +253,13 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
         pluginEventManager.unregister(this);
 
-        globalFunctions.values().forEach(closure -> InvokerHelper.removeClass(closure.getScriptClass()));
+        invalidateAll();
 
+        globalFunctions.values().forEach(closure -> InvokerHelper.removeClass(closure.getScriptClass()));
         globalFunctions.clear();
         globalVariables.clear();
-        scriptCache.invalidateAll();
 
         try {
-            gcl.clearCache();
             gcl.close();
         } catch (IOException e) {
             logger.error("unable to close gcl", e);

@@ -72,12 +72,6 @@
             <version>1.7.9</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.8.5</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>com.atlassian.templaterenderer</groupId>
@@ -102,6 +96,12 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>2.6.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.mail.jira.plugins</groupId>
+            <artifactId>commons</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
     <build>

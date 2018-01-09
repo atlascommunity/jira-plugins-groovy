@@ -35,6 +35,7 @@
         <dependency>com.atlassian.auiplugin:dialog2</dependency>
         <dependency>com.atlassian.auiplugin:aui-experimental-tooltips</dependency>
         <dependency>com.atlassian.auiplugin:aui-select</dependency>
+        <dependency>com.atlassian.auiplugin:aui-select2</dependency>
 
         <resource type="download" name="i18n.js" location="/ru/mail/jira/plugins/groovy/i18n.js"/>
         <resource type="download" name="common.js" location="/ru/mail/jira/plugins/groovy/js/common.js"/>
@@ -210,7 +211,57 @@
         />
     </workflow-function>
 
-    <!-- todo: registry condition & validator -->
+    <workflow-condition
+            key="registry-script-condition"
+            name="Groovy registry script"
+            class="ru.mail.jira.plugins.groovy.impl.workflow.registry.RegistryScriptConditionFactory"
+    >
+        <condition-class>
+            ru.mail.jira.plugins.groovy.impl.workflow.ScriptedCondition
+        </condition-class>
+
+        <resource
+                type="velocity"
+                name="view"
+                location="ru/mail/jira/plugins/groovy/templates/registry-script-view.vm"
+        />
+        <resource
+                type="velocity"
+                name="input-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/registry-script-edit.vm"
+        />
+        <resource
+                type="velocity"
+                name="edit-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/registry-script-edit.vm"
+        />
+    </workflow-condition>
+
+    <workflow-validator
+            key="registry-script-validator"
+            name="Groovy registry script"
+            class="ru.mail.jira.plugins.groovy.impl.workflow.registry.RegistryScriptValidatorFactory"
+    >
+        <validator-class>
+            ru.mail.jira.plugins.groovy.impl.workflow.ScriptedValidator
+        </validator-class>
+
+        <resource
+                type="velocity"
+                name="view"
+                location="ru/mail/jira/plugins/groovy/templates/registry-script-view.vm"
+        />
+        <resource
+                type="velocity"
+                name="input-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/registry-script-edit.vm"
+        />
+        <resource
+                type="velocity"
+                name="edit-parameters"
+                location="ru/mail/jira/plugins/groovy/templates/registry-script-edit.vm"
+        />
+    </workflow-validator>
 
     <web-section key="admin_mailru_groovy_section" location="admin_plugins_menu">
         <label key="ru.mail.jira.plugins.groovy.link.section" />

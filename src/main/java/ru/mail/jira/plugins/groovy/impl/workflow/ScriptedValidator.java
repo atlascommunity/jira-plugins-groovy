@@ -11,6 +11,7 @@ import com.opensymphony.workflow.Validator;
 import com.opensymphony.workflow.WorkflowException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class ScriptedValidator implements Validator {
             return;
         }
 
-        workflowHelper.executeScript(script, (Issue) transientVars.get("issue"), getCaller(transientVars), transientVars);
+        workflowHelper.executeScript(script, ScriptType.WORKFLOW_VALIDATOR, (Issue) transientVars.get("issue"), getCaller(transientVars), transientVars);
     }
 
     private ApplicationUser getCaller(Map transientVars) throws InvalidInputException {

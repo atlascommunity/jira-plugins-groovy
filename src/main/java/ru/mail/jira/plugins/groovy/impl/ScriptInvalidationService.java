@@ -5,6 +5,7 @@ import com.atlassian.jira.cluster.ClusterMessagingService;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,12 @@ public class ScriptInvalidationService implements LifecycleAware {
         scriptService.invalidate(scriptId);
     }
 
+    public void invalidateAll() {
+        logger.debug("sending invalidation message for all");
+        clusterMessagingService.sendRemote(INVALIDATION_CHANNEL, "");
+        scriptService.invalidateAll();
+    }
+
     @Override
     public void onStart() {
         this.clusterMessagingService.registerListener(INVALIDATION_CHANNEL, this.messageConsumer);
@@ -51,7 +58,11 @@ public class ScriptInvalidationService implements LifecycleAware {
         @Override
         public void receive(String channel, String message, String senderId) {
             if (INVALIDATION_CHANNEL.equals(channel)) {
-                scriptService.invalidate(message);
+                if (StringUtils.isEmpty(message)) {
+                    scriptService.invalidateAll();
+                } else {
+                    scriptService.invalidate(message);
+                }
                 logger.debug("invalidating {}", message);
             }
         }
