@@ -15,13 +15,13 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 @Scanned
-@Path("/repository")
-public class RepositoryResource {
+@Path("/registry")
+public class RegistryResource {
     private final JiraAuthenticationContext authenticationContext;
     private final ScriptRepository scriptRepository;
     private final PermissionHelper permissionHelper;
 
-    public RepositoryResource(
+    public RegistryResource(
         @ComponentImport JiraAuthenticationContext authenticationContext,
         ScriptRepository scriptRepository,
         PermissionHelper permissionHelper
@@ -85,6 +85,17 @@ public class RepositoryResource {
             scriptRepository.deleteDirectory(authenticationContext.getLoggedInUser(), id);
 
             return null;
+        }).getResponse();
+    }
+
+    @GET
+    @Path("/script/all")
+    @WebSudoRequired
+    public Response getAllScripts() {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return scriptRepository.getAllScriptDescriptions();
         }).getResponse();
     }
 

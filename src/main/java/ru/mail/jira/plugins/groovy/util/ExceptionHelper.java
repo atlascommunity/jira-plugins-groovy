@@ -6,7 +6,6 @@ import org.codehaus.groovy.control.messages.ExceptionMessage;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
 import ru.mail.jira.plugins.groovy.api.dto.error.ScriptError;
 import ru.mail.jira.plugins.groovy.api.dto.error.SyntaxError;
-import ru.mail.jira.plugins.groovy.rest.RepositoryResource;
 
 import java.util.Map;
 import java.util.stream.Collectors;

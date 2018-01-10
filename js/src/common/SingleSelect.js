@@ -13,10 +13,10 @@ export class SingleSelect extends React.Component {
     };
 
     render() {
-        const {options, value, onChange} = this.props;
+        const {options, value, onChange, ...selectProps} = this.props;
 
         return (
-            <select value={value} onChange={onChange} className="select">
+            <select value={value} onChange={onChange} className="select" {...selectProps}>
                 <option className="hidden"/>
                 {options.map(option =>
                     <option

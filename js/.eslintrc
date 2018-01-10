@@ -9,6 +9,7 @@
     "key-spacing": ["warn", { "beforeColon": false, "afterColon": true }],
     "semi": ["warn", "always", { "omitLastInOneLineBlock" : false }],
     "no-unused-vars": ["warn", { "vars": "all", "args": "all", "argsIgnorePattern": "^_" }],
+    "eol-last": ["error", "always"],
 
     "react/jsx-no-literals": [1, {"noStrings": true}],
     "jsx-quotes": ["error", "prefer-double"],

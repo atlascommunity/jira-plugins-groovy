@@ -16,4 +16,6 @@ public class ScriptDto extends ScriptForm {
     private boolean deleted;
     @XmlElement
     private List<ChangelogDto> changelogs;
+    @XmlElement
+    private List<ScriptParamDto> params;
 }

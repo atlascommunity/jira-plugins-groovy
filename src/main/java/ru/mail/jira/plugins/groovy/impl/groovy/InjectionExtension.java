@@ -66,7 +66,6 @@ public class InjectionExtension extends CompilationCustomizer {
                                 }
 
                                 parseContextHolder.get().getInjections().add(injectionObject);
-                                //remove expression since this variable will be passed as binding
                                 expression.setRightExpression(new VariableExpression(varName));
 
                                 break;

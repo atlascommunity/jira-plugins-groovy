@@ -31,6 +31,9 @@ import ru.mail.jira.plugins.groovy.api.entity.Script;
 import ru.mail.jira.plugins.groovy.api.entity.ScriptDirectory;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptDescription;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
+import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
+import ru.mail.jira.plugins.groovy.util.Const;
+import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -47,6 +50,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     private final ActiveObjects ao;
     private final ScriptInvalidationService scriptInvalidationService;
     private final ScriptService scriptService;
+    private final JsonMapper jsonMapper;
 
     @Autowired
     public ScriptRepositoryImpl(
@@ -58,7 +62,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         @ComponentImport ClusterLockService clusterLockService,
         @ComponentImport ActiveObjects ao,
         ScriptInvalidationService scriptInvalidationService,
-        ScriptService scriptService
+        ScriptService scriptService,
+        JsonMapper jsonMapper
     ) {
         this.i18nHelper = i18nHelper;
         this.dateTimeFormatter = dateTimeFormatter;
@@ -69,6 +74,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         this.ao = ao;
         this.scriptInvalidationService = scriptInvalidationService;
         this.scriptService = scriptService;
+        this.jsonMapper = jsonMapper;
     }
 
     private ScriptDirectory getParentDirectory(Integer parentId) {
@@ -157,7 +163,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     public List<ScriptDescription> getAllScriptDescriptions() {
         return Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(ScriptRepositoryImpl::buildScriptDescription)
+            .map(this::buildScriptDescription)
             .sorted(Comparator.comparing(ScriptDescription::getName))
             .collect(Collectors.toList());
     }
@@ -178,14 +184,17 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             throw new RuntimeException();
         }
 
-        validateScriptForm(true, scriptForm);
+        ParseContext parseContext = validateScriptForm(true, scriptForm);
+
+        String parameters = parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null;
 
         Script script = ao.create(
             Script.class,
             new DBParam("NAME", scriptForm.getName()),
             new DBParam("SCRIPT_BODY", scriptForm.getScriptBody()),
             new DBParam("DIRECTORY_ID", scriptForm.getDirectoryId()),
-            new DBParam("DELETED", false)
+            new DBParam("DELETED", false),
+            new DBParam("PARAMETERS", parameters)
         );
 
         String diff = generateDiff(script.getID(), "", script.getName(), "", scriptForm.getScriptBody());
@@ -204,13 +213,13 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     @Override
     public ScriptDto updateScript(ApplicationUser user, int id, ScriptForm scriptForm) {
-        validateScriptForm(false, scriptForm);
+        ParseContext parseContext = validateScriptForm(false, scriptForm);
 
         ClusterLock lock = clusterLockService.getLockForName(getLockKey(id));
 
         lock.lock();
         try {
-            ScriptDto result = doUpdateScript(user, id, scriptForm);
+            ScriptDto result = doUpdateScript(user, id, scriptForm, parseContext);
             scriptInvalidationService.invalidate(String.valueOf(id));
             return result;
         } finally {
@@ -218,7 +227,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
     }
 
-    private ScriptDto doUpdateScript(ApplicationUser user, int id, ScriptForm form) {
+    private ScriptDto doUpdateScript(ApplicationUser user, int id, ScriptForm form, ParseContext parseContext) {
         Script script = ao.get(Script.class, id);
 
         if (script.isDeleted()) {
@@ -236,8 +245,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             new DBParam("COMMENT", form.getComment())
         );
 
+        String parameters = parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null;
+
         script.setName(form.getName());
         script.setScriptBody(form.getScriptBody());
+        script.setParameters(parameters);
         script.save();
 
         return buildScriptDto(script);
@@ -297,6 +309,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                     .map(this::buildChangelogDto)
                     .collect(Collectors.toList())
             );
+        }
+
+        if (script.getParameters() != null) {
+            result.setParams(jsonMapper.read(script.getParameters(), Const.PARAM_LIST_TYPE_REF));
         }
 
         return result;
@@ -364,8 +380,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
     }
 
-    private void validateScriptForm(boolean isNew, ScriptForm form) {
-        scriptService.validateScript(form.getScriptBody());
+    private ParseContext validateScriptForm(boolean isNew, ScriptForm form) {
+        ParseContext parseContext = scriptService.parseScript(form.getScriptBody());
 
         if (StringUtils.isEmpty(form.getName())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
@@ -376,9 +392,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
         }
+
+        return parseContext;
     }
 
-    private static ScriptDescription buildScriptDescription(Script script) {
+    private ScriptDescription buildScriptDescription(Script script) {
         ScriptDescription result = new ScriptDescription();
         result.setId(script.getID());
 
@@ -392,6 +410,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
 
         result.setName(Lists.reverse(nameElements).stream().collect(Collectors.joining("/")));
+
+        if (script.getParameters() != null) {
+            result.setParams(jsonMapper.read(script.getParameters(), Const.PARAM_LIST_TYPE_REF));
+        }
 
         return result;
     }

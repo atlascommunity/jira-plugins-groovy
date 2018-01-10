@@ -16,6 +16,10 @@ public interface Script extends Entity {
     void setScriptBody(String scriptBody);
     String getScriptBody();
 
+    @StringLength(StringLength.UNLIMITED)
+    void setParameters(String parameters);
+    String getParameters();
+
     @NotNull
     void setDirectory(ScriptDirectory directory);
     ScriptDirectory getDirectory();

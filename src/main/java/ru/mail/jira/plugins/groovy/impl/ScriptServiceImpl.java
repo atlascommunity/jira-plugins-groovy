@@ -25,11 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
-import ru.mail.jira.plugins.groovy.impl.groovy.ScriptInjection;
-import ru.mail.jira.plugins.groovy.impl.groovy.InjectionExtension;
-import ru.mail.jira.plugins.groovy.impl.groovy.LoadClassesExtension;
-import ru.mail.jira.plugins.groovy.impl.groovy.ParseContextHolder;
-import ru.mail.jira.plugins.groovy.impl.groovy.WithPluginGroovyExtension;
+import ru.mail.jira.plugins.groovy.impl.groovy.*;
 import ru.mail.jira.plugins.groovy.impl.var.GlobalVariable;
 import ru.mail.jira.plugins.groovy.impl.var.HttpClientGlobalVariable;
 import ru.mail.jira.plugins.groovy.impl.var.LoggerGlobalVariable;
@@ -75,13 +71,11 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         this.classLoader = classLoader;
         CompilerConfiguration config = new CompilerConfiguration()
             .addCompilationCustomizers(
-                new ImportCustomizer()
-                    .addStarImports("ru.mail.jira.plugins.groovy.api.script")
-                    .addStaticStars("ru.mail.jira.plugins.groovy.api.script.ScriptType")
-                ,
+                new ImportCustomizer().addStarImports("ru.mail.jira.plugins.groovy.api.script"),
                 new WithPluginGroovyExtension(parseContextHolder),
                 new LoadClassesExtension(parseContextHolder, pluginAccessor, classLoader),
-                new InjectionExtension(parseContextHolder)
+                new InjectionExtension(parseContextHolder),
+                new ParamExtension(parseContextHolder)
             );
         config.setTolerance(10);
         this.gcl = new GroovyClassLoader(
@@ -100,8 +94,8 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     }
 
     @Override
-    public void validateScript(String script) {
-        parseClass(script);
+    public ParseContext parseScript(String script) {
+        return parseClass(script, true).getParseContext();
     }
 
     @Override
@@ -115,11 +109,10 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         gcl.clearCache();
     }
 
-    private Object doExecuteScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> additionalBindings) throws Exception {
+    private Object doExecuteScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> externalBindings) throws Exception {
         //todo: r lock
 
         logger.info("started execution");
-        //classLoader.ensureAvailability(withPlugins);
 
         CompiledScript compiledScript = null;
 
@@ -129,7 +122,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         }
 
         if (compiledScript == null) {
-            compiledScript = parseClass(scriptString);
+            compiledScript = parseClass(scriptString, false);
 
             if (scriptIdPresent) {
                 scriptCache.put(scriptId, compiledScript);
@@ -152,7 +145,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
         logger.info("created class");
 
-        HashMap<String, Object> bindings = new HashMap<>(additionalBindings);
+        HashMap<String, Object> bindings = new HashMap<>(externalBindings);
         bindings.put("scriptType", type);
 
         for (ScriptInjection injection : compiledScript.getParseContext().getInjections()) {
@@ -216,9 +209,11 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         }
     }
 
-    private CompiledScript parseClass(String script) {
+    private CompiledScript parseClass(String script, boolean extended) {
         logger.info("parsing script");
         try {
+            parseContextHolder.get().setExtended(extended);
+
             Class scriptClass = gcl.parseClass(script);
 
             logger.info("parsed script");
@@ -237,7 +232,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         pluginEventManager.register(this);
 
         for (Map.Entry<String, String> entry : globalFunctionManager.getGlobalFunctions().entrySet()) {
-            globalFunctions.put(entry.getKey(), new ScriptClosure(parseClass(entry.getValue()).getScriptClass()));
+            globalFunctions.put(entry.getKey(), new ScriptClosure(parseClass(entry.getValue(), false).getScriptClass()));
         }
 
         globalVariables.put("httpClient", new HttpClientGlobalVariable());

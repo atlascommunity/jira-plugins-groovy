@@ -90,7 +90,8 @@ module.exports = {
         repository: [require.resolve('./polyfills'), paths.resolveApp('src/app-registry/index.js')],
         console: [require.resolve('./polyfills'), paths.resolveApp('src/app-console/index.js')],
         workflow: [require.resolve('./polyfills'), paths.resolveApp('src/app-workflow/index.js')],
-        listeners: [require.resolve('./polyfills'), paths.resolveApp('src/app-listeners/index.js')]
+        listeners: [require.resolve('./polyfills'), paths.resolveApp('src/app-listeners/index.js')],
+        extras: [require.resolve('./polyfills'), paths.resolveApp('src/app-extras/index.js')],
     },
     output: {
         // The build folder.

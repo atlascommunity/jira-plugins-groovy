@@ -10,9 +10,6 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableList;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.EventListenerRepository;
@@ -22,9 +19,9 @@ import ru.mail.jira.plugins.groovy.api.entity.EventListener;
 import ru.mail.jira.plugins.groovy.impl.listener.ScriptedEventListener;
 import ru.mail.jira.plugins.groovy.impl.listener.condition.ConditionDescriptor;
 import ru.mail.jira.plugins.groovy.impl.listener.condition.ConditionFactory;
+import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -36,18 +33,18 @@ import java.util.stream.Collectors;
 public class EventListenerRepositoryImpl implements EventListenerRepository {
     private static final String VALUE_KEY = "value";
 
-    private final Logger logger = LoggerFactory.getLogger(EventListenerRepositoryImpl.class);
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     private final Cache<String, List<ScriptedEventListener>> cache;
     private final ActiveObjects ao;
     private final ConditionFactory conditionFactory;
+    private final JsonMapper jsonMapper;
 
     @Autowired
     public EventListenerRepositoryImpl(
         @ComponentImport CacheManager cacheManager,
         @ComponentImport ActiveObjects ao,
-        ConditionFactory conditionFactory) {
+        ConditionFactory conditionFactory,
+        JsonMapper jsonMapper
+    ) {
         cache = cacheManager.getCache(EventListenerRepositoryImpl.class.getName() + ".cache",
             new EventListenerCacheLoader(),
             new CacheSettingsBuilder()
@@ -58,6 +55,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         );
         this.ao = ao;
         this.conditionFactory = conditionFactory;
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
@@ -87,7 +85,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             new DBParam("SCRIPT", form.getScript()),
             new DBParam("AUTHOR_KEY", user.getKey()),
             new DBParam("DELETED", false),
-            new DBParam("CONDITION", writeDescriptor(form.getCondition()))
+            new DBParam("CONDITION", jsonMapper.write(form.getCondition()))
         );
 
         cache.remove(VALUE_KEY);
@@ -105,7 +103,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         eventListener.setName(form.getName());
         eventListener.setUuid(UUID.randomUUID().toString());
         eventListener.setScript(form.getScript());
-        eventListener.setCondition(writeDescriptor(form.getCondition()));
+        eventListener.setCondition(jsonMapper.write(form.getCondition()));
         eventListener.save();
 
         cache.remove(VALUE_KEY);
@@ -121,41 +119,28 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         cache.remove(VALUE_KEY);
     }
 
+    @Override
+    public void invalidate() {
+        cache.removeAll();
+    }
+
     private EventListenerDto buildDto(EventListener listener) {
         EventListenerDto result = new EventListenerDto();
         result.setId(listener.getID());
         result.setName(listener.getName());
         result.setScript(listener.getScript());
         result.setUuid(listener.getUuid());
-        result.setCondition(readDescriptor(listener.getCondition()));
+        result.setCondition(jsonMapper.read(listener.getCondition(), ConditionDescriptor.class));
         return result;
     }
 
-    private ScriptedEventListener buildEventListener(EventListener eventListener) {
+    private ScriptedEventListener buildEventListener(EventListener listener) {
         return new ScriptedEventListener(
-            eventListener.getID(),
-            eventListener.getScript(),
-            eventListener.getUuid(),
-            conditionFactory.create(readDescriptor(eventListener.getCondition()))
+            listener.getID(),
+            listener.getScript(),
+            listener.getUuid(),
+            conditionFactory.create(jsonMapper.read(listener.getCondition(), ConditionDescriptor.class))
         );
-    }
-
-    private ConditionDescriptor readDescriptor(String json) {
-        try {
-            return objectMapper.readValue(json, ConditionDescriptor.class);
-        } catch (IOException e) {
-            logger.error("unable to read condition descriptor {}", json);
-        }
-        return null;
-    }
-
-    private String writeDescriptor(ConditionDescriptor descriptor) {
-        try {
-            return objectMapper.writeValueAsString(descriptor);
-        } catch (IOException e) {
-            logger.error("unable to write condition descriptor {}", descriptor);
-        }
-        return null;
     }
 
     private class EventListenerCacheLoader implements CacheLoader<String, List<ScriptedEventListener>> {

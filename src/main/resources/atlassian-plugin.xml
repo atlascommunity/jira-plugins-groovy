@@ -12,19 +12,6 @@
     <!-- add our i18n resource -->
     <resource type="i18n" name="i18n" location="ru.mail.jira.plugins.groovy.i18n"/>
 
-    <!-- non-react resources -->
-
-    <web-resource key="workflow-registry-resources" name="groovy workflow edit Web Resources">
-        <transformation extension="js">
-            <transformer key="jsI18n"/>
-        </transformation>
-
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <dependency>com.atlassian.auiplugin:aui-select</dependency>
-
-        <context>ru.mail.jira.plugins.groovy.workflow-registry-edit</context>
-    </web-resource>
-
     <!-- react resources -->
     <web-resource key="react-common">
         <transformation extension="js">
@@ -78,6 +65,15 @@
         <context>ru.mail.jira.plugins.groovy.listeners</context>
     </web-resource>
 
+    <web-resource key="extras-resources" name="groovy extras Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="extras.js" location="/ru/mail/jira/plugins/groovy/js/extras.js"/>
+        <resource type="download" name="extras.js.map" location="/ru/mail/jira/plugins/groovy/js/extras.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.listeners</context>
+    </web-resource>
+
     <!-- end of resources -->
 
     <rest key="groovyRest" path="/groovy" version="1.0">
@@ -97,6 +93,11 @@
     <servlet name="Listeners servlet" key="listeners-servlet" class="ru.mail.jira.plugins.groovy.servlet.ListenersServlet">
         <description>Listeners servlet</description>
         <url-pattern>/groovy/listeners</url-pattern>
+    </servlet>
+
+    <servlet name="Extras servlet" key="extras-servlet" class="ru.mail.jira.plugins.groovy.servlet.ExtrasServlet">
+        <description>Extras servlet</description>
+        <url-pattern>/groovy/extras</url-pattern>
     </servlet>
 
     <ao key="ao-entities">
@@ -295,6 +296,16 @@
         <description>Link to groovy listeners page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.listeners" />
         <link linkId="mailru-groovy-listeners-link">/plugins/servlet/groovy/listeners</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
+    <web-item key="groovy-extras-menu-item" name="Groovy listeners menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy extras page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.extras" />
+        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/groovy/extras</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>

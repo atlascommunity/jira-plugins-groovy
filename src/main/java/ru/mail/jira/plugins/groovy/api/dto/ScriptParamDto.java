@@ -1,19 +1,22 @@
 package ru.mail.jira.plugins.groovy.api.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.mail.jira.plugins.groovy.api.script.ParamType;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
 @Getter @Setter
+@AllArgsConstructor @NoArgsConstructor
 @XmlRootElement
-public class ScriptDescription {
-    @XmlElement
-    private int id;
+public class ScriptParamDto {
     @XmlElement
     private String name;
     @XmlElement
-    private List<ScriptParamDto> params;
+    private String displayName;
+    @XmlElement
+    private ParamType paramType;
 }

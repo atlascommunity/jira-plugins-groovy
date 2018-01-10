@@ -1,8 +1,15 @@
+#* @vtlvariable name="paramValues" type="java.util.Map<java.lang.String, java.lang.String>" *#
+#* @vtlvariable name="params" type="java.util.List<ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto>" *#
 #* @vtlvariable name="script" type="ru.mail.jira.plugins.groovy.api.entity.Script" *#
 #* @vtlvariable name="escapeJs" type="java.util.function.Function" *#
 
 <strong>Groovy script from registry</strong>
 <br/>
+#if ($params)
+    #foreach ($param in $params)
+        <strong>${param.displayName}:</strong> $paramValues.get($param.name) <br/>
+    #end
+#end
 <div id="mailru-groovy-script-react-container-$uuid"></div>
 $webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.workflow")
 

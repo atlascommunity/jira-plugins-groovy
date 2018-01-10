@@ -14,10 +14,13 @@ import ru.mail.jira.plugins.groovy.api.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptDto;
+import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
+import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,15 +31,23 @@ public class WorkflowHelper {
     private final ScriptService scriptService;
     private final ScriptRepository scriptRepository;
     private final ExecutionRepository executionRepository;
+    private final ScriptParamFactory scriptParamFactory;
 
     @Autowired
-    public WorkflowHelper(ScriptService scriptService, ScriptRepository scriptRepository, ExecutionRepository executionRepository) {
+    public WorkflowHelper(
+        ScriptService scriptService,
+        ScriptRepository scriptRepository,
+        ExecutionRepository executionRepository,
+        ScriptParamFactory scriptParamFactory
+    ) {
         this.scriptService = scriptService;
         this.scriptRepository = scriptRepository;
         this.executionRepository = executionRepository;
+        this.scriptParamFactory = scriptParamFactory;
     }
 
     public ScriptDescriptor getScript(Map args) {
+        Map<String, Object> paramBindings = ImmutableMap.of();
         String scriptString = (String) args.get(Const.WF_INLINE_SCRIPT);
         String id = (String) args.get(Const.WF_UUID);
         boolean fromRegistry = false;
@@ -52,8 +63,23 @@ public class WorkflowHelper {
                         scriptString = script.getScriptBody();
                         fromRegistry = true;
 
+                        if (script.getParams() != null) {
+                            paramBindings = new HashMap<>();
+
+                            for (ScriptParamDto param : script.getParams()) {
+                                String paramName = param.getName();
+                                String value = (String) args.get(Const.getParamKey(paramName));
+
+                                if (value == null) {
+                                    logger.error("Value for script param {} is not found", paramName);
+                                } else {
+                                    paramBindings.put(paramName, scriptParamFactory.getParamObject(param, value));
+                                }
+                            }
+                        }
+
                         if (script.isDeleted()) {
-                            logger.warn("Deleted script is used " + id); //todo: log workflow & action
+                            logger.warn("Deleted script is used {}", id); //todo: log workflow & action
                         }
                     } else {
                         logger.error("unable to find script with id {}", scriptId);
@@ -70,7 +96,7 @@ public class WorkflowHelper {
             return null;
         }
 
-        return new ScriptDescriptor(id, fromRegistry, scriptString);
+        return new ScriptDescriptor(id, fromRegistry, scriptString, paramBindings);
     }
 
     public Object executeScript(ScriptDescriptor script, ScriptType type, Issue issue, ApplicationUser user, Map transientVars) throws WorkflowException {
@@ -81,17 +107,18 @@ public class WorkflowHelper {
         String error = null;
         String id = script.getId();
 
+        HashMap<String, Object> bindings = new HashMap<>(script.getBindings());
+        bindings.put("issue", issue);
+        bindings.put("user", user);
+        bindings.put("transientVars", transientVars);
+
         long t = System.currentTimeMillis();
         try {
             result =  scriptService.executeScript(
                 id,
                 script.getScriptBody(),
                 type,
-                ImmutableMap.of(
-                    "issue", issue,
-                    "user", user,
-                    "transientVars", transientVars
-                )
+                bindings
             );
         } catch (WorkflowException e) {
             rethrow = e;
@@ -107,7 +134,8 @@ public class WorkflowHelper {
             "issue", Objects.toString(issue, ""),
             "user", Objects.toString(user, ""),
             "transientVars", Objects.toString(transientVars, ""),
-            "type", type.name()
+            "type", type.name(),
+            "bindings", script.getBindings().toString()
         );
         if (script.isFromRegistry()) {
             Integer parsedId = Ints.tryParse(id);

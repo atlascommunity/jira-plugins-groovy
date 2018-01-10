@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {FormEditor} from './FormEditor';
+import {RegistryPicker} from './RegistryPicker';
 
 import {Script} from '../common/Script';
 
@@ -10,6 +11,7 @@ import '../flex.less';
 
 function noop() {}
 
+//todo: params
 window.define('mailru/groovy/renderRegistryScript', () => {
     return (element, id, name, source) => {
         ReactDOM.render(
@@ -57,6 +59,15 @@ window.define('mailru/groovy/renderEditor', () => {
     return (element, fieldName, initialValue) => {
         ReactDOM.render(
             <FormEditor fieldName={fieldName} initialValue={initialValue}/>,
+            element
+        );
+    };
+});
+
+window.define('mailru/groovy/renderRegistryPicker', () => {
+    return (element, fieldName, initialValue) => {
+        ReactDOM.render(
+            <RegistryPicker initialValue={initialValue} fieldName={fieldName}/>,
             element
         );
     };

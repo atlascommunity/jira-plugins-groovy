@@ -8,9 +8,11 @@ import com.google.common.primitives.Ints;
 import com.opensymphony.workflow.loader.AbstractDescriptor;
 import ru.mail.jira.plugins.groovy.api.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptDto;
+import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.entity.Script;
 import ru.mail.jira.plugins.groovy.api.entity.ScriptDirectory;
 import ru.mail.jira.plugins.groovy.util.Const;
+import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import java.util.*;
 import java.util.function.Function;
@@ -19,9 +21,11 @@ import java.util.stream.Collectors;
 @Scanned
 public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkflowPluginFactory {
     private final ScriptRepository scriptRepository;
+    private final JsonMapper jsonMapper;
 
-    protected RegistryScriptWorkflowPluginFactory(ScriptRepository scriptRepository) {
+    protected RegistryScriptWorkflowPluginFactory(ScriptRepository scriptRepository, JsonMapper jsonMapper) {
         this.scriptRepository = scriptRepository;
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
@@ -65,6 +69,19 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
                 }
 
                 map.put("extendedName", Lists.reverse(nameElements).stream().collect(Collectors.joining("/")));
+
+                if (script.getParameters() != null) {
+                    List<ScriptParamDto> params = jsonMapper.read(script.getParameters(), Const.PARAM_LIST_TYPE_REF);
+                    Map<String, String> paramValues = new HashMap<>();
+
+                    for (ScriptParamDto param : params) {
+                        String paramName = param.getName();
+                        paramValues.put(paramName, (String) args.get(Const.getParamKey(paramName)));
+                    }
+
+                    map.put("params", params);
+                    map.put("paramValues", paramValues);
+                }
             }
         }
     }
@@ -72,8 +89,28 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
     @Override
     public Map<String, ?> getDescriptorParams(Map<String, Object> input) {
         Map<String, Object> params = new HashMap<>();
-        
-        params.put(Const.WF_REPOSITORY_SCRIPT_ID, extractSingleParam(input, "scriptId"));
+
+        String scriptIdString = extractSingleParam(input, "script");
+        params.put(Const.WF_REPOSITORY_SCRIPT_ID, scriptIdString);
+
+        Integer scriptId = Ints.tryParse(scriptIdString);
+
+        if (scriptId == null) {
+            throw new RuntimeException("script is not a number");
+        }
+
+        ScriptDto script = scriptRepository.getScript(scriptId);
+
+        if (script.getParams() != null) {
+            for (ScriptParamDto scriptParamDto : script.getParams()) {
+                String paramName = scriptParamDto.getName();
+                String value = extractSingleParam(input, "script-" + paramName);
+                if (value == null) {
+                    throw new RuntimeException("param for " + paramName + " is not specified");
+                }
+                params.put(Const.getParamKey(paramName), value);
+            }
+        }
 
         return params;
     }

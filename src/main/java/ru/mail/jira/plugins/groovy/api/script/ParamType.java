@@ -1,0 +1,23 @@
+package ru.mail.jira.plugins.groovy.api.script;
+
+import com.atlassian.crowd.embedded.api.Group;
+import com.atlassian.jira.issue.fields.CustomField;
+import com.atlassian.jira.user.ApplicationUser;
+import lombok.Getter;
+
+@Getter
+public enum ParamType {
+    STRING(String.class),
+    TEXT(String.class),
+    LONG(Long.class),
+    DOUBLE(Double.class),
+    CUSTOM_FIELD(CustomField.class), //todo: system fields, script
+    USER(ApplicationUser.class),
+    GROUP(Group.class);
+
+    private final Class type;
+
+    ParamType(Class type) {
+        this.type = type;
+    }
+}

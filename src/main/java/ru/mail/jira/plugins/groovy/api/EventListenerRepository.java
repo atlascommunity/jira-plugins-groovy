@@ -19,4 +19,6 @@ public interface EventListenerRepository {
     EventListenerDto updateEventListener(ApplicationUser user, int id, EventListenerForm form);
 
     void deleteEventListener(ApplicationUser user, int id);
+
+    void invalidate();
 }
