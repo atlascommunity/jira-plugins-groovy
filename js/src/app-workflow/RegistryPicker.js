@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import {registryService} from '../service/services';
 import {SingleSelect} from '../common/SingleSelect';
-import {UserPicker} from '../common/UserPicker';
+import {getPluginBaseUrl} from '../service/ajaxHelper';
 
 
 function mapScriptToOption(script) {
@@ -13,6 +13,7 @@ function mapScriptToOption(script) {
     };
 }
 
+//todo: keep values
 export class RegistryPicker extends React.Component {
     static propTypes = {
         initialValue: PropTypes.number,
@@ -26,36 +27,41 @@ export class RegistryPicker extends React.Component {
     };
 
     _renderParam(param) {
-        //todo: types
         const inputName = `${this.props.fieldName}-${param.name}`;
         switch (param.paramType) {
             case 'USER':
-                return <UserPicker name={inputName}/>;
+                return <aui-select src={`${getPluginBaseUrl()}/jira-api/userPicker`} name={inputName}/>;
+            case 'GROUP':
+                return <aui-select src={`${getPluginBaseUrl()}/jira-api/groupPicker`} name={inputName}/>;
+            case 'CUSTOM_FIELD':
+                return <aui-select src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`} name={inputName}/>;
             case 'STRING':
                 return <input type="text" className="text" name={inputName}/>;
             case 'TEXT':
                 return <textarea className="textarea" name={inputName}/>;
+            case 'LONG':
+                return <input type="number" className="text" name={inputName}/>;
+            case 'DOUBLE':
+                return <input type="text" className="text" pattern="[0-9.]+" name={inputName}/>;
             default:
-                return <div>Unsupported type</div>;
+                return <div>{'Unsupported type'}</div>;
         }
     }
 
-    constructor(props) {
-        super();
-
-        this.state = {
-            ready: false,
-            scripts: [],
-            value: {
-                id: props.initialValue
-            }
-        };
-    }
+    state = {
+        ready: false,
+        scripts: []
+    };
 
     componentDidMount() {
         registryService
             .getAllScripts()
-            .then(scripts => this.setState({ scripts, ready: true }));
+            .then(scripts =>
+                this.setState({
+                    scripts,
+                    ready: true,
+                    value: this.props.initialValue ? scripts.find(el => el.id === this.props.initialValue) : null
+                }));
     }
 
     render() {

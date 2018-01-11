@@ -36,6 +36,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
 
     @Override
     protected void getVelocityParamsForEdit(Map<String, Object> map, AbstractDescriptor abstractDescriptor) {
+        //todo: fill params
         Map<String, Object> args = getArgs(abstractDescriptor);
 
         map.put("scripts", scriptRepository.getAllScriptDescriptions());

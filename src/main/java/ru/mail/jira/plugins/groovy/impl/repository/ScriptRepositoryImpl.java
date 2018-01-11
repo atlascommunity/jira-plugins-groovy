@@ -3,11 +3,8 @@ package ru.mail.jira.plugins.groovy.impl.repository;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.beehive.ClusterLock;
 import com.atlassian.beehive.ClusterLockService;
-import com.atlassian.jira.avatar.AvatarService;
 import com.atlassian.jira.datetime.DateTimeFormatter;
-import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.github.difflib.DiffUtils;
@@ -23,9 +20,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.commons.RestFieldException;
+import ru.mail.jira.plugins.groovy.api.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.*;
+import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
 import ru.mail.jira.plugins.groovy.api.entity.Changelog;
 import ru.mail.jira.plugins.groovy.api.entity.Script;
 import ru.mail.jira.plugins.groovy.api.entity.ScriptDirectory;
@@ -34,6 +33,7 @@ import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
+import ru.mail.jira.plugins.groovy.util.UserMapper;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -43,38 +43,35 @@ import java.util.stream.Collectors;
 public class ScriptRepositoryImpl implements ScriptRepository {
     private final I18nHelper i18nHelper;
     private final DateTimeFormatter dateTimeFormatter;
-    private final JiraAuthenticationContext authenticationContext;
-    private final UserManager userManager;
-    private final AvatarService avatarService;
     private final ClusterLockService clusterLockService;
     private final ActiveObjects ao;
     private final ScriptInvalidationService scriptInvalidationService;
     private final ScriptService scriptService;
     private final JsonMapper jsonMapper;
+    private final UserMapper userMapper;
+    private final AuditLogRepository auditLogRepository;
 
     @Autowired
     public ScriptRepositoryImpl(
         @ComponentImport I18nHelper i18nHelper,
         @ComponentImport DateTimeFormatter dateTimeFormatter,
-        @ComponentImport JiraAuthenticationContext authenticationContext,
-        @ComponentImport UserManager userManager,
-        @ComponentImport AvatarService avatarService,
         @ComponentImport ClusterLockService clusterLockService,
         @ComponentImport ActiveObjects ao,
         ScriptInvalidationService scriptInvalidationService,
         ScriptService scriptService,
-        JsonMapper jsonMapper
+        JsonMapper jsonMapper,
+        UserMapper userMapper,
+        AuditLogRepository auditLogRepository
     ) {
         this.i18nHelper = i18nHelper;
         this.dateTimeFormatter = dateTimeFormatter;
-        this.authenticationContext = authenticationContext;
-        this.userManager = userManager;
-        this.avatarService = avatarService;
         this.clusterLockService = clusterLockService;
         this.ao = ao;
         this.scriptInvalidationService = scriptInvalidationService;
         this.scriptService = scriptService;
         this.jsonMapper = jsonMapper;
+        this.userMapper = userMapper;
+        this.auditLogRepository = auditLogRepository;
     }
 
     private ScriptDirectory getParentDirectory(Integer parentId) {
@@ -115,22 +112,42 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     public ScriptDirectoryDto createDirectory(ApplicationUser user, ScriptDirectoryForm directoryForm) {
         validateDirectoryForm(directoryForm);
 
-        return buildDirectoryDto(ao.create(
+        ScriptDirectory directory = ao.create(
             ScriptDirectory.class,
             new DBParam("NAME", directoryForm.getName()),
             new DBParam("PARENT_ID", getParentDirectory(directoryForm.getParentId())),
             new DBParam("DELETED", false)
-        ));
+        );
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.REGISTRY_DIRECTORY,
+                AuditAction.CREATED,
+                directory.getID() + " - " + directory.getName()
+            )
+        );
+
+        return buildDirectoryDto(directory);
     }
 
     @Override
     public ScriptDirectoryDto updateDirectory(ApplicationUser user, int id, ScriptDirectoryForm directoryForm) {
-        ScriptDirectory scriptDirectory = ao.get(ScriptDirectory.class, id);
-        scriptDirectory.setName(directoryForm.getName());
-        scriptDirectory.setParent(getParentDirectory(directoryForm.getParentId()));
-        scriptDirectory.save();
+        ScriptDirectory directory = ao.get(ScriptDirectory.class, id);
+        directory.setName(directoryForm.getName());
+        directory.setParent(getParentDirectory(directoryForm.getParentId()));
+        directory.save();
 
-        return buildDirectoryDto(scriptDirectory);
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.REGISTRY_DIRECTORY,
+                AuditAction.UPDATED,
+                directory.getID() + " - " + directory.getName()
+            )
+        );
+
+        return buildDirectoryDto(directory);
     }
 
     @Override
@@ -138,15 +155,24 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         deleteDirectory(user, ao.get(ScriptDirectory.class, id));
     }
 
-    private void deleteDirectory(ApplicationUser user, ScriptDirectory scriptDirectory) {
-        scriptDirectory.setDeleted(true);
-        scriptDirectory.save();
+    private void deleteDirectory(ApplicationUser user, ScriptDirectory directory) {
+        directory.setDeleted(true);
+        directory.save();
 
-        for (ScriptDirectory child : scriptDirectory.getChildren()) {
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.REGISTRY_DIRECTORY,
+                AuditAction.DELETED,
+                directory.getID() + " - " + directory.getName()
+            )
+        );
+
+        for (ScriptDirectory child : directory.getChildren()) {
             deleteDirectory(user, child);
         }
 
-        for (Script script : scriptDirectory.getScripts()) {
+        for (Script script : directory.getScripts()) {
             deleteScript(user, script);
         }
     }
@@ -208,6 +234,15 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             new DBParam("COMMENT", "Created.")
         );
 
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.REGISTRY_SCRIPT,
+                AuditAction.CREATED,
+                script.getID() + " - " + script.getName()
+            )
+        );
+
         return buildScriptDto(script);
     }
 
@@ -252,6 +287,15 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         script.setParameters(parameters);
         script.save();
 
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.REGISTRY_SCRIPT,
+                AuditAction.UPDATED,
+                script.getID() + " - " + script.getName()
+            )
+        );
+
         return buildScriptDto(script);
     }
 
@@ -289,6 +333,15 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     private void deleteScript(ApplicationUser user, Script script) {
         script.setDeleted(true);
         script.save();
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.REGISTRY_SCRIPT,
+                AuditAction.DELETED,
+                script.getID() + " - " + script.getName()
+            )
+        );
     }
 
     private ScriptDto buildScriptDto(Script script) {
@@ -352,26 +405,12 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         ChangelogDto result = new ChangelogDto();
 
         result.setId(changelog.getID());
-        result.setAuthor(buildUser(changelog.getAuthorKey()));
+        result.setAuthor(userMapper.buildUser(changelog.getAuthorKey()));
         result.setComment(changelog.getComment());
         result.setDiff(changelog.getDiff());
         result.setDate(dateTimeFormatter.forLoggedInUser().format(changelog.getDate()));
 
         return result;
-    }
-
-    private JiraUser buildUser(String key) {
-        ApplicationUser user = userManager.getUserByKey(key);
-
-        if (user == null) {
-            return new JiraUser(key, null, key);
-        }
-
-        return new JiraUser(
-            user.getName(),
-            avatarService.getAvatarURL(authenticationContext.getLoggedInUser(), user).toString(),
-            user.getDisplayName()
-        );
     }
 
     private void validateDirectoryForm(ScriptDirectoryForm form) {

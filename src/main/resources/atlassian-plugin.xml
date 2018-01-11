@@ -65,39 +65,53 @@
         <context>ru.mail.jira.plugins.groovy.listeners</context>
     </web-resource>
 
+    <web-resource key="audit-resources" name="groovy audit Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="audit.js" location="/ru/mail/jira/plugins/groovy/js/audit.js"/>
+        <resource type="download" name="audit.js.map" location="/ru/mail/jira/plugins/groovy/js/audit.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.audit</context>
+    </web-resource>
+
     <web-resource key="extras-resources" name="groovy extras Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
         <resource type="download" name="extras.js" location="/ru/mail/jira/plugins/groovy/js/extras.js"/>
         <resource type="download" name="extras.js.map" location="/ru/mail/jira/plugins/groovy/js/extras.js.map"/>
 
-        <context>ru.mail.jira.plugins.groovy.listeners</context>
+        <context>ru.mail.jira.plugins.groovy.extras</context>
     </web-resource>
 
     <!-- end of resources -->
 
-    <rest key="groovyRest" path="/groovy" version="1.0">
+    <rest key="groovyRest" path="/my-groovy" version="1.0">
         <description>Groovy rest module</description>
     </rest>
 
     <servlet name="Console servlet" key="console-servlet" class="ru.mail.jira.plugins.groovy.servlet.ConsoleServlet">
         <description>Console servlet</description>
-        <url-pattern>/groovy/console</url-pattern>
+        <url-pattern>/my-groovy/console</url-pattern>
     </servlet>
 
     <servlet name="Registry servlet" key="registry-servlet" class="ru.mail.jira.plugins.groovy.servlet.RegistryServlet">
         <description>Registry servlet</description>
-        <url-pattern>/groovy/registry</url-pattern>
+        <url-pattern>/my-groovy/registry</url-pattern>
     </servlet>
 
     <servlet name="Listeners servlet" key="listeners-servlet" class="ru.mail.jira.plugins.groovy.servlet.ListenersServlet">
         <description>Listeners servlet</description>
-        <url-pattern>/groovy/listeners</url-pattern>
+        <url-pattern>/my-groovy/listeners</url-pattern>
     </servlet>
 
     <servlet name="Extras servlet" key="extras-servlet" class="ru.mail.jira.plugins.groovy.servlet.ExtrasServlet">
         <description>Extras servlet</description>
-        <url-pattern>/groovy/extras</url-pattern>
+        <url-pattern>/my-groovy/extras</url-pattern>
+    </servlet>
+
+    <servlet name="Audit servlet" key="audit-servlet" class="ru.mail.jira.plugins.groovy.servlet.AuditLogServlet">
+        <description>Extras servlet</description>
+        <url-pattern>/my-groovy/audit</url-pattern>
     </servlet>
 
     <ao key="ao-entities">
@@ -106,6 +120,7 @@
         <entity>ru.mail.jira.plugins.groovy.api.entity.Changelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.ScriptExecution</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.EventListener</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.AuditLogEntry</entity>
     </ao>
 
     <workflow-condition
@@ -275,7 +290,7 @@
     <web-item key="groovy-console-menu-item" name="Groovy console menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy console page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.console" />
-        <link linkId="mailru-groovy-console-link">/plugins/servlet/groovy/console</link>
+        <link linkId="mailru-groovy-console-link">/plugins/servlet/my-groovy/console</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -285,7 +300,7 @@
     <web-item key="groovy-registry-menu-item" name="Groovy registry" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy registry page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.registry" />
-        <link linkId="mailru-groovy-registry-link">/plugins/servlet/groovy/registry</link>
+        <link linkId="mailru-groovy-registry-link">/plugins/servlet/my-groovy/registry</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -295,7 +310,17 @@
     <web-item key="groovy-listeners-menu-item" name="Groovy listeners menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy listeners page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.listeners" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/groovy/listeners</link>
+        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/listeners</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
+    <web-item key="groovy-audit-menu-item" name="Groovy audit menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy audit page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.audit" />
+        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/audit</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -305,7 +330,7 @@
     <web-item key="groovy-extras-menu-item" name="Groovy listeners menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy extras page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.extras" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/groovy/extras</link>
+        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/extras</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>

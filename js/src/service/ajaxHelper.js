@@ -3,7 +3,7 @@ import AJS from 'AJS';
 
 
 export function getPluginBaseUrl(version) {
-    return `${getBaseUrl()}/rest/groovy/${version || 'latest'}`;
+    return `${getBaseUrl()}/rest/my-groovy/${version || 'latest'}`;
 }
 
 export function getBaseUrl() {

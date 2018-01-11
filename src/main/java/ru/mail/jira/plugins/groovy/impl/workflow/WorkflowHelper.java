@@ -107,7 +107,7 @@ public class WorkflowHelper {
         String error = null;
         String id = script.getId();
 
-        HashMap<String, Object> bindings = new HashMap<>(script.getBindings());
+        HashMap<String, Object> bindings = new HashMap<>(script.getParams());
         bindings.put("issue", issue);
         bindings.put("user", user);
         bindings.put("transientVars", transientVars);
@@ -135,7 +135,7 @@ public class WorkflowHelper {
             "user", Objects.toString(user, ""),
             "transientVars", Objects.toString(transientVars, ""),
             "type", type.name(),
-            "bindings", script.getBindings().toString()
+            "params", script.getParams().toString()
         );
         if (script.isFromRegistry()) {
             Integer parsedId = Ints.tryParse(id);

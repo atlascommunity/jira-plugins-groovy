@@ -18,7 +18,6 @@ import '../flex.less';
 const store = createStore(registryReducer, {directories: []});
 
 AJS.toInit(() => {
-    //todo: create promise api for $.ajax
     registryService
         .getAllDirectories()
         .then(directories => store.dispatch(RegistryActionCreators.loadState(directories)));

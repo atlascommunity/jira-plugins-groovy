@@ -17,7 +17,6 @@ import {Script} from '../common/Script';
 import './ListenerRegistry.less';
 
 
-//todo: redux
 export class ListenerRegistry extends React.Component {
     static propTypes = {
         listeners: PropTypes.arrayOf(ListenerModel).isRequired,

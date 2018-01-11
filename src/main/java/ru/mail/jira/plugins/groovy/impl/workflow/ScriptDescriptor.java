@@ -12,5 +12,5 @@ public class ScriptDescriptor {
     private String id;
     private boolean fromRegistry;
     private String scriptBody;
-    private Map<String, Object> bindings;
+    private Map<String, Object> params;
 }

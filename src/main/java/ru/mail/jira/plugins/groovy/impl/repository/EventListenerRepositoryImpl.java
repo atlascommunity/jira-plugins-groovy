@@ -12,9 +12,13 @@ import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.EventListenerRepository;
+import ru.mail.jira.plugins.groovy.api.dto.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.dto.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.EventListenerDto;
 import ru.mail.jira.plugins.groovy.api.dto.EventListenerForm;
+import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
 import ru.mail.jira.plugins.groovy.api.entity.EventListener;
 import ru.mail.jira.plugins.groovy.impl.listener.ScriptedEventListener;
 import ru.mail.jira.plugins.groovy.impl.listener.condition.ConditionDescriptor;
@@ -37,13 +41,15 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     private final ActiveObjects ao;
     private final ConditionFactory conditionFactory;
     private final JsonMapper jsonMapper;
+    private final AuditLogRepository auditLogRepository;
 
     @Autowired
     public EventListenerRepositoryImpl(
         @ComponentImport CacheManager cacheManager,
         @ComponentImport ActiveObjects ao,
         ConditionFactory conditionFactory,
-        JsonMapper jsonMapper
+        JsonMapper jsonMapper,
+        AuditLogRepository auditLogRepository
     ) {
         cache = cacheManager.getCache(EventListenerRepositoryImpl.class.getName() + ".cache",
             new EventListenerCacheLoader(),
@@ -56,6 +62,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         this.ao = ao;
         this.conditionFactory = conditionFactory;
         this.jsonMapper = jsonMapper;
+        this.auditLogRepository = auditLogRepository;
     }
 
     @Override
@@ -78,7 +85,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
     @Override
     public EventListenerDto createEventListener(ApplicationUser user, EventListenerForm form) {
-        EventListener eventListener = ao.create(
+        EventListener listener = ao.create(
             EventListener.class,
             new DBParam("UUID", UUID.randomUUID().toString()),
             new DBParam("NAME", form.getName()),
@@ -89,25 +96,45 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         );
 
         cache.remove(VALUE_KEY);
-        return buildDto(eventListener);
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.LISTENER,
+                AuditAction.CREATED,
+                listener.getID() + " - " + listener.getName()
+            )
+        );
+
+        return buildDto(listener);
     }
 
     @Override
     public EventListenerDto updateEventListener(ApplicationUser user, int id, EventListenerForm form) {
-        EventListener eventListener = ao.get(EventListener.class, id);
+        EventListener listener = ao.get(EventListener.class, id);
 
-        if (eventListener == null || eventListener.isDeleted()) {
+        if (listener == null || listener.isDeleted()) {
             throw new RuntimeException("Event listener is deleted");
         }
 
-        eventListener.setName(form.getName());
-        eventListener.setUuid(UUID.randomUUID().toString());
-        eventListener.setScript(form.getScript());
-        eventListener.setCondition(jsonMapper.write(form.getCondition()));
-        eventListener.save();
+        listener.setName(form.getName());
+        listener.setUuid(UUID.randomUUID().toString());
+        listener.setScript(form.getScript());
+        listener.setCondition(jsonMapper.write(form.getCondition()));
+        listener.save();
 
         cache.remove(VALUE_KEY);
-        return buildDto(eventListener);
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.LISTENER,
+                AuditAction.UPDATED,
+                listener.getID() + " - " + listener.getName()
+            )
+        );
+
+        return buildDto(listener);
     }
 
     @Override
@@ -117,6 +144,15 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         listener.save();
 
         cache.remove(VALUE_KEY);
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.LISTENER,
+                AuditAction.DELETED,
+                listener.getID() + " - " + listener.getName()
+            )
+        );
     }
 
     @Override

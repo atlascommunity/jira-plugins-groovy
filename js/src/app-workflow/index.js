@@ -11,7 +11,6 @@ import '../flex.less';
 
 function noop() {}
 
-//todo: params
 window.define('mailru/groovy/renderRegistryScript', () => {
     return (element, id, name, source) => {
         ReactDOM.render(
