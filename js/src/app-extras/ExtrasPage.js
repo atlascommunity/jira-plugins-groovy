@@ -11,6 +11,6 @@ export class ExtrasPage extends React.Component {
     };
 
     render() {
-        return <Button type="primary" onClick={this._clearCache}>Kill it with fire</Button>;
+        return <Button type="primary" onClick={this._clearCache}>{'Kill it with fire'}</Button>;
     }
 }

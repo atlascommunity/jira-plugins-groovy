@@ -4,7 +4,11 @@ define('/mailru/groovy/i18n-react', function() {
             name: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.name'),
             scriptCode: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.scriptCode'),
             comment: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.comment'),
-            condition: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.condition')
+            condition: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.condition'),
+            date: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.date'),
+            time: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.time'),
+            bindings: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.bindings'),
+            successful: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.successful'),
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),
@@ -15,6 +19,13 @@ define('/mailru/groovy/i18n-react', function() {
             edit: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.edit'),
             delete: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.delete'),
             showCode: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.showCode'),
+            prev: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.prev'),
+            next: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.next'),
+            of: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.of'),
+            yes: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.yes'),
+            no: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.no'),
+            error: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.error'),
+            script: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.script'),
         },
         console: {
             execute: AJS.I18n.getText('ru.mail.jira.plugins.groovy.console.execute'),
@@ -32,6 +43,12 @@ define('/mailru/groovy/i18n-react', function() {
             createListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.createListener'),
             updateListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.updateListener'),
             addCondition: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.addCondition')
+        },
+        audit: {
+            user: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.user'),
+            category: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.category'),
+            action: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.action'),
+            description: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.description'),
         },
         dialog: {
             notReady: AJS.I18n.getText('ru.mail.jira.plugins.groovy.dialog.notReady')

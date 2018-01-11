@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {registryService} from '../service/services';
 import {SingleSelect} from '../common/SingleSelect';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
+import {CommonMessages} from '../i18n/common.i18n';
 
 
 function mapScriptToOption(script) {
@@ -73,7 +74,7 @@ export class RegistryPicker extends React.Component {
 
         return <div>
             <div className="field-group">
-                <label>Script</label>
+                <label>{CommonMessages.script}</label>
                 <SingleSelect
                     options={scripts.map(mapScriptToOption)}
                     onChange={this._onChange}

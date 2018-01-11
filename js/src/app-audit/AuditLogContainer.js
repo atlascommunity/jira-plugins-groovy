@@ -5,6 +5,8 @@ import Button from 'aui-react/lib/AUIButton';
 
 import {AuditLogEntryModel} from '../model/audit.model';
 import {auditLogService} from '../service/services';
+import {CommonMessages} from '../i18n/common.i18n';
+import {AuditMessages} from '../i18n/audit.i18n';
 
 
 export class AuditLogContainer extends React.Component {
@@ -24,7 +26,7 @@ export class AuditLogContainer extends React.Component {
             .then(data => this.setState({ data, offset, isReady: true }));
     }
 
-    _loadHandler = (offset) => () => this._loadList(offset);
+    _goToOffset = (offset) => () => this._loadList(offset);
 
     componentDidMount() {
         this._loadList(0);
@@ -42,7 +44,7 @@ export class AuditLogContainer extends React.Component {
                 <strong>
                     {data.offset+1}{'-'}{data.offset+data.size}
                 </strong>
-                {' '}of{' '}
+                {' '}{CommonMessages.of}{' '}
                 <strong>
                     {data.total}
                     </strong>
@@ -52,16 +54,16 @@ export class AuditLogContainer extends React.Component {
                 <Button
                     type="link"
                     disabled={data.offset === 0}
-                    onClick={this._loadHandler(data.offset - data.limit)}
+                    onClick={this._goToOffset(data.offset - data.limit)}
                 >
-                    Prev
+                    {CommonMessages.prev}
                 </Button>
                 <Button
                     type="link"
                     disabled={data.isLast}
-                    onClick={this._loadHandler(data.offset + data.limit)}
+                    onClick={this._goToOffset(data.offset + data.limit)}
                 >
-                    Next
+                    {CommonMessages.next}
                 </Button>
             </div>
         </div>;
@@ -79,11 +81,11 @@ class AuditLog extends React.Component {
         return <table className="aui">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>User</th>
-                    <th>Category</th>
-                    <th>Action</th>
-                    <th>Description</th>
+                    <th>{'#'}</th>
+                    <th>{AuditMessages.user}</th>
+                    <th>{AuditMessages.category}</th>
+                    <th>{AuditMessages.action}</th>
+                    <th>{AuditMessages.description}</th>
                 </tr>
             </thead>
             <tbody>
