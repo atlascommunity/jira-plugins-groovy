@@ -67,6 +67,15 @@ export class ConditionPicker extends React.Component {
         };
     };
 
+    _onTypeChange = (val) => {
+        const {value, onChange} = this.props;
+
+        onChange({
+            ...value,
+            type: val.value
+        });
+    };
+
     _onInputChange = property => {
         return e => {
             const {value, onChange} = this.props;
@@ -151,8 +160,8 @@ export class ConditionPicker extends React.Component {
             }
         } else {
             typeEl = <SingleSelect
-                options={conditionList.map(type => { return {value: type.id, name: type.name}; })}
-                onChange={this._onInputChange('type')}
+                options={conditionList.map(type => { return {value: type.id, label: type.name}; })}
+                onChange={this._onTypeChange}
             />;
         }
 
