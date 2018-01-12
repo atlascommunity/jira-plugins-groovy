@@ -29,6 +29,6 @@ public class PermissionHelper {
     public void checkIfAdmin(ApplicationUser user) {
         if (!globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, user)) {
             throw new SecurityException("User is not admin");
-        };
+        }
     }
 }

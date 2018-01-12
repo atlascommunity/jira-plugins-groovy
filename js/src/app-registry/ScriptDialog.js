@@ -48,7 +48,8 @@ export class ScriptDialog extends React.Component {
                     name: data.name,
                     scriptBody: data.scriptBody,
                     directoryId: data.directoryId
-                })
+                }),
+                error: null
             }));
         //todo: show something when loading
     };

@@ -6,7 +6,8 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.websudo.WebSudoRequired;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import ru.mail.jira.plugins.groovy.api.ScriptRepository;
-import ru.mail.jira.plugins.groovy.api.dto.*;
+import ru.mail.jira.plugins.groovy.api.dto.ScriptDirectoryForm;
+import ru.mail.jira.plugins.groovy.api.dto.ScriptForm;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.RestExecutor;
@@ -106,7 +107,7 @@ public class RegistryResource {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
-            return scriptRepository.getScript(id);
+            return scriptRepository.getScript(id, true, false);
         }).getResponse();
     }
 
@@ -119,8 +120,8 @@ public class RegistryResource {
 
             return scriptRepository.createScript(authenticationContext.getLoggedInUser(), form);
         })
-        .withExceptionMapper(MultipleCompilationErrorsException.class, e -> ExceptionHelper.mapCompilationException("scriptBody", e))
-        .getResponse();
+            .withExceptionMapper(MultipleCompilationErrorsException.class, Response.Status.BAD_REQUEST, e -> ExceptionHelper.mapCompilationException("scriptBody", e))
+            .getResponse();
     }
 
     @PUT
@@ -131,8 +132,8 @@ public class RegistryResource {
             permissionHelper.checkIfAdmin();
             return scriptRepository.updateScript(authenticationContext.getLoggedInUser(), id, form);
         })
-        .withExceptionMapper(MultipleCompilationErrorsException.class, e -> ExceptionHelper.mapCompilationException("scriptBody", e))
-        .getResponse();
+            .withExceptionMapper(MultipleCompilationErrorsException.class, Response.Status.BAD_REQUEST, e -> ExceptionHelper.mapCompilationException("scriptBody", e))
+            .getResponse();
     }
 
     @DELETE

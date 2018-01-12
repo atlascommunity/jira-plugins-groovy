@@ -57,7 +57,7 @@ public class WorkflowHelper {
             if (scriptIdString != null) {
                 Integer scriptId = Ints.tryParse(scriptIdString);
                 if (scriptId != null) {
-                    ScriptDto script = scriptRepository.getScript(scriptId);
+                    ScriptDto script = scriptRepository.getScript(scriptId, false, false);
                     if (script != null) {
                         id = String.valueOf(script.getId());
                         scriptString = script.getScriptBody();
@@ -72,6 +72,7 @@ public class WorkflowHelper {
 
                                 if (value == null) {
                                     logger.error("Value for script param {} is not found", paramName);
+                                    return null;
                                 } else {
                                     paramBindings.put(paramName, scriptParamFactory.getParamObject(param, value));
                                 }
@@ -114,7 +115,7 @@ public class WorkflowHelper {
 
         long t = System.currentTimeMillis();
         try {
-            result =  scriptService.executeScript(
+            result = scriptService.executeScript(
                 id,
                 script.getScriptBody(),
                 type,

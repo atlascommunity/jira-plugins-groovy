@@ -1,32 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Select from 'react-select';
+import './react-select-common.less';
+
 
 export class SingleSelect extends React.Component {
     static propTypes = {
         value: PropTypes.string,
         onChange: PropTypes.func,
         options: PropTypes.arrayOf(PropTypes.shape({
-            value: PropTypes.string.isRequired,
-            name: PropTypes.string.isRequired
+            value: PropTypes.any.isRequired,
+            label: PropTypes.string.isRequired
         })).isRequired
     };
 
     render() {
-        const {options, value, onChange, ...selectProps} = this.props;
+        const {options, value, onChange, ...otherProps} = this.props;
 
         return (
-            <select value={value} onChange={onChange} className="select" {...selectProps}>
-                <option className="hidden"/>
-                {options.map(option =>
-                    <option
-                        key={option.value}
-                        value={option.value}
-                    >
-                        {option.name}
-                    </option>
-                )}
-            </select>
+            <Select value={value} onChange={onChange} options={options} {...otherProps}/>
         );
     }
 }

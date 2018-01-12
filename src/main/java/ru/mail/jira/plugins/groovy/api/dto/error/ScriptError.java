@@ -8,8 +8,9 @@ import lombok.Setter;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+@Getter @Setter
+@AllArgsConstructor @NoArgsConstructor
 @XmlRootElement
-@Getter @Setter @AllArgsConstructor @NoArgsConstructor
 public class ScriptError {
     @XmlElement
     private String message;

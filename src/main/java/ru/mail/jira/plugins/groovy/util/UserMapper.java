@@ -26,11 +26,11 @@ public class UserMapper {
         this.avatarService = avatarService;
     }
 
-    public JiraUser buildUser(ApplicationUser currentUser, String key) {
+    public JiraUser buildUserNullable(ApplicationUser currentUser, String key) {
         ApplicationUser user = userManager.getUserByKey(key);
 
         if (user == null) {
-            return new JiraUser(key, null, key);
+            return null;
         }
 
         return new JiraUser(
@@ -40,7 +40,21 @@ public class UserMapper {
         );
     }
 
+    public JiraUser buildUser(ApplicationUser currentUser, String key) {
+        JiraUser result = buildUserNullable(currentUser, key);
+
+        if (result == null) {
+            return new JiraUser(key, null, key);
+        }
+
+        return result;
+    }
+
     public JiraUser buildUser(String key) {
         return buildUser(authenticationContext.getLoggedInUser(), key);
+    }
+
+    public JiraUser buildUserNullable(String key) {
+        return buildUserNullable(authenticationContext.getLoggedInUser(), key);
     }
 }

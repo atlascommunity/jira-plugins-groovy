@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.impl.repository;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
+import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import net.java.ao.DBParam;
@@ -14,6 +15,7 @@ import ru.mail.jira.plugins.groovy.api.dto.Page;
 import ru.mail.jira.plugins.groovy.api.entity.AuditLogEntry;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,14 +23,17 @@ import java.util.stream.Collectors;
 @Component
 public class AuditLogRepositoryImpl implements AuditLogRepository {
     private final ActiveObjects activeObjects;
+    private final DateTimeFormatter dateTimeFormatter;
     private final UserMapper userMapper;
 
     @Autowired
     public AuditLogRepositoryImpl(
         @ComponentImport ActiveObjects activeObjects,
+        @ComponentImport DateTimeFormatter dateTimeFormatter,
         UserMapper userMapper
     ) {
         this.activeObjects = activeObjects;
+        this.dateTimeFormatter = dateTimeFormatter;
         this.userMapper = userMapper;
     }
 
@@ -36,6 +41,7 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
     public void create(ApplicationUser user, AuditLogEntryForm form) {
         activeObjects.create(
             AuditLogEntry.class,
+            new DBParam("DATE", new Timestamp(System.currentTimeMillis())),
             new DBParam("USER_KEY", user.getKey()),
             new DBParam("CATEGORY", form.getCategory()),
             new DBParam("ACTION", form.getAction()),
@@ -62,6 +68,7 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
     private AuditLogEntryDto buildEntryDto(AuditLogEntry auditLogEntry) {
         AuditLogEntryDto result = new AuditLogEntryDto();
 
+        result.setDate(dateTimeFormatter.forLoggedInUser().format(auditLogEntry.getDate()));
         result.setId(auditLogEntry.getID());
         result.setUser(userMapper.buildUser(auditLogEntry.getUserKey()));
         result.setAction(auditLogEntry.getAction());

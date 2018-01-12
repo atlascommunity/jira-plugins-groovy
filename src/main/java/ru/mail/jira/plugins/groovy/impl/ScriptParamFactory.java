@@ -1,27 +1,34 @@
 package ru.mail.jira.plugins.groovy.impl;
 
 import com.atlassian.jira.issue.CustomFieldManager;
+import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.JiraUser;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
+import ru.mail.jira.plugins.groovy.util.UserMapper;
 
 @Component
 public class ScriptParamFactory {
     private final UserManager userManager;
     private final CustomFieldManager customFieldManager;
     private final GroupManager groupManager;
+    private final UserMapper userMapper;
 
     @Autowired
     public ScriptParamFactory(
         @ComponentImport UserManager userManager,
         @ComponentImport CustomFieldManager customFieldManager,
-        @ComponentImport GroupManager groupManager
+        @ComponentImport GroupManager groupManager,
+        UserMapper userMapper
     ) {
+        this.userMapper = userMapper;
         this.userManager = userManager;
         this.customFieldManager = customFieldManager;
         this.groupManager = groupManager;
@@ -48,6 +55,44 @@ public class ScriptParamFactory {
                 return groupManager.getGroup(value);
         }
 
+        return null;
+    }
+
+    public Object getParamFormValue(ScriptParamDto paramDto, String value) {
+        switch (paramDto.getParamType()) {
+            case STRING:
+            case TEXT:
+            case LONG:
+            case DOUBLE:
+                return value;
+            case CUSTOM_FIELD:
+                CustomField customFieldObject = customFieldManager.getCustomFieldObject(value);
+                if (customFieldObject == null) {
+                    return null;
+                }
+
+                return ImmutableMap.of(
+                    "label", customFieldObject.getName(),
+                    "value", value
+                );
+            case USER:
+                JiraUser user = userMapper.buildUserNullable(value);
+
+                if (user == null) {
+                    return null;
+                }
+
+                return ImmutableMap.of(
+                    "label", user.getDisplayName(),
+                    "value", value,
+                    "avatarUrl", user.getAvatarUrl()
+                );
+            case GROUP:
+                return ImmutableMap.of(
+                    "label", value,
+                    "value", value
+                );
+        }
         return null;
     }
 }

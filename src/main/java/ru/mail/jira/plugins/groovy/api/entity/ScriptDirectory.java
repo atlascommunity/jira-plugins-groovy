@@ -4,8 +4,6 @@ import net.java.ao.Entity;
 import net.java.ao.OneToMany;
 import net.java.ao.schema.NotNull;
 
-import java.util.List;
-
 public interface ScriptDirectory extends Entity {
     @NotNull
     void setName(String name);

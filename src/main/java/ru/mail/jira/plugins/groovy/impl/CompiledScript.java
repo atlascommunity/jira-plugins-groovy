@@ -3,8 +3,6 @@ package ru.mail.jira.plugins.groovy.impl;
 import lombok.Getter;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 
-import java.util.Set;
-
 @Getter
 class CompiledScript {
     private final Class scriptClass;

@@ -3,8 +3,6 @@ package ru.mail.jira.plugins.groovy.impl.groovy;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Objects;
 
 @Getter @Setter

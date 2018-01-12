@@ -28,7 +28,6 @@ import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
 import ru.mail.jira.plugins.groovy.api.entity.Changelog;
 import ru.mail.jira.plugins.groovy.api.entity.Script;
 import ru.mail.jira.plugins.groovy.api.entity.ScriptDirectory;
-import ru.mail.jira.plugins.groovy.api.dto.ScriptDescription;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 import ru.mail.jira.plugins.groovy.util.Const;
@@ -36,7 +35,10 @@ import ru.mail.jira.plugins.groovy.util.JsonMapper;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -93,7 +95,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     @Override
     public List<ScriptDirectoryTreeDto> getAllDirectories() {
         Multimap<Integer, ScriptDto> scripts = HashMultimap.create();
-        for (ScriptDto scriptDto : getAllScripts()) {
+        for (ScriptDto scriptDto : getAllScripts(true)) {
             scripts.put(scriptDto.getDirectoryId(), scriptDto);
         }
 
@@ -178,10 +180,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public List<ScriptDto> getAllScripts() {
+    public List<ScriptDto> getAllScripts(boolean includeChangelog) {
         return Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(this::buildScriptDto)
+            .map(script -> buildScriptDto(script, includeChangelog, false))
             .collect(Collectors.toList());
     }
 
@@ -195,13 +197,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public Script getRawScript(int id) {
-        return ao.get(Script.class, id);
-    }
-
-    @Override
-    public ScriptDto getScript(int id) {
-        return buildScriptDto(ao.get(Script.class, id));
+    public ScriptDto getScript(int id, boolean includeChangelogs, boolean expandName) {
+        return buildScriptDto(ao.get(Script.class, id), includeChangelogs, expandName);
     }
 
     @Override
@@ -243,7 +240,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             )
         );
 
-        return buildScriptDto(script);
+        return buildScriptDto(script, true, false);
     }
 
     @Override
@@ -296,7 +293,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             )
         );
 
-        return buildScriptDto(script);
+        return buildScriptDto(script, true, false);
     }
 
     private String generateDiff(int id, String originalName, String name, String originalSource, String newSource) {
@@ -344,24 +341,30 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         );
     }
 
-    private ScriptDto buildScriptDto(Script script) {
+    private ScriptDto buildScriptDto(Script script, boolean includeChangelogs, boolean expandName) {
         ScriptDto result = new ScriptDto();
 
         result.setId(script.getID());
-        result.setName(script.getName());
         result.setDirectoryId(script.getDirectory().getID());
         result.setScriptBody(script.getScriptBody());
         result.setDeleted(script.isDeleted());
 
-        Changelog[] changelogs = script.getChangelogs();
-        if (changelogs != null) {
-            result.setChangelogs(
-                Arrays
-                    .stream(changelogs)
-                    .sorted(Comparator.comparing(Changelog::getDate).reversed())
-                    .map(this::buildChangelogDto)
-                    .collect(Collectors.toList())
-            );
+        if (expandName) {
+            result.setName(getExpandedName(script));
+        } else {
+            result.setName(script.getName());
+        }
+        if (includeChangelogs) {
+            Changelog[] changelogs = script.getChangelogs();
+            if (changelogs != null) {
+                result.setChangelogs(
+                    Arrays
+                        .stream(changelogs)
+                        .sorted(Comparator.comparing(Changelog::getDate).reversed())
+                        .map(this::buildChangelogDto)
+                        .collect(Collectors.toList())
+                );
+            }
         }
 
         if (script.getParameters() != null) {
@@ -438,7 +441,16 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     private ScriptDescription buildScriptDescription(Script script) {
         ScriptDescription result = new ScriptDescription();
         result.setId(script.getID());
+        result.setName(getExpandedName(script));
 
+        if (script.getParameters() != null) {
+            result.setParams(jsonMapper.read(script.getParameters(), Const.PARAM_LIST_TYPE_REF));
+        }
+
+        return result;
+    }
+
+    private String getExpandedName(Script script) {
         List<String> nameElements = new ArrayList<>();
         nameElements.add(script.getName());
 
@@ -448,13 +460,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             directory = directory.getParent();
         }
 
-        result.setName(Lists.reverse(nameElements).stream().collect(Collectors.joining("/")));
-
-        if (script.getParameters() != null) {
-            result.setParams(jsonMapper.read(script.getParameters(), Const.PARAM_LIST_TYPE_REF));
-        }
-
-        return result;
+        return Lists.reverse(nameElements).stream().collect(Collectors.joining("/"));
     }
 
     private static String getLockKey(int id) {

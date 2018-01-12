@@ -12,5 +12,7 @@ public class AuditLogEntryDto extends AuditLogEntryForm {
     @XmlElement
     private Integer id;
     @XmlElement
+    private String date;
+    @XmlElement
     private JiraUser user;
 }

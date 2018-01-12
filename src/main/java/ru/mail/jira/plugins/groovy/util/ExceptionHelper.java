@@ -13,7 +13,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class ExceptionHelper {
-    private ExceptionHelper() {}
+    private ExceptionHelper() {
+    }
 
     public static String writeExceptionToString(Exception e) {
         StringWriter sw = new StringWriter();
@@ -33,6 +34,7 @@ public final class ExceptionHelper {
                 .collect(Collectors.toList())
         );
     }
+
     private static Object mapMessage(Object message) {
         if (message instanceof SyntaxErrorMessage) {
             return SyntaxError.fromErrorMessage((SyntaxErrorMessage) message);

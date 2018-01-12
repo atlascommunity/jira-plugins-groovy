@@ -6,8 +6,8 @@ import lombok.Setter;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
 @Getter @Setter
+@XmlRootElement
 public class EventListenerDto extends EventListenerForm {
     @XmlElement
     private int id;

@@ -4,7 +4,13 @@ import net.java.ao.Entity;
 import net.java.ao.schema.NotNull;
 import ru.mail.jira.plugins.groovy.api.dto.AuditCategory;
 
+import java.sql.Timestamp;
+
 public interface AuditLogEntry extends Entity {
+    @NotNull
+    void setDate(Timestamp date);
+    Timestamp getDate();
+
     @NotNull
     void setUserKey(String userKey);
     String getUserKey();

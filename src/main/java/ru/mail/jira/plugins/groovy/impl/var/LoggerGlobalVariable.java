@@ -12,5 +12,5 @@ public class LoggerGlobalVariable implements GlobalVariable<Logger> {
     }
 
     @Override
-    public void dispose() { }
+    public void dispose() {}
 }

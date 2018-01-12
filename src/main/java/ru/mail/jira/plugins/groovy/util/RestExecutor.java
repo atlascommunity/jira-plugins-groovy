@@ -1,6 +1,8 @@
 package ru.mail.jira.plugins.groovy.util;
 
 import com.google.common.collect.ImmutableMap;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.commons.RestFieldException;
@@ -15,15 +17,15 @@ import java.util.function.Function;
 public final class RestExecutor<T> {
     private static final Logger log = LoggerFactory.getLogger(RestExecutor.class);
 
-    private final Map<Class, Function<Exception, Map<String, Object>>> exceptionMappers = new HashMap<>();
+    private final Map<Class, ExceptionMapper> exceptionMappers = new HashMap<>();
     private final RestExecutorSupplier<T> supplier;
 
     public RestExecutor(RestExecutorSupplier<T> supplier) {
         this.supplier = supplier;
     }
 
-    public <ET extends Exception> RestExecutor<T> withExceptionMapper(Class<ET> clazz, Function<ET, Map<String, Object>> mapper) {
-        exceptionMappers.put(clazz, (Function<Exception, Map<String, Object>>) mapper);
+    public <ET extends Exception> RestExecutor<T> withExceptionMapper(Class<ET> clazz, Response.Status status, Function<ET, Map<String, Object>> mapper) {
+        exceptionMappers.put(clazz, new ExceptionMapper(status, (Function<Exception, Map<String, Object>>) mapper));
         return this;
     }
 
@@ -38,11 +40,11 @@ public final class RestExecutor<T> {
 
             if (actionResult instanceof byte[])
                 responseBuilder = responseBuilder.type("application/force-download")
-                        .header("Content-Transfer-Encoding", "binary")
-                        .header("charset", "UTF-8");
-            else if(actionResult instanceof StreamRestResult)
+                    .header("Content-Transfer-Encoding", "binary")
+                    .header("charset", "UTF-8");
+            else if (actionResult instanceof StreamRestResult)
                 responseBuilder = responseBuilder.entity(((StreamRestResult) actionResult).getInputStream())
-                        .type(((StreamRestResult) actionResult).getContentType());
+                    .type(((StreamRestResult) actionResult).getContentType());
             return responseBuilder.build();
         } catch (SecurityException e) {
             return Response
@@ -64,24 +66,39 @@ public final class RestExecutor<T> {
         } catch (Exception e) {
             Map<String, Object> entity = null;
 
-            for (Map.Entry<Class, Function<Exception, Map<String, Object>>> entry : exceptionMappers.entrySet()) {
+            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            boolean handled = false;
+
+            for (Map.Entry<Class, ExceptionMapper> entry : exceptionMappers.entrySet()) {
                 Class type = entry.getKey();
 
                 if (type.isInstance(e)) {
-                    entity = entry.getValue().apply(e);
+                    ExceptionMapper mapper = entry.getValue();
+                    entity = mapper.getFunction().apply(e);
+                    status = mapper.getStatus();
+                    handled = true;
+                    break;
                 }
             }
 
-            if (entity == null) {
+
+            if (!handled) {
                 entity = ImmutableMap.of("message", e.getMessage());
+                log.error("REST Exception", e);
             }
 
-            log.error("REST Exception", e);
             return Response
-                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .status(status)
                 .entity(entity)
                 .type(MediaType.APPLICATION_JSON)
                 .build();
         }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    private static class ExceptionMapper {
+        private final Response.Status status;
+        private final Function<Exception, Map<String, Object>> function;
     }
 }

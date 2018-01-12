@@ -5,7 +5,7 @@ import Button from 'aui-react/lib/AUIButton';
 
 import {AuditLogEntryModel} from '../model/audit.model';
 import {auditLogService} from '../service/services';
-import {CommonMessages} from '../i18n/common.i18n';
+import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {AuditMessages} from '../i18n/audit.i18n';
 
 
@@ -82,6 +82,7 @@ class AuditLog extends React.Component {
             <thead>
                 <tr>
                     <th>{'#'}</th>
+                    <th>{FieldMessages.date}</th>
                     <th>{AuditMessages.user}</th>
                     <th>{AuditMessages.category}</th>
                     <th>{AuditMessages.action}</th>
@@ -91,7 +92,12 @@ class AuditLog extends React.Component {
             <tbody>
                 {entries.map(entry =>
                     <tr key={entry.id}>
-                        <td>{entry.id}</td>
+                        <td>
+                            {entry.id}
+                            </td>
+                        <td>
+                            {entry.date}
+                        </td>
                         <td>
                             <span className="aui-avatar aui-avatar-xsmall">
                                 <span className="aui-avatar-inner">

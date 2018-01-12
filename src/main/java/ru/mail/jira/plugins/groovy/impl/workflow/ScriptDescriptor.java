@@ -7,7 +7,10 @@ import lombok.ToString;
 
 import java.util.Map;
 
-@Getter @Setter @ToString @AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
 public class ScriptDescriptor {
     private String id;
     private boolean fromRegistry;

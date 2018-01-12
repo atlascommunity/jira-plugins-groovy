@@ -43,7 +43,7 @@ public abstract class InlineScriptWorkflowPluginFactory extends AbstractWorkflow
     @Override
     public Map<String, ?> getDescriptorParams(Map<String, Object> input) {
         Map<String, Object> params = new HashMap<>();
-        
+
         params.put(Const.WF_INLINE_SCRIPT, extractSingleParam(input, "inlineScript"));
         params.put(Const.WF_INLINE_SCRIPT_NAME, extractSingleParam(input, "inlineScriptName"));
         params.put(Const.WF_UUID, extractSingleParam(input, "uuid"));

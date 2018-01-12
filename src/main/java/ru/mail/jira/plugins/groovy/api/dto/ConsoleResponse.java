@@ -7,7 +7,8 @@ import lombok.Setter;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@Getter @Setter @AllArgsConstructor
+@Getter @Setter
+@AllArgsConstructor
 @XmlRootElement
 public class ConsoleResponse {
     @XmlElement

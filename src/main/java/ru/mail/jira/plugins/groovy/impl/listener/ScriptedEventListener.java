@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ru.mail.jira.plugins.groovy.impl.listener.condition.EventCondition;
 
-@Getter @AllArgsConstructor
+@Getter
+@AllArgsConstructor
 public class ScriptedEventListener {
     private final int id;
     private final String script;

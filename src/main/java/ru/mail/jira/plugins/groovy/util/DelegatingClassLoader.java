@@ -7,12 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class DelegatingClassLoader extends ClassLoader {
@@ -52,7 +50,8 @@ public class DelegatingClassLoader extends ClassLoader {
                 }
 
                 return classLoader.loadClass(name);
-            } catch (ClassNotFoundException ignore) {}
+            } catch (ClassNotFoundException ignore) {
+            }
         }
         throw new ClassNotFoundException(name);
     }

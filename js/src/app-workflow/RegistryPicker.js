@@ -1,49 +1,109 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {Map} from 'immutable';
+
 import {registryService} from '../service/services';
 import {SingleSelect} from '../common/SingleSelect';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {CommonMessages} from '../i18n/common.i18n';
+import {AsyncPicker} from '../common/AsyncPicker';
 
 
 function mapScriptToOption(script) {
     return {
-        value: script.id.toString(),
-        name: script.name
+        value: script.id,
+        label: script.name
     };
 }
 
 //todo: keep values
 export class RegistryPicker extends React.Component {
     static propTypes = {
-        initialValue: PropTypes.number,
+        values: PropTypes.object,
+        scriptId: PropTypes.number,
         fieldName: PropTypes.string
     };
 
-    _onChange = (e) => {
+    _onChange = (value) => {
         this.setState({
-            value: this.state.scripts.find(el => el.id.toString() === e.target.value)
+            script: value ? this.state.scripts.find(el => el.id === value.value) : null
         });
     };
 
+    _setInputValue = (field) => (e) => this._mutateValue(field, e.target.value);
+
+    _setValue = (field) => (value) => this._mutateValue(field, value);
+
+    _mutateValue = (field, value) => this.setState((state) => {
+        return {
+            values: state.values.set(field, value)
+        };
+    });
+
     _renderParam(param) {
-        const inputName = `${this.props.fieldName}-${param.name}`;
+        const {values} = this.state;
+        const {fieldName} = this.props;
+        const paramName = param.name;
+        const inputName = `${fieldName}-${paramName}`;
+        const value = values.get(paramName);
         switch (param.paramType) {
             case 'USER':
-                return <aui-select src={`${getPluginBaseUrl()}/jira-api/userPicker`} name={inputName}/>;
+                return <AsyncPicker
+                    src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                    name={inputName}
+                    onChange={this._setValue(paramName)}
+                    value={value}
+                    className="long-field"
+                />;
             case 'GROUP':
-                return <aui-select src={`${getPluginBaseUrl()}/jira-api/groupPicker`} name={inputName}/>;
+                return <AsyncPicker
+                    src={`${getPluginBaseUrl()}/jira-api/groupPicker`}
+                    name={inputName}
+                    onChange={this._setValue(paramName)}
+                    value={value}
+                    className="long-field"
+                />;
             case 'CUSTOM_FIELD':
-                return <aui-select src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`} name={inputName}/>;
+                return <AsyncPicker
+                    src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`}
+                    name={inputName}
+                    onChange={this._setValue(paramName)}
+                    value={value}
+                    className="long-field"
+                />;
             case 'STRING':
-                return <input type="text" className="text" name={inputName}/>;
+                return <input
+                    type="text"
+                    className="text long-field"
+                    name={inputName}
+                    value={value}
+                    onChange={this._setInputValue(paramName)}
+                />;
             case 'TEXT':
-                return <textarea className="textarea" name={inputName}/>;
+                return <textarea
+                    className="textarea long-field"
+                    name={inputName}
+                    value={value}
+                    onChange={this._setInputValue(paramName)}
+                />;
             case 'LONG':
-                return <input type="number" className="text" name={inputName}/>;
+                return <input
+                    type="number"
+                    className="text long-field"
+                    name={inputName}
+                    value={value}
+                    onChange={this._setInputValue(paramName)}
+                />;
             case 'DOUBLE':
-                return <input type="text" className="text" pattern="[0-9.]+" name={inputName}/>;
+                return <input
+                    type="text"
+                    className="text long-field"
+                    pattern="[0-9.]+"
+                    name={inputName}
+                    value={value}
+                    onChange={this._setInputValue(paramName)}
+                />;
             default:
                 return <div>{'Unsupported type'}</div>;
         }
@@ -61,12 +121,13 @@ export class RegistryPicker extends React.Component {
                 this.setState({
                     scripts,
                     ready: true,
-                    value: this.props.initialValue ? scripts.find(el => el.id === this.props.initialValue) : null
+                    values: new Map(this.props.values),
+                    script: this.props.scriptId ? scripts.find(el => el.id === this.props.scriptId) : null
                 }));
     }
 
     render() {
-        const {ready, scripts, value} = this.state;
+        const {ready, scripts, script} = this.state;
 
         if (!ready) {
             return <span className="aui-icon aui-icon-wait"/>;
@@ -78,14 +139,16 @@ export class RegistryPicker extends React.Component {
                 <SingleSelect
                     options={scripts.map(mapScriptToOption)}
                     onChange={this._onChange}
-                    value={value ? value.id.toString() : ''}
+                    value={script ? script.id.toString() : ''}
 
                     name={this.props.fieldName}
+
+                    className="long-field"
                 />
             </div>
 
-            {value && value.params &&
-                value.params.map(param =>
+            {script && script.params &&
+                script.params.map(param =>
                     <div className="field-group" key={param.name}>
                         <label>{param.displayName}</label>
                         {this._renderParam(param)}

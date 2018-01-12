@@ -21,7 +21,6 @@ import {RegistryMessages} from '../i18n/registry.i18n';
 import './ScriptRegistry.less';
 
 
-//todo: check leaks
 @connect(
     state => {
         return {

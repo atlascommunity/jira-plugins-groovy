@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -12,11 +11,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 @XmlRootElement
-public class SingleSelectDto {
+public class PickerOption {
     @XmlElement
     private String label;
     @XmlElement
     private String value;
-    @XmlElement(name = "img-src")
+    @XmlElement()
     private String imgSrc;
 }

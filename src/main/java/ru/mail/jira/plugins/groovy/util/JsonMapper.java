@@ -10,7 +10,7 @@ import java.io.IOException;
 public class JsonMapper {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public  <T> T read(String json, Class<T> clazz) {
+    public <T> T read(String json, Class<T> clazz) {
         try {
             return objectMapper.readValue(json, clazz);
         } catch (IOException e) {
@@ -26,7 +26,7 @@ public class JsonMapper {
         }
     }
 
-    public  <T> String write(T value) {
+    public <T> String write(T value) {
         try {
             return objectMapper.writeValueAsString(value);
         } catch (IOException e) {

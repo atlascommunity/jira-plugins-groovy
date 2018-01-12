@@ -1,7 +1,8 @@
 #* @vtlvariable name="escapeJs" type="java.util.function.Function" *#
 <strong>Groovy inline script</strong>
 <br/>
-<div id="mailru-groovy-script-react-container-${uuid}"></div>
+<div id="mailru-groovy-script-react-container-${uuid}" style="margin-top: 6px;"></div>
+
 $webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.workflow")
 
 <script>

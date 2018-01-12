@@ -2,8 +2,6 @@ package ru.mail.jira.plugins.groovy.api;
 
 import com.atlassian.jira.user.ApplicationUser;
 import ru.mail.jira.plugins.groovy.api.dto.*;
-import ru.mail.jira.plugins.groovy.api.entity.Script;
-import ru.mail.jira.plugins.groovy.api.dto.ScriptDescription;
 
 import java.util.List;
 
@@ -18,13 +16,11 @@ public interface ScriptRepository {
 
     void deleteDirectory(ApplicationUser user, int id);
 
-    List<ScriptDto> getAllScripts();
+    List<ScriptDto> getAllScripts(boolean includeChangelog);
 
     List<ScriptDescription> getAllScriptDescriptions();
 
-    Script getRawScript(int id);
-
-    ScriptDto getScript(int id);
+    ScriptDto getScript(int id, boolean includeChangelogs, boolean expandName);
 
     ScriptDto createScript(ApplicationUser user, ScriptForm scriptForm);
 

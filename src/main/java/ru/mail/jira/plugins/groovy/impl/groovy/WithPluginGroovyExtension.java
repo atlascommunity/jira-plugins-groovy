@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.impl.groovy;
 
-import org.codehaus.groovy.ast.*;
+import org.codehaus.groovy.ast.AnnotationNode;
+import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.expr.ArrayExpression;
 import org.codehaus.groovy.ast.expr.ConstantExpression;
 import org.codehaus.groovy.ast.expr.Expression;

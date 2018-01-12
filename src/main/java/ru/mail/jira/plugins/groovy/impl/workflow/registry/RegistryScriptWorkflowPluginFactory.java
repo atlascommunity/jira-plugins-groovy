@@ -3,28 +3,30 @@ package ru.mail.jira.plugins.groovy.impl.workflow.registry;
 import com.atlassian.jira.plugin.workflow.AbstractWorkflowPluginFactory;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.templaterenderer.JavaScriptEscaper;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 import com.opensymphony.workflow.loader.AbstractDescriptor;
 import ru.mail.jira.plugins.groovy.api.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
-import ru.mail.jira.plugins.groovy.api.entity.Script;
-import ru.mail.jira.plugins.groovy.api.entity.ScriptDirectory;
+import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Scanned
 public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkflowPluginFactory {
     private final ScriptRepository scriptRepository;
+    private final ScriptParamFactory paramFactory;
     private final JsonMapper jsonMapper;
 
-    protected RegistryScriptWorkflowPluginFactory(ScriptRepository scriptRepository, JsonMapper jsonMapper) {
+    protected RegistryScriptWorkflowPluginFactory(ScriptRepository scriptRepository, ScriptParamFactory paramFactory, JsonMapper jsonMapper) {
         this.scriptRepository = scriptRepository;
+        this.paramFactory = paramFactory;
         this.jsonMapper = jsonMapper;
     }
 
@@ -32,16 +34,26 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
     protected void getVelocityParamsForInput(Map<String, Object> map) {
         map.put("scripts", scriptRepository.getAllScriptDescriptions());
         map.put("escapeJs", (Function<String, String>) JavaScriptEscaper::escape);
+        map.put("values", jsonMapper.write(ImmutableMap.of()));
     }
 
     @Override
     protected void getVelocityParamsForEdit(Map<String, Object> map, AbstractDescriptor abstractDescriptor) {
-        //todo: fill params
         Map<String, Object> args = getArgs(abstractDescriptor);
 
-        map.put("scripts", scriptRepository.getAllScriptDescriptions());
-        map.put("id", args.get(Const.WF_REPOSITORY_SCRIPT_ID));
+        String idString = (String) args.get(Const.WF_REPOSITORY_SCRIPT_ID);
+        Integer scriptId = Ints.tryParse(idString);
+        ScriptDto script = null;
+        if (scriptId != null) {
+            script = scriptRepository.getScript(scriptId, false, false);
+        }
+
+        map.put("id", scriptId);
         map.put("escapeJs", (Function<String, String>) JavaScriptEscaper::escape);
+
+        Map<String, Object> values = getScriptParams(script, args);
+        values.put("script", idString);
+        map.put("values", jsonMapper.write(values));
     }
 
     @Override
@@ -55,33 +67,14 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
 
         Integer id = Ints.tryParse(idString);
         if (id != null) {
-            Script script = scriptRepository.getRawScript(id);
+            ScriptDto script = scriptRepository.getScript(id, false, true);
 
             if (script != null) {
                 map.put("script", script);
 
-                List<String> nameElements = new ArrayList<>();
-                nameElements.add(script.getName());
-
-                ScriptDirectory directory = script.getDirectory();
-                while (directory != null) {
-                    nameElements.add(directory.getName());
-                    directory = directory.getParent();
-                }
-
-                map.put("extendedName", Lists.reverse(nameElements).stream().collect(Collectors.joining("/")));
-
-                if (script.getParameters() != null) {
-                    List<ScriptParamDto> params = jsonMapper.read(script.getParameters(), Const.PARAM_LIST_TYPE_REF);
-                    Map<String, String> paramValues = new HashMap<>();
-
-                    for (ScriptParamDto param : params) {
-                        String paramName = param.getName();
-                        paramValues.put(paramName, (String) args.get(Const.getParamKey(paramName)));
-                    }
-
-                    map.put("params", params);
-                    map.put("paramValues", paramValues);
+                if (script.getParams() != null) {
+                    map.put("paramsHtml", jsonMapper.write(script.getParams()));
+                    map.put("paramValuesHtml", jsonMapper.write(getScriptParams(script, args)));
                 }
             }
         }
@@ -100,7 +93,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
             throw new RuntimeException("script is not a number");
         }
 
-        ScriptDto script = scriptRepository.getScript(scriptId);
+        ScriptDto script = scriptRepository.getScript(scriptId, false, false);
 
         if (script.getParams() != null) {
             for (ScriptParamDto scriptParamDto : script.getParams()) {
@@ -114,6 +107,21 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
         }
 
         return params;
+    }
+
+    private Map<String, Object> getScriptParams(ScriptDto script, Map<String, Object> args) {
+        Map<String, Object> values = new HashMap<>();
+        if (script != null) {
+            if (script.getParams() != null) {
+                for (ScriptParamDto param : script.getParams()) {
+                    String paramName = param.getName();
+                    String value = (String) args.get(Const.getParamKey(paramName));
+
+                    values.put(paramName, paramFactory.getParamFormValue(param, value));
+                }
+            }
+        }
+        return values;
     }
 
     abstract protected Map<String, Object> getArgs(AbstractDescriptor descriptor);
