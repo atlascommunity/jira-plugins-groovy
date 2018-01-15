@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.groovy.api;
 
 import com.atlassian.jira.user.ApplicationUser;
 import ru.mail.jira.plugins.groovy.api.dto.*;
+import ru.mail.jira.plugins.groovy.api.dto.directory.*;
 
 import java.util.List;
 

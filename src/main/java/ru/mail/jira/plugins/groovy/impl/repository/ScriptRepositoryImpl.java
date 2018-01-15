@@ -7,10 +7,6 @@ import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.github.difflib.DiffUtils;
-import com.github.difflib.UnifiedDiffUtils;
-import com.github.difflib.algorithm.DiffException;
-import com.github.difflib.patch.Patch;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -24,6 +20,9 @@ import ru.mail.jira.plugins.groovy.api.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.*;
+import ru.mail.jira.plugins.groovy.api.dto.audit.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
+import ru.mail.jira.plugins.groovy.api.dto.directory.*;
 import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
 import ru.mail.jira.plugins.groovy.api.entity.Changelog;
 import ru.mail.jira.plugins.groovy.api.entity.Script;
@@ -31,6 +30,7 @@ import ru.mail.jira.plugins.groovy.api.entity.ScriptDirectory;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 import ru.mail.jira.plugins.groovy.util.Const;
+import ru.mail.jira.plugins.groovy.util.ChangelogUtil;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
 
@@ -220,7 +220,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             new DBParam("PARAMETERS", parameters)
         );
 
-        String diff = generateDiff(script.getID(), "", script.getName(), "", scriptForm.getScriptBody());
+        String diff = ChangelogUtil.generateDiff(script.getID(), "", script.getName(), "", scriptForm.getScriptBody());
 
         ao.create(
             Changelog.class,
@@ -266,7 +266,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             throw new IllegalArgumentException("Script " + id + " is deleted");
         }
 
-        String diff = generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
+        String diff = ChangelogUtil.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
 
         ao.create(
             Changelog.class,
@@ -294,25 +294,6 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         );
 
         return buildScriptDto(script, true, false);
-    }
-
-    private String generateDiff(int id, String originalName, String name, String originalSource, String newSource) {
-        try {
-            List<String> originalLines = Arrays.asList(originalSource.split("\n"));
-            List<String> newLines = Arrays.asList(newSource.split("\n"));
-            Patch<String> patch = DiffUtils.diff(originalLines, newLines);
-
-            return UnifiedDiffUtils
-                .generateUnifiedDiff(genName(id, originalName), genName(id, name), originalLines, patch, 5)
-                .stream()
-                .collect(Collectors.joining("\n"));
-        } catch (DiffException e) {
-            throw new RuntimeException("Unable to create diff", e);
-        }
-    }
-
-    private static String genName(int id, String name) {
-        return String.valueOf(id) + " - " + name + ".groovy";
     }
 
     @Override

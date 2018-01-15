@@ -6,7 +6,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import ru.mail.jira.plugins.groovy.api.RestRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
-import ru.mail.jira.plugins.groovy.api.dto.RestScriptDto;
+import ru.mail.jira.plugins.groovy.api.dto.RestScriptDescription;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 
 import javax.ws.rs.*;
@@ -73,7 +73,7 @@ public class CustomRestResource {
     }
 
     private Response runScript(String method, String key, UriInfo uriInfo, String body) throws Exception {
-        RestScriptDto script = restRepository.getScript(method, key);
+        RestScriptDescription script = restRepository.getScript(method, key);
 
         //todo: execution tracker
 

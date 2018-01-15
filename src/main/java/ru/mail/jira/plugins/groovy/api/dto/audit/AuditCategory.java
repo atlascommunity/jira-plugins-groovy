@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.api.dto;
+package ru.mail.jira.plugins.groovy.api.dto.audit;
 
 public enum AuditCategory {
     REGISTRY_SCRIPT,

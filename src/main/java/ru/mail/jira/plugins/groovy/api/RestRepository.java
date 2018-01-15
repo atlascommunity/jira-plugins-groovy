@@ -1,7 +1,8 @@
 package ru.mail.jira.plugins.groovy.api;
 
-import ru.mail.jira.plugins.groovy.api.dto.RestScriptDto;
+import ru.mail.jira.plugins.groovy.api.dto.RestScriptDescription;
 
 public interface RestRepository {
-    RestScriptDto getScript(String method, String key);
+
+    RestScriptDescription getScript(String method, String key);
 }

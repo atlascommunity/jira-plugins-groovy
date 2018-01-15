@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 import com.opensymphony.workflow.loader.AbstractDescriptor;
 import ru.mail.jira.plugins.groovy.api.ScriptRepository;
-import ru.mail.jira.plugins.groovy.api.dto.ScriptDto;
+import ru.mail.jira.plugins.groovy.api.dto.directory.ScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.Const;

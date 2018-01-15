@@ -1,5 +1,6 @@
-package ru.mail.jira.plugins.groovy.api.dto;
+package ru.mail.jira.plugins.groovy.api.dto.console;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,12 +8,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Getter @Setter
+@AllArgsConstructor
 @XmlRootElement
-public class AuditLogEntryDto extends AuditLogEntryForm {
+public class ConsoleResponse {
     @XmlElement
-    private Integer id;
+    private String result;
     @XmlElement
-    private String date;
-    @XmlElement
-    private JiraUser user;
+    private long time;
 }

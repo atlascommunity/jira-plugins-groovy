@@ -1,6 +1,6 @@
 #* @vtlvariable name="paramValues" type="java.util.Map<java.lang.String, java.lang.String>" *#
 #* @vtlvariable name="params" type="java.util.List<ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto>" *#
-#* @vtlvariable name="script" type="ru.mail.jira.plugins.groovy.api.dto.ScriptDto" *#
+#* @vtlvariable name="script" type="ru.mail.jira.plugins.groovy.api.dto.directory.ScriptDto" *#
 #* @vtlvariable name="escapeJs" type="java.util.function.Function" *#
 
 <div>

@@ -7,7 +7,7 @@ import {ConsoleMessages} from '../i18n/console.i18n';
 import {consoleService} from '../service/services';
 import {Editor} from '../common/Editor';
 
-
+//todo: add spinner
 export class ScriptConsole extends React.Component {
     state = {
         script: '',
