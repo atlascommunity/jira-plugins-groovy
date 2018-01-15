@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
 
+//todo: invalidate listeners & rest
 @Component
 @ExportAsService(LifecycleAware.class)
 public class ScriptInvalidationService implements LifecycleAware {

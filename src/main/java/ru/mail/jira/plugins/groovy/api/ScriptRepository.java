@@ -11,21 +11,21 @@ public interface ScriptRepository {
 
     ScriptDirectoryDto getDirectory(int id);
 
-    ScriptDirectoryDto createDirectory(ApplicationUser user, ScriptDirectoryForm directoryForm);
+    ScriptDirectoryDto createDirectory(ApplicationUser user, ScriptDirectoryForm form);
 
-    ScriptDirectoryDto updateDirectory(ApplicationUser user, int id, ScriptDirectoryForm directoryForm);
+    ScriptDirectoryDto updateDirectory(ApplicationUser user, int id, ScriptDirectoryForm form);
 
     void deleteDirectory(ApplicationUser user, int id);
 
-    List<ScriptDto> getAllScripts(boolean includeChangelog);
+    List<RegistryScriptDto> getAllScripts(boolean includeChangelog);
 
     List<ScriptDescription> getAllScriptDescriptions();
 
-    ScriptDto getScript(int id, boolean includeChangelogs, boolean expandName);
+    RegistryScriptDto getScript(int id, boolean includeChangelogs, boolean expandName);
 
-    ScriptDto createScript(ApplicationUser user, ScriptForm scriptForm);
+    RegistryScriptDto createScript(ApplicationUser user, RegistryScriptForm scriptForm);
 
-    ScriptDto updateScript(ApplicationUser user, int id, ScriptForm scriptForm);
+    RegistryScriptDto updateScript(ApplicationUser user, int id, RegistryScriptForm scriptForm);
 
     void deleteScript(ApplicationUser user, int id);
 }

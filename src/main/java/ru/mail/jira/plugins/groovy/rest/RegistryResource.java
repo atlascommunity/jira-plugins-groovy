@@ -7,7 +7,7 @@ import com.atlassian.sal.api.websudo.WebSudoRequired;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import ru.mail.jira.plugins.groovy.api.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.dto.directory.ScriptDirectoryForm;
-import ru.mail.jira.plugins.groovy.api.dto.directory.ScriptForm;
+import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptForm;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.RestExecutor;
@@ -114,7 +114,7 @@ public class RegistryResource {
     @POST
     @Path("/script")
     @WebSudoRequired
-    public Response createScript(ScriptForm form) {
+    public Response createScript(RegistryScriptForm form) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
@@ -127,7 +127,7 @@ public class RegistryResource {
     @PUT
     @Path("/script/{id}")
     @WebSudoRequired
-    public Response updateScript(@PathParam("id") int id, ScriptForm form) {
+    public Response updateScript(@PathParam("id") int id, RegistryScriptForm form) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
             return scriptRepository.updateScript(authenticationContext.getLoggedInUser(), id, form);

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter @Setter
 @XmlRootElement
-public class ScriptDto extends ScriptForm {
+public class RegistryScriptDto extends RegistryScriptForm {
     @XmlElement
     private Integer id;
     @XmlElement

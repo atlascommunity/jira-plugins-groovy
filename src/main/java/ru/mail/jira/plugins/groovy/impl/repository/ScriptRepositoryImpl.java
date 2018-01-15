@@ -3,7 +3,6 @@ package ru.mail.jira.plugins.groovy.impl.repository;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.beehive.ClusterLock;
 import com.atlassian.beehive.ClusterLockService;
-import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -23,16 +22,12 @@ import ru.mail.jira.plugins.groovy.api.dto.*;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditCategory;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.directory.*;
-import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
-import ru.mail.jira.plugins.groovy.api.entity.Changelog;
-import ru.mail.jira.plugins.groovy.api.entity.Script;
-import ru.mail.jira.plugins.groovy.api.entity.ScriptDirectory;
+import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 import ru.mail.jira.plugins.groovy.util.Const;
-import ru.mail.jira.plugins.groovy.util.ChangelogUtil;
+import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
-import ru.mail.jira.plugins.groovy.util.UserMapper;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -44,36 +39,33 @@ import java.util.stream.Collectors;
 @Component
 public class ScriptRepositoryImpl implements ScriptRepository {
     private final I18nHelper i18nHelper;
-    private final DateTimeFormatter dateTimeFormatter;
     private final ClusterLockService clusterLockService;
     private final ActiveObjects ao;
     private final ScriptInvalidationService scriptInvalidationService;
     private final ScriptService scriptService;
     private final JsonMapper jsonMapper;
-    private final UserMapper userMapper;
     private final AuditLogRepository auditLogRepository;
+    private final ChangelogHelper changelogHelper;
 
     @Autowired
     public ScriptRepositoryImpl(
         @ComponentImport I18nHelper i18nHelper,
-        @ComponentImport DateTimeFormatter dateTimeFormatter,
         @ComponentImport ClusterLockService clusterLockService,
         @ComponentImport ActiveObjects ao,
         ScriptInvalidationService scriptInvalidationService,
         ScriptService scriptService,
         JsonMapper jsonMapper,
-        UserMapper userMapper,
-        AuditLogRepository auditLogRepository
+        AuditLogRepository auditLogRepository,
+        ChangelogHelper changelogHelper
     ) {
         this.i18nHelper = i18nHelper;
-        this.dateTimeFormatter = dateTimeFormatter;
         this.clusterLockService = clusterLockService;
         this.ao = ao;
         this.scriptInvalidationService = scriptInvalidationService;
         this.scriptService = scriptService;
         this.jsonMapper = jsonMapper;
-        this.userMapper = userMapper;
         this.auditLogRepository = auditLogRepository;
+        this.changelogHelper = changelogHelper;
     }
 
     private ScriptDirectory getParentDirectory(Integer parentId) {
@@ -94,8 +86,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     @Override
     public List<ScriptDirectoryTreeDto> getAllDirectories() {
-        Multimap<Integer, ScriptDto> scripts = HashMultimap.create();
-        for (ScriptDto scriptDto : getAllScripts(true)) {
+        Multimap<Integer, RegistryScriptDto> scripts = HashMultimap.create();
+        for (RegistryScriptDto scriptDto : getAllScripts(true)) {
             scripts.put(scriptDto.getDirectoryId(), scriptDto);
         }
 
@@ -111,13 +103,13 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public ScriptDirectoryDto createDirectory(ApplicationUser user, ScriptDirectoryForm directoryForm) {
-        validateDirectoryForm(directoryForm);
+    public ScriptDirectoryDto createDirectory(ApplicationUser user, ScriptDirectoryForm form) {
+        validateDirectoryForm(form);
 
         ScriptDirectory directory = ao.create(
             ScriptDirectory.class,
-            new DBParam("NAME", directoryForm.getName()),
-            new DBParam("PARENT_ID", getParentDirectory(directoryForm.getParentId())),
+            new DBParam("NAME", form.getName()),
+            new DBParam("PARENT_ID", getParentDirectory(form.getParentId())),
             new DBParam("DELETED", false)
         );
 
@@ -134,10 +126,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public ScriptDirectoryDto updateDirectory(ApplicationUser user, int id, ScriptDirectoryForm directoryForm) {
+    public ScriptDirectoryDto updateDirectory(ApplicationUser user, int id, ScriptDirectoryForm form) {
         ScriptDirectory directory = ao.get(ScriptDirectory.class, id);
-        directory.setName(directoryForm.getName());
-        directory.setParent(getParentDirectory(directoryForm.getParentId()));
+        directory.setName(form.getName());
+        directory.setParent(getParentDirectory(form.getParentId()));
         directory.save();
 
         auditLogRepository.create(
@@ -180,7 +172,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public List<ScriptDto> getAllScripts(boolean includeChangelog) {
+    public List<RegistryScriptDto> getAllScripts(boolean includeChangelog) {
         return Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
             .map(script -> buildScriptDto(script, includeChangelog, false))
@@ -197,12 +189,12 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public ScriptDto getScript(int id, boolean includeChangelogs, boolean expandName) {
+    public RegistryScriptDto getScript(int id, boolean includeChangelogs, boolean expandName) {
         return buildScriptDto(ao.get(Script.class, id), includeChangelogs, expandName);
     }
 
     @Override
-    public ScriptDto createScript(ApplicationUser user, ScriptForm scriptForm) {
+    public RegistryScriptDto createScript(ApplicationUser user, RegistryScriptForm scriptForm) {
         if (scriptForm.getDirectoryId() == null) {
             throw new RuntimeException();
         }
@@ -220,16 +212,9 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             new DBParam("PARAMETERS", parameters)
         );
 
-        String diff = ChangelogUtil.generateDiff(script.getID(), "", script.getName(), "", scriptForm.getScriptBody());
+        String diff = changelogHelper.generateDiff(script.getID(), "", script.getName(), "", scriptForm.getScriptBody());
 
-        ao.create(
-            Changelog.class,
-            new DBParam("AUTHOR_KEY", user.getKey()),
-            new DBParam("SCRIPT_ID", script.getID()),
-            new DBParam("DATE", new Timestamp(System.currentTimeMillis())),
-            new DBParam("DIFF", diff),
-            new DBParam("COMMENT", "Created.")
-        );
+        changelogHelper.addChangelog(Changelog.class, script.getID(), user.getKey(), diff, "Created.");
 
         auditLogRepository.create(
             user,
@@ -244,14 +229,14 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public ScriptDto updateScript(ApplicationUser user, int id, ScriptForm scriptForm) {
+    public RegistryScriptDto updateScript(ApplicationUser user, int id, RegistryScriptForm scriptForm) {
         ParseContext parseContext = validateScriptForm(false, scriptForm);
 
         ClusterLock lock = clusterLockService.getLockForName(getLockKey(id));
 
         lock.lock();
         try {
-            ScriptDto result = doUpdateScript(user, id, scriptForm, parseContext);
+            RegistryScriptDto result = doUpdateScript(user, id, scriptForm, parseContext);
             scriptInvalidationService.invalidate(String.valueOf(id));
             return result;
         } finally {
@@ -259,23 +244,16 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
     }
 
-    private ScriptDto doUpdateScript(ApplicationUser user, int id, ScriptForm form, ParseContext parseContext) {
+    private RegistryScriptDto doUpdateScript(ApplicationUser user, int id, RegistryScriptForm form, ParseContext parseContext) {
         Script script = ao.get(Script.class, id);
 
         if (script.isDeleted()) {
             throw new IllegalArgumentException("Script " + id + " is deleted");
         }
 
-        String diff = ChangelogUtil.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
+        String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
 
-        ao.create(
-            Changelog.class,
-            new DBParam("AUTHOR_KEY", user.getKey()),
-            new DBParam("SCRIPT_ID", script.getID()),
-            new DBParam("DATE", new Timestamp(System.currentTimeMillis())),
-            new DBParam("DIFF", diff),
-            new DBParam("COMMENT", form.getComment())
-        );
+        changelogHelper.addChangelog(Changelog.class, script.getID(), user.getKey(), diff, form.getComment());
 
         String parameters = parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null;
 
@@ -322,8 +300,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         );
     }
 
-    private ScriptDto buildScriptDto(Script script, boolean includeChangelogs, boolean expandName) {
-        ScriptDto result = new ScriptDto();
+    private RegistryScriptDto buildScriptDto(Script script, boolean includeChangelogs, boolean expandName) {
+        RegistryScriptDto result = new RegistryScriptDto();
 
         result.setId(script.getID());
         result.setDirectoryId(script.getDirectory().getID());
@@ -342,7 +320,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                     Arrays
                         .stream(changelogs)
                         .sorted(Comparator.comparing(Changelog::getDate).reversed())
-                        .map(this::buildChangelogDto)
+                        .map(changelogHelper::buildDto)
                         .collect(Collectors.toList())
                 );
             }
@@ -369,7 +347,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return result;
     }
 
-    private static ScriptDirectoryTreeDto buildDirectoryTreeDto(ScriptDirectory directory, Multimap<Integer, ScriptDto> scripts) {
+    private static ScriptDirectoryTreeDto buildDirectoryTreeDto(ScriptDirectory directory, Multimap<Integer, RegistryScriptDto> scripts) {
         ScriptDirectoryTreeDto result = new ScriptDirectoryTreeDto();
 
         result.setId(directory.getID());
@@ -380,19 +358,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                 .map(child -> buildDirectoryTreeDto(child, scripts))
                 .collect(Collectors.toList())
         );
-        result.setScripts(scripts.get(directory.getID()).stream().sorted(Comparator.comparing(ScriptDto::getId)).collect(Collectors.toList()));
-
-        return result;
-    }
-
-    private ChangelogDto buildChangelogDto(Changelog changelog) {
-        ChangelogDto result = new ChangelogDto();
-
-        result.setId(changelog.getID());
-        result.setAuthor(userMapper.buildUser(changelog.getAuthorKey()));
-        result.setComment(changelog.getComment());
-        result.setDiff(changelog.getDiff());
-        result.setDate(dateTimeFormatter.forLoggedInUser().format(changelog.getDate()));
+        result.setScripts(scripts.get(directory.getID()).stream().sorted(Comparator.comparing(RegistryScriptDto::getId)).collect(Collectors.toList()));
 
         return result;
     }
@@ -403,7 +369,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
     }
 
-    private ParseContext validateScriptForm(boolean isNew, ScriptForm form) {
+    private ParseContext validateScriptForm(boolean isNew, RegistryScriptForm form) {
         ParseContext parseContext = scriptService.parseScript(form.getScriptBody());
 
         if (StringUtils.isEmpty(form.getName())) {
