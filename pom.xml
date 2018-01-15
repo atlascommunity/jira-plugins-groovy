@@ -176,7 +176,7 @@
         </plugins>
     </build>
     <properties>
-        <jira.version>7.5.2</jira.version>
+        <jira.version>7.6.3</jira.version>
         <amps.version>6.3.11</amps.version>
         <ao.version>1.5.0</ao.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
