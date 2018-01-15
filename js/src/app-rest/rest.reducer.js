@@ -8,7 +8,8 @@ const UPDATE_SCRIPT = 'UPDATE_SCRIPT';
 const DELETE_SCRIPT = 'DELETE_SCRIPT';
 
 export const scriptsReducer = combineReducers({
-    scripts: scriptReducer
+    scripts: scriptReducer,
+    ready: readyReducer
 });
 
 export const ScriptActionCreators = {
@@ -58,6 +59,18 @@ function scriptReducer(state, action) {
             });
         case DELETE_SCRIPT:
             return state.filter(script => script.id !== action.id);
+    }
+
+    return state;
+}
+
+function readyReducer(state, action) {
+    if (state === undefined) {
+        return false;
+    }
+
+    if (action.type === LOAD_SCRIPTS) {
+        return true;
     }
 
     return state;

@@ -4,6 +4,7 @@ import org.codehaus.jackson.type.TypeReference;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public final class Const {
     private Const() {
@@ -14,6 +15,8 @@ public final class Const {
     public static final String WF_REPOSITORY_SCRIPT_ID = "SCRIPT_ID";
     public static final String WF_REPOSITORY_SCRIPT_PARAM_PREFIX = "SCRIPT_PARAM_";
     public static final String WF_UUID = "UUID";
+
+    public static final Pattern REST_NAME_PATTERN = Pattern.compile("[a-z0-9_-]{1,64}");
 
     public static final TypeReference<List<ScriptParamDto>> PARAM_LIST_TYPE_REF = new TypeReference<List<ScriptParamDto>>() {
     };

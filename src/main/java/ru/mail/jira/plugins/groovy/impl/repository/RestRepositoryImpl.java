@@ -23,6 +23,7 @@ import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
 import ru.mail.jira.plugins.groovy.api.entity.RestChangelog;
 import ru.mail.jira.plugins.groovy.api.entity.RestScript;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
+import ru.mail.jira.plugins.groovy.util.Const;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -125,6 +126,9 @@ public class RestRepositoryImpl implements RestRepository {
         RestScript script = ao.get(RestScript.class, id);
 
         script.setDeleted(true);
+        script.save();
+
+        //todo: free name after deletion
 
         auditLogRepository.create(
             user,
@@ -166,6 +170,10 @@ public class RestRepositoryImpl implements RestRepository {
 
         if (StringUtils.isEmpty(form.getName())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
+        }
+
+        if (!Const.REST_NAME_PATTERN.matcher(form.getName()).matches()) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.incorrectRestName"), "name");
         }
 
         if (form.getMethods() == null || form.getMethods().isEmpty()) {

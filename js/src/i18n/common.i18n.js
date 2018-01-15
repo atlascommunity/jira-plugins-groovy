@@ -10,7 +10,8 @@ export const FieldMessages = {
     date: i18n.fields.date,
     time: i18n.fields.time,
     bindings: i18n.fields.bindings,
-    successful: i18n.fields.successful
+    successful: i18n.fields.successful,
+    httpMethods: i18n.fields.httpMethods
 };
 
 export const CommonMessages = {
@@ -33,4 +34,8 @@ export const CommonMessages = {
 
 export const DialogMessages = {
     notReady: i18n.dialog.notReady
+};
+
+export const ErrorMessages = {
+    noValue: i18n.error.noValue
 };

@@ -8,12 +8,13 @@ import {createStore} from 'redux';
 import AJS from 'AJS';
 
 import {ScriptActionCreators, scriptsReducer} from './rest.reducer';
+import {RestRegistryContainer} from './RestRegistryContainer';
 
 import '../flex.less';
 import {restService} from '../service/services';
 
 
-const store = createStore(scriptsReducer, {scripts: []});
+const store = createStore(scriptsReducer, {scripts: [], ready: false});
 
 AJS.toInit(() => {
     restService
@@ -23,7 +24,7 @@ AJS.toInit(() => {
     ReactDOM.render(
         <div>
             <Provider store={store}>
-                <div>KA</div>
+                <RestRegistryContainer/>
             </Provider>
         </div>,
         document.getElementById('react-content')

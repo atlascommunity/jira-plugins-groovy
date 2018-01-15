@@ -9,6 +9,7 @@ define('/mailru/groovy/i18n-react', function() {
             time: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.time'),
             bindings: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.bindings'),
             successful: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.successful'),
+            httpMethods: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.httpMethods')
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),
@@ -26,6 +27,9 @@ define('/mailru/groovy/i18n-react', function() {
             no: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.no'),
             error: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.error'),
             script: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.script'),
+        },
+        error: {
+            noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue')
         },
         console: {
             execute: AJS.I18n.getText('ru.mail.jira.plugins.groovy.console.execute'),
@@ -49,6 +53,12 @@ define('/mailru/groovy/i18n-react', function() {
             category: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.category'),
             action: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.action'),
             description: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.description'),
+        },
+        rest: {
+            nameDescription: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.nameDescription'),
+            addScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.addScript'),
+            updateScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.updateScript'),
+            createScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.createScript'),
         },
         dialog: {
             notReady: AJS.I18n.getText('ru.mail.jira.plugins.groovy.dialog.notReady')
