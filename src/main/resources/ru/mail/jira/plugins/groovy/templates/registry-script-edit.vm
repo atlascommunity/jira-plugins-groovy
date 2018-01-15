@@ -12,7 +12,7 @@ $webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.work
         renderRegistryScript(
             document.getElementById("mailru-registry-script-picker"),
             "script",
-            $id,
+            #if ($id) $id #else null #end,
             $valuesHtml
         );
     });
