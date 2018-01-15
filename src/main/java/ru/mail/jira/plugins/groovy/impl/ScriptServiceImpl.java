@@ -2,7 +2,6 @@ package ru.mail.jira.plugins.groovy.impl;
 
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.util.JiraUtils;
-import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.PluginEventListener;
@@ -152,10 +151,10 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
             if (injection.getPlugin() != null) {
                 Plugin plugin = pluginAccessor.getPlugin(injection.getPlugin());
                 Class pluginClass = plugin.getClassLoader().loadClass(injection.getClassName());
-                List<ModuleDescriptor> moduleDescriptors = plugin.getModuleDescriptorsByModuleClass(pluginClass);
+                Object component = ComponentAccessor.getOSGiComponentInstanceOfType(pluginClass);
 
-                if (moduleDescriptors.size() > 0) {
-                    bindings.put(injection.getVariableName(), moduleDescriptors.get(0).getModule());
+                if (component != null) {
+                    bindings.put(injection.getVariableName(), component);
                     continue;
                 }
             } else {
@@ -168,7 +167,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
                 }
             }
 
-            throw new RuntimeException("Unable to resolve injection");
+            throw new RuntimeException("Unable to resolve injection: " + injection);
         }
 
         for (Map.Entry<String, ScriptClosure> entry : globalFunctions.entrySet()) {
