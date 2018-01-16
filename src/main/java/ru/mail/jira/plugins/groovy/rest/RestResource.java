@@ -3,6 +3,7 @@ package ru.mail.jira.plugins.groovy.rest;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.websudo.WebSudoRequired;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import ru.mail.jira.plugins.groovy.api.RestRepository;
 import ru.mail.jira.plugins.groovy.api.dto.rest.RestScriptForm;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Response;
 
 @Scanned
 @Path("/rest")
+@WebSudoRequired
 public class RestResource {
     private final JiraAuthenticationContext authenticationContext;
     private final PermissionHelper permissionHelper;
@@ -33,6 +35,7 @@ public class RestResource {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @WebSudoRequired
     public Response createRestScript(RestScriptForm form) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
@@ -46,6 +49,7 @@ public class RestResource {
     @Path("/{id}")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
+    @WebSudoRequired
     public Response updateRestScript(@PathParam("id") int id, RestScriptForm form) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
@@ -59,6 +63,7 @@ public class RestResource {
     @Path("/{id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @WebSudoRequired
     public Response getRestScript(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
@@ -69,6 +74,7 @@ public class RestResource {
 
     @Path("/{id}")
     @DELETE
+    @WebSudoRequired
     public Response deleteRestScript(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
@@ -81,6 +87,7 @@ public class RestResource {
     @Path("/all")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @WebSudoRequired
     public Response getAllScripts() {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();

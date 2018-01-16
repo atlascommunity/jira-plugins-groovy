@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.rest;
 
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
+import com.atlassian.sal.api.websudo.WebSudoRequired;
 import ru.mail.jira.plugins.groovy.api.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 import ru.mail.jira.plugins.groovy.util.RestExecutor;
@@ -29,6 +30,7 @@ public class AuditLogResource {
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
+    @WebSudoRequired
     public Response getAuditLogPage(@QueryParam("offset") int offset) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();

@@ -4,13 +4,15 @@ import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.websudo.WebSudoManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 
 @Scanned
 public class RegistryServlet extends AbstractTemplateServlet {
     public RegistryServlet(
         @ComponentImport TemplateRenderer templateRenderer,
-        @ComponentImport WebSudoManager webSudoManager
+        @ComponentImport WebSudoManager webSudoManager,
+        PermissionHelper permissionHelper
     ) {
-        super(templateRenderer, webSudoManager, "ru/mail/jira/plugins/groovy/templates/registry.vm");
+        super(templateRenderer, webSudoManager, permissionHelper, "ru/mail/jira/plugins/groovy/templates/registry.vm");
     }
 }

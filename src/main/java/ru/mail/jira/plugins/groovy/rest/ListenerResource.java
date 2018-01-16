@@ -3,6 +3,7 @@ package ru.mail.jira.plugins.groovy.rest;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.websudo.WebSudoRequired;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import ru.mail.jira.plugins.groovy.api.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerForm;
@@ -32,6 +33,7 @@ public class ListenerResource {
 
     @GET
     @Path("/all")
+    @WebSudoRequired
     public Response getAllListeners() {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
@@ -42,6 +44,7 @@ public class ListenerResource {
 
     @GET
     @Path("/{id}")
+    @WebSudoRequired
     public Response getListener(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
@@ -52,6 +55,7 @@ public class ListenerResource {
 
     @POST
     @Path("/")
+    @WebSudoRequired
     public Response createListener(EventListenerForm form) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
@@ -64,6 +68,7 @@ public class ListenerResource {
 
     @PUT
     @Path("/{id}")
+    @WebSudoRequired
     public Response updateListener(@PathParam("id") int id, EventListenerForm form) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
@@ -76,6 +81,7 @@ public class ListenerResource {
 
     @DELETE
     @Path("/{id}")
+    @WebSudoRequired
     public Response deleteListener(@PathParam("id") int id) {
         return new RestExecutor<Void>(() -> {
             permissionHelper.checkIfAdmin();
