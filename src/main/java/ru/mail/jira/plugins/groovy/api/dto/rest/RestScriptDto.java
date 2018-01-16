@@ -14,6 +14,8 @@ public class RestScriptDto extends RestScriptForm {
     @XmlElement
     private Integer id;
     @XmlElement
+    private String uuid;
+    @XmlElement
     private boolean deleted;
     @XmlElement
     private List<ChangelogDto> changelogs;

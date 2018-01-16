@@ -7,6 +7,7 @@ import {Map} from 'immutable';
 
 import Button from 'aui-react/lib/AUIButton';
 import Modal from 'aui-react/lib/AUIDialog';
+import Message from 'aui-react/lib/AUIMessage';
 
 import {ScriptActionCreators} from './rest.reducer';
 
@@ -17,7 +18,11 @@ import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n
 
 import {restService} from '../service/services';
 import {Editor} from '../common/Editor';
+import {MultiSelect2} from '../common/MultiSelect2';
+import {getMarkers} from '../common/error';
 
+
+const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { label: method, value: method }; });
 
 @connect(
     () => { return{}; },
@@ -49,12 +54,18 @@ export class RestScriptDialog extends React.Component {
         if (props.isNew) {
             this.setState({
                 ready: true,
-                values: new Map()
+                values: new Map({
+                    name: '',
+                    methods: [],
+                    scriptBody: ''
+                }),
+                error: null
             });
         } else {
             this.setState({
                 ready: false,
-                values: null
+                values: null,
+                error: null
             });
 
             restService
@@ -63,12 +74,23 @@ export class RestScriptDialog extends React.Component {
                     this.setState({
                         values: new Map({
                             name: script.name,
-                            methods: script.methods,
-                            scriptBody: script.scriptBody
+                            methods: script.methods.map(method => { return { label: method, value: method }; }),
+                            scriptBody: script.scriptBody,
+                            comment: ''
                         }),
                         ready: true
                     });
                 });
+        }
+    };
+
+    _handleError = (error) => {
+        const {response} = error;
+
+        if (response.status === 400) {
+            this.setState({error: response.data});
+        } else {
+            throw error;
         }
     };
 
@@ -78,23 +100,34 @@ export class RestScriptDialog extends React.Component {
         }
 
         const {isNew, id, onClose} = this.props;
-        const data = this.state.values.toJS();
+
+        const jsData = this.state.values.toJS();
+        const data = {
+            ...jsData,
+            methods: jsData.methods ? jsData.methods.map(option => option.value) : null
+        };
 
         //todo: validation & error display
         if (isNew) {
             restService
                 .createScript(data)
-                .then(script => {
-                    onClose();
-                    this.props.addScript(script);
-                });
+                .then(
+                    script => {
+                        onClose();
+                        this.props.addScript(script);
+                    },
+                    this._handleError
+                );
         } else {
             restService
                 .updateScript(id, data)
-                .then(script => {
-                    onClose();
-                    this.props.updateScript(script);
-                });
+                .then(
+                    script => {
+                        onClose();
+                        this.props.updateScript(script);
+                    },
+                    this._handleError
+                );
         }
     };
 
@@ -112,15 +145,40 @@ export class RestScriptDialog extends React.Component {
 
     render() {
         const {onClose, isNew} = this.props;
-        const {ready, values} = this.state;
+        const {ready, values, error} = this.state;
 
         let body = null;
 
         if (!ready) {
             body = <div>{DialogMessages.notReady}</div>;
         } else {
+            let errorMessage = null;
+            let errorField = null;
+
+            let markers = null;
+            let annotations = null;
+
+            if (error) {
+                if (error.field === 'scriptBody' && Array.isArray(error.error)) {
+                    const errors = error.error.filter(e => e);
+                    markers = getMarkers(errors);
+                    errorMessage = errors
+                        .map(error => error.message)
+                        .map(error => <p key={error}>{error}</p>);
+                } else {
+                    errorMessage = error.message;
+                }
+                errorField = error.field;
+            }
+
             body =
                 <form className="aui" onSubmit={this._onSubmit}>
+                    {error && !errorField ?
+                        <Message type="error">
+                            {errorMessage}
+                        </Message>
+                    : null}
+
                     <div className="field-group">
                         <label htmlFor="directory-dialog-name">
                             {FieldMessages.name}
@@ -133,12 +191,21 @@ export class RestScriptDialog extends React.Component {
                             value={values.get('name') || ''}
                             onChange={this._setTextValue('name')}
                         />
-                        {/* todo: description */}
+                        <div className="description">{RestMessages.nameDescription}</div>
+                        {errorField === 'name' && <div className="error">{errorMessage}</div>}
                     </div>
                     <div className="field-group">
                         <label>
                             {FieldMessages.httpMethods}
                         </label>
+                        <MultiSelect2
+                            className="long-field"
+
+                            options={httpMethods}
+                            value={values.get('methods')}
+                            onChange={this._setObjectValue('methods')}
+                        />
+                        {errorField === 'methods' && <div className="error">{errorMessage}</div>}
                     </div>
                     <div className="field-group">
                         <label>
@@ -148,11 +215,15 @@ export class RestScriptDialog extends React.Component {
                         <Editor
                             mode="groovy"
 
-                            onChange={this._setObjectValue('script')}
-                            value={values.get('script') || ''}
+                            onChange={this._setObjectValue('scriptBody')}
+                            value={values.get('scriptBody') || ''}
+
+                            markers={markers}
+                            annotations={annotations}
                         />
+                        {errorField === 'scriptBody' && <div className="error">{errorMessage}</div>}
                     </div>
-                    {isNew && <div className="field-group">
+                    {!isNew && <div className="field-group">
                         <label>
                             {FieldMessages.comment}
                             <AUIRequired/>
@@ -164,11 +235,10 @@ export class RestScriptDialog extends React.Component {
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}
                         />
+                        {errorField === 'comment' && <div className="error">{errorMessage}</div>}
                     </div> }
                 </form>;
         }
-
-        //todo: delete
 
         return <Modal
             size="xlarge"

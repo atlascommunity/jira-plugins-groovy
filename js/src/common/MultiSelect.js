@@ -12,10 +12,6 @@ export class MultiSelect extends React.Component {
         onChange: PropTypes.func.isRequired
     };
 
-    state = {
-        ready: false
-    };
-
     _handleChange = (e) => {
         this.props.onChange([...e.target.selectedOptions].map(option => parseInt(option.value, 10)));
     };

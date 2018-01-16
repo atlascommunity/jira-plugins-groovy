@@ -55,7 +55,7 @@ export class RestRegistryContainer extends React.Component {
             content = <div>{CommonMessages.loading}</div>;
         } else {
             console.log(scripts);
-            content = <RestRegistry listeners={scripts} triggerDialog={this._triggerDialog}/>;
+            content = <RestRegistry scripts={scripts} triggerDialog={this._triggerDialog}/>;
         }
 
         return (

@@ -99,15 +99,16 @@ public class RestRepositoryImpl implements RestRepository {
         validateScriptForm(false, form);
 
         RestScript script = ao.get(RestScript.class, id);
+
+        String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
+
+        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, "Created.");
+
         script.setUuid(UUID.randomUUID().toString());
         script.setMethods(joinMethods(form.getMethods()));
         script.setName(form.getName());
         script.setScriptBody(form.getScriptBody());
         script.save();
-
-        String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
-
-        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, "Created.");
 
         auditLogRepository.create(
             user,
@@ -176,6 +177,12 @@ public class RestRepositoryImpl implements RestRepository {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.incorrectRestName"), "name");
         }
 
+        //todo: check if name is taken
+
+        if (StringUtils.isEmpty(form.getScriptBody())) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
+        }
+
         if (form.getMethods() == null || form.getMethods().isEmpty()) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "methods");
         }
@@ -191,6 +198,7 @@ public class RestRepositoryImpl implements RestRepository {
         RestScriptDto result = new RestScriptDto();
 
         result.setId(script.getID());
+        result.setUuid(script.getUuid());
         result.setName(script.getName());
         result.setMethods(parseMethods(script.getMethods()));
         result.setScriptBody(script.getScriptBody());

@@ -10,6 +10,8 @@ import {ScriptActionCreators} from './rest.reducer';
 import {restService} from '../service/services';
 import {RestMessages} from '../i18n/rest.i18n';
 import {Script} from '../common/Script';
+import {getBaseUrl, getPluginBaseUrl} from '../service/ajaxHelper';
+import {FieldMessages} from '../i18n/common.i18n';
 
 
 export class RestRegistry extends React.Component {
@@ -29,11 +31,11 @@ export class RestRegistry extends React.Component {
                     </Button>
                 </div>
                 <div className="flex-column">
-                    {this.props.listeners.map(listener =>
+                    {this.props.scripts.map(script =>
                         <RestScript
-                            key={listener.id}
-                            listener={listener}
-                            onEdit={this._triggerDialog(false, listener.id)}
+                            key={script.id}
+                            script={script}
+                            onEdit={this._triggerDialog(false, script.id)}
                         />
                     )}
                 </div>
@@ -66,21 +68,31 @@ class RestScript extends React.Component {
     render() {
         const {script, onEdit} = this.props;
 
+        const url = `${getPluginBaseUrl()}/custom/${script.name}`;
+
         return <div className="flex-column">
             <Script
                 script={{
                     id: script.uuid,
                     name: script.name,
                     inline: true,
-                    scriptBody: script.script
+                    scriptBody: script.scriptBody,
+                    changelogs: script.changelogs
                 }}
 
-                withChangelog={false}
+                withChangelog={true}
                 editable={true}
                 onEdit={onEdit}
                 onDelete={this._delete}
             >
-                {/*todo: rest info*/}
+                <div className="flex-column">
+                    <div>
+                        <a href={url}>{url}</a>
+                    </div>
+                    <div>
+                        <strong>{FieldMessages.httpMethods}{':'}</strong> {script.methods.join(', ')}
+                    </div>
+                </div>
             </Script>
         </div>;
     }

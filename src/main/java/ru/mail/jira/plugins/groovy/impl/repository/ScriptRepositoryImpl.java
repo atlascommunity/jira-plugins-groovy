@@ -376,6 +376,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
         }
 
+        if (StringUtils.isEmpty(form.getScriptBody())) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
+        }
+
         if (!isNew) {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");

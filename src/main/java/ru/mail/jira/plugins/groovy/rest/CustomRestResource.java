@@ -84,6 +84,10 @@ public class CustomRestResource {
     private Response runScript(HttpMethod method, String key, UriInfo uriInfo, String body) throws Exception {
         Script script = restRepository.getScript(method, key);
 
+        if (script == null) {
+            return Response.status(404).build();
+        }
+
         long t = System.currentTimeMillis();
         ApplicationUser user = authenticationContext.getLoggedInUser();
 
@@ -119,7 +123,7 @@ public class CustomRestResource {
             ImmutableMap.of(
                 "name", key,
                 "method", method.name(),
-                "uriInfo", Objects.toString(uriInfo),
+                "queryParameters", Objects.toString(uriInfo.getQueryParameters()),
                 "body", body != null ? body : "",
                 "user", user.getKey()
             )
