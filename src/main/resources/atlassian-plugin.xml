@@ -133,7 +133,8 @@
         <entity>ru.mail.jira.plugins.groovy.api.entity.ScriptDirectory</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.Changelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.ScriptExecution</entity>
-        <entity>ru.mail.jira.plugins.groovy.api.entity.EventListener</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.Listener</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.ListenerChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.AuditLogEntry</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestScript</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestChangelog</entity>

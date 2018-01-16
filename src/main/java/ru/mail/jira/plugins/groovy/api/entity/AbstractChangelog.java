@@ -7,7 +7,6 @@ import net.java.ao.schema.StringLength;
 
 import java.sql.Timestamp;
 
-//todo: changelog for listeners and rest
 @Polymorphic
 public interface AbstractChangelog extends Entity {
     @NotNull

@@ -4,13 +4,14 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 import Button from 'aui-react/lib/AUIButton';
+import Message from 'aui-react/lib/AUIMessage';
 
 import {ScriptActionCreators} from './rest.reducer';
 
 import {restService} from '../service/services';
 import {RestMessages} from '../i18n/rest.i18n';
 import {Script} from '../common/Script';
-import {getBaseUrl, getPluginBaseUrl} from '../service/ajaxHelper';
+import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {FieldMessages} from '../i18n/common.i18n';
 
 
@@ -23,6 +24,8 @@ export class RestRegistry extends React.Component {
     _triggerDialog = (isNew, id) => () => this.props.triggerDialog(isNew, id);
 
     render() {
+        const {scripts} = this.props;
+
         return (
             <div className="flex-column">
                 <div>
@@ -31,13 +34,16 @@ export class RestRegistry extends React.Component {
                     </Button>
                 </div>
                 <div className="flex-column">
-                    {this.props.scripts.map(script =>
-                        <RestScript
-                            key={script.id}
-                            script={script}
-                            onEdit={this._triggerDialog(false, script.id)}
-                        />
-                    )}
+                    <div>
+                        {scripts.map(script =>
+                            <RestScript
+                                key={script.id}
+                                script={script}
+                                onEdit={this._triggerDialog(false, script.id)}
+                            />
+                        )}
+                    </div>
+                    {!scripts.length && <Message type="info">{RestMessages.noScripts}</Message>}
                 </div>
             </div>
         );

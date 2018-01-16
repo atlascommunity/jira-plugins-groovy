@@ -14,7 +14,7 @@ export const ConditionModel = PropTypes.shape(ConditionShape);
 export const ListenerModel = PropTypes.shape({
     id: PropTypes.number.isRequired,
     uuid: PropTypes.string.isRequired,
-    script: PropTypes.string.isRequired,
+    scriptBody: PropTypes.string.isRequired,
     condition: ConditionModel.isRequired
 });
 

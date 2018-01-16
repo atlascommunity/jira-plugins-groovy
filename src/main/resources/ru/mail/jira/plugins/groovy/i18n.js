@@ -46,7 +46,8 @@ define('/mailru/groovy/i18n-react', function() {
             addListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.addListener'),
             createListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.createListener'),
             updateListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.updateListener'),
-            addCondition: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.addCondition')
+            addCondition: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.addCondition'),
+            noListeners: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.noListeners'),
         },
         audit: {
             user: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.user'),
@@ -59,6 +60,7 @@ define('/mailru/groovy/i18n-react', function() {
             addScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.addScript'),
             updateScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.updateScript'),
             createScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.createScript'),
+            noScripts: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.noScripts'),
         },
         dialog: {
             notReady: AJS.I18n.getText('ru.mail.jira.plugins.groovy.dialog.notReady')

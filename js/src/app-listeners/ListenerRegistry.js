@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 import Button from 'aui-react/lib/AUIButton';
+import Message from 'aui-react/lib/AUIMessage';
 
 import {ListenerActionCreators} from './listeners.reducer';
 
@@ -26,7 +27,7 @@ export class ListenerRegistry extends React.Component {
     _triggerDialog = (isNew, id) => () => this.props.triggerDialog(isNew, id);
 
     render() {
-        console.log(this.props.listeners);
+        const {listeners} = this.props;
 
         return (
             <div className="flex-column">
@@ -36,13 +37,16 @@ export class ListenerRegistry extends React.Component {
                     </Button>
                 </div>
                 <div className="flex-column">
-                    {this.props.listeners.map(listener =>
-                        <Listener
-                            key={listener.id}
-                            listener={listener}
-                            onEdit={this._triggerDialog(false, listener.id)}
-                        />
-                    )}
+                    <div>
+                        {listeners.map(listener =>
+                            <Listener
+                                key={listener.id}
+                                listener={listener}
+                                onEdit={this._triggerDialog(false, listener.id)}
+                            />
+                        )}
+                    </div>
+                    {!listeners.length && <Message type="info" title={ListenerMessages.noListeners}>{ListenerMessages.noListeners}</Message>}
                 </div>
             </div>
         );
@@ -78,10 +82,11 @@ class Listener extends React.Component {
                     id: listener.uuid,
                     name: listener.name,
                     inline: true,
-                    scriptBody: listener.script
+                    scriptBody: listener.scriptBody,
+                    changelogs: listener.changelogs
                 }}
 
-                withChangelog={false}
+                withChangelog={true}
                 editable={true}
                 onEdit={onEdit}
                 onDelete={this._delete}

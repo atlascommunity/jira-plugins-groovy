@@ -136,7 +136,7 @@ export class RestScriptDialog extends React.Component {
             return {
                 values: state.values.set(field, value)
             };
-        }, () => console.log(this.state.values.toJS()));
+        });
     };
 
     _setTextValue = (field) => (event) => this.mutateValue(field, event.target.value);
@@ -180,7 +180,7 @@ export class RestScriptDialog extends React.Component {
                     : null}
 
                     <div className="field-group">
-                        <label htmlFor="directory-dialog-name">
+                        <label htmlFor="rest-script-dialog-name">
                             {FieldMessages.name}
                             <AUIRequired/>
                         </label>
@@ -224,12 +224,12 @@ export class RestScriptDialog extends React.Component {
                         {errorField === 'scriptBody' && <div className="error">{errorMessage}</div>}
                     </div>
                     {!isNew && <div className="field-group">
-                        <label>
+                        <label htmlFor="rest-script-dialog-comment">
                             {FieldMessages.comment}
                             <AUIRequired/>
                         </label>
                         <textarea
-                            id={'rest-script-dialog-comment'}
+                            id="rest-script-dialog-comment"
                             className="textarea long-field"
 
                             value={values.get('comment') || ''}

@@ -13,7 +13,9 @@ public class EventListenerForm {
     @XmlElement
     private String name;
     @XmlElement
-    private String script;
+    private String scriptBody;
     @XmlElement
     private ConditionDescriptor condition;
+    @XmlElement
+    private String comment;
 }

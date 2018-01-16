@@ -7,6 +7,7 @@ import {Map} from 'immutable';
 
 import Button from 'aui-react/lib/AUIButton';
 import Modal from 'aui-react/lib/AUIDialog';
+import Message from 'aui-react/lib/AUIMessage';
 
 import {ConditionPicker} from './ConditionPicker';
 import {ListenerActionCreators} from './listeners.reducer';
@@ -20,6 +21,7 @@ import {fillListenerKeys} from '../model/listener.model';
 
 import {listenerService} from '../service/services';
 import {Editor} from '../common/Editor';
+import {getMarkers} from '../common/error';
 
 
 @connect(
@@ -71,7 +73,7 @@ export class ListenerDialog extends React.Component {
                     this.setState({
                         values: new Map({
                             name: listener.name,
-                            script: listener.script,
+                            scriptBody: listener.scriptBody,
                             condition: listener.condition
                         }),
                         ready: true
@@ -111,7 +113,7 @@ export class ListenerDialog extends React.Component {
             return {
                 values: state.values.set(field, value)
             };
-        }, () => console.log(this.state.values.toJS()));
+        });
     };
 
     _setTextValue = (field) => (event) => this.mutateValue(field, event.target.value);
@@ -120,27 +122,53 @@ export class ListenerDialog extends React.Component {
 
     render() {
         const {onClose, isNew} = this.props;
-        const {ready, values} = this.state;
+        const {ready, values, error} = this.state;
 
         let body = null;
 
         if (!ready) {
             body = <div>{DialogMessages.notReady}</div>;
         } else {
+            let errorMessage = null;
+            let errorField = null;
+
+            let markers = null;
+            let annotations = null;
+
+            if (error) {
+                if (error.field === 'scriptBody' && Array.isArray(error.error)) {
+                    const errors = error.error.filter(e => e);
+                    markers = getMarkers(errors);
+                    errorMessage = errors
+                        .map(error => error.message)
+                        .map(error => <p key={error}>{error}</p>);
+                } else {
+                    errorMessage = error.message;
+                }
+                errorField = error.field;
+            }
+
             body =
                 <form className="aui" onSubmit={this._onSubmit}>
+                    {error && !errorField ?
+                        <Message type="error">
+                            {errorMessage}
+                        </Message>
+                    : null}
+
                     <div className="field-group">
-                        <label htmlFor="directory-dialog-name">
+                        <label htmlFor="listener-dialog-name">
                             {FieldMessages.name}
                             <AUIRequired/>
                         </label>
                         <input
                             type="text"
                             className="text long-field"
-                            id="directory-dialog-name"
+                            id="listener-dialog-name"
                             value={values.get('name') || ''}
                             onChange={this._setTextValue('name')}
                         />
+                        {errorField === 'name' && <div className="error">{errorMessage}</div>}
                     </div>
                     <div className="field-group">
                         <label>
@@ -148,6 +176,7 @@ export class ListenerDialog extends React.Component {
                             <AUIRequired/>
                         </label>
                         <ConditionPicker value={values.get('condition')} onChange={this._setObjectValue('condition')}/>
+                        {errorField === 'condition' && <div className="error">{errorMessage}</div>}
                     </div>
                     <div className="field-group">
                         <label>
@@ -157,14 +186,30 @@ export class ListenerDialog extends React.Component {
                         <Editor
                             mode="groovy"
 
-                            onChange={this._setObjectValue('script')}
-                            value={values.get('script') || ''}
+                            onChange={this._setObjectValue('scriptBody')}
+                            value={values.get('scriptBody') || ''}
+
+                            markers={markers}
+                            annotations={annotations}
                         />
+                        {errorField === 'scriptBody' && <div className="error">{errorMessage}</div>}
                     </div>
+                    {!isNew && <div className="field-group">
+                        <label htmlFor="listener-dialog-comment">
+                            {FieldMessages.comment}
+                            <AUIRequired/>
+                        </label>
+                        <textarea
+                            id="listener-dialog-comment"
+                            className="textarea long-field"
+
+                            value={values.get('comment') || ''}
+                            onChange={this._setTextValue('comment')}
+                        />
+                        {errorField === 'comment' && <div className="error">{errorMessage}</div>}
+                    </div> }
                 </form>;
         }
-
-        //todo: delete
 
         return <Modal
             size="xlarge"

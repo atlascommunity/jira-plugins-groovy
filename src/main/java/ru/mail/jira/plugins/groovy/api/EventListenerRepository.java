@@ -10,7 +10,7 @@ import java.util.List;
 public interface EventListenerRepository {
     List<ScriptedEventListener> getAllListeners();
 
-    List<EventListenerDto> getListeners();
+    List<EventListenerDto> getListeners(boolean includeChangelogs);
 
     EventListenerDto getEventListener(int id);
 

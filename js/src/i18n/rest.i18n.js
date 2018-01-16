@@ -6,5 +6,6 @@ export const RestMessages = {
     nameDescription: i18n.rest.nameDescription,
     addScript: i18n.rest.addScript,
     createScript: i18n.rest.createScript,
-    updateScript: i18n.rest.updateScript
+    updateScript: i18n.rest.updateScript,
+    noScripts: i18n.rest.noScripts
 };

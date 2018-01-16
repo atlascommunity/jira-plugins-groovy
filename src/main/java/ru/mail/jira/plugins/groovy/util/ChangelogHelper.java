@@ -64,10 +64,14 @@ public final class ChangelogHelper {
     }
 
     public void addChangelog(Class<? extends AbstractChangelog> clazz, int scriptId, String userKey, String diff, String comment) {
+        addChangelog(clazz, "SCRIPT_ID", scriptId, userKey, diff, comment);
+    }
+
+    public void addChangelog(Class<? extends AbstractChangelog> clazz, String fkField, int scriptId, String userKey, String diff, String comment) {
         ao.create(
             clazz,
             new DBParam("AUTHOR_KEY", userKey),
-            new DBParam("SCRIPT_ID", scriptId),
+            new DBParam(fkField, scriptId),
             new DBParam("DATE", new Timestamp(System.currentTimeMillis())),
             new DBParam("DIFF", StringUtils.isEmptyOrNull(diff) ? "no changes" : diff),
             new DBParam("COMMENT", comment)

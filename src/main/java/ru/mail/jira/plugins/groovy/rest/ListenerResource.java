@@ -36,7 +36,7 @@ public class ListenerResource {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
-            return listenerRepository.getListeners();
+            return listenerRepository.getListeners(true);
         }).getResponse();
     }
 
