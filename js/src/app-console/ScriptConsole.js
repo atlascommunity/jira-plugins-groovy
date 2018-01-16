@@ -7,12 +7,13 @@ import {ConsoleMessages} from '../i18n/console.i18n';
 import {consoleService} from '../service/services';
 import {Editor} from '../common/Editor';
 
-//todo: add spinner
+
 export class ScriptConsole extends React.Component {
     state = {
         script: '',
         output: null,
-        error: null
+        error: null,
+        waiting: false
     };
 
     _scriptChange = (script) => this.setState({script: script});
@@ -22,23 +23,28 @@ export class ScriptConsole extends React.Component {
             e.preventDefault();
         }
 
+        this.setState({ waiting: true });
+
         consoleService
             .executeScript(this.state.script)
             .then(
-                output => this.setState({output, error: null}),
+                output => this.setState({ output, error: null, waiting: false }),
                 ({response}) => {
                     if (response.status === 500) {
                         this.setState({
                             error: response.data,
-                            output: null
+                            output: null,
+                            waiting: false
                         });
+                    } else {
+                        this.setState({ waiting: false });
                     }
                 }
             );
     };
 
     render() {
-        const state = this.state;
+        const {script, output, error, waiting} = this.state;
 
         return (
             <form className="aui flex-column" onSubmit={this._submit}>
@@ -46,28 +52,29 @@ export class ScriptConsole extends React.Component {
                     mode="groovy"
 
                     onChange={this._scriptChange}
-                    value={state.script}
+                    value={script}
                 />
                 <br/>
                 <div>
-                    <button className="button">{ConsoleMessages.execute}</button>
+                    <button className="button" disabled={waiting}>{ConsoleMessages.execute}</button>
                 </div>
                 <br/>
-                <div id="console-result">
-                    {state.output ?
+                {!waiting && <div id="console-result">
+                    {output ?
                         <div>
-                            <strong>{ConsoleMessages.executedIn(state.output.time)}</strong>
-                            <pre>{state.output.result}</pre>
+                            <strong>{ConsoleMessages.executedIn(output.time)}</strong>
+                            <pre>{output.result}</pre>
                         </div>
                     : null}
-                    {state.error ?
-                        <Message type="error" title={state.error.message}>
+                    {error ?
+                        <Message type="error" title={error.message}>
                             <pre style={{overflowX: 'auto'}}>
-                                {state.error['stack-trace']}
+                                {error['stack-trace']}
                             </pre>
                         </Message>
                     : null}
-                </div>
+                </div>}
+                {waiting && <div className="aui-icon aui-icon-wait"/>}
             </form>
         );
     }
