@@ -36,7 +36,10 @@ public abstract class AbstractTemplateServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            permissionHelper.checkIfAdmin();
+            if (!permissionHelper.isAdmin()) {
+                resp.sendError(403);
+                return;
+            }
 
             webSudoManager.willExecuteWebSudoRequest(req);
 
