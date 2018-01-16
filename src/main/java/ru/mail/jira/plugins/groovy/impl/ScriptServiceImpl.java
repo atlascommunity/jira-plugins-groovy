@@ -111,7 +111,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     private Object doExecuteScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> externalBindings) throws Exception {
         //todo: r lock
 
-        logger.info("started execution");
+        logger.debug("started execution");
 
         CompiledScript compiledScript = null;
 
@@ -142,7 +142,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
         classLoader.ensureAvailability(plugins);
 
-        logger.info("created class");
+        logger.debug("created class");
 
         HashMap<String, Object> bindings = new HashMap<>(externalBindings);
         bindings.put("scriptType", type);
@@ -178,15 +178,15 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
             bindings.put(entry.getKey(), entry.getValue().getValue());
         }
 
-        logger.info("initialized bindings");
+        logger.debug("initialized bindings");
 
         Script script = InvokerHelper.createScript(compiledScript.getScriptClass(), new Binding(bindings));
 
-        logger.info("created script");
+        logger.debug("created script");
 
         try {
             Object result = script.run();
-            logger.info("completed script");
+            logger.debug("completed script");
 
             return result;
         } finally {
@@ -209,19 +209,19 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     }
 
     private CompiledScript parseClass(String script, boolean extended) {
-        logger.info("parsing script");
+        logger.debug("parsing script");
         try {
             parseContextHolder.get().setExtended(extended);
 
             Class scriptClass = gcl.parseClass(script);
 
-            logger.info("parsed script");
+            logger.debug("parsed script");
             return new CompiledScript(
                 scriptClass,
                 parseContextHolder.get()
             );
         } finally {
-            logger.info("resetting parse context");
+            logger.debug("resetting parse context");
             this.parseContextHolder.reset();
         }
     }

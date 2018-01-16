@@ -8,7 +8,9 @@ public class ParseContextHolder {
     private final ThreadLocal<ParseContext> context = ThreadLocal.withInitial(ParseContext::new);
 
     public ParseContext get() {
-        logger.info("accessing parse context");
+        if (logger.isTraceEnabled()) {
+            logger.trace("accessing parse context");
+        }
         return context.get();
     }
 
