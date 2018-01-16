@@ -9,7 +9,10 @@ define('/mailru/groovy/i18n-react', function() {
             time: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.time'),
             bindings: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.bindings'),
             successful: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.successful'),
-            httpMethods: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.httpMethods')
+            httpMethods: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.httpMethods'),
+            projects: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.projects'),
+            eventTypes: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.eventTypes'),
+            type: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.type')
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),
@@ -48,6 +51,10 @@ define('/mailru/groovy/i18n-react', function() {
             updateListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.updateListener'),
             addCondition: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.addCondition'),
             noListeners: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.noListeners'),
+            type: {
+                className: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.type.className'),
+                issueEvent: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.type.issueEvent')
+            }
         },
         audit: {
             user: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.user'),

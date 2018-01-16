@@ -9,3 +9,8 @@ export const ListenerMessages = {
     updateListener: i18n.listener.updateListener,
     noListeners: i18n.listener.noListeners
 };
+
+export const ListenerTypeMessages = {
+    CLASS_NAME: i18n.listener.type.className,
+    ISSUE: i18n.listener.type.issueEvent
+};

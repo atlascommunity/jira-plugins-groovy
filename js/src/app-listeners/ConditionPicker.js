@@ -1,19 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Button from 'aui-react/lib/AUIButton';
-import Icon from 'aui-react/lib/AUIIcon';
-
 import {jiraService} from '../service/services';
-import {SingleSelect} from '../common/SingleSelect';
 import {AsyncLoadingMultiSelect} from '../common/AsyncLoadingMultiSelect';
 
-import {ConditionModel, conditionList, conditions} from '../model/listener.model';
-
-import {CommonMessages} from '../i18n/common.i18n';
-import {ListenerMessages} from '../i18n/listener.i18n';
+import {ConditionModel} from '../model/listener.model';
 
 import './ConditionPicker.less';
+import {FieldMessages} from '../i18n/common.i18n';
+import {ListenerTypeMessages} from '../i18n/listener.i18n';
 
 
 const projectsLoader = () => jiraService
@@ -38,23 +33,7 @@ export class ConditionPicker extends React.Component {
     static propTypes = {
         value: ConditionModel.isRequired,
         onChange: PropTypes.func.isRequired,
-        onDelete: function(props, propName) {
-            if (props.isDeletable && !props[propName]) {
-                return Error(`${propName} must be specified if component is deletable`);
-            }
-        },
-        isDeletable: PropTypes.bool.isRequired
     };
-
-    static defaultProps = {
-        isDeletable: false
-    };
-
-    constructor(props) {
-        super(props);
-
-        console.log(props.value);
-    }
 
     _onChange = property => {
         return val => {
@@ -67,12 +46,12 @@ export class ConditionPicker extends React.Component {
         };
     };
 
-    _onTypeChange = (val) => {
+    _onTypeChange = (val) => () => {
         const {value, onChange} = this.props;
 
         onChange({
             ...value,
-            type: val.value
+            type: val
         });
     };
 
@@ -87,172 +66,89 @@ export class ConditionPicker extends React.Component {
         };
     };
 
-    _onDelete = e => {
-        if (e) {
-            e.preventDefault();
-        }
-
-        this.props.onDelete();
-    };
-
-    _onReset = e => {
-        if (e) {
-            e.preventDefault();
-        }
-
-        const {value, onChange} = this.props;
-
-        onChange({
-            key: value.key
-        });
-    };
-
     render() {
-        const {value, isDeletable} = this.props;
+        const {value} = this.props;
 
-        console.log(value);
-
-        let typeEl = null;
         let paramEl = null;
 
         if (value.type) {
-            typeEl =
-                <div>
-                    <strong>{conditions[value.type].name}</strong>
-                    <a href="" onClick={this._onReset}>
-                        <Icon icon="edit"/>
-                    </a>
-                </div>;
-
             switch (value.type) {
-                case 'AND':
-                case 'OR':
-                    paramEl = <ConditionList
-                        value={value.children || []}
-                        onChange={this._onChange('children')}
-                    />;
-                    break;
                 case 'CLASS_NAME':
-                    paramEl = <input
-                        type="text"
-                        className="text long-field"
+                    paramEl = <div className="field-group">
+                            <label>
+                                {ListenerTypeMessages.CLASS_NAME}
+                            </label>
+                            <input
+                                type="text"
+                                className="text long-field"
 
-                        value={value.className || ''}
-                        onChange={this._onInputChange('className')}
-                    />;
+                                value={value.className || ''}
+                                onChange={this._onInputChange('className')}
+                            />
+                        </div>;
                     break;
-                case 'ISSUE_PROJECT':
-                    paramEl = <AsyncLoadingMultiSelect
-                        value={value.entityIds || []}
-                        onChange={this._onChange('entityIds')}
-                        loader={projectsLoader}
-                    />;
-                    break;
-                case 'ISSUE_EVENT_TYPE':
-                    paramEl = <AsyncLoadingMultiSelect
-                        value={value.entityIds || []}
-                        onChange={this._onChange('entityIds')}
-                        loader={eventTypeLoader}
-                    />;
+                case 'ISSUE':
+                    paramEl = [
+                            <div className="field-group" key="project">
+                                <label>
+                                    {FieldMessages.projects}
+                                </label>
+                                <AsyncLoadingMultiSelect
+                                    value={value.projectIds || []}
+                                    onChange={this._onChange('projectIds')}
+                                    loader={projectsLoader}
+                                />
+                            </div>,
+                            <div className="field-group" key="type">
+                                <label>
+                                    {FieldMessages.eventTypes}
+                                </label>
+                                <AsyncLoadingMultiSelect
+                                    value={value.typeIds || []}
+                                    onChange={this._onChange('typeIds')}
+                                    loader={eventTypeLoader}
+                                />
+                            </div>
+                        ];
                     break;
                 default:
                     paramEl = 'not implemented'; //todo
             }
-        } else {
-            typeEl = <SingleSelect
-                options={conditionList.map(type => { return {value: type.id, label: type.name}; })}
-                onChange={this._onTypeChange}
-            />;
         }
 
         return <div className="ConditionPicker">
             <div className="flex-row">
-                <div className="flex-grow">
-                    {typeEl}
-                </div>
-                {isDeletable && <div className="flex-none">
-                    <Button type="subtle" icon="delete" onClick={this._onDelete}>{CommonMessages.delete}</Button>
-                </div>}
+                <fieldset className="group">
+                    <legend>
+                        <span>{FieldMessages.type}</span>
+                    </legend>
+                    <div className="radio">
+                        <input
+                            className="radio"
+                            type="radio"
+                            name="listener-condition-type"
+                            id="listener-condition-type-issue"
+
+                            checked={value.type === 'ISSUE'}
+                            onClick={this._onTypeChange('ISSUE')}
+                        />
+                        <label htmlFor="listener-condition-type-issue">{ListenerTypeMessages.ISSUE}</label>
+                    </div>
+                    <div className="radio">
+                        <input
+                            className="radio"
+                            type="radio"
+                            name="listener-condition-type"
+                            id="listener-condition-type-class-name"
+
+                            checked={value.type === 'CLASS_NAME'}
+                            onClick={this._onTypeChange('CLASS_NAME')}
+                        />
+                        <label htmlFor="listener-condition-type-class-name">{ListenerTypeMessages.CLASS_NAME}</label>
+                    </div>
+                </fieldset>
             </div>
             {paramEl}
         </div>;
-    }
-}
-
-class ConditionList extends React.Component {
-    static propTypes = {
-        value: PropTypes.arrayOf(ConditionModel).isRequired,
-        onChange: PropTypes.func.isRequired
-    };
-
-    constructor(props) {
-        super(props);
-
-        this._genNextKey(props);
-    }
-
-    _genNextKey = props => {
-        const {value} = props;
-
-        if (!value.length) {
-            this.nextKey = 0;
-            return;
-        }
-
-        this.nextKey = Math.max(...value.map(condition => condition.key)) + 1;
-    };
-
-    _addItem = (e) => {
-        if (e) {
-            e.preventDefault();
-        }
-
-        this.props.onChange([...this.props.value, {key: this.nextKey++}]);
-    };
-
-    _onModified = (key) => {
-        return val => {
-            const {value, onChange} = this.props;
-
-            onChange(value.map(condition => {
-                if (condition.key === key) {
-                    return val;
-                } else {
-                    return condition;
-                }
-            }));
-        };
-    };
-
-    _onDelete = (key) => {
-        return () => {
-            const {value, onChange} = this.props;
-
-            onChange(value.filter(condition => condition.key !== key));
-        };
-    };
-
-    componentWillReceiveProps(nextProps) {
-        this._genNextKey(nextProps);
-    }
-
-    render() {
-        const {value} = this.props;
-
-        return (
-            <div className="flex-column">
-                {value.map(condition =>
-                    <ConditionPicker
-                        key={condition.key}
-                        onChange={this._onModified(condition.key)}
-                        onDelete={this._onDelete(condition.key)}
-                        value={condition}
-
-                        isDeletable={true}
-                    />
-                )}
-                <Button icon="add" type="subtle" onClick={this._addItem}>{ListenerMessages.addCondition}</Button>
-            </div>
-        );
     }
 }

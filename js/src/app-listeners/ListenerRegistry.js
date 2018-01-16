@@ -8,11 +8,13 @@ import Message from 'aui-react/lib/AUIMessage';
 
 import {ListenerActionCreators} from './listeners.reducer';
 
-import {ConditionModel, ListenerModel, conditions} from '../model/listener.model';
+import {ConditionModel, ListenerModel} from '../model/listener.model';
 
 import {listenerService} from '../service/services';
 
-import {ListenerMessages} from '../i18n/listener.i18n';
+import {ListenerMessages, ListenerTypeMessages} from '../i18n/listener.i18n';
+import {FieldMessages} from '../i18n/common.i18n';
+
 import {Script} from '../common/Script';
 
 import './ListenerRegistry.less';
@@ -119,28 +121,21 @@ class Condition extends React.Component {
         let vertical = true;
         let conditionBody = null;
         switch (condition.type) {
-            case 'AND':
-            case 'OR':
-                vertical = false;
-                conditionBody = condition.children
-                    .map(condition => <Condition
-                        key={condition.key}
-                        condition={condition}
-                        projects={projects}
-                        eventTypes={eventTypes}
-                    />);
-                break;
             case 'CLASS_NAME':
                 conditionBody = condition.className;
                 break;
-            case 'ISSUE_PROJECT':
-                conditionBody = condition.entityIds.map(id =>
-                    <div key={id}>{projects[id] || id}</div>
-                );
-                break;
-            case 'ISSUE_EVENT_TYPE':
-                conditionBody = condition.entityIds.map(id =>
-                    <div key={id}>{eventTypes[id] || id}</div>
+            case 'ISSUE':
+                conditionBody = (
+                    <div>
+                        <strong>{FieldMessages.projects}{':'}</strong>
+                        {condition.projectIds.map(id =>
+                            <div key={id}>{projects[id] || id}</div>
+                        )}
+                        <strong>{FieldMessages.eventTypes}{':'}</strong>
+                        {condition.typeIds.map(id =>
+                            <div key={id}>{eventTypes[id] || id}</div>
+                        )}
+                    </div>
                 );
                 break;
             default:
@@ -150,7 +145,7 @@ class Condition extends React.Component {
         return (
             <div className={`Condition ${vertical ? 'flex-column' : 'flex-row'}`}>
                 <div className="ConditionName">
-                    <strong>{conditions[condition.type].name}</strong>
+                    <strong>{ListenerTypeMessages[condition.type]}</strong>
                 </div>
                 <div className="ConditionBody">
                     {conditionBody}

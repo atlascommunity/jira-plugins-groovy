@@ -9,9 +9,12 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.commons.RestFieldException;
@@ -25,9 +28,9 @@ import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerForm;
 import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
 import ru.mail.jira.plugins.groovy.api.entity.Listener;
 import ru.mail.jira.plugins.groovy.api.entity.ListenerChangelog;
+import ru.mail.jira.plugins.groovy.impl.listener.ConditionType;
 import ru.mail.jira.plugins.groovy.impl.listener.ScriptedEventListener;
-import ru.mail.jira.plugins.groovy.impl.listener.condition.ConditionDescriptor;
-import ru.mail.jira.plugins.groovy.impl.listener.condition.ConditionFactory;
+import ru.mail.jira.plugins.groovy.impl.listener.ConditionDescriptor;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
@@ -40,10 +43,11 @@ import java.util.stream.Collectors;
 public class EventListenerRepositoryImpl implements EventListenerRepository {
     private static final String VALUE_KEY = "value";
 
+    private final Logger logger = LoggerFactory.getLogger(EventListenerRepositoryImpl.class);
+
     private final Cache<String, List<ScriptedEventListener>> cache;
     private final ActiveObjects ao;
     private final I18nHelper i18nHelper;
-    private final ConditionFactory conditionFactory;
     private final JsonMapper jsonMapper;
     private final AuditLogRepository auditLogRepository;
     private final ChangelogHelper changelogHelper;
@@ -54,7 +58,6 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         @ComponentImport CacheManager cacheManager,
         @ComponentImport ActiveObjects ao,
         @ComponentImport I18nHelper i18nHelper,
-        ConditionFactory conditionFactory,
         JsonMapper jsonMapper,
         AuditLogRepository auditLogRepository,
         ChangelogHelper changelogHelper,
@@ -70,7 +73,6 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         );
         this.ao = ao;
         this.i18nHelper = i18nHelper;
-        this.conditionFactory = conditionFactory;
         this.jsonMapper = jsonMapper;
         this.auditLogRepository = auditLogRepository;
         this.changelogHelper = changelogHelper;
@@ -224,15 +226,43 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             }
         }
 
-        conditionFactory.create(form.getCondition());
+        ConditionDescriptor condition = form.getCondition();
+        if (condition == null) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "condition");
+        }
+
+        if (condition.getType() == ConditionType.CLASS_NAME) {
+            try {
+                Class.forName(condition.getClassName());
+            } catch (ClassNotFoundException e) {
+                throw new RestFieldException("Unable to resolve class: " + e.getMessage(), "condition");
+            }
+        } else {
+            if (condition.getProjectIds() == null) {
+                condition.setProjectIds(ImmutableSet.of());
+            }
+            if (condition.getTypeIds() == null) {
+                condition.setTypeIds(ImmutableSet.of());
+            }
+            if (condition.getType() == ConditionType.ISSUE) {
+                condition.setClassName(null);
+            } else {
+                condition.setProjectIds(null);
+                condition.setTypeIds(null);
+            }
+        }
     }
 
-    private ScriptedEventListener buildEventListener(Listener listener) {
+    private ScriptedEventListener buildEventListener(Listener listener) throws ClassNotFoundException {
+        ConditionDescriptor descriptor = jsonMapper.read(listener.getCondition(), ConditionDescriptor.class);
+        if (descriptor.getClassName() != null) {
+            descriptor.setClassInstance(Class.forName(descriptor.getClassName()));
+        }
         return new ScriptedEventListener(
             listener.getID(),
             listener.getScriptBody(),
             listener.getUuid(),
-            conditionFactory.create(jsonMapper.read(listener.getCondition(), ConditionDescriptor.class))
+            descriptor
         );
     }
 
@@ -243,7 +273,15 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             if (Objects.equals(VALUE_KEY, key)) {
                 return Arrays
                     .stream(ao.find(Listener.class, Query.select().where("DELETED = ?", false)))
-                    .map(EventListenerRepositoryImpl.this::buildEventListener)
+                    .map(listener -> {
+                        try {
+                            return buildEventListener(listener);
+                        } catch (ClassNotFoundException e) {
+                            logger.error("unable to load class for condition", e);
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             } else {
                 return ImmutableList.of();

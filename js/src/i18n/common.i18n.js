@@ -11,7 +11,10 @@ export const FieldMessages = {
     time: i18n.fields.time,
     bindings: i18n.fields.bindings,
     successful: i18n.fields.successful,
-    httpMethods: i18n.fields.httpMethods
+    httpMethods: i18n.fields.httpMethods,
+    projects: i18n.fields.projects,
+    eventTypes: i18n.fields.eventTypes,
+    type: i18n.fields.type
 };
 
 export const CommonMessages = {

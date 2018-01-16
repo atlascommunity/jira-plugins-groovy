@@ -55,9 +55,10 @@ export class ListenerDialog extends React.Component {
             this.setState({
                 ready: true,
                 values: new Map({
-                    condition: {
-                        key: 0
-                    }
+                    condition: {},
+                    name: '',
+                    comment: '',
+                    scriptBody: ''
                 })
             });
         } else {
@@ -82,6 +83,16 @@ export class ListenerDialog extends React.Component {
         }
     };
 
+    _handleError = (error) => {
+        const {response} = error;
+
+        if (response.status === 400) {
+            this.setState({error: response.data});
+        } else {
+            throw error;
+        }
+    };
+
     _onSubmit = (e) => {
         if (e) {
             e.preventDefault();
@@ -90,21 +101,26 @@ export class ListenerDialog extends React.Component {
         const {isNew, id, onClose} = this.props;
         const data = this.state.values.toJS();
 
-        //todo: validation & error display
         if (isNew) {
             listenerService
                 .createListener(data)
-                .then(listener => {
-                    onClose();
-                    this.props.addListener(fillListenerKeys(listener));
-                });
+                .then(
+                    listener => {
+                        onClose();
+                        this.props.addListener(fillListenerKeys(listener));
+                    },
+                    this._handleError
+                );
         } else {
             listenerService
                 .updateListener(id, data)
-                .then(listener => {
-                    onClose();
-                    this.props.updateListener(fillListenerKeys(listener));
-                });
+                .then(
+                    listener => {
+                        onClose();
+                        this.props.updateListener(fillListenerKeys(listener));
+                    },
+                    this._handleError
+                );
         }
     };
 

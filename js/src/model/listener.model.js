@@ -1,15 +1,12 @@
 import PropTypes from 'prop-types';
 
 
-const ConditionShape = {
-    key: PropTypes.number.isRequired, //must have key
+export const ConditionModel = PropTypes.shape({
     type: PropTypes.string,
     className: PropTypes.string,
-    entityIds: PropTypes.arrayOf(PropTypes.number)
-};
-ConditionShape.children = PropTypes.arrayOf(PropTypes.shape(ConditionShape));
-
-export const ConditionModel = PropTypes.shape(ConditionShape);
+    projectIds: PropTypes.arrayOf(PropTypes.number),
+    typeIds: PropTypes.arrayOf(PropTypes.number)
+});
 
 export const ListenerModel = PropTypes.shape({
     id: PropTypes.number.isRequired,
@@ -17,37 +14,6 @@ export const ListenerModel = PropTypes.shape({
     scriptBody: PropTypes.string.isRequired,
     condition: ConditionModel.isRequired
 });
-
-
-export const conditions = {
-    'AND': {
-        id: 'AND',
-        name: 'And',
-        requiresChildren: true
-    },
-    'OR': {
-        id: 'OR',
-        name: 'Or',
-        requiresChildren: true
-    },
-    'CLASS_NAME': {
-        id: 'CLASS_NAME',
-        name: 'Class name',
-        requiresChildren: false
-    },
-    'ISSUE_PROJECT': {
-        id: 'ISSUE_PROJECT',
-        name: 'Issue project',
-        requiresChildren: false
-    },
-    'ISSUE_EVENT_TYPE': {
-        id: 'ISSUE_EVENT_TYPE',
-        name: 'IssueEvent type',
-        requiresChildren: false
-    }
-};
-
-export const conditionList = Object.values(conditions);
 
 function fillConditionKeys(condition) {
     if (condition.children) {

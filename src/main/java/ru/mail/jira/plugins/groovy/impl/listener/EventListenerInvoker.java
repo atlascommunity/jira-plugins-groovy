@@ -2,6 +2,8 @@ package ru.mail.jira.plugins.groovy.impl.listener;
 
 import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
+import com.atlassian.jira.event.issue.IssueEvent;
+import com.atlassian.jira.issue.Issue;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
@@ -15,6 +17,8 @@ import ru.mail.jira.plugins.groovy.api.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
+
+import java.util.Set;
 
 @Component
 @ExportAsService({LifecycleAware.class})
@@ -51,6 +55,33 @@ public class EventListenerInvoker implements LifecycleAware {
     }
 
     @EventListener
+    public void onIssueEvent(IssueEvent event) {
+        if (logger.isTraceEnabled()) {
+            logger.trace("Event {}", event.getClass());
+        }
+
+        if (event == null) {
+            logger.warn("event is null");
+            return;
+        }
+
+        for (ScriptedEventListener listener : eventListenerRepository.getAllListeners()) {
+            ConditionDescriptor condition = listener.getCondition();
+            if (condition.getType() == ConditionType.ISSUE) {
+                Set<Long> typeIds = condition.getTypeIds();
+                Set<Long> projectIds = condition.getProjectIds();
+                Issue issue = event.getIssue();
+                if (
+                    (typeIds.isEmpty() || typeIds.contains(event.getEventTypeId())) &&
+                    (projectIds.isEmpty() || projectIds.contains(issue.getProjectId()))
+                ) {
+                    executeScript(listener, event);
+                }
+            }
+        }
+    }
+
+    @EventListener
     public void onEvent(Object event) {
         if (logger.isTraceEnabled()) {
             logger.trace("Event {}", event.getClass());
@@ -62,32 +93,39 @@ public class EventListenerInvoker implements LifecycleAware {
         }
 
         for (ScriptedEventListener listener : eventListenerRepository.getAllListeners()) {
-            if (listener.passesCondition(event)) {
-                String uuid = listener.getUuid();
-                long t = System.currentTimeMillis();
-                boolean successful = true;
-                String error = null;
-
-                try {
-                    scriptService.executeScript(
-                        uuid,
-                        listener.getScript(),
-                        ScriptType.LISTENER,
-                        ImmutableMap.of("event", event)
-                    );
-                } catch (Exception e) {
-                    logger.error("Was unable to execute listener {}/{}", listener.getId(), uuid, e);
-                    successful = false;
-                    error = ExceptionHelper.writeExceptionToString(e);
-                } finally {
-                    t = System.currentTimeMillis() - t;
+            ConditionDescriptor condition = listener.getCondition();
+            if (condition.getType() == ConditionType.CLASS_NAME) {
+                if (condition.getClassInstance().isInstance(event)) {
+                    executeScript(listener, event);
                 }
-
-                executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
-                    "event", event.toString(),
-                    "type", ScriptType.LISTENER.name()
-                ));
             }
         }
+    }
+
+    private void executeScript(ScriptedEventListener listener, Object event) {
+        String uuid = listener.getUuid();
+        long t = System.currentTimeMillis();
+        boolean successful = true;
+        String error = null;
+
+        try {
+            scriptService.executeScript(
+                uuid,
+                listener.getScript(),
+                ScriptType.LISTENER,
+                ImmutableMap.of("event", event)
+            );
+        } catch (Exception e) {
+            logger.error("Was unable to execute listener {}/{}", listener.getId(), uuid, e);
+            successful = false;
+            error = ExceptionHelper.writeExceptionToString(e);
+        } finally {
+            t = System.currentTimeMillis() - t;
+        }
+
+        executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
+            "event", event.toString(),
+            "type", ScriptType.LISTENER.name()
+        ));
     }
 }
