@@ -9,6 +9,8 @@ import 'brace/theme/chrome';
 
 import Ace from 'react-ace';
 
+import './Editor.less';
+
 
 let count = 0;
 

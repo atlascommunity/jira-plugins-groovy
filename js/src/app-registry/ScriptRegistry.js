@@ -82,7 +82,7 @@ export class ScriptRegistry extends React.Component {
                     />
                 )}
 
-                {!this.props.directories.length ? <Message type="info" title="You have no scripts.">{RegistryMessages.noScripts}</Message> : null}
+                {!this.props.directories.length ? <Message type="info" title={RegistryMessages.noScripts}>{RegistryMessages.noScripts}</Message> : null}
                 <ScriptDirectoryDialog ref={this._setRef('directoryDialogRef')}/>
                 <ScriptDialog ref={this._setRef('scriptDialogRef')}/>
             </div>

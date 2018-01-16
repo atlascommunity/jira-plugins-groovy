@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.api.dto;
+package ru.mail.jira.plugins.groovy.api.dto.listener;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,9 @@ public class EventListenerForm {
     @XmlElement
     private String name;
     @XmlElement
-    private String script;
+    private String scriptBody;
     @XmlElement
     private ConditionDescriptor condition;
+    @XmlElement
+    private String comment;
 }

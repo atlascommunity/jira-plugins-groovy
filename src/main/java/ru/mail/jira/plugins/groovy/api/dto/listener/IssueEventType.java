@@ -1,6 +1,5 @@
-package ru.mail.jira.plugins.groovy.api.dto;
+package ru.mail.jira.plugins.groovy.api.dto.listener;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,11 +7,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Getter @Setter
-@AllArgsConstructor
 @XmlRootElement
-public class ConsoleResponse {
+public class IssueEventType {
     @XmlElement
-    private String result;
+    private Long id;
     @XmlElement
-    private long time;
+    private String name;
 }

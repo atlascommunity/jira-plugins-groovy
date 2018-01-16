@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 import com.opensymphony.workflow.loader.AbstractDescriptor;
 import ru.mail.jira.plugins.groovy.api.ScriptRepository;
-import ru.mail.jira.plugins.groovy.api.dto.ScriptDto;
+import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.Const;
@@ -43,7 +43,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
 
         String idString = (String) args.get(Const.WF_REPOSITORY_SCRIPT_ID);
         Integer scriptId = Ints.tryParse(idString);
-        ScriptDto script = null;
+        RegistryScriptDto script = null;
         if (scriptId != null) {
             script = scriptRepository.getScript(scriptId, false, false);
         }
@@ -67,7 +67,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
 
         Integer id = Ints.tryParse(idString);
         if (id != null) {
-            ScriptDto script = scriptRepository.getScript(id, false, true);
+            RegistryScriptDto script = scriptRepository.getScript(id, false, true);
 
             if (script != null) {
                 map.put("script", script);
@@ -93,7 +93,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
             throw new RuntimeException("script is not a number");
         }
 
-        ScriptDto script = scriptRepository.getScript(scriptId, false, false);
+        RegistryScriptDto script = scriptRepository.getScript(scriptId, false, false);
 
         if (script.getParams() != null) {
             for (ScriptParamDto scriptParamDto : script.getParams()) {
@@ -109,7 +109,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
         return params;
     }
 
-    private Map<String, Object> getScriptParams(ScriptDto script, Map<String, Object> args) {
+    private Map<String, Object> getScriptParams(RegistryScriptDto script, Map<String, Object> args) {
         Map<String, Object> values = new HashMap<>();
         if (script != null) {
             if (script.getParams() != null) {

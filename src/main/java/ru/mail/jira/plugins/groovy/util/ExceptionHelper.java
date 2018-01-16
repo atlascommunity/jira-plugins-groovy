@@ -25,7 +25,7 @@ public final class ExceptionHelper {
 
     public static Map<String, Object> mapCompilationException(String fieldName, MultipleCompilationErrorsException e) {
         return ImmutableMap.of(
-            "field", "scriptBody",
+            "field", fieldName,
             "error", e
                 .getErrorCollector()
                 .getErrors()

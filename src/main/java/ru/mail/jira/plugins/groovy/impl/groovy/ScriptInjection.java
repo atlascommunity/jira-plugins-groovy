@@ -2,10 +2,11 @@ package ru.mail.jira.plugins.groovy.impl.groovy;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Objects;
 
-@Getter @Setter
+@Getter @Setter @ToString
 public class ScriptInjection {
     private String plugin;
     private String className;

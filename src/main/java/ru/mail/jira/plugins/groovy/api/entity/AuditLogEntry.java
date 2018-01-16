@@ -2,7 +2,7 @@ package ru.mail.jira.plugins.groovy.api.entity;
 
 import net.java.ao.Entity;
 import net.java.ao.schema.NotNull;
-import ru.mail.jira.plugins.groovy.api.dto.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.dto.audit.AuditCategory;
 
 import java.sql.Timestamp;
 

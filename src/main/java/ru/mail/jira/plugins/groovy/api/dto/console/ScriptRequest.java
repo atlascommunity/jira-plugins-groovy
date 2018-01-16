@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.api.dto;
+package ru.mail.jira.plugins.groovy.api.dto.console;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,9 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @Getter @Setter
 @XmlRootElement
-public class EventListenerDto extends EventListenerForm {
+public class ScriptRequest {
     @XmlElement
-    private int id;
-    @XmlElement
-    private String uuid;
+    private String script;
 }

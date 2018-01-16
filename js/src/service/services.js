@@ -8,6 +8,7 @@ import {ExecutionService} from './execution.service';
 import {JiraService} from './jira.service';
 import {ExtrasService} from './extrasService';
 import {AuditLogService} from './auditLogService';
+import {RestService} from './rest.service';
 
 
 export const listenerService = new ListenerService();
@@ -17,6 +18,7 @@ export const executionService = new ExecutionService();
 export const jiraService = new JiraService();
 export const extrasService = new ExtrasService();
 export const auditLogService = new AuditLogService();
+export const restService = new RestService();
 
 
 window.addEventListener('unhandledrejection', function(err) {

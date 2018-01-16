@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.api.dto;
+package ru.mail.jira.plugins.groovy.api.dto.directory;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,5 +18,5 @@ public class ScriptDirectoryTreeDto {
     @XmlElement
     private List<ScriptDirectoryTreeDto> children;
     @XmlElement
-    private Collection<ScriptDto> scripts;
+    private Collection<RegistryScriptDto> scripts;
 }

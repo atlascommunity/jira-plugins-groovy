@@ -6,30 +6,33 @@ import com.atlassian.cache.CacheLoader;
 import com.atlassian.cache.CacheManager;
 import com.atlassian.cache.CacheSettingsBuilder;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableList;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.commons.RestFieldException;
 import ru.mail.jira.plugins.groovy.api.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.EventListenerRepository;
-import ru.mail.jira.plugins.groovy.api.dto.AuditCategory;
-import ru.mail.jira.plugins.groovy.api.dto.AuditLogEntryForm;
-import ru.mail.jira.plugins.groovy.api.dto.EventListenerDto;
-import ru.mail.jira.plugins.groovy.api.dto.EventListenerForm;
+import ru.mail.jira.plugins.groovy.api.ScriptService;
+import ru.mail.jira.plugins.groovy.api.dto.audit.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
+import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerDto;
+import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerForm;
 import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
-import ru.mail.jira.plugins.groovy.api.entity.EventListener;
+import ru.mail.jira.plugins.groovy.api.entity.Listener;
+import ru.mail.jira.plugins.groovy.api.entity.ListenerChangelog;
 import ru.mail.jira.plugins.groovy.impl.listener.ScriptedEventListener;
 import ru.mail.jira.plugins.groovy.impl.listener.condition.ConditionDescriptor;
 import ru.mail.jira.plugins.groovy.impl.listener.condition.ConditionFactory;
+import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -39,17 +42,23 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
     private final Cache<String, List<ScriptedEventListener>> cache;
     private final ActiveObjects ao;
+    private final I18nHelper i18nHelper;
     private final ConditionFactory conditionFactory;
     private final JsonMapper jsonMapper;
     private final AuditLogRepository auditLogRepository;
+    private final ChangelogHelper changelogHelper;
+    private final ScriptService scriptService;
 
     @Autowired
     public EventListenerRepositoryImpl(
         @ComponentImport CacheManager cacheManager,
         @ComponentImport ActiveObjects ao,
+        @ComponentImport I18nHelper i18nHelper,
         ConditionFactory conditionFactory,
         JsonMapper jsonMapper,
-        AuditLogRepository auditLogRepository
+        AuditLogRepository auditLogRepository,
+        ChangelogHelper changelogHelper,
+        ScriptService scriptService
     ) {
         cache = cacheManager.getCache(EventListenerRepositoryImpl.class.getName() + ".cache",
             new EventListenerCacheLoader(),
@@ -60,9 +69,12 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
                 .build()
         );
         this.ao = ao;
+        this.i18nHelper = i18nHelper;
         this.conditionFactory = conditionFactory;
         this.jsonMapper = jsonMapper;
         this.auditLogRepository = auditLogRepository;
+        this.changelogHelper = changelogHelper;
+        this.scriptService = scriptService;
     }
 
     @Override
@@ -71,29 +83,34 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     }
 
     @Override
-    public List<EventListenerDto> getListeners() {
+    public List<EventListenerDto> getListeners(boolean includeChangelogs) {
         return Arrays
-            .stream(ao.find(EventListener.class, Query.select().where("DELETED = ?", false)))
-            .map(this::buildDto)
+            .stream(ao.find(Listener.class, Query.select().where("DELETED = ?", false)))
+            .map(listener -> buildDto(listener, includeChangelogs))
             .collect(Collectors.toList());
     }
 
     @Override
     public EventListenerDto getEventListener(int id) {
-        return buildDto(ao.get(EventListener.class, id));
+        return buildDto(ao.get(Listener.class, id), true);
     }
 
     @Override
     public EventListenerDto createEventListener(ApplicationUser user, EventListenerForm form) {
-        EventListener listener = ao.create(
-            EventListener.class,
+        validateListener(true, form);
+
+        Listener listener = ao.create(
+            Listener.class,
             new DBParam("UUID", UUID.randomUUID().toString()),
             new DBParam("NAME", form.getName()),
-            new DBParam("SCRIPT", form.getScript()),
-            new DBParam("AUTHOR_KEY", user.getKey()),
+            new DBParam("SCRIPT_BODY", form.getScriptBody()),
             new DBParam("DELETED", false),
             new DBParam("CONDITION", jsonMapper.write(form.getCondition()))
         );
+
+        String diff = changelogHelper.generateDiff(listener.getID(), "", listener.getName(), "", form.getScriptBody());
+
+        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, "Created.");
 
         cache.remove(VALUE_KEY);
 
@@ -106,20 +123,26 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             )
         );
 
-        return buildDto(listener);
+        return buildDto(listener, true);
     }
 
     @Override
     public EventListenerDto updateEventListener(ApplicationUser user, int id, EventListenerForm form) {
-        EventListener listener = ao.get(EventListener.class, id);
+        validateListener(false, form);
+
+        Listener listener = ao.get(Listener.class, id);
 
         if (listener == null || listener.isDeleted()) {
             throw new RuntimeException("Event listener is deleted");
         }
 
+        String diff = changelogHelper.generateDiff(id, listener.getName(), form.getName(), listener.getScriptBody(), form.getScriptBody());
+
+        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, form.getComment());
+
         listener.setName(form.getName());
         listener.setUuid(UUID.randomUUID().toString());
-        listener.setScript(form.getScript());
+        listener.setScriptBody(form.getScriptBody());
         listener.setCondition(jsonMapper.write(form.getCondition()));
         listener.save();
 
@@ -134,12 +157,12 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             )
         );
 
-        return buildDto(listener);
+        return buildDto(listener, true);
     }
 
     @Override
     public void deleteEventListener(ApplicationUser user, int id) {
-        EventListener listener = ao.get(EventListener.class, id);
+        Listener listener = ao.get(Listener.class, id);
         listener.setDeleted(true);
         listener.save();
 
@@ -160,20 +183,54 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         cache.removeAll();
     }
 
-    private EventListenerDto buildDto(EventListener listener) {
+    private EventListenerDto buildDto(Listener listener, boolean includeChangelogs) {
         EventListenerDto result = new EventListenerDto();
         result.setId(listener.getID());
         result.setName(listener.getName());
-        result.setScript(listener.getScript());
+        result.setScriptBody(listener.getScriptBody());
         result.setUuid(listener.getUuid());
         result.setCondition(jsonMapper.read(listener.getCondition(), ConditionDescriptor.class));
+
+        if (includeChangelogs) {
+            ListenerChangelog[] changelogs = listener.getChangelogs();
+            if (changelogs != null) {
+                result.setChangelogs(
+                    Arrays
+                        .stream(changelogs)
+                        .sorted(Comparator.comparing(ListenerChangelog::getDate).reversed())
+                        .map(changelogHelper::buildDto)
+                        .collect(Collectors.toList())
+                );
+            }
+        }
+
         return result;
     }
 
-    private ScriptedEventListener buildEventListener(EventListener listener) {
+    private void validateListener(boolean isNew, EventListenerForm form) {
+        scriptService.parseScript(form.getScriptBody());
+
+        if (StringUtils.isEmpty(form.getName())) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
+        }
+
+        if (StringUtils.isEmpty(form.getScriptBody())) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
+        }
+
+        if (!isNew) {
+            if (StringUtils.isEmpty(form.getComment())) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
+            }
+        }
+
+        conditionFactory.create(form.getCondition());
+    }
+
+    private ScriptedEventListener buildEventListener(Listener listener) {
         return new ScriptedEventListener(
             listener.getID(),
-            listener.getScript(),
+            listener.getScriptBody(),
             listener.getUuid(),
             conditionFactory.create(jsonMapper.read(listener.getCondition(), ConditionDescriptor.class))
         );
@@ -185,7 +242,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         public List<ScriptedEventListener> load(@Nonnull String key) {
             if (Objects.equals(VALUE_KEY, key)) {
                 return Arrays
-                    .stream(ao.find(EventListener.class, Query.select().where("DELETED = ?", false)))
+                    .stream(ao.find(Listener.class, Query.select().where("DELETED = ?", false)))
                     .map(EventListenerRepositoryImpl.this::buildEventListener)
                     .collect(Collectors.toList());
             } else {

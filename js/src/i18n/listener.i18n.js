@@ -7,4 +7,5 @@ export const ListenerMessages = {
     addCondition: i18n.listener.addCondition,
     createListener: i18n.listener.createListener,
     updateListener: i18n.listener.updateListener,
+    noListeners: i18n.listener.noListeners
 };

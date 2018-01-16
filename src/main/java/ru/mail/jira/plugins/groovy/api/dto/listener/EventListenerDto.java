@@ -1,7 +1,8 @@
-package ru.mail.jira.plugins.groovy.api.dto;
+package ru.mail.jira.plugins.groovy.api.dto.listener;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -9,13 +10,11 @@ import java.util.List;
 
 @Getter @Setter
 @XmlRootElement
-public class ScriptDto extends ScriptForm {
+public class EventListenerDto extends EventListenerForm {
     @XmlElement
-    private Integer id;
+    private int id;
     @XmlElement
-    private boolean deleted;
+    private String uuid;
     @XmlElement
     private List<ChangelogDto> changelogs;
-    @XmlElement
-    private List<ScriptParamDto> params;
 }

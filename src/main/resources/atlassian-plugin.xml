@@ -74,6 +74,15 @@
         <context>ru.mail.jira.plugins.groovy.audit</context>
     </web-resource>
 
+    <web-resource key="rest-resources" name="groovy rest Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="rest.js" location="/ru/mail/jira/plugins/groovy/js/rest.js"/>
+        <resource type="download" name="rest.js.map" location="/ru/mail/jira/plugins/groovy/js/rest.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.rest</context>
+    </web-resource>
+
     <web-resource key="extras-resources" name="groovy extras Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
@@ -114,13 +123,21 @@
         <url-pattern>/my-groovy/audit</url-pattern>
     </servlet>
 
+    <servlet name="REST servlet" key="rest-servlet" class="ru.mail.jira.plugins.groovy.servlet.RestServlet">
+        <description>REST servlet</description>
+        <url-pattern>/my-groovy/rest</url-pattern>
+    </servlet>
+
     <ao key="ao-entities">
         <entity>ru.mail.jira.plugins.groovy.api.entity.Script</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.ScriptDirectory</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.Changelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.ScriptExecution</entity>
-        <entity>ru.mail.jira.plugins.groovy.api.entity.EventListener</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.Listener</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.ListenerChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.AuditLogEntry</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.RestScript</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.RestChangelog</entity>
     </ao>
 
     <workflow-condition
@@ -321,6 +338,16 @@
         <description>Link to groovy audit page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.audit" />
         <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/audit</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
+    <web-item key="groovy-rest-menu-item" name="Groovy rest menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy rest page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.rest" />
+        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/rest</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>

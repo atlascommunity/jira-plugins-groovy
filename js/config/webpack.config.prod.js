@@ -92,6 +92,7 @@ module.exports = {
         workflow: [require.resolve('./polyfills'), paths.resolveApp('src/app-workflow/index.js')],
         listeners: [require.resolve('./polyfills'), paths.resolveApp('src/app-listeners/index.js')],
         audit: [require.resolve('./polyfills'), paths.resolveApp('src/app-audit/index.js')],
+        rest: [require.resolve('./polyfills'), paths.resolveApp('src/app-rest/index.js')],
         extras: [require.resolve('./polyfills'), paths.resolveApp('src/app-extras/index.js')],
     },
     output: {

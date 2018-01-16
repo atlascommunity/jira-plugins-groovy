@@ -96,7 +96,7 @@ export class Script extends React.Component {
                         <div key="current" className="scriptChangelog" onClick={this._switchToCurrent}>
                             <strong>{CommonMessages.currentVersion}</strong>
                         </div>
-                        {script.changelogs.map(changelog =>
+                        {script.changelogs && script.changelogs.map(changelog =>
                             <div key={changelog.id} className="scriptChangelog" onClick={this._switchToChangelog(changelog)}>
                                 <div>
                                     <Icon icon="devtools-commit"/>

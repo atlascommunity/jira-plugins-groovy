@@ -14,8 +14,5 @@ public class ScriptForm {
     @XmlElement
     private String scriptBody;
     @XmlElement
-    private Integer directoryId;
-
-    @XmlElement
     private String comment;
 }
