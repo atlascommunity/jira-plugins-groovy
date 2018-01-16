@@ -6,11 +6,11 @@
     <artifactId>groovy</artifactId>
     <version>1.0.1</version>
     <organization>
-        <name>Example Company</name>
-        <url>http://www.example.com/</url>
+        <name>Mail.Ru Group</name>
+        <url>https://mail.ru</url>
     </organization>
     <name>groovy</name>
-    <description>This is the ru.mail.jira.plugins:groovy plugin for Atlassian JIRA.</description>
+    <description>Mail.Ru Groovy plugin.</description>
     <packaging>atlassian-plugin</packaging>
     <dependencies>
         <dependency>
