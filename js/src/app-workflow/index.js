@@ -17,8 +17,6 @@ import {ErrorMessages} from '../i18n/common.i18n';
 import '../flex.less';
 
 
-function noop() {}
-
 function ScriptParamValue({value, param}) {
     if (!value) {
         return <strong style={{color: 'red'}}>{ErrorMessages.noValue}</strong>;
@@ -47,16 +45,12 @@ define('mailru/groovy/renderRegistryScript', () => {
         ReactDOM.render(
             <Script
                 withChangelog={false}
-                editable={false}
 
                 script={{
                     id: id,
                     name: name,
                     scriptBody: source
                 }}
-
-                onEdit={noop}
-                onDelete={noop}
             >
                 {params && <form className="aui" style={{margin: 0}}>
                     {params.map(param =>
@@ -82,6 +76,7 @@ define('mailru/groovy/renderInlineScript', () => {
             <Script
                 withChangelog={false}
                 editable={false}
+                deletable={false}
 
                 script={{
                     id: id,
@@ -89,9 +84,6 @@ define('mailru/groovy/renderInlineScript', () => {
                     scriptBody: source,
                     inline: true
                 }}
-
-                onEdit={noop}
-                onDelete={noop}
             />,
             element
         );

@@ -21,7 +21,7 @@ import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import java.util.Set;
 
 @Component
-@ExportAsService({LifecycleAware.class})
+@ExportAsService(LifecycleAware.class)
 public class EventListenerInvoker implements LifecycleAware {
     private final Logger logger = LoggerFactory.getLogger(EventListenerInvoker.class);
 

@@ -13,11 +13,12 @@ import {ConditionModel, ListenerModel} from '../model/listener.model';
 import {listenerService} from '../service/services';
 
 import {ListenerMessages, ListenerTypeMessages} from '../i18n/listener.i18n';
-import {FieldMessages} from '../i18n/common.i18n';
+import {FieldMessages, TitleMessages} from '../i18n/common.i18n';
 
 import {Script} from '../common/Script';
 
 import './ListenerRegistry.less';
+import {RegistryMessages} from '../i18n/registry.i18n';
 
 
 export class ListenerRegistry extends React.Component {
@@ -33,12 +34,20 @@ export class ListenerRegistry extends React.Component {
 
         return (
             <div className="flex-column">
-                <div>
-                    <Button icon="add" type="primary" onClick={this._triggerDialog(true)}>
-                        {ListenerMessages.addListener}
-                    </Button>
-                </div>
-                <div className="flex-column">
+                <header className="aui-page-header">
+                    <div className="aui-page-header-inner">
+                        <div className="aui-page-header-main">
+                            <h2>{TitleMessages.listeners}</h2>
+                        </div>
+                        <div className="aui-page-header-actions">
+                            <Button onClick={this._triggerDialog(true)}>
+                                {ListenerMessages.addListener}
+                            </Button>
+                        </div>
+                    </div>
+                </header>
+
+                <div className="flex-column page-content">
                     <div>
                         {listeners.map(listener =>
                             <Listener
@@ -89,7 +98,6 @@ class Listener extends React.Component {
                 }}
 
                 withChangelog={true}
-                editable={true}
                 onEdit={onEdit}
                 onDelete={this._delete}
             >

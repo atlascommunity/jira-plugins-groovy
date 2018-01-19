@@ -6,5 +6,6 @@ public enum ScriptType {
     WORKFLOW_CONDITION,
     LISTENER,
     CONSOLE,
-    REST
+    REST,
+    CUSTOM_FIELD
 }

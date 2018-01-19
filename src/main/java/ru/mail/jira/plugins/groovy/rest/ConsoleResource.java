@@ -19,6 +19,8 @@ import javax.ws.rs.core.Response;
 
 @Scanned
 @Path("/scripts")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class ConsoleResource {
     private final ScriptService scriptService;
     private final PermissionHelper permissionHelper;
@@ -33,8 +35,6 @@ public class ConsoleResource {
 
     @Path("/execute")
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @WebSudoRequired
     public Response execute(ScriptRequest request) {
         return new RestExecutor<>(() -> {

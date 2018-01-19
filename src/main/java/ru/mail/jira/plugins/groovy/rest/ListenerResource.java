@@ -12,10 +12,13 @@ import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.RestExecutor;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Scanned
 @Path("/listener")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class ListenerResource {
     private final JiraAuthenticationContext authenticationContext;
     private final EventListenerRepository listenerRepository;

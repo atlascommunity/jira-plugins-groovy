@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.api.entity;
 
 import net.java.ao.Entity;
+import net.java.ao.schema.Indexed;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 
@@ -10,6 +11,7 @@ public interface ScriptExecution extends Entity {
     Script getScript();
     void setScript(Script script);
 
+    @Indexed
     String getInlineId();
     void setInlineId(String inlineId);
 

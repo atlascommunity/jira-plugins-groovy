@@ -24,6 +24,19 @@ import {Editor} from '../common/Editor';
 import {getMarkers} from '../common/error';
 
 
+//AbstractProjectEvent
+//ProjectCategoryChangeEvent
+//AbstractVersionEvent
+//AbstractProjectComponentEvent
+//DirectoryEvent
+//AbstractCustomFieldEvent
+//AbstractWorklogEvent
+//IndexEvent
+//AbstractRemoteIssueLinkEvent
+//IssueWatcherAddedEvent
+//IssueWatcherDeletedEvent
+
+
 @connect(
     () => { return{}; },
     ListenerActionCreators

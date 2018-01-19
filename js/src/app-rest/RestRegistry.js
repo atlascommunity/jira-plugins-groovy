@@ -12,7 +12,8 @@ import {restService} from '../service/services';
 import {RestMessages} from '../i18n/rest.i18n';
 import {Script} from '../common/Script';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
-import {FieldMessages} from '../i18n/common.i18n';
+import {FieldMessages, TitleMessages} from '../i18n/common.i18n';
+import {ListenerMessages} from '../i18n/listener.i18n';
 
 
 export class RestRegistry extends React.Component {
@@ -27,22 +28,27 @@ export class RestRegistry extends React.Component {
         const {scripts} = this.props;
 
         return (
-            <div className="flex-column">
-                <div>
-                    <Button icon="add" type="primary" onClick={this._triggerDialog(true)}>
-                        {RestMessages.addScript}
-                    </Button>
-                </div>
-                <div className="flex-column">
-                    <div>
-                        {scripts.map(script =>
-                            <RestScript
-                                key={script.id}
-                                script={script}
-                                onEdit={this._triggerDialog(false, script.id)}
-                            />
-                        )}
+            <div>
+                <header className="aui-page-header">
+                    <div className="aui-page-header-inner">
+                        <div className="aui-page-header-main">
+                            <h2>{TitleMessages.rest}</h2>
+                        </div>
+                        <div className="aui-page-header-actions">
+                            <Button onClick={this._triggerDialog(true)}>
+                                {RestMessages.addScript}
+                            </Button>
+                        </div>
                     </div>
+                </header>
+                <div className="flex-column page-content">
+                    {scripts.map(script =>
+                        <RestScript
+                            key={script.id}
+                            script={script}
+                            onEdit={this._triggerDialog(false, script.id)}
+                        />
+                    )}
                     {!scripts.length && <Message type="info">{RestMessages.noScripts}</Message>}
                 </div>
             </div>
@@ -87,7 +93,7 @@ class RestScript extends React.Component {
                 }}
 
                 withChangelog={true}
-                editable={true}
+
                 onEdit={onEdit}
                 onDelete={this._delete}
             >

@@ -1,16 +1,12 @@
 package ru.mail.jira.plugins.groovy.impl.workflow;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Map;
 
-@Getter
-@Setter
+@Getter @Setter
 @ToString
-@AllArgsConstructor
+@AllArgsConstructor @NoArgsConstructor
 public class ScriptDescriptor {
     private String id;
     private boolean fromRegistry;

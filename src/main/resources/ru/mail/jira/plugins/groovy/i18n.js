@@ -12,7 +12,9 @@ define('/mailru/groovy/i18n-react', function() {
             httpMethods: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.httpMethods'),
             projects: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.projects'),
             eventTypes: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.eventTypes'),
-            type: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.type')
+            type: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.type'),
+            customField: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.customField'),
+            cacheable: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.cacheable')
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),
@@ -30,9 +32,11 @@ define('/mailru/groovy/i18n-react', function() {
             no: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.no'),
             error: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.error'),
             script: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.script'),
+            switchTheme: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.switchTheme'),
         },
         error: {
-            noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue')
+            noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue'),
+            notConfigured: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.notConfigured')
         },
         console: {
             execute: AJS.I18n.getText('ru.mail.jira.plugins.groovy.console.execute'),
@@ -71,6 +75,19 @@ define('/mailru/groovy/i18n-react', function() {
         },
         dialog: {
             notReady: AJS.I18n.getText('ru.mail.jira.plugins.groovy.dialog.notReady')
+        },
+        jira: {
+            configure: AJS.I18n.getText('admin.common.words.configure'),
+            edit: AJS.I18n.getText('common.words.edit')
+        },
+        titles: {
+            console: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.console'),
+            registry: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.registry'),
+            listeners: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.listeners'),
+            audit: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.audit'),
+            rest: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.rest'),
+            fields: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.fields'),
+            extras: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.extras'),
         }
     };
 });

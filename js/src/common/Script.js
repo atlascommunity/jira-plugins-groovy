@@ -28,10 +28,10 @@ export class Script extends React.Component {
             inline: PropTypes.bool,
             changelogs: PropTypes.array
         }).isRequired,
-        editable: PropTypes.bool.isRequired,
-        onEdit: PropTypes.func.isRequired,
-        onDelete: PropTypes.func.isRequired,
+        onEdit: PropTypes.func,
+        onDelete: PropTypes.func,
 
+        collapsible: PropTypes.bool,
         title: PropTypes.oneOfType([
             PropTypes.string,
             PropTypes.node
@@ -39,7 +39,15 @@ export class Script extends React.Component {
         children: PropTypes.oneOfType([
             PropTypes.arrayOf(PropTypes.node),
             PropTypes.node
+        ]),
+        additionalButtons: PropTypes.oneOfType([
+            PropTypes.arrayOf(PropTypes.node),
+            PropTypes.node
         ])
+    };
+
+    static defaultProps = {
+        collapsible: true
     };
 
     state = {
@@ -48,18 +56,33 @@ export class Script extends React.Component {
             type: 'groovy',
             id: 'current'
         },
-        executions: []
+        executions: [],
+        executionsReady: false
     };
 
-    _showCode = () => {
-        const script = this.props.script;
-        if (!this.state.showCode) {
-            executionService
-                .getExecutions(script.inline, script.id)
-                .then(result => this.setState({executions: result}));
+    componentDidMount() {
+        if (!this.props.collapsible) {
+            this._fetchExecutions();
         }
-        this.setState({ showCode: !this.state.showCode });
+    }
+
+    _showCode = () => {
+        const {showCode} = this.state;
+
+        if (!showCode) {
+            this._fetchExecutions();
+        }
+        this.setState({ showCode: !showCode });
     };
+
+    _fetchExecutions() {
+        this.setState({ executionsReady: false });
+        const {script} = this.props;
+
+        executionService
+            .getExecutions(script.inline, script.id)
+            .then(result => this.setState({executions: result, executionsReady: true}));
+    }
 
     _switchToCurrent = () => {
         this.setState({
@@ -81,16 +104,16 @@ export class Script extends React.Component {
     };
 
     render() {
-        const {script, title, children} = this.props;
-        const activeSource = this.state.activeSource;
+        const {script, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons} = this.props;
+        const {activeSource, showCode, executions, executionsReady} = this.state;
 
         let codeBlock = null;
         let executionBar = null;
 
-        if (this.state.showCode) {
+        if (showCode || !collapsible) {
             let changelog = null;
 
-            if (this.props.withChangelog) {
+            if (withChangelog) {
                 changelog = (
                     <div className="scriptChangelogs" style={{width: '150px'}}>
                         <div key="current" className="scriptChangelog" onClick={this._switchToCurrent}>
@@ -118,7 +141,7 @@ export class Script extends React.Component {
             }
 
             codeBlock = (
-                <div className="flex-row">
+                <div className="flex-row editor">
                     {changelog}
                     <div className="flex-grow">
                         <Editor
@@ -132,15 +155,16 @@ export class Script extends React.Component {
             );
 
             executionBar = (
-                <div className="flex-none full-width">
-                    <ExecutionBar executions={this.state.executions}/>
+                <div className="flex-none full-width executions">
+                    {executionsReady && <ExecutionBar executions={executions}/>}
+                    {!executionsReady && <div className="aui-icon aui-icon-wait"/>}
                 </div>
             );
         }
 
         return (
             <div key={script.id} className="scriptRow">
-                <div className="flex-row">
+                <div className="flex-row title">
                     {title ?
                         <div className="flex-grow">
                             {title}
@@ -152,14 +176,15 @@ export class Script extends React.Component {
                         </div>
                     }
                     <div className="flex-none">
-                        <Button type="subtle" icon={this.state.showCode ? 'arrows-up' : 'arrows-down'} onClick={this._showCode}>{CommonMessages.showCode}</Button>
-                        {this.props.editable ? [
-                            <Button key="edit-button" type="subtle" icon="edit" onClick={this.props.onEdit}>{CommonMessages.edit}</Button>,
-                            <Button key="delete-button" type="subtle" icon="delete" onClick={this.props.onDelete}>{CommonMessages.delete}</Button>
-                        ] : null}
+                        {collapsible && <Button type="subtle" icon={showCode ? 'arrows-up' : 'arrows-down'} onClick={this._showCode}>{CommonMessages.showCode}</Button>}
+                        {onEdit && <Button key="edit-button" type="subtle" icon="edit" onClick={onEdit}>{CommonMessages.edit}</Button>}
+                        {onDelete && <Button key="delete-button" type="subtle" icon="delete" onClick={onDelete}>{CommonMessages.delete}</Button>}
+                        {additionalButtons}
                     </div>
                 </div>
-                {children}
+                <div className="children">
+                    {children}
+                </div>
                 {codeBlock}
                 {executionBar}
             </div>

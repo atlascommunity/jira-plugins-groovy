@@ -1,0 +1,14 @@
+<html>
+<head>
+    <title>Groovy script field</title>
+    <meta name="decorator" content="atl.admin">
+    <meta name="admin.active.section" content="admin_issues_menu/element_options_section/fields_section" />
+    <meta name="admin.active.tab" content="view_custom_fields"/>
+</head>
+<body>
+<div id="react-content">
+</div>
+
+$webResourceManager.requireResource("ru.mail.jira.plugins.groovy:cf-resources")
+</body>
+</html>

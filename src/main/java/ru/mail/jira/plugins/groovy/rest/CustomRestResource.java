@@ -121,11 +121,11 @@ public class CustomRestResource {
             successful,
             error,
             ImmutableMap.of(
-                "name", key,
                 "method", method.name(),
                 "queryParameters", Objects.toString(uriInfo.getQueryParameters()),
                 "body", body != null ? body : "",
-                "user", user.getKey()
+                "user", user.getKey(),
+                "type", ScriptType.REST.name()
             )
         );
 

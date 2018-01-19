@@ -5,16 +5,38 @@
 
   border: 1px solid grey;
 
-  padding: 3px 3px 3px 8px;
+  padding: 3px 0;
   margin: 2px;
 
   border-radius: 5px;
+
+  >.title {
+    margin-left: 8px;
+    margin-right: 3px;
+  }
+
+  >.editor {
+    border-top: 1px solid grey;
+    border-bottom: 1px solid grey;
+  }
+
+  >.children {
+    .flex-column;
+
+    margin-left: 8px;
+    margin-right: 3px;
+  }
+
+  >.executions {
+
+  }
 }
 
 .scriptChangelogs {
   .flex-none;
 
-  max-height: 300px;
+  border-right: 1px solid grey;
+  max-height: 320px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -24,6 +46,7 @@
 
   border-bottom: 1px solid grey;
   cursor: pointer;
+  padding-left: 3px;
 
   &:last-child {
     border-bottom: none;

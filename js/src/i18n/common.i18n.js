@@ -14,7 +14,9 @@ export const FieldMessages = {
     httpMethods: i18n.fields.httpMethods,
     projects: i18n.fields.projects,
     eventTypes: i18n.fields.eventTypes,
-    type: i18n.fields.type
+    type: i18n.fields.type,
+    customField: i18n.fields.customField,
+    cacheable: i18n.fields.cacheable
 };
 
 export const CommonMessages = {
@@ -33,6 +35,7 @@ export const CommonMessages = {
     no: i18n.common.no,
     error: i18n.common.error,
     script: i18n.common.script,
+    switchTheme: i18n.common.switchTheme
 };
 
 export const DialogMessages = {
@@ -40,5 +43,21 @@ export const DialogMessages = {
 };
 
 export const ErrorMessages = {
-    noValue: i18n.error.noValue
+    noValue: i18n.error.noValue,
+    notConfigured: i18n.error.notConfigured
+};
+
+export const JiraMessages = {
+    configure: i18n.jira.configure,
+    edit: i18n.jira.edit
+};
+
+export const TitleMessages = {
+    console: i18n.titles.console,
+    registry: i18n.titles.registry,
+    listeners: i18n.titles.listeners,
+    audit: i18n.titles.audit,
+    rest: i18n.titles.rest,
+    fields: i18n.titles.fields,
+    extras: i18n.titles.extras,
 };

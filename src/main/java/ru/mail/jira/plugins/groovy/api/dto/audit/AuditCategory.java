@@ -4,5 +4,6 @@ public enum AuditCategory {
     REGISTRY_SCRIPT,
     REGISTRY_DIRECTORY,
     LISTENER,
-    REST
+    REST,
+    CUSTOM_FIELD
 }

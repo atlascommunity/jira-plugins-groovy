@@ -5,8 +5,9 @@ import Button from 'aui-react/lib/AUIButton';
 
 import {AuditLogEntryModel} from '../model/audit.model';
 import {auditLogService} from '../service/services';
-import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
+import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {AuditMessages} from '../i18n/audit.i18n';
+import {ListenerMessages} from '../i18n/listener.i18n';
 
 
 export class AuditLogContainer extends React.Component {
@@ -40,31 +41,41 @@ export class AuditLogContainer extends React.Component {
         }
 
         return <div>
-            <div>
-                <strong>
-                    {data.offset+1}{'-'}{data.offset+data.size}
-                </strong>
-                {' '}{CommonMessages.of}{' '}
-                <strong>
-                    {data.total}
+            <header className="aui-page-header">
+                <div className="aui-page-header-inner">
+                    <div className="aui-page-header-main">
+                        <h2>{TitleMessages.audit}</h2>
+                    </div>
+                </div>
+            </header>
+
+            <div className="page-content">
+                <div>
+                    <strong>
+                        {data.offset+1}{'-'}{data.offset+data.size}
                     </strong>
-            </div>
-            <AuditLog entries={data.values}/>
-            <div>
-                <Button
-                    type="link"
-                    disabled={data.offset === 0}
-                    onClick={this._goToOffset(data.offset - data.limit)}
-                >
-                    {CommonMessages.prev}
-                </Button>
-                <Button
-                    type="link"
-                    disabled={data.isLast}
-                    onClick={this._goToOffset(data.offset + data.limit)}
-                >
-                    {CommonMessages.next}
-                </Button>
+                    {' '}{CommonMessages.of}{' '}
+                    <strong>
+                        {data.total}
+                        </strong>
+                </div>
+                <AuditLog entries={data.values}/>
+                <div>
+                    <Button
+                        type="link"
+                        disabled={data.offset === 0}
+                        onClick={this._goToOffset(data.offset - data.limit)}
+                    >
+                        {CommonMessages.prev}
+                    </Button>
+                    <Button
+                        type="link"
+                        disabled={data.isLast}
+                        onClick={this._goToOffset(data.offset + data.limit)}
+                    >
+                        {CommonMessages.next}
+                    </Button>
+                </div>
             </div>
         </div>;
     }

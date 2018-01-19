@@ -8,13 +8,20 @@ import AJS from 'AJS';
 
 import {ScriptConsole} from './ScriptConsole';
 
+import {TitleMessages} from '../i18n/common.i18n';
+
 
 AJS.toInit(() => {
     ReactDOM.render(
-        <div className="content-container">
-            <div className="content-body">
-                <ScriptConsole/>
-            </div>
+        <div>
+            <header className="aui-page-header">
+                <div className="aui-page-header-inner">
+                    <div className="aui-page-header-main">
+                        <h2>{TitleMessages.console}</h2>
+                    </div>
+                </div>
+            </header>
+            <ScriptConsole/>
         </div>,
         document.getElementById('react-content')
     );

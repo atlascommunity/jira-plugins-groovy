@@ -15,7 +15,7 @@ import {Script} from '../common/Script';
 
 import {registryService} from '../service/services';
 
-import {CommonMessages} from '../i18n/common.i18n';
+import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import './ScriptRegistry.less';
@@ -64,27 +64,36 @@ export class ScriptRegistry extends React.Component {
     render() {
         return (
             <div className="full-width">
-                <Button
-                    type="primary"
-                    icon="add"
-                    onClick={this._activateCreateDialog(null, 'directory')}
-                >
-                    {RegistryMessages.addDirectory}
-                </Button>
+                <header className="aui-page-header">
+                    <div className="aui-page-header-inner">
+                        <div className="aui-page-header-main">
+                            <h2>{TitleMessages.registry}</h2>
+                        </div>
+                        <div className="aui-page-header-actions">
+                            <Button
+                                onClick={this._activateCreateDialog(null, 'directory')}
+                            >
+                                {RegistryMessages.addDirectory}
+                            </Button>
+                        </div>
+                    </div>
+                </header>
 
-                {this.props.directories.map(directory =>
-                    <ScriptDirectory
-                        directory={directory}
-                        key={directory.id}
-                        onCreate={this._activateCreateDialog}
-                        onEdit={this._activateEditDialog}
-                        onDelete={this._activateDeleteDialog}
-                    />
-                )}
+                <div className="page-content">
+                    {this.props.directories.map(directory =>
+                        <ScriptDirectory
+                            directory={directory}
+                            key={directory.id}
+                            onCreate={this._activateCreateDialog}
+                            onEdit={this._activateEditDialog}
+                            onDelete={this._activateDeleteDialog}
+                        />
+                    )}
 
-                {!this.props.directories.length ? <Message type="info" title={RegistryMessages.noScripts}>{RegistryMessages.noScripts}</Message> : null}
-                <ScriptDirectoryDialog ref={this._setRef('directoryDialogRef')}/>
-                <ScriptDialog ref={this._setRef('scriptDialogRef')}/>
+                    {!this.props.directories.length ? <Message type="info" title={RegistryMessages.noScripts}>{RegistryMessages.noScripts}</Message> : null}
+                    <ScriptDirectoryDialog ref={this._setRef('directoryDialogRef')}/>
+                    <ScriptDialog ref={this._setRef('scriptDialogRef')}/>
+                </div>
             </div>
         );
     }
@@ -130,7 +139,6 @@ class ScriptDirectory extends React.Component {
                                 script={script}
 
                                 withChangelog={true}
-                                editable={true}
 
                                 onEdit={this.props.onEdit(script.id, 'script')}
                                 onDelete={this.props.onDelete(script.id, 'script', script.name)}

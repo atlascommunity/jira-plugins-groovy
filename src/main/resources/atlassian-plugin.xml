@@ -23,13 +23,14 @@
         <dependency>com.atlassian.auiplugin:aui-experimental-tooltips</dependency>
         <dependency>com.atlassian.auiplugin:aui-select</dependency>
         <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+        <dependency>com.atlassian.auiplugin:aui-toggle</dependency>
 
         <resource type="download" name="i18n.js" location="/ru/mail/jira/plugins/groovy/i18n.js"/>
         <resource type="download" name="common.js" location="/ru/mail/jira/plugins/groovy/js/common.js"/>
         <resource type="download" name="common.js.map" location="/ru/mail/jira/plugins/groovy/js/common.js.map"/>
     </web-resource>
 
-    <web-resource key="workflow" name="groovy workflow view Web Resources">
+    <web-resource key="workflow" name="groovy workflow Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
         <resource type="download" name="workflow.js" location="/ru/mail/jira/plugins/groovy/js/workflow.js"/>
@@ -56,7 +57,7 @@
         <context>ru.mail.jira.plugins.groovy.registry</context>
     </web-resource>
 
-    <web-resource key="listeners-resources" name="groovy script registry Web Resources">
+    <web-resource key="listeners-resources" name="groovy listeners Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
         <resource type="download" name="listeners.js" location="/ru/mail/jira/plugins/groovy/js/listeners.js"/>
@@ -81,6 +82,24 @@
         <resource type="download" name="rest.js.map" location="/ru/mail/jira/plugins/groovy/js/rest.js.map"/>
 
         <context>ru.mail.jira.plugins.groovy.rest</context>
+    </web-resource>
+
+    <web-resource key="fields-resources" name="groovy fields Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="fields.js" location="/ru/mail/jira/plugins/groovy/js/fields.js"/>
+        <resource type="download" name="fields.js.map" location="/ru/mail/jira/plugins/groovy/js/fields.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.fields</context>
+    </web-resource>
+
+    <web-resource key="cf-resources" name="groovy custom field Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="cf.js" location="/ru/mail/jira/plugins/groovy/js/cf.js"/>
+        <resource type="download" name="cf.js.map" location="/ru/mail/jira/plugins/groovy/js/cf.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.cf</context>
     </web-resource>
 
     <web-resource key="extras-resources" name="groovy extras Web Resources">
@@ -123,6 +142,16 @@
         <url-pattern>/my-groovy/audit</url-pattern>
     </servlet>
 
+    <servlet name="Groovy fields servlet" key="fields-servlet" class="ru.mail.jira.plugins.groovy.servlet.FieldsServlet">
+        <description>Groovy fields servlet</description>
+        <url-pattern>/my-groovy/fields</url-pattern>
+    </servlet>
+
+    <servlet name="Custom field servlet" key="cf-servlet" class="ru.mail.jira.plugins.groovy.servlet.CustomFieldServlet">
+        <description>Custom field servlet</description>
+        <url-pattern>/my-groovy/custom-field</url-pattern>
+    </servlet>
+
     <servlet name="REST servlet" key="rest-servlet" class="ru.mail.jira.plugins.groovy.servlet.RestServlet">
         <description>REST servlet</description>
         <url-pattern>/my-groovy/rest</url-pattern>
@@ -138,6 +167,8 @@
         <entity>ru.mail.jira.plugins.groovy.api.entity.AuditLogEntry</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestScript</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestChangelog</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.FieldConfig</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog</entity>
     </ao>
 
     <workflow-condition
@@ -334,20 +365,30 @@
         </condition>
     </web-item>
 
-    <web-item key="groovy-audit-menu-item" name="Groovy audit menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
-        <description>Link to groovy audit page.</description>
-        <label key="ru.mail.jira.plugins.groovy.link.audit" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/audit</link>
+    <web-item key="groovy-rest-menu-item" name="Groovy rest menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy rest page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.rest" />
+        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/rest</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
         </condition>
     </web-item>
 
-    <web-item key="groovy-rest-menu-item" name="Groovy rest menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
-        <description>Link to groovy rest page.</description>
-        <label key="ru.mail.jira.plugins.groovy.link.rest" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/rest</link>
+    <web-item key="groovy-fields-menu-item" name="Groovy fields menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy fields page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.fields" />
+        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/fields</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
+    <web-item key="groovy-audit-menu-item" name="Groovy audit menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy audit page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.audit" />
+        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/audit</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -363,4 +404,71 @@
             <param name="permission">SYSTEM_ADMIN</param>
         </condition>
     </web-item>
+
+    <customfield-type key="groovy-user-field" name="Groovy user field" class="ru.mail.jira.plugins.groovy.impl.cf.UserScriptedCFType">
+        <description>
+            Scripted user custom field type.
+        </description>
+
+        <resource type="velocity" name="view" location="templates/plugins/fields/view/view-user.vm" />
+        <resource type="velocity" name="xml" location="templates/plugins/fields/xml/xml-user.vm" />
+
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="userpickergroupsearcher"/>
+    </customfield-type>
+
+    <customfield-type key="groovy-multiuser-field" name="Groovy multi user field" class="ru.mail.jira.plugins.groovy.impl.cf.MultiUserScriptedCFType">
+        <description>
+            Scripted multi user custom field type.
+        </description>
+
+        <resource type="velocity" name="view" location="templates/plugins/fields/view/view-multiuser.vm" />
+        <resource type="velocity" name="xml" location="templates/plugins/fields/xml/xml-multiuser.vm" />
+
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="userpickergroupsearcher"/>
+    </customfield-type>
+
+    <customfield-type key="groovy-date-field" name="Groovy date field" class="ru.mail.jira.plugins.groovy.impl.cf.DateScriptedCFType">
+        <description>
+            Scripted date custom field type.
+        </description>
+
+        <resource type="velocity" name="view" location="templates/plugins/fields/view/view-date.vm" />
+        <resource type="velocity" name="xml" location="templates/plugins/fields/xml/xml-date.vm" />
+
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="daterange"/>
+    </customfield-type>
+
+    <customfield-type key="groovy-datetime-field" name="Groovy date time field" class="ru.mail.jira.plugins.groovy.impl.cf.DateTimeScriptedCFType">
+        <description>
+            Scripted date time custom field type.
+        </description>
+
+        <resource type="velocity" name="view" location="templates/plugins/fields/view/view-datetime.vm" />
+        <resource type="velocity" name="xml" location="templates/plugins/fields/xml/xml-datetime.vm" />
+
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="datetimerange"/>
+    </customfield-type>
+
+    <customfield-type key="groovy-text-field" name="Groovy text field" class="ru.mail.jira.plugins.groovy.impl.cf.TextScriptedCFType">
+        <description>
+            Scripted text custom field type.
+        </description>
+
+        <resource type="velocity" name="view" location="templates/plugins/fields/view/view-basictext.vm" />
+        <resource type="velocity" name="xml" location="templates/plugins/fields/xml/xml-basictext.vm" />
+
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="textsearcher"/>
+    </customfield-type>
+
+    <customfield-type key="groovy-textarea-field" name="Groovy textarea field" class="ru.mail.jira.plugins.groovy.impl.cf.TextScriptedCFType">
+        <description>
+            Scripted textarea custom field type.
+        </description>
+
+        <resource type="velocity" name="view" location="templates/plugins/fields/view/view-textarea.vm"/>
+        <resource type="velocity" name="column-view" location="templates/plugins/fields/view/view-basictext.vm"/>
+        <resource type="velocity" name="xml" location="templates/plugins/fields/xml/xml-basictext.vm" />
+
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="textsearcher"/>
+    </customfield-type>
 </atlassian-plugin>

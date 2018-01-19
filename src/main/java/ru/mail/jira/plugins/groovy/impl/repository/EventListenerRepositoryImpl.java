@@ -63,7 +63,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         ChangelogHelper changelogHelper,
         ScriptService scriptService
     ) {
-        cache = cacheManager.getCache(EventListenerRepositoryImpl.class.getName() + ".cache",
+        cache = cacheManager.getCache(EventListenerRepositoryImpl.class.getCanonicalName() + ".cache",
             new EventListenerCacheLoader(),
             new CacheSettingsBuilder()
                 .expireAfterAccess(30, TimeUnit.MINUTES)

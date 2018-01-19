@@ -18,6 +18,8 @@ import javax.ws.rs.core.Response;
 @Scanned
 @Path("/rest")
 @WebSudoRequired
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class RestResource {
     private final JiraAuthenticationContext authenticationContext;
     private final PermissionHelper permissionHelper;
@@ -34,7 +36,6 @@ public class RestResource {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @WebSudoRequired
     public Response createRestScript(RestScriptForm form) {
         return new RestExecutor<>(() -> {
@@ -48,7 +49,6 @@ public class RestResource {
 
     @Path("/{id}")
     @PUT
-    @Produces(MediaType.APPLICATION_JSON)
     @WebSudoRequired
     public Response updateRestScript(@PathParam("id") int id, RestScriptForm form) {
         return new RestExecutor<>(() -> {
@@ -62,7 +62,6 @@ public class RestResource {
 
     @Path("/{id}")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @WebSudoRequired
     public Response getRestScript(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
@@ -86,7 +85,6 @@ public class RestResource {
 
     @Path("/all")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @WebSudoRequired
     public Response getAllScripts() {
         return new RestExecutor<>(() -> {

@@ -36,7 +36,7 @@ public final class ChangelogHelper {
         this.userMapper = userMapper;
     }
 
-    public String generateDiff(int id, String originalName, String name, String originalSource, String newSource) {
+    public String generateDiff(long id, String originalName, String name, String originalSource, String newSource) {
         try {
             List<String> originalLines = Arrays.asList(originalSource.split("\n"));
             List<String> newLines = Arrays.asList(newSource.split("\n"));
@@ -78,7 +78,7 @@ public final class ChangelogHelper {
         );
     }
 
-    private static String genName(int id, String name) {
+    private static String genName(long id, String name) {
         return String.valueOf(id) + " - " + name + ".groovy";
     }
 }

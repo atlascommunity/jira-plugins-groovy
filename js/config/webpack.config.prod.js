@@ -93,6 +93,8 @@ module.exports = {
         listeners: [require.resolve('./polyfills'), paths.resolveApp('src/app-listeners/index.js')],
         audit: [require.resolve('./polyfills'), paths.resolveApp('src/app-audit/index.js')],
         rest: [require.resolve('./polyfills'), paths.resolveApp('src/app-rest/index.js')],
+        cf: [require.resolve('./polyfills'), paths.resolveApp('src/app-cf/index.js')],
+        fields: [require.resolve('./polyfills'), paths.resolveApp('src/app-fields/index.js')],
         extras: [require.resolve('./polyfills'), paths.resolveApp('src/app-extras/index.js')],
     },
     output: {

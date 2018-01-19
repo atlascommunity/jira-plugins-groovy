@@ -6,15 +6,14 @@ import ru.mail.jira.plugins.groovy.api.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 import ru.mail.jira.plugins.groovy.util.RestExecutor;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Scanned
 @Path("/auditLog")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class AuditLogResource {
     private final PermissionHelper permissionHelper;
     private final AuditLogRepository auditLogRepository;
@@ -29,7 +28,6 @@ public class AuditLogResource {
 
     @GET
     @Path("/all")
-    @Produces(MediaType.APPLICATION_JSON)
     @WebSudoRequired
     public Response getAuditLogPage(@QueryParam("offset") int offset) {
         return new RestExecutor<>(() -> {

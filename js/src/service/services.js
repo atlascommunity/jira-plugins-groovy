@@ -9,6 +9,8 @@ import {JiraService} from './jira.service';
 import {ExtrasService} from './extrasService';
 import {AuditLogService} from './auditLogService';
 import {RestService} from './rest.service';
+import {FieldConfigService} from './fieldConfig.service';
+import {PreferenceService} from './PreferenceService';
 
 
 export const listenerService = new ListenerService();
@@ -19,6 +21,8 @@ export const jiraService = new JiraService();
 export const extrasService = new ExtrasService();
 export const auditLogService = new AuditLogService();
 export const restService = new RestService();
+export const fieldConfigService = new FieldConfigService();
+export const preferenceService = new PreferenceService();
 
 
 window.addEventListener('unhandledrejection', function(err) {

@@ -18,16 +18,15 @@ import ru.mail.jira.plugins.groovy.api.dto.PickerResultSet;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Scanned
 @Path("/jira-api")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class JiraApiResource {
     private final JiraAuthenticationContext authenticationContext;
     private final EventTypeManager eventTypeManager;
@@ -57,7 +56,6 @@ public class JiraApiResource {
 
     @GET
     @Path("/eventType")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<IssueEventType> getIssueEventTypes() {
         permissionHelper.checkIfAdmin();
 
@@ -70,7 +68,6 @@ public class JiraApiResource {
 
     @GET
     @Path("/userPicker")
-    @Produces(MediaType.APPLICATION_JSON)
     public PickerResultSet<PickerOption> userPicker(@QueryParam("q") String query) {
         permissionHelper.checkIfAdmin();
 
@@ -96,7 +93,6 @@ public class JiraApiResource {
 
     @GET
     @Path("/groupPicker")
-    @Produces(MediaType.APPLICATION_JSON)
     public PickerResultSet<PickerOption> groupPicker(@QueryParam("q") String query) {
         permissionHelper.checkIfAdmin();
 
@@ -111,7 +107,6 @@ public class JiraApiResource {
 
     @GET
     @Path("/customFieldPicker")
-    @Produces(MediaType.APPLICATION_JSON)
     public PickerResultSet<PickerOption> fieldPicker() {
         permissionHelper.checkIfAdmin();
 
