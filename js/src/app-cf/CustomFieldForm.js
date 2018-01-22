@@ -140,7 +140,9 @@ export class CustomFieldForm extends React.Component {
                 }
                 <div className="field-group">
                     <Button type="primary" onClick={this._onSubmit}>{CommonMessages.update}</Button>
-                    <button className="aui-button aui-button-link" onClick={this.props.onCancel}>{CommonMessages.cancel}</button> {/*todo: go back*/}
+                    {this.props.fieldConfig.uuid &&
+                        <button className="aui-button aui-button-link" onClick={this.props.onCancel}>{CommonMessages.cancel}</button>
+                    }
                 </div>
             </form>
         );

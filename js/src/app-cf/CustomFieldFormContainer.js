@@ -7,6 +7,7 @@ import {CustomFieldForm} from './CustomFieldForm';
 
 import {Script} from '../common/Script';
 import {fieldConfigService} from '../service/services';
+import {ScriptFieldMessages} from '../i18n/cf.i18n';
 
 
 export class CustomFieldFormContainer extends React.Component {
@@ -46,28 +47,38 @@ export class CustomFieldFormContainer extends React.Component {
         }
 
         return <div>
-            {config.uuid && !editing &&
-            <Script
-                script={{
-                    id: config.uuid,
-                    name: `${config.customFieldName} - ${config.contextName}`,
-                    inline: true,
-                    scriptBody: config.scriptBody,
-                    changelogs: config.changelogs,
-                }}
-
-                withChangelog={true}
-                collapsible={false}
-
-                onEdit={this._setEditing(true)}
-            >
-                <div>
-                    <strong>Cacheable:</strong> {config.cacheable ? 'yes' : 'no'}
+            <header className="aui-page-header">
+                <div className="aui-page-header-inner">
+                    <div className="aui-page-header-main">
+                        <h2>{ScriptFieldMessages.scriptFor(`${config.customFieldName} - ${config.contextName}`)}</h2>
+                    </div>
                 </div>
-            </Script>}
-            {(!config.uuid || editing) &&
-                <CustomFieldForm id={this.props.id} fieldConfig={config} onChange={this._onChange} onCancel={this._setEditing(false)}/>
-            }
+            </header>
+            <div className="page-content">
+                {config.uuid && !editing &&
+                    <Script
+                        script={{
+                            id: config.uuid,
+                            name: `${config.customFieldName} - ${config.contextName}`,
+                            inline: true,
+                            scriptBody: config.scriptBody,
+                            changelogs: config.changelogs,
+                        }}
+
+                        withChangelog={true}
+                        collapsible={false}
+
+                        onEdit={this._setEditing(true)}
+                    >
+                        <div>
+                            <strong>Cacheable:</strong> {config.cacheable ? 'yes' : 'no'}
+                        </div>
+                    </Script>
+                }
+                {(!config.uuid || editing) &&
+                    <CustomFieldForm id={this.props.id} fieldConfig={config} onChange={this._onChange} onCancel={this._setEditing(false)}/>
+                }
+            </div>
         </div>;
     }
 }

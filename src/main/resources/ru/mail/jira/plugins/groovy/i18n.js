@@ -80,6 +80,11 @@ define('/mailru/groovy/i18n-react', function() {
             configure: AJS.I18n.getText('admin.common.words.configure'),
             edit: AJS.I18n.getText('common.words.edit')
         },
+        field: {
+            scriptFor: function(...params) {
+                return AJS.I18n.getText('ru.mail.jira.plugins.groovy.field.scriptFor', ...params);
+            }
+        },
         titles: {
             console: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.console'),
             registry: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.registry'),
