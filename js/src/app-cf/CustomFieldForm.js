@@ -92,7 +92,6 @@ export class CustomFieldForm extends React.Component {
             errorField = error.field;
         }
 
-        //todo: add title
         return (
             <form className="aui top-label" onSubmit={this._onSubmit}>
                 <div className="field-group">

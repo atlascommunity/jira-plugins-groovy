@@ -12,6 +12,8 @@ import {RestService} from './rest.service';
 import {FieldConfigService} from './fieldConfig.service';
 import {PreferenceService} from './PreferenceService';
 
+import {ErrorMessages} from '../i18n/common.i18n';
+
 
 export const listenerService = new ListenerService();
 export const consoleService = new ConsoleService();
@@ -28,7 +30,7 @@ export const preferenceService = new PreferenceService();
 window.addEventListener('unhandledrejection', function(err) {
     console.error('uncaught error', err);
     AJS.flag({
-        title: 'Error occurred', //todo: i18n
+        title: ErrorMessages.errorOccurred,
         body: err.reason.message,
         type: 'error',
         close: 'manual'

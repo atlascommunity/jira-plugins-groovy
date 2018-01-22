@@ -5,7 +5,6 @@ import net.java.ao.OneToMany;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 
-//todo: add script type - condition/function/validator/listener etc
 public interface Script extends Entity {
     @NotNull
     void setName(String name);

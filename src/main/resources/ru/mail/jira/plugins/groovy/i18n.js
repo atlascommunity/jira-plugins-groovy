@@ -37,7 +37,8 @@ define('/mailru/groovy/i18n-react', function() {
         },
         error: {
             noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue'),
-            notConfigured: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.notConfigured')
+            notConfigured: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.notConfigured'),
+            errorOccurred: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.errorOccurred'),
         },
         console: {
             execute: AJS.I18n.getText('ru.mail.jira.plugins.groovy.console.execute'),

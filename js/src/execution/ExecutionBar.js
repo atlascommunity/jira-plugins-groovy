@@ -11,7 +11,6 @@ import './ExecutionBar.less';
 import {ExecutionDialog} from './ExecutionDialog';
 
 
-//todo: execution details
 export class ExecutionBar extends React.Component {
     static propTypes = {
         executions: PropTypes.array.isRequired

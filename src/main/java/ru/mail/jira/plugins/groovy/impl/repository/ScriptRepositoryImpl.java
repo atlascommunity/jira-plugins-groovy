@@ -188,6 +188,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             .collect(Collectors.toList());
     }
 
+    //todo: cache result, maybe add new method for workflow functions
     @Override
     public RegistryScriptDto getScript(int id, boolean includeChangelogs, boolean expandName) {
         return buildScriptDto(ao.get(Script.class, id), includeChangelogs, expandName);

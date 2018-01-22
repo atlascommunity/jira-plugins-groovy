@@ -71,7 +71,6 @@ export class Editor extends React.Component {
     };
 
     render() {
-        //todo: add eslint rule to ignore unused __vars
        const {onChange, value, readyOnly, mode, decorated} = this.props;
 
         return (

@@ -20,7 +20,6 @@ export class MultiSelect2 extends React.Component {
         const {value, options, onChange, ...otherProps} = this.props;
 
         return (
-            //todo: properly get value of select
             <Select value={value} options={options} onChange={onChange} multi {...otherProps}/>
         );
     }

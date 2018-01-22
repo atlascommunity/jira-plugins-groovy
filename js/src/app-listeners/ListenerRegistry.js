@@ -149,7 +149,7 @@ class Condition extends React.Component {
                 );
                 break;
             default:
-                conditionBody = 'not implemented'; //todo
+                conditionBody = 'not implemented'; //todo: ???
         }
 
         return (

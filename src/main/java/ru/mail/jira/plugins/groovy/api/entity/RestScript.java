@@ -6,7 +6,7 @@ import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 import net.java.ao.schema.Unique;
 
-//todo: permissions?
+//todo: permissions (groups)
 public interface RestScript extends Entity {
     @NotNull
     @Unique

@@ -18,7 +18,7 @@ import {ListenerMessages} from '../i18n/listener.i18n';
 
 export class RestRegistry extends React.Component {
     static propTypes = {
-        scripts: PropTypes.arrayOf(PropTypes.object).isRequired, //todo: model
+        scripts: PropTypes.arrayOf(PropTypes.object).isRequired, //todo: shape
         triggerDialog: PropTypes.func.isRequired
     };
 
@@ -63,7 +63,7 @@ export class RestRegistry extends React.Component {
 )
 class RestScript extends React.Component {
     static propTypes = {
-        script: PropTypes.object.isRequired, //todo: model
+        script: PropTypes.object.isRequired, //todo: shape
         onEdit: PropTypes.func.isRequired,
         deleteScript: PropTypes.func.isRequired
     };

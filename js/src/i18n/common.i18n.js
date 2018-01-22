@@ -45,7 +45,8 @@ export const DialogMessages = {
 
 export const ErrorMessages = {
     noValue: i18n.error.noValue,
-    notConfigured: i18n.error.notConfigured
+    notConfigured: i18n.error.notConfigured,
+    errorOccurred: i18n.error.errorOccurred
 };
 
 export const JiraMessages = {

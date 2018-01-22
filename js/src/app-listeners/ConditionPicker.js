@@ -112,7 +112,7 @@ export class ConditionPicker extends React.Component {
                         ];
                     break;
                 default:
-                    paramEl = 'not implemented'; //todo
+                    paramEl = 'not implemented'; //todo: ???
             }
         }
 

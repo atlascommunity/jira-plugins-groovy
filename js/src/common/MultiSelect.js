@@ -20,7 +20,6 @@ export class MultiSelect extends React.Component {
         const {value, options} = this.props;
 
         return (
-            //todo: properly get value of select
             <select multiple size={4} className="multi-select" onChange={this._handleChange} value={value}>
                 {options.map(option =>
                     <option

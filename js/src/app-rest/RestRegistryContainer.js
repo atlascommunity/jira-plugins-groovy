@@ -22,7 +22,7 @@ import {CommonMessages} from '../i18n/common.i18n';
 )
 export class RestRegistryContainer extends React.Component {
     static propTypes ={
-        scripts: PropTypes.arrayOf(PropTypes.object).isRequired, //todo: model
+        scripts: PropTypes.arrayOf(PropTypes.object).isRequired, //todo: shape
         ready: PropTypes.bool.isRequired
     };
 

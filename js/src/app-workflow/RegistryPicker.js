@@ -17,7 +17,6 @@ function mapScriptToOption(script) {
     };
 }
 
-//todo: keep values
 export class RegistryPicker extends React.Component {
     static propTypes = {
         values: PropTypes.object,

@@ -25,8 +25,6 @@ public class FieldValueCache {
         return cache;
     }
 
-    //todo: invalidate on issue change ?
-    //todo: use
     public void invalidateField(long fieldId) {
         logger.debug("invalidating values for field {}", fieldId);
         cache

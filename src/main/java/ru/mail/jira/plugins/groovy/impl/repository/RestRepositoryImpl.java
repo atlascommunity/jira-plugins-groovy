@@ -28,7 +28,6 @@ import ru.mail.jira.plugins.groovy.util.Const;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//todo
 @Component
 public class RestRepositoryImpl implements RestRepository {
     private final ActiveObjects ao;
