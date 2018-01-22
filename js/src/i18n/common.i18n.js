@@ -35,7 +35,8 @@ export const CommonMessages = {
     no: i18n.common.no,
     error: i18n.common.error,
     script: i18n.common.script,
-    switchTheme: i18n.common.switchTheme
+    switchTheme: i18n.common.switchTheme,
+    editorMode: i18n.common.editorMode
 };
 
 export const DialogMessages = {

@@ -8,6 +8,7 @@ import {CustomFieldForm} from './CustomFieldForm';
 import {Script} from '../common/Script';
 import {fieldConfigService} from '../service/services';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
+import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 
 
 export class CustomFieldFormContainer extends React.Component {
@@ -52,6 +53,14 @@ export class CustomFieldFormContainer extends React.Component {
                     <div className="aui-page-header-main">
                         <h2>{ScriptFieldMessages.scriptFor(`${config.customFieldName} - ${config.contextName}`)}</h2>
                     </div>
+                    <div className="aui-page-header-actions">
+                        {config.uuid && !editing && <button
+                            className="aui-button"
+                            onClick={this._setEditing(true)}
+                        >
+                            {CommonMessages.edit}
+                        </button>}
+                    </div>
                 </div>
             </header>
             <div className="page-content">
@@ -67,11 +76,12 @@ export class CustomFieldFormContainer extends React.Component {
 
                         withChangelog={true}
                         collapsible={false}
+                        headerless={true}
 
                         onEdit={this._setEditing(true)}
                     >
                         <div>
-                            <strong>Cacheable:</strong> {config.cacheable ? 'yes' : 'no'}
+                            <strong>{FieldMessages.cacheable}{':'}</strong> {config.cacheable ? 'yes' : 'no'}
                         </div>
                     </Script>
                 }

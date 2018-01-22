@@ -33,6 +33,7 @@ define('/mailru/groovy/i18n-react', function() {
             error: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.error'),
             script: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.script'),
             switchTheme: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.switchTheme'),
+            editorMode: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.editorMode'),
         },
         error: {
             noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue'),

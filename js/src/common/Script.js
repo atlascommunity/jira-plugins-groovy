@@ -32,6 +32,8 @@ export class Script extends React.Component {
         onDelete: PropTypes.func,
 
         collapsible: PropTypes.bool,
+        headerless: PropTypes.bool,
+
         title: PropTypes.oneOfType([
             PropTypes.string,
             PropTypes.node
@@ -104,7 +106,7 @@ export class Script extends React.Component {
     };
 
     render() {
-        const {script, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons} = this.props;
+        const {script, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons, headerless} = this.props;
         const {activeSource, showCode, executions, executionsReady} = this.state;
 
         let codeBlock = null;
@@ -166,24 +168,29 @@ export class Script extends React.Component {
 
         return (
             <div key={script.id} className={`scriptRow ${!isOpen ? 'collapsed' : ''}`}>
-                <div className="flex-row title">
-                    {title ?
-                        <div className="flex-grow">
-                            {title}
+                {!headerless &&
+                    <div className="flex-row title">
+                        {title ?
+                            <div className="flex-grow">
+                                {title}
+                            </div>
+                            :
+                            <div className="flex-grow">
+                                <Icon icon="file-code"/>{' '}
+                                <strong>{script.name}</strong>
+                            </div>
+                        }
+                        <div className="flex-none">
+                            {collapsible && <Button type="subtle" icon={showCode ? 'arrows-up' : 'arrows-down'}
+                                                    onClick={this._showCode}>{CommonMessages.showCode}</Button>}
+                            {onEdit && <Button key="edit-button" type="subtle" icon="edit"
+                                               onClick={onEdit}>{CommonMessages.edit}</Button>}
+                            {onDelete && <Button key="delete-button" type="subtle" icon="delete"
+                                                 onClick={onDelete}>{CommonMessages.delete}</Button>}
+                            {additionalButtons}
                         </div>
-                        :
-                        <div className="flex-grow">
-                            <Icon icon="file-code"/>{' '}
-                            <strong>{script.name}</strong>
-                        </div>
-                    }
-                    <div className="flex-none">
-                        {collapsible && <Button type="subtle" icon={showCode ? 'arrows-up' : 'arrows-down'} onClick={this._showCode}>{CommonMessages.showCode}</Button>}
-                        {onEdit && <Button key="edit-button" type="subtle" icon="edit" onClick={onEdit}>{CommonMessages.edit}</Button>}
-                        {onDelete && <Button key="delete-button" type="subtle" icon="delete" onClick={onDelete}>{CommonMessages.delete}</Button>}
-                        {additionalButtons}
                     </div>
-                </div>
+                }
                 <div className="children">
                     {children}
                 </div>

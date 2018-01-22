@@ -34,8 +34,7 @@ export class Editor extends React.Component {
                 className: PropTypes.string
             })
         ),
-        decorated: PropTypes.bool,
-        className: PropTypes.string
+        decorated: PropTypes.bool
     };
 
     state = {
@@ -73,11 +72,11 @@ export class Editor extends React.Component {
 
     render() {
         //todo: add eslint rule to ignore unused __vars
-       const {onChange, value, readyOnly, mode, decorated, className} = this.props;
+       const {onChange, value, readyOnly, mode, decorated} = this.props;
 
         return (
             <div className="flex-column">
-                <div className={`${decorated ? 'DecoratedEditor' : ''}`}>
+                <div className={`CodeEditor ${decorated ? 'DecoratedEditor' : ''}`}>
                     <CodeMirror
                         options={{
                             theme: this.state.isLight ? 'eclipse' : 'lesser-dark',
@@ -98,10 +97,16 @@ export class Editor extends React.Component {
                         value={value}
                     />
                 </div>
-                <div className="flex-row" style={{justifyContent: 'flex-end', marginRight: '3px'}}>
-                    <a href="" onClick={this._switchTheme}>
-                        {CommonMessages.switchTheme}
-                    </a>
+                <div className="flex-row" style={{margin: '0 3px'}}>
+                    <div style={{ color: 'grey' }}>
+                        <strong>{CommonMessages.editorMode}{':'}</strong> {mode}
+                    </div>
+                    <div className="flex-grow"/>
+                    <div>
+                        <a href="" onClick={this._switchTheme}>
+                            {CommonMessages.switchTheme}
+                        </a>
+                    </div>
                 </div>
             </div>
         );
