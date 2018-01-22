@@ -39,7 +39,7 @@ export class FieldRegistry extends React.Component {
                     </div>
                 </div>
             </header>
-            <div className="page-content">
+            <div className="page-content ScriptList">
                 {configs && configs.map(config =>
                     <Field key={config.id} config={config}/>
                 )}
@@ -58,7 +58,7 @@ class Field extends React.Component {
 
         const actionsElId = `field-${config.id}-actions`;
 
-        return <div>
+        return (
             <Script
                 script={{
                     id: config.uuid,
@@ -106,6 +106,6 @@ class Field extends React.Component {
                     </strong>
                 </div>}
             </Script>
-        </div>;
+        );
     }
 }

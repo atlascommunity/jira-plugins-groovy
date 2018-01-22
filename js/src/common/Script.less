@@ -1,14 +1,29 @@
 @import (reference) "../flex";
 
+.ScriptList {
+  .flex-column;
+
+  > .scriptRow {
+    margin: 2px;
+
+    &:not(:first-child) {
+      margin-top: 10px;
+    }
+  }
+}
+
 .scriptRow {
   .flex-column;
 
   border: 1px solid grey;
 
-  padding: 3px 0;
-  margin: 2px;
+  padding: 3px 0 0;
 
-  border-radius: 5px;
+  border-radius: 3.01px 3.01px 0 0;
+
+  &.collapsed {
+    border-radius: 3.01px
+  }
 
   >.title {
     margin-left: 8px;

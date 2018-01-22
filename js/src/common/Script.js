@@ -110,7 +110,9 @@ export class Script extends React.Component {
         let codeBlock = null;
         let executionBar = null;
 
-        if (showCode || !collapsible) {
+        const isOpen = showCode || !collapsible;
+
+        if (isOpen) {
             let changelog = null;
 
             if (withChangelog) {
@@ -163,7 +165,7 @@ export class Script extends React.Component {
         }
 
         return (
-            <div key={script.id} className="scriptRow">
+            <div key={script.id} className={`scriptRow ${!isOpen ? 'collapsed' : ''}`}>
                 <div className="flex-row title">
                     {title ?
                         <div className="flex-grow">
