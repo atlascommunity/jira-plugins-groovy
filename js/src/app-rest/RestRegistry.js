@@ -41,7 +41,7 @@ export class RestRegistry extends React.Component {
                         </div>
                     </div>
                 </header>
-                <div className="flex-column page-content">
+                <div className="ScriptList page-content">
                     {scripts.map(script =>
                         <RestScript
                             key={script.id}
@@ -82,7 +82,7 @@ class RestScript extends React.Component {
 
         const url = `${getPluginBaseUrl()}/custom/${script.name}`;
 
-        return <div className="flex-column">
+        return (
             <Script
                 script={{
                     id: script.uuid,
@@ -106,6 +106,6 @@ class RestScript extends React.Component {
                     </div>
                 </div>
             </Script>
-        </div>;
+        );
     }
 }

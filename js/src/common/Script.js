@@ -145,7 +145,7 @@ export class Script extends React.Component {
             codeBlock = (
                 <div className="flex-row editor">
                     {changelog}
-                    <div className="flex-grow">
+                    <div className="flex-grow" style={{overflow: 'hidden'}}>
                         <Editor
                             mode={activeSource.type}
 

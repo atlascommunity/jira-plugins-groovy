@@ -81,7 +81,11 @@ export class ScriptDirectoryDialog extends React.Component {
                 .createDirectory(data)
                 .then(
                     result => {
-                        this.props.addDirectory(result);
+                        this.props.addDirectory({
+                            ...result,
+                            children: [],
+                            scripts: []
+                        });
                         this.setState({active: false});
                     },
                     this._handleError

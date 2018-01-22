@@ -1,22 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import 'brace';
+import 'codemirror/mode/groovy/groovy';
+import 'codemirror/mode/diff/diff';
+import 'codemirror/addon/selection/mark-selection';
+import 'codemirror/addon/lint/lint';
 
-import 'brace/mode/groovy';
-import 'brace/mode/diff';
-import 'brace/theme/xcode';
-import 'brace/theme/monokai';
-
-import Ace from 'react-ace';
+import {Controlled as CodeMirror} from 'react-codemirror2';
 
 import {preferenceService} from '../service/services';
 
 import './Editor.less';
+
 import {CommonMessages} from '../i18n/common.i18n';
 
-
-let count = 0;
 
 function isLight() {
     return !(preferenceService.get('ru.mail.groovy.isLight') === 'false');
@@ -25,7 +22,20 @@ function isLight() {
 export class Editor extends React.Component {
     static propTypes = {
         mode: PropTypes.string.isRequired,
-        value: PropTypes.string.isRequired
+        value: PropTypes.string.isRequired,
+        onChange: PropTypes.func,
+        readyOnly: PropTypes.bool,
+        markers: PropTypes.arrayOf(
+            PropTypes.shape({
+                startRow: PropTypes.number,
+                endRow: PropTypes.number,
+                startCol: PropTypes.number,
+                endCol: PropTypes.number,
+                className: PropTypes.string
+            })
+        ),
+        decorated: PropTypes.bool,
+        className: PropTypes.string
     };
 
     state = {
@@ -44,22 +54,50 @@ export class Editor extends React.Component {
         });
     };
 
-    componentDidMount() {
-        this.i = count++;
-    }
+    _onChange = (_editor, _data, value) => this.props.onChange(value);
+
+    _getAnnotations = () => {
+        const markers = this.props.markers;
+        if (markers) {
+            return markers.map(marker => {
+                return {
+                    message: marker.message,
+                    severity: 'error',
+                    from: {line: marker.startRow, ch: marker.startCol},
+                    to: {line: marker.endRow, ch: marker.endCol}
+                };
+            });
+        }
+        return [];
+    };
 
     render() {
+        //todo: add eslint rule to ignore unused __vars
+       const {onChange, value, readyOnly, mode, decorated, className} = this.props;
+
         return (
             <div className="flex-column">
-                <Ace
-                    theme={this.state.isLight ? 'xcode' : 'monokai'}
-                    name={`ace-editor-${this.i}`}
+                <div className={`${decorated ? 'DecoratedEditor' : ''}`}>
+                    <CodeMirror
+                        options={{
+                            theme: this.state.isLight ? 'eclipse' : 'lesser-dark',
+                            mode: mode,
+                            lineNumbers: true,
+                            readOnly: readyOnly || false,
+                            gutters: ['CodeMirror-lint-markers'],
+                            lint: {
+                                getAnnotations: this._getAnnotations,
+                                tooltips: true
+                            }
+                        }}
 
-                    height="300px"
-                    width="100%"
+                        height="300px"
+                        width="100%"
 
-                    {...this.props}
-                />
+                        onBeforeChange={onChange && this._onChange}
+                        value={value}
+                    />
+                </div>
                 <div className="flex-row" style={{justifyContent: 'flex-end', marginRight: '3px'}}>
                     <a href="" onClick={this._switchTheme}>
                         {CommonMessages.switchTheme}

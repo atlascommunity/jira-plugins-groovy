@@ -11,7 +11,7 @@ public enum ParamType {
     TEXT(String.class),
     LONG(Long.class),
     DOUBLE(Double.class),
-    CUSTOM_FIELD(CustomField.class), //todo: system fields, script
+    CUSTOM_FIELD(CustomField.class), //todo: system fields, script, current workflow action
     USER(ApplicationUser.class),
     GROUP(Group.class);
 

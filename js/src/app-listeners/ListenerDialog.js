@@ -192,7 +192,7 @@ export class ListenerDialog extends React.Component {
                         </label>
                         <input
                             type="text"
-                            className="text long-field"
+                            className="text full-width-field"
                             id="listener-dialog-name"
                             value={values.get('name') || ''}
                             onChange={this._setTextValue('name')}
@@ -214,6 +214,7 @@ export class ListenerDialog extends React.Component {
                         </label>
                         <Editor
                             mode="groovy"
+                            decorated={true}
 
                             onChange={this._setObjectValue('scriptBody')}
                             value={values.get('scriptBody') || ''}
@@ -230,7 +231,7 @@ export class ListenerDialog extends React.Component {
                         </label>
                         <textarea
                             id="listener-dialog-comment"
-                            className="textarea long-field"
+                            className="textarea full-width-field"
 
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}

@@ -3,11 +3,13 @@ package ru.mail.jira.plugins.groovy.rest;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.sal.api.websudo.WebSudoRequired;
 import com.google.common.collect.ImmutableMap;
+import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import ru.mail.jira.plugins.groovy.api.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.console.ConsoleResponse;
 import ru.mail.jira.plugins.groovy.api.dto.console.ScriptRequest;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
+import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.RestExecutor;
 
 import javax.ws.rs.Consumes;
@@ -45,6 +47,8 @@ public class ConsoleResource {
                 String.valueOf(scriptService.executeScript(null, request.getScript(), ScriptType.CONSOLE, ImmutableMap.of())),
                 System.currentTimeMillis() - startTime
             );
-        }).getResponse();
+        })
+            .withExceptionMapper(MultipleCompilationErrorsException.class, Response.Status.BAD_REQUEST, e -> ExceptionHelper.mapCompilationException("script", e))
+            .getResponse();
     }
 }

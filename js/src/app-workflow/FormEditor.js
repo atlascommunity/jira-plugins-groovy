@@ -19,6 +19,8 @@ export class FormEditor extends React.Component {
     render() {
         return <div>
             <Editor
+                decorated={true}
+
                 mode="groovy"
                 value={this.state.value}
                 onChange={this._setValue}

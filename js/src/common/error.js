@@ -6,7 +6,7 @@ export function getMarkers(errors) {
             startCol: error.startColumn - 1,
             endCol: error.endColumn - 1,
             className: 'error-marker',
-            type: 'background'
+            message: error.message
         };
     });
 }

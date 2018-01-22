@@ -92,8 +92,9 @@ export class CustomFieldForm extends React.Component {
             errorField = error.field;
         }
 
+        //todo: add title
         return (
-            <form className="aui" onSubmit={this._onSubmit}>
+            <form className="aui top-label" onSubmit={this._onSubmit}>
                 <div className="field-group">
                     <div className="checkbox">
                         <input
@@ -111,6 +112,8 @@ export class CustomFieldForm extends React.Component {
                     <label>{FieldMessages.scriptCode}</label>
                     <Editor
                         mode="groovy"
+                        decorated={true}
+
                         value={values.get('scriptBody')}
                         onChange={this._setObjectValue('scriptBody')}
 
@@ -127,7 +130,7 @@ export class CustomFieldForm extends React.Component {
                         </label>
                         <textarea
                             id="field-form-comment"
-                            className="textarea long-field"
+                            className="textarea full-width-field"
 
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}

@@ -15,6 +15,7 @@ import {StaticField} from '../common/StaticField';
 import {ErrorMessages} from '../i18n/common.i18n';
 
 import '../flex.less';
+import './workflow.less';
 
 
 function ScriptParamValue({value, param}) {

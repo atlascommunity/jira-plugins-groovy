@@ -1,4 +1,30 @@
+@import '~codemirror/lib/codemirror.css';
+@import "~codemirror/addon/lint/lint.css";
+@import '~codemirror/theme/lesser-dark.css';
+@import '~codemirror/theme/eclipse.css';
+
+.cm-s-lesser-dark {
+  line-height: 1.46em;
+}
+
+.cm-s-lesser-dark pre {
+  padding: 0 4px;
+}
+
 .error-marker {
-  position: absolute;
   background-color: #ff000066;
+}
+
+.error-annotation {
+  background-color: #ff000066;
+}
+
+.CodeMirror-lint-tooltip {
+  z-index: 3001;
+}
+
+.DecoratedEditor {
+  border-radius: 3.01px;
+  border: 1px solid #cccccc;
+  overflow: hidden;
 }

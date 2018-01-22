@@ -6,7 +6,7 @@
 
 <div class="field-group">
     <label for="mailru-inlineScriptName">Name: </label>
-    <input type="text" class="text long-field" name="inlineScriptName" id="mailru-inlineScriptName" value="${inlineScriptName}"/>
+    <input type="text" class="text full-width-field" name="inlineScriptName" id="mailru-inlineScriptName" value="${inlineScriptName}"/>
 </div>
 <textarea class="hidden" id="groovy-inline-script-field">${inlineScript}</textarea>
 
@@ -18,7 +18,7 @@
 $webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.workflow")
 
 <script>
-    AJS.$('#mailru-inlineScriptName').closest('form').addClass('aui');
+    AJS.$('#mailru-inlineScriptName').closest('form').addClass('aui top-label');
     require(['mailru/groovy/renderEditor'], function(renderEditor) {
         renderEditor(
             document.getElementById('groovy-inline-script'),

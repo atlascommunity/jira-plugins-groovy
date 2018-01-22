@@ -107,7 +107,6 @@ export class RestScriptDialog extends React.Component {
             methods: jsData.methods ? jsData.methods.map(option => option.value) : null
         };
 
-        //todo: validation & error display
         if (isNew) {
             restService
                 .createScript(data)
@@ -156,7 +155,6 @@ export class RestScriptDialog extends React.Component {
             let errorField = null;
 
             let markers = null;
-            let annotations = null;
 
             if (error) {
                 if (error.field === 'scriptBody' && Array.isArray(error.error)) {
@@ -186,7 +184,7 @@ export class RestScriptDialog extends React.Component {
                         </label>
                         <input
                             type="text"
-                            className="text long-field"
+                            className="text full-width-field"
                             id="rest-script-dialog-name"
                             value={values.get('name') || ''}
                             onChange={this._setTextValue('name')}
@@ -199,7 +197,7 @@ export class RestScriptDialog extends React.Component {
                             {FieldMessages.httpMethods}
                         </label>
                         <MultiSelect2
-                            className="long-field"
+                            className="full-width-field"
 
                             options={httpMethods}
                             value={values.get('methods')}
@@ -214,12 +212,12 @@ export class RestScriptDialog extends React.Component {
                         </label>
                         <Editor
                             mode="groovy"
+                            decorated={true}
 
                             onChange={this._setObjectValue('scriptBody')}
                             value={values.get('scriptBody') || ''}
 
                             markers={markers}
-                            annotations={annotations}
                         />
                         {errorField === 'scriptBody' && <div className="error">{errorMessage}</div>}
                     </div>
@@ -230,7 +228,7 @@ export class RestScriptDialog extends React.Component {
                         </label>
                         <textarea
                             id="rest-script-dialog-comment"
-                            className="textarea long-field"
+                            className="textarea full-width-field"
 
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}

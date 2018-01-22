@@ -41,15 +41,20 @@ export function ajaxPromise(url, method, _params, data) {
                     resolve(data);
                 },
                 error => {
+                    let data = {error: `${error.status}: ${error.statusText}`};
+
+                    if (error.responseText) {
+                        try {
+                            data = JSON.parse(error.responseText);
+                        } catch (e) {
+                            data = error.responseText;
+                        }
+                    }
+
                     reject({
                         response: {
                             ...error,
-                            data: error.responseText ?
-                                JSON.parse(error.responseText) :
-                                {
-                                    error: `${error.status}: ${error.statusText}`
-                                }
-
+                            data: data
                         },
                         message: `${error.status}: ${error.statusText}`
                     });

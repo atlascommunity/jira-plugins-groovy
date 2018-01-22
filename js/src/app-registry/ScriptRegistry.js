@@ -79,7 +79,7 @@ export class ScriptRegistry extends React.Component {
                     </div>
                 </header>
 
-                <div className="page-content">
+                <div className="page-content ScriptList">
                     {this.props.directories.map(directory =>
                         <ScriptDirectory
                             directory={directory}
@@ -132,7 +132,7 @@ class ScriptDirectory extends React.Component {
                             />
                         ) : null}
                     </div>
-                    <div>
+                    <div className="ScriptList">
                         {directory.scripts ? directory.scripts.map(script =>
                             <Script
                                 key={script.id}

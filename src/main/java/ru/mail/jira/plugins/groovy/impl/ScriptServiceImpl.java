@@ -84,12 +84,8 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     }
 
     @Override
-    public Object executeScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> bindings) {
-        try {
-            return doExecuteScript(scriptId, scriptString, type, bindings);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public Object executeScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> bindings) throws Exception {
+        return doExecuteScript(scriptId, scriptString, type, bindings);
     }
 
     @Override

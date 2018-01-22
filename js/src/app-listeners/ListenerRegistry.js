@@ -47,16 +47,14 @@ export class ListenerRegistry extends React.Component {
                     </div>
                 </header>
 
-                <div className="flex-column page-content">
-                    <div>
-                        {listeners.map(listener =>
-                            <Listener
-                                key={listener.id}
-                                listener={listener}
-                                onEdit={this._triggerDialog(false, listener.id)}
-                            />
-                        )}
-                    </div>
+                <div className="page-content ScriptList">
+                    {listeners.map(listener =>
+                        <Listener
+                            key={listener.id}
+                            listener={listener}
+                            onEdit={this._triggerDialog(false, listener.id)}
+                        />
+                    )}
                     {!listeners.length && <Message type="info" title={ListenerMessages.noListeners}>{ListenerMessages.noListeners}</Message>}
                 </div>
             </div>
@@ -87,7 +85,7 @@ class Listener extends React.Component {
     render() {
         const {listener, onEdit} = this.props;
 
-        return <div className="flex-column">
+        return (
             <Script
                 script={{
                     id: listener.uuid,
@@ -103,7 +101,7 @@ class Listener extends React.Component {
             >
                 <Condition condition={listener.condition}/>
             </Script>
-        </div>;
+        );
     }
 }
 
@@ -134,15 +132,19 @@ class Condition extends React.Component {
                 break;
             case 'ISSUE':
                 conditionBody = (
-                    <div>
-                        <strong>{FieldMessages.projects}{':'}</strong>
-                        {condition.projectIds.map(id =>
-                            <div key={id}>{projects[id] || id}</div>
-                        )}
-                        <strong>{FieldMessages.eventTypes}{':'}</strong>
-                        {condition.typeIds.map(id =>
-                            <div key={id}>{eventTypes[id] || id}</div>
-                        )}
+                    <div className="flex-row">
+                        <div className="flex-grow">
+                            <strong>{FieldMessages.projects}{':'}</strong>
+                            {condition.projectIds.map(id =>
+                                <div key={id}>{projects[id] || id}</div>
+                            )}
+                        </div>
+                        <div className="flex-grow">
+                            <strong>{FieldMessages.eventTypes}{':'}</strong>
+                            {condition.typeIds.map(id =>
+                                <div key={id}>{eventTypes[id] || id}</div>
+                            )}
+                        </div>
                     </div>
                 );
                 break;
@@ -151,7 +153,7 @@ class Condition extends React.Component {
         }
 
         return (
-            <div className={`Condition ${vertical ? 'flex-column' : 'flex-row'}`}>
+            <div className={`${vertical ? 'flex-column' : 'flex-row'}`}>
                 <div className="ConditionName">
                     <strong>{ListenerTypeMessages[condition.type]}</strong>
                 </div>

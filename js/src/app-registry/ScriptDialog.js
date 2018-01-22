@@ -24,7 +24,8 @@ export class ScriptDialog extends React.Component {
         active: false,
         id: null,
         values: new Map(),
-        error: null
+        error: null,
+        modified: false
     };
 
     activateCreate = (directoryId) => {
@@ -58,7 +59,10 @@ export class ScriptDialog extends React.Component {
         const {response} = error;
 
         if (response.status === 400) {
-            this.setState({error: response.data});
+            this.setState({
+                error: response.data,
+                modified: false
+            });
         } else {
             throw error;
         }
@@ -98,7 +102,8 @@ export class ScriptDialog extends React.Component {
     mutateValue = (field, value) => {
         this.setState(state => {
             return {
-                values: state.values.set(field, value)
+                values: state.values.set(field, value),
+                modified: true
             };
         });
     };
@@ -108,16 +113,17 @@ export class ScriptDialog extends React.Component {
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
 
     render() {
-        const {values, error} = this.state;
+        const {values, error, modified} = this.state;
         let errorMessage = null;
         let errorField = null;
 
         let markers = null;
-        let annotations = null;
         if (error) {
             if (error.field === 'scriptBody' && Array.isArray(error.error)) {
                 const errors = error.error.filter(e => e);
-                markers = getMarkers(errors);
+                if (!modified) {
+                    markers = getMarkers(errors);
+                }
                 errorMessage = errors
                     .map(error => error.message)
                     .map(error => <p key={error}>{error}</p>);
@@ -127,7 +133,7 @@ export class ScriptDialog extends React.Component {
             errorField = error.field;
         }
 
-        console.log(error, markers, annotations);
+        console.log(error, markers);
 
         return (
             <div>
@@ -158,7 +164,7 @@ export class ScriptDialog extends React.Component {
                                 </label>
                                 <input
                                     type="text"
-                                    className="text long-field"
+                                    className="text full-width-field"
                                     id="directory-dialog-name"
                                     value={values.get('name') || ''}
                                     onChange={this._setTextValue('name')}
@@ -172,12 +178,12 @@ export class ScriptDialog extends React.Component {
                                 </label>
                                 <Editor
                                     mode="groovy"
+                                    decorated={true}
 
                                     onChange={this._setObjectValue('scriptBody')}
                                     value={values.get('scriptBody') || ''}
 
                                     markers={markers}
-                                    annotations={annotations}
                                 />
                                 {errorField === 'scriptBody' && <div className="error">{errorMessage}</div>}
                             </div>
@@ -189,7 +195,7 @@ export class ScriptDialog extends React.Component {
                                 <textarea
                                     id="directory-dialog-comment"
 
-                                    className="textarea long-field"
+                                    className="textarea full-width-field"
                                     value={values.get('comment')}
                                     onChange={this._setTextValue('comment')}
                                 />
