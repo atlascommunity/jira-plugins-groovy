@@ -11,4 +11,9 @@ public class InlineScriptConditionFactory extends InlineScriptWorkflowPluginFact
     protected Map<String, Object> getArgs(AbstractDescriptor descriptor) {
         return ((ConditionDescriptor) descriptor).getArgs();
     }
+
+    @Override
+    protected String getModuleKey() {
+        return "ru.mail.jira.plugins.groovyinline-script-condition";
+    }
 }

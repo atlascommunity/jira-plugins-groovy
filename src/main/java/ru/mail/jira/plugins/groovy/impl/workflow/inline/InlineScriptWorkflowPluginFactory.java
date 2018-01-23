@@ -47,9 +47,12 @@ public abstract class InlineScriptWorkflowPluginFactory extends AbstractWorkflow
         params.put(Const.WF_INLINE_SCRIPT, extractSingleParam(input, "inlineScript"));
         params.put(Const.WF_INLINE_SCRIPT_NAME, extractSingleParam(input, "inlineScriptName"));
         params.put(Const.WF_UUID, extractSingleParam(input, "uuid"));
+        params.put("full.module.key", getModuleKey());
 
         return params;
     }
 
     abstract protected Map<String, Object> getArgs(AbstractDescriptor descriptor);
+
+    abstract protected String getModuleKey();
 }

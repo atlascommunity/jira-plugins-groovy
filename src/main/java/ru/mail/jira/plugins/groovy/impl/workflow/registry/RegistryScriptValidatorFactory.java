@@ -17,6 +17,11 @@ public class RegistryScriptValidatorFactory extends RegistryScriptWorkflowPlugin
     }
 
     @Override
+    protected String getModuleKey() {
+        return "ru.mail.jira.plugins.groovyregistry-script-validator";
+    }
+
+    @Override
     protected Map<String, Object> getArgs(AbstractDescriptor descriptor) {
         return ((ValidatorDescriptor) descriptor).getArgs();
     }

@@ -11,4 +11,9 @@ public class InlineScriptFunctionFactory extends InlineScriptWorkflowPluginFacto
     protected Map<String, Object> getArgs(AbstractDescriptor descriptor) {
         return ((FunctionDescriptor) descriptor).getArgs();
     }
+
+    @Override
+    protected String getModuleKey() {
+        return "ru.mail.jira.plugins.groovyinline-script-function";
+    }
 }

@@ -86,6 +86,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
 
         String scriptIdString = extractSingleParam(input, "script");
         params.put(Const.WF_REPOSITORY_SCRIPT_ID, scriptIdString);
+        params.put("full.module.key", getModuleKey());
 
         Integer scriptId = Ints.tryParse(scriptIdString);
 
@@ -123,6 +124,8 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
         }
         return values;
     }
+
+    abstract protected String getModuleKey();
 
     abstract protected Map<String, Object> getArgs(AbstractDescriptor descriptor);
 }

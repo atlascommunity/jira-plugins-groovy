@@ -17,6 +17,11 @@ public class RegistryScriptFunctionFactory extends RegistryScriptWorkflowPluginF
     }
 
     @Override
+    protected String getModuleKey() {
+        return "ru.mail.jira.plugins.groovyregistry-script-function";
+    }
+
+    @Override
     protected Map<String, Object> getArgs(AbstractDescriptor descriptor) {
         return ((FunctionDescriptor) descriptor).getArgs();
     }

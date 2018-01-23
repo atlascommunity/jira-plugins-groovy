@@ -17,6 +17,11 @@ public class RegistryScriptConditionFactory extends RegistryScriptWorkflowPlugin
     }
 
     @Override
+    protected String getModuleKey() {
+        return "ru.mail.jira.plugins.groovyregistry-script-condition";
+    }
+
+    @Override
     protected Map<String, Object> getArgs(AbstractDescriptor descriptor) {
         return ((ConditionDescriptor) descriptor).getArgs();
     }

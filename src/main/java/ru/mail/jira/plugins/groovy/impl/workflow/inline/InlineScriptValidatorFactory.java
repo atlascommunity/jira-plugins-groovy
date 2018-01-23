@@ -11,4 +11,9 @@ public class InlineScriptValidatorFactory extends InlineScriptWorkflowPluginFact
     protected Map<String, Object> getArgs(AbstractDescriptor descriptor) {
         return ((ValidatorDescriptor) descriptor).getArgs();
     }
+
+    @Override
+    protected String getModuleKey() {
+        return "ru.mail.jira.plugins.groovyinline-script-validator";
+    }
 }
