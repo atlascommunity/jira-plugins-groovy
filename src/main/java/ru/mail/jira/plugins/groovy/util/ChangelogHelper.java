@@ -8,7 +8,7 @@ import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.Patch;
 import net.java.ao.DBParam;
-import org.eclipse.jgit.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
@@ -73,7 +73,7 @@ public final class ChangelogHelper {
             new DBParam("AUTHOR_KEY", userKey),
             new DBParam(fkField, scriptId),
             new DBParam("DATE", new Timestamp(System.currentTimeMillis())),
-            new DBParam("DIFF", StringUtils.isEmptyOrNull(diff) ? "no changes" : diff),
+            new DBParam("DIFF", StringUtils.isEmpty(diff) ? "no changes" : diff),
             new DBParam("COMMENT", comment)
         );
     }
