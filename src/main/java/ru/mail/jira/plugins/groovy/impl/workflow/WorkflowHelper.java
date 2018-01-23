@@ -69,7 +69,7 @@ public class WorkflowHelper {
 
                             for (ScriptParamDto param : script.getParams()) {
                                 String paramName = param.getName();
-                                String value = (String) args.get(Const.getParamKey(paramName));
+                                String value = Base64Util.decode((String) args.get(Const.getParamKey(paramName)));
 
                                 if (value == null) {
                                     logger.error("Value for script param {} is not found", paramName);

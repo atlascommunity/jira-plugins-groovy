@@ -10,6 +10,7 @@ import ru.mail.jira.plugins.groovy.api.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
+import ru.mail.jira.plugins.groovy.util.Base64Util;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
@@ -103,7 +104,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
                 if (value == null) {
                     throw new RuntimeException("param for " + paramName + " is not specified");
                 }
-                params.put(Const.getParamKey(paramName), value);
+                params.put(Const.getParamKey(paramName), Base64Util.encode(value));
             }
         }
 
@@ -116,7 +117,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
             if (script.getParams() != null) {
                 for (ScriptParamDto param : script.getParams()) {
                     String paramName = param.getName();
-                    String value = (String) args.get(Const.getParamKey(paramName));
+                    String value = Base64Util.decode((String) args.get(Const.getParamKey(paramName)));
 
                     values.put(paramName, paramFactory.getParamFormValue(param, value));
                 }
