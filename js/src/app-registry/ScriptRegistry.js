@@ -3,6 +3,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import Button from 'aui-react/lib/AUIButton';
+import Icon from 'aui-react/lib/AUIIcon';
 import Message from 'aui-react/lib/AUIMessage';
 
 import PropTypes from 'prop-types';
@@ -152,13 +153,16 @@ class ScriptDirectory extends React.Component {
         return (
             <div className="flex full-width flex-column scriptDirectory">
                 <div className="scriptDirectoryTitle">
-                    <Button
-                        icon={this.state.collapsed ? 'devtools-folder-closed' : 'devtools-folder-open'}
+                    <div
                         onClick={this._toggle}
-                        type="link"
+                        className="aui-button aui-button-link"
                     >
-                        {directory.name}
-                    </Button>
+                        <h3>
+                            <Icon icon={this.state.collapsed ? 'devtools-folder-closed' : 'devtools-folder-open'}/>
+                            {' '}
+                            {directory.name}
+                        </h3>
+                    </div>
                     <div className="pull-right">
                         <Button icon="add" type="subtle" onClick={this.props.onCreate(directory.id, 'directory')}>{RegistryMessages.addDirectory}</Button>
                         <Button icon="add" type="subtle" onClick={this.props.onCreate(directory.id, 'script')}>{RegistryMessages.addScript}</Button>

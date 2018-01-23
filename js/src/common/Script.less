@@ -1,4 +1,5 @@
 @import (reference) "../flex";
+@import (reference) "../const";
 
 .ScriptList {
   .flex-column;
@@ -15,7 +16,7 @@
 .scriptRow {
   .flex-column;
 
-  border: 1px solid grey;
+  border: 1px solid @border-color;
 
   padding: 3px 0 0;
 
@@ -31,8 +32,8 @@
   }
 
   >.editor {
-    border-top: 1px solid grey;
-    border-bottom: 1px solid grey;
+    border-top: 1px solid @border-color;
+    border-bottom: 1px solid @border-color;
   }
 
   >.children {
@@ -47,14 +48,14 @@
   }
 
   .CodeEditor {
-    border-bottom: 1px solid grey;
+    border-bottom: 1px solid @border-color;
   }
 }
 
 .scriptChangelogs {
   .flex-none;
 
-  border-right: 1px solid grey;
+  border-right: 1px solid @border-color;
   max-height: 321px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -63,7 +64,7 @@
 .scriptChangelog {
   .flex-column;
 
-  border-bottom: 1px solid grey;
+  border-bottom: 1px solid @border-color;
   cursor: pointer;
   padding-left: 3px;
 

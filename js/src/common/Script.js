@@ -176,8 +176,10 @@ export class Script extends React.Component {
                             </div>
                             :
                             <div className="flex-grow">
-                                <Icon icon="file-code"/>{' '}
-                                <strong>{script.name}</strong>
+                                <h3>
+                                    <Icon icon="file-code"/>{' '}
+                                    {script.name}
+                                </h3>
                             </div>
                         }
                         <div className="flex-none">
