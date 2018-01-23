@@ -357,9 +357,16 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             Arrays
                 .stream(directory.getChildren())
                 .map(child -> buildDirectoryTreeDto(child, scripts))
+                .sorted(Comparator.comparing(ScriptDirectoryTreeDto::getName))
                 .collect(Collectors.toList())
         );
-        result.setScripts(scripts.get(directory.getID()).stream().sorted(Comparator.comparing(RegistryScriptDto::getId)).collect(Collectors.toList()));
+        result.setScripts(
+            scripts
+                .get(directory.getID())
+                .stream()
+                .sorted(Comparator.comparing(RegistryScriptDto::getName))
+                .collect(Collectors.toList())
+        );
 
         return result;
     }
