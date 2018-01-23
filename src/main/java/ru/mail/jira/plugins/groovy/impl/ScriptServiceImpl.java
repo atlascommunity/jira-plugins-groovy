@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.groovy.impl;
 
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.util.JiraUtils;
+import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.PluginEventListener;
@@ -148,6 +149,13 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
                 Plugin plugin = pluginAccessor.getPlugin(injection.getPlugin());
                 Class pluginClass = plugin.getClassLoader().loadClass(injection.getClassName());
                 Object component = ComponentAccessor.getOSGiComponentInstanceOfType(pluginClass);
+
+                if (component == null) {
+                    List<ModuleDescriptor> modules = plugin.getModuleDescriptorsByModuleClass(pluginClass);
+                    if (modules.size() > 0) {
+                        component = modules.get(0).getModule();
+                    }
+                }
 
                 if (component != null) {
                     bindings.put(injection.getVariableName(), component);
