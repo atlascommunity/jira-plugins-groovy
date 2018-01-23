@@ -17,6 +17,7 @@ import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
+import ru.mail.jira.plugins.groovy.util.Base64Util;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
@@ -48,7 +49,7 @@ public class WorkflowHelper {
 
     public ScriptDescriptor getScript(Map args) {
         Map<String, Object> paramBindings = ImmutableMap.of();
-        String scriptString = (String) args.get(Const.WF_INLINE_SCRIPT);
+        String scriptString = Base64Util.decode((String) args.get(Const.WF_INLINE_SCRIPT));
         String id = (String) args.get(Const.WF_UUID);
         boolean fromRegistry = false;
 
