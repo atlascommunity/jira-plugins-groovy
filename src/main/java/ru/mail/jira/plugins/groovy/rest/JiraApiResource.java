@@ -11,6 +11,7 @@ import com.atlassian.jira.event.type.EventTypeManager;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.workflow.WorkflowManager;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import ru.mail.jira.plugins.groovy.api.dto.listener.IssueEventType;
@@ -34,6 +35,7 @@ public class JiraApiResource {
     private final GroupPickerSearchService groupPickerSearchService;
     private final CustomFieldManager customFieldManager;
     private final AvatarService avatarService;
+    private final WorkflowManager workflowManager;
     private final PermissionHelper permissionHelper;
 
     public JiraApiResource(
@@ -43,6 +45,7 @@ public class JiraApiResource {
         @ComponentImport GroupPickerSearchService groupPickerSearchService,
         @ComponentImport CustomFieldManager customFieldManager,
         @ComponentImport AvatarService avatarService,
+        @ComponentImport WorkflowManager workflowManager,
         PermissionHelper permissionHelper
     ) {
         this.authenticationContext = authenticationContext;
@@ -51,6 +54,7 @@ public class JiraApiResource {
         this.groupPickerSearchService = groupPickerSearchService;
         this.customFieldManager = customFieldManager;
         this.avatarService = avatarService;
+        this.workflowManager = workflowManager;
         this.permissionHelper = permissionHelper;
     }
 
@@ -116,6 +120,43 @@ public class JiraApiResource {
             .map(field -> new PickerOption(
                 field.getName() + " - " + field.getIdAsLong() + " (" + field.getCustomFieldType().getKey() + ")",
                 field.getId(),
+                null
+            ))
+            .collect(Collectors.toList());
+
+        return new PickerResultSet<>(options, true);
+    }
+
+    @GET
+    @Path("/workflowPicker")
+    public PickerResultSet<PickerOption> workflowPicker() {
+        permissionHelper.checkIfAdmin();
+
+        List<PickerOption> options = workflowManager
+            .getActiveWorkflows()
+            .stream()
+            .map(workflow -> new PickerOption(
+                workflow.getDisplayName(),
+                workflow.getName(),
+                null
+            ))
+            .collect(Collectors.toList());
+
+        return new PickerResultSet<>(options, true);
+    }
+
+    @GET
+    @Path("/workflowActionPicker/{workflowName}")
+    public PickerResultSet<PickerOption> workflowActionPicker(@PathParam("workflowName") String workflowName) {
+        permissionHelper.checkIfAdmin();
+
+        List<PickerOption> options = workflowManager
+            .getWorkflow(workflowName)
+            .getAllActions()
+            .stream()
+            .map(action -> new PickerOption(
+                action.getName(),
+                String.valueOf(action.getId()),
                 null
             ))
             .collect(Collectors.toList());

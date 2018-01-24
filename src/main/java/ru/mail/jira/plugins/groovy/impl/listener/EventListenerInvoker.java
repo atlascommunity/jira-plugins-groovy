@@ -12,17 +12,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.api.EventListenerRepository;
-import ru.mail.jira.plugins.groovy.api.ExecutionRepository;
-import ru.mail.jira.plugins.groovy.api.ScriptService;
+import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
+import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
+import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
 import java.util.Set;
 
 @Component
-@ExportAsService(LifecycleAware.class)
-public class EventListenerInvoker implements LifecycleAware {
+public class EventListenerInvoker {
     private final Logger logger = LoggerFactory.getLogger(EventListenerInvoker.class);
 
     private final EventPublisher eventPublisher;
@@ -44,12 +43,10 @@ public class EventListenerInvoker implements LifecycleAware {
         this.executionRepository = executionRepository;
     }
 
-    @Override
     public void onStart() {
         eventPublisher.register(this);
     }
 
-    @Override
     public void onStop() {
         eventPublisher.unregister(this);
     }

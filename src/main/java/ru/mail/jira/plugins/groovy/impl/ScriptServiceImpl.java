@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.api.ScriptService;
+import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.groovy.*;
 import ru.mail.jira.plugins.groovy.impl.var.GlobalVariable;
@@ -71,6 +71,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         this.classLoader = classLoader;
         CompilerConfiguration config = new CompilerConfiguration()
             .addCompilationCustomizers(
+                //todo: later new ASTTransformationCustomizer(CompileStatic.class),
                 new ImportCustomizer().addStarImports("ru.mail.jira.plugins.groovy.api.script"),
                 new WithPluginGroovyExtension(parseContextHolder),
                 new LoadClassesExtension(parseContextHolder, pluginAccessor, classLoader),

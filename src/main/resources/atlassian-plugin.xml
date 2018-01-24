@@ -169,6 +169,8 @@
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.FieldConfig</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.ScheduledTask</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.ScheduledTaskChangelog</entity>
     </ao>
 
     <workflow-condition

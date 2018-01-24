@@ -7,5 +7,6 @@ public enum ScriptType {
     LISTENER,
     CONSOLE,
     REST,
-    CUSTOM_FIELD
+    CUSTOM_FIELD,
+    SCHEDULED_TASK
 }

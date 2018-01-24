@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.api;
+package ru.mail.jira.plugins.groovy.api.repository;
 
 import com.atlassian.jira.user.ApplicationUser;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryDto;

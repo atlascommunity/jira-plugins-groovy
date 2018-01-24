@@ -2,7 +2,7 @@ package ru.mail.jira.plugins.groovy.impl;
 
 import com.google.common.collect.ImmutableMap;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.api.GlobalFunctionManager;
+import ru.mail.jira.plugins.groovy.api.service.GlobalFunctionManager;
 
 import java.util.Map;
 

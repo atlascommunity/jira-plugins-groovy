@@ -10,7 +10,7 @@ import com.atlassian.jira.issue.fields.rest.json.JsonData;
 import com.atlassian.jira.issue.fields.rest.json.JsonType;
 import com.atlassian.jira.issue.fields.rest.json.JsonTypeBuilder;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
-import ru.mail.jira.plugins.groovy.api.FieldConfigRepository;
+import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 import javax.annotation.Nullable;
 

@@ -15,11 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.commons.RestFieldException;
-import ru.mail.jira.plugins.groovy.api.AuditLogRepository;
-import ru.mail.jira.plugins.groovy.api.ScriptRepository;
-import ru.mail.jira.plugins.groovy.api.ScriptService;
+import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
+import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
+import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.*;
-import ru.mail.jira.plugins.groovy.api.dto.audit.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.directory.*;
 import ru.mail.jira.plugins.groovy.api.entity.*;
@@ -29,7 +29,6 @@ import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -315,16 +314,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             result.setName(script.getName());
         }
         if (includeChangelogs) {
-            Changelog[] changelogs = script.getChangelogs();
-            if (changelogs != null) {
-                result.setChangelogs(
-                    Arrays
-                        .stream(changelogs)
-                        .sorted(Comparator.comparing(Changelog::getDate).reversed())
-                        .map(changelogHelper::buildDto)
-                        .collect(Collectors.toList())
-                );
-            }
+            result.setChangelogs(changelogHelper.collect(script.getChangelogs()));
         }
 
         if (script.getParameters() != null) {

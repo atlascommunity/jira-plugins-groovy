@@ -18,10 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.commons.RestFieldException;
-import ru.mail.jira.plugins.groovy.api.AuditLogRepository;
-import ru.mail.jira.plugins.groovy.api.FieldConfigRepository;
-import ru.mail.jira.plugins.groovy.api.ScriptService;
-import ru.mail.jira.plugins.groovy.api.dto.audit.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
+import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
+import ru.mail.jira.plugins.groovy.api.service.ScriptService;
+import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigDto;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigForm;
@@ -34,8 +34,6 @@ import ru.mail.jira.plugins.groovy.impl.cf.ScriptedCFType;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -225,16 +223,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             result.setUuid(fieldConfig.getUuid());
 
             if (includeChangelogs) {
-                FieldConfigChangelog[] changelogs = fieldConfig.getChangelogs();
-                if (changelogs != null) {
-                    result.setChangelogs(
-                        Arrays
-                            .stream(changelogs)
-                            .sorted(Comparator.comparing(FieldConfigChangelog::getDate).reversed())
-                            .map(changelogHelper::buildDto)
-                            .collect(Collectors.toList())
-                    );
-                }
+                result.setChangelogs(changelogHelper.collect(fieldConfig.getChangelogs()));
             }
         }
 

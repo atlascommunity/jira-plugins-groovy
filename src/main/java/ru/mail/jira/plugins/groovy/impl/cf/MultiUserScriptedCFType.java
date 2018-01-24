@@ -14,7 +14,7 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import ru.mail.jira.plugins.groovy.api.FieldConfigRepository;
+import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 import javax.annotation.Nullable;
 import java.util.List;

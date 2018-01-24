@@ -4,7 +4,7 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.fields.config.FieldConfig;
 import com.atlassian.jira.issue.fields.config.FieldConfigItemType;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
-import ru.mail.jira.plugins.groovy.api.FieldConfigRepository;
+import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 public class ScriptedFieldConfigItemType implements FieldConfigItemType {
     private final FieldConfigRepository configRepository;

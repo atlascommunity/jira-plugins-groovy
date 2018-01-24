@@ -1,0 +1,351 @@
+package ru.mail.jira.plugins.groovy.impl.repository;
+
+import com.atlassian.activeobjects.external.ActiveObjects;
+import com.atlassian.jira.datetime.DateTimeFormatter;
+import com.atlassian.jira.datetime.DateTimeStyle;
+import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.util.I18nHelper;
+import com.atlassian.jira.workflow.JiraWorkflow;
+import com.atlassian.jira.workflow.WorkflowManager;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.scheduler.SchedulerHistoryService;
+import com.atlassian.scheduler.caesium.cron.parser.CronExpressionParser;
+import com.atlassian.scheduler.cron.CronSyntaxException;
+import com.atlassian.scheduler.status.RunDetails;
+import com.google.common.primitives.Ints;
+import com.opensymphony.workflow.loader.ActionDescriptor;
+import net.java.ao.DBParam;
+import net.java.ao.Query;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.commons.RestFieldException;
+import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
+import ru.mail.jira.plugins.groovy.api.dto.scheduled.RunInfo;
+import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskForm;
+import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskDto;
+import ru.mail.jira.plugins.groovy.api.dto.scheduled.TransitionOptionsDto;
+import ru.mail.jira.plugins.groovy.api.entity.*;
+import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
+import ru.mail.jira.plugins.groovy.api.repository.ScheduledTaskRepository;
+import ru.mail.jira.plugins.groovy.api.service.ScriptService;
+import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
+import ru.mail.jira.plugins.groovy.impl.scheduled.JobUtil;
+import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
+import ru.mail.jira.plugins.groovy.util.UserMapper;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Component
+public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
+    private final ActiveObjects ao;
+    private final I18nHelper i18nHelper;
+    private final DateTimeFormatter dateTimeFormatter;
+    private final WorkflowManager workflowManager;
+    private final UserManager userManager;
+    private final SchedulerHistoryService schedulerHistoryService;
+    private final ChangelogHelper changelogHelper;
+    private final AuditLogRepository auditLogRepository;
+    private final UserMapper userMapper;
+    private final ScriptService scriptService;
+
+    @Autowired
+    public ScheduledTaskRepositoryImpl(
+        @ComponentImport ActiveObjects ao,
+        @ComponentImport I18nHelper i18nHelper,
+        @ComponentImport DateTimeFormatter dateTimeFormatter,
+        @ComponentImport WorkflowManager workflowManager,
+        @ComponentImport UserManager userManager,
+        @ComponentImport SchedulerHistoryService schedulerHistoryService,
+        ChangelogHelper changelogHelper,
+        AuditLogRepository auditLogRepository,
+        UserMapper userMapper,
+        ScriptService scriptService
+    ) {
+        this.ao = ao;
+        this.i18nHelper = i18nHelper;
+        this.dateTimeFormatter = dateTimeFormatter;
+        this.workflowManager = workflowManager;
+        this.userManager = userManager;
+        this.schedulerHistoryService = schedulerHistoryService;
+        this.changelogHelper = changelogHelper;
+        this.auditLogRepository = auditLogRepository;
+        this.userMapper = userMapper;
+        this.scriptService = scriptService;
+    }
+
+    @Override
+    public List<ScheduledTaskDto> getAllTasks(boolean includeChangelogs, boolean includeLastRunInfo) {
+        return Arrays
+            .stream(ao.find(ScheduledTask.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
+            .map(task -> buildDto(task, includeChangelogs, includeLastRunInfo))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public ScheduledTaskDto getTaskInfo(int id, boolean includeChangelogs, boolean includeLastRunInfo) {
+        return buildDto(ao.get(ScheduledTask.class, id), includeChangelogs, includeLastRunInfo);
+    }
+
+    @Override
+    public ScheduledTaskDto createTask(ApplicationUser user, ScheduledTaskForm form) {
+        validateForm(true, form);
+
+        ScheduledTask task = ao.create(
+            ScheduledTask.class,
+            new DBParam("UUID", UUID.randomUUID().toString()),
+            new DBParam("NAME", form.getName()),
+            new DBParam("SCHEDULE_EXPRESSION", form.getScheduleExpression()),
+            new DBParam("USER_KEY", form.getUserKey()),
+            new DBParam("TYPE", form.getType()),
+            new DBParam("SCRIPT_BODY", form.getScriptBody()),
+            new DBParam("JQL", form.getIssueJql()),
+            new DBParam("WORKFLOW", form.getIssueWorkflowName()),
+            new DBParam("WORKFLOW_ACTION", form.getIssueWorkflowActionId()),
+            new DBParam("TRANSITION_OPTIONS", form.getTransitionOptions() != null ? form.getTransitionOptions().toInt() : null),
+            new DBParam("DELETED", false)
+        );
+
+        String diff = changelogHelper.generateDiff(task.getID(), "", task.getName(), "", task.getScriptBody());
+
+        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK", task.getID(), user.getKey(), diff, "Created.");
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.SCHEDULED_TASK,
+                AuditAction.CREATED,
+                task.getID() + " - " + task.getName()
+            )
+        );
+
+        return buildDto(task, true, true);
+    }
+
+    @Override
+    public ScheduledTaskDto updateTask(ApplicationUser user, int id, ScheduledTaskForm form) {
+        validateForm(false, form);
+
+        ScheduledTask task = ao.get(ScheduledTask.class, id);
+
+        String diff = changelogHelper.generateDiff(id, task.getName(), form.getName(), task.getScriptBody(), form.getScriptBody());
+
+        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK", task.getID(), user.getKey(), diff, form.getComment());
+
+        task.setUuid(UUID.randomUUID().toString());
+        task.setName(form.getName());
+        task.setScheduleExpression(form.getScheduleExpression());
+        task.setUserKey(form.getUserKey());
+        task.setType(form.getType());
+        task.setScriptBody(form.getScriptBody());
+        task.setJql(form.getIssueJql());
+        task.setWorkflow(form.getIssueWorkflowName());
+        task.setWorkflowAction(form.getIssueWorkflowActionId());
+        task.setTransitionOptions(form.getTransitionOptions() != null ? form.getTransitionOptions().toInt() : null);
+        task.save();
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.SCHEDULED_TASK,
+                AuditAction.UPDATED,
+                task.getID() + " - " + task.getName()
+            )
+        );
+
+        return buildDto(task, true, true);
+    }
+
+    @Override
+    public void setEnabled(ApplicationUser user, int id, boolean enabled) {
+        ScheduledTask task = ao.get(ScheduledTask.class, id);
+
+        task.setEnabled(enabled);
+        task.save();
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.SCHEDULED_TASK,
+                enabled ? AuditAction.ENABLED : AuditAction.DISABLED,
+                task.getID() + " - " + task.getName()
+            )
+        );
+    }
+
+    @Override
+    public void deleteTask(ApplicationUser user, int id) {
+        ScheduledTask task = ao.get(ScheduledTask.class, id);
+
+        task.setDeleted(true);
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.SCHEDULED_TASK,
+                AuditAction.DELETED,
+                task.getID() + " - " + task.getName()
+            )
+        );
+    }
+
+    private void validateForm(boolean isNew, ScheduledTaskForm form) {
+        scriptService.parseScript(form.getScriptBody());
+
+        if (StringUtils.isEmpty(form.getName())) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
+        }
+
+        if (!isNew) {
+            if (StringUtils.isEmpty(form.getComment())) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
+            }
+        }
+
+        String scheduleExpression = StringUtils.trimToNull(form.getScheduleExpression());
+        form.setScheduleExpression(scheduleExpression);
+
+        if (scheduleExpression == null) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scheduleExpression");
+        }
+        Integer schedulePeriod = Ints.tryParse(scheduleExpression);
+        boolean isPeriod = schedulePeriod != null;
+        if (isPeriod) {
+            if (schedulePeriod == 0) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.invalidValue"), "scheduleExpression");
+            }
+        } else {
+            try {
+                CronExpressionParser.parse(scheduleExpression);
+            } catch (CronSyntaxException e) {
+                throw new RestFieldException(e.getMessage(), "scheduleExpression");
+            }
+        }
+
+        String userKey = StringUtils.trimToNull(form.getUserKey());
+        form.setUserKey(userKey);
+
+        if (userKey == null) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "userKey");
+        }
+
+        ApplicationUser user = userManager.getUserByKey(userKey);
+
+        if (user == null) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.unknownUser"), "userKey");
+        }
+
+        boolean requiresScript = false;
+        boolean requiresJql = false;
+
+        switch(form.getType()) {
+            case BASIC_SCRIPT:
+                requiresScript = true;
+                break;
+            case ISSUE_JQL_SCRIPT:
+            case DOCUMENT_ISSUE_JQL_SCRIPT:
+                requiresScript = true;
+                requiresJql = true;
+                break;
+            case ISSUE_JQL_TRANSITION:
+                requiresJql = true;
+
+                if (StringUtils.isEmpty(form.getIssueWorkflowName())) {
+                    throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "issueWorkflowName");
+                }
+
+                if (form.getIssueWorkflowActionId() == null) {
+                    throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "issueWorkflowActionId");
+                }
+
+                if (form.getTransitionOptions() == null) {
+                    form.setTransitionOptions(new TransitionOptionsDto());
+                }
+                break;
+        }
+
+        if (requiresScript) {
+            if (StringUtils.isEmpty(form.getScriptBody())) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
+            }
+        } else {
+            form.setScriptBody(null);
+        }
+
+        if (requiresJql) {
+            if (StringUtils.isEmpty(form.getIssueJql())) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "issueJql");
+            }
+        } else {
+            form.setIssueJql(null);
+        }
+    }
+
+    private ScheduledTaskDto buildDto(ScheduledTask task, boolean includeChangelogs, boolean includeLastRunInfo) {
+        ScheduledTaskDto result = new ScheduledTaskDto();
+
+        result.setId(task.getID());
+        result.setUuid(task.getUuid());
+        result.setName(task.getName());
+        result.setScheduleExpression(task.getScheduleExpression());
+        result.setType(task.getType());
+        result.setScriptBody(task.getScriptBody());
+        result.setUserKey(task.getUserKey());
+        result.setIssueJql(task.getJql());
+        result.setIssueWorkflowActionId(task.getWorkflowAction());
+        result.setEnabled(task.isEnabled());
+
+        result.setUser(userMapper.buildUserNullable(task.getUserKey()));
+
+        if (task.getType() == ScheduledTaskType.ISSUE_JQL_TRANSITION) {
+            JiraWorkflow workflow = workflowManager.getWorkflow(task.getWorkflow());
+            if (workflow != null) {
+                ActionDescriptor workflowAction = workflow
+                    .getAllActions()
+                    .stream()
+                    .filter(action -> action.getId() == task.getWorkflowAction())
+                    .findAny()
+                    .orElse(null);
+
+                if (workflowAction != null) {
+                    result.setIssueWorkflow(new PickerOption(
+                        workflow.getDisplayName(),
+                        workflow.getName(),
+                        null
+                    ));
+                    result.setIssueWorkflowAction(new PickerOption(
+                        String.valueOf(workflowAction.getId()),
+                        workflowAction.getName(),
+                        null
+                    ));
+                }
+
+                result.setTransitionOptions(TransitionOptionsDto.fromInt(task.getTransitionOptions()));
+            }
+        }
+
+        if (includeChangelogs) {
+            result.setChangelogs(changelogHelper.collect(task.getChangelogs()));
+        }
+
+        if (includeLastRunInfo) {
+            RunDetails runDetails = schedulerHistoryService.getLastRunForJob(JobUtil.getJobId(task.getID()));
+
+            if (runDetails != null) {
+                RunInfo runInfo = new RunInfo();
+                runInfo.setStartDate(dateTimeFormatter.withStyle(DateTimeStyle.COMPLETE).format(runDetails.getStartTime()));
+                runInfo.setDuration(runDetails.getDurationInMillis());
+                runInfo.setOutcome(runDetails.getRunOutcome());
+                runInfo.setMessage(runDetails.getMessage());
+
+                result.setLastRunInfo(runInfo);
+            }
+        }
+
+        return result;
+    }
+}

@@ -18,10 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.commons.RestFieldException;
-import ru.mail.jira.plugins.groovy.api.AuditLogRepository;
-import ru.mail.jira.plugins.groovy.api.EventListenerRepository;
-import ru.mail.jira.plugins.groovy.api.ScriptService;
-import ru.mail.jira.plugins.groovy.api.dto.audit.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
+import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
+import ru.mail.jira.plugins.groovy.api.service.ScriptService;
+import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerDto;
 import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerForm;
@@ -194,16 +194,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         result.setCondition(jsonMapper.read(listener.getCondition(), ConditionDescriptor.class));
 
         if (includeChangelogs) {
-            ListenerChangelog[] changelogs = listener.getChangelogs();
-            if (changelogs != null) {
-                result.setChangelogs(
-                    Arrays
-                        .stream(changelogs)
-                        .sorted(Comparator.comparing(ListenerChangelog::getDate).reversed())
-                        .map(changelogHelper::buildDto)
-                        .collect(Collectors.toList())
-                );
-            }
+            result.setChangelogs(changelogHelper.collect(listener.getChangelogs()));
         }
 
         return result;

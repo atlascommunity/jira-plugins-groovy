@@ -1,7 +1,7 @@
 package ru.mail.jira.plugins.groovy.rest;
 
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
-import ru.mail.jira.plugins.groovy.api.ExecutionRepository;
+import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 import ru.mail.jira.plugins.groovy.util.RestExecutor;
 
