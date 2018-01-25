@@ -7,7 +7,6 @@ import {AuditLogEntryModel} from '../model/audit.model';
 import {auditLogService} from '../service/services';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {AuditMessages} from '../i18n/audit.i18n';
-import {ListenerMessages} from '../i18n/listener.i18n';
 
 
 export class AuditLogContainer extends React.Component {

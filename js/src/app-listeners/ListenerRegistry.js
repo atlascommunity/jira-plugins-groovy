@@ -18,7 +18,6 @@ import {FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {Script} from '../common/Script';
 
 import './ListenerRegistry.less';
-import {RegistryMessages} from '../i18n/registry.i18n';
 
 
 export class ListenerRegistry extends React.Component {

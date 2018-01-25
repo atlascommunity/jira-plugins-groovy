@@ -52,17 +52,26 @@ public final class RestExecutor<T> {
                 .entity(ImmutableMap.of("message", e.getMessage()))
                 .type(MediaType.APPLICATION_JSON)
                 .build();
+        } catch (ValidationException e) {
+            Map<String, Object> entity = new HashMap<>();
+            entity.put("messages", e.getMessages());
+            entity.put("field", e.getField());
+
+            return Response
+                .status(Response.Status.BAD_REQUEST)
+                .entity(entity)
+                .build();
         } catch (IllegalArgumentException e) {
             Map<String, String> entity = new HashMap<>();
             entity.put("message", e.getMessage());
 
-            Response.ResponseBuilder responseBuilder = Response
-                .status(Response.Status.BAD_REQUEST)
-                .entity(entity);
             if (e instanceof RestFieldException) {
                 entity.put("field", ((RestFieldException) e).getField());
             }
-            return responseBuilder.build();
+            return Response
+                .status(Response.Status.BAD_REQUEST)
+                .entity(entity)
+                .build();
         } catch (Exception e) {
             Map<String, Object> entity = null;
 

@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 public class ScheduledTaskServiceImpl implements ScheduledTaskService {
     private static final JobRunnerKey JOB_RUNNER_KEY = JobRunnerKey.of("ru.mail.jira.groovy.scriptJobRunner");
     private static final String LOCK_KEY = "ru.mail.jira.groovy.scheduledTasks";
-    //todo: info message in form about limit
+    //todo: make it configurable
     private static final int ISSUE_LIMIT = 1000; //some sane number to avoid OOMs
     private static final int MIN_DELAY = 15000;
     private static final int MAX_JITTER = 10000;
@@ -114,6 +114,8 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                 int taskId = task.getId();
 
                 if (!existingIds.contains(taskId)) {
+                    logger.debug("adding new service {}", taskId);
+
                     this.createJob(task);
                 } else {
                     boolean needsUpdate = false;
@@ -156,6 +158,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
             }
 
             for (Integer id : removeScripts) {
+                logger.debug("removing job for {}", id);
                 schedulerService.unscheduleJob(JobUtil.getJobId(id));
             }
 
@@ -299,6 +302,8 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                 }
             }
 
+            logger.info("running task {}", task.getId());
+
             TransitionOptions transitionOptions = isTransition? task.getTransitionOptions().toJiraOptions() : null;
 
             try {
@@ -326,24 +331,50 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                         boolean isMutableIssue = type == ScheduledTaskType.ISSUE_JQL_SCRIPT;
                         SearchResults searchResults = searchService.search(runAs, query, new PagerFilter(ISSUE_LIMIT));
 
+                        long total = searchResults.getTotal();
+                        long errors = 0;
+
                         for (Issue issue : searchResults.getIssues()) {
                             Issue issueBinding = issue;
 
                             if (isTransition) {
-                                transitionIssue(runAs, issue, task.getIssueWorkflowActionId(), transitionOptions);
+                                boolean successful = transitionIssue(runAs, issue, task.getIssueWorkflowActionId(), transitionOptions);
+
+                                if (!successful) {
+                                    errors++;
+                                }
                             } else {
                                 if (isMutableIssue) {
                                     issueBinding = issueManager.getIssueObject(issue.getId());
                                 }
 
-                                runScript(task, ImmutableMap.of("issue", issueBinding), false);
+                                Exception error = runScript(task, ImmutableMap.of("issue", issueBinding), false);
+
+                                if (error != null) {
+                                    errors++;
+                                    logger.error("Exception occurred in task {} for issue {}", task.getId(), issue.getKey());
+                                }
                             }
+                        }
+
+                        if (errors > 0) {
+                            if (errors == total) {
+                                return JobRunnerResponse.failed("Task failed for all of " + total + " issues");
+                            } else {
+                                return JobRunnerResponse.failed("Task failed for " + errors + " of " + total + " issues");
+                            }
+                        } else {
+                            return JobRunnerResponse.success("Task ran successfully for all of " + total + " issues");
                         }
                     } catch (SearchException e) {
                         return JobRunnerResponse.failed(e);
                     }
                 } else {
-                    runScript(task, ImmutableMap.of(), true);
+                    Exception exception = runScript(task, ImmutableMap.of(), true);
+
+                    if (exception != null) {
+                        return JobRunnerResponse.failed(exception);
+                    }
                 }
             } finally {
                 authenticationContext.setLoggedInUser(currentUser);
@@ -353,11 +384,12 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
         }
     }
 
-    private void runScript(ScheduledTaskDto taskInfo, Map<String, Object> bindings, boolean trackAll) {
+    private Exception runScript(ScheduledTaskDto taskInfo, Map<String, Object> bindings, boolean trackAll) {
         String uuid = taskInfo.getUuid();
         long t = System.currentTimeMillis();
         boolean successful = true;
         String error = null;
+        Exception exception = null;
 
         try {
             scriptService.executeScript(
@@ -367,6 +399,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                 bindings
             );
         } catch (Exception e) {
+            exception = e;
             successful = false;
             error = ExceptionHelper.writeExceptionToString(e);
         }
@@ -383,9 +416,11 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                 )
             );
         }
+
+        return exception;
     }
 
-    private void transitionIssue(ApplicationUser user, Issue issue, int action, TransitionOptions options) {
+    private boolean transitionIssue(ApplicationUser user, Issue issue, int action, TransitionOptions options) {
         IssueService.TransitionValidationResult validationResult = issueService.validateTransition(
             user,
             issue.getId(),
@@ -399,7 +434,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                 "Action {} is not valid for issue {}: {}",
                 action, issue.getKey(), validationResult.getErrorCollection()
             );
-            return;
+            return false;
         }
 
         //todo: maybe add transition inputs
@@ -410,6 +445,9 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                 "Transition {} for issue {} was unsuccessful: {}",
                 action, issue.getKey(), transitionResult.getErrorCollection()
             );
+            return false;
         }
+
+        return true;
     }
 }

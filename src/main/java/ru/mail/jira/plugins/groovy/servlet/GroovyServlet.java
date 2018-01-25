@@ -24,6 +24,7 @@ public class GroovyServlet extends HttpServlet {
         "fields",
         "custom-field",
         "rest",
+        "scheduled",
         "extras"
     );
 

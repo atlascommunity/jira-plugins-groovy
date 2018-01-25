@@ -18,7 +18,7 @@ public class ScheduledTaskDto extends ScheduledTaskForm {
     @XmlElement
     private String uuid;
     @XmlElement
-    private JiraUser user;
+    private PickerOption user;
     @XmlElement
     private PickerOption issueWorkflow;
     @XmlElement

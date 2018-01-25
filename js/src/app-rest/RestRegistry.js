@@ -13,7 +13,6 @@ import {RestMessages} from '../i18n/rest.i18n';
 import {Script} from '../common/Script';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {FieldMessages, TitleMessages} from '../i18n/common.i18n';
-import {ListenerMessages} from '../i18n/listener.i18n';
 
 
 export class RestRegistry extends React.Component {

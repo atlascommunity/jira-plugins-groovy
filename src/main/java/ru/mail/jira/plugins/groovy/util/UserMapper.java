@@ -8,6 +8,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.JiraUser;
+import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
 
 @Component
 public class UserMapper {
@@ -56,5 +57,15 @@ public class UserMapper {
 
     public JiraUser buildUserNullable(String key) {
         return buildUserNullable(authenticationContext.getLoggedInUser(), key);
+    }
+
+    public PickerOption buildUserOption(String key) {
+        JiraUser jiraUser = buildUserNullable(key);
+
+        if (jiraUser != null) {
+            return new PickerOption(jiraUser.getDisplayName(), key, jiraUser.getAvatarUrl());
+        }
+
+        return null;
     }
 }

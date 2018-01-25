@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.impl.repository;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
+import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.datetime.DateTimeStyle;
 import com.atlassian.jira.user.ApplicationUser;
@@ -13,6 +14,7 @@ import com.atlassian.scheduler.SchedulerHistoryService;
 import com.atlassian.scheduler.caesium.cron.parser.CronExpressionParser;
 import com.atlassian.scheduler.cron.CronSyntaxException;
 import com.atlassian.scheduler.status.RunDetails;
+import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 import net.java.ao.DBParam;
@@ -20,7 +22,6 @@ import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.commons.RestFieldException;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.RunInfo;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskForm;
@@ -34,6 +35,7 @@ import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
 import ru.mail.jira.plugins.groovy.impl.scheduled.JobUtil;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
+import ru.mail.jira.plugins.groovy.util.ValidationException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,6 +50,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
     private final WorkflowManager workflowManager;
     private final UserManager userManager;
     private final SchedulerHistoryService schedulerHistoryService;
+    private final SearchService searchService;
     private final ChangelogHelper changelogHelper;
     private final AuditLogRepository auditLogRepository;
     private final UserMapper userMapper;
@@ -61,6 +64,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         @ComponentImport WorkflowManager workflowManager,
         @ComponentImport UserManager userManager,
         @ComponentImport SchedulerHistoryService schedulerHistoryService,
+        @ComponentImport SearchService searchService,
         ChangelogHelper changelogHelper,
         AuditLogRepository auditLogRepository,
         UserMapper userMapper,
@@ -72,6 +76,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         this.workflowManager = workflowManager;
         this.userManager = userManager;
         this.schedulerHistoryService = schedulerHistoryService;
+        this.searchService = searchService;
         this.changelogHelper = changelogHelper;
         this.auditLogRepository = auditLogRepository;
         this.userMapper = userMapper;
@@ -107,12 +112,13 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             new DBParam("WORKFLOW", form.getIssueWorkflowName()),
             new DBParam("WORKFLOW_ACTION", form.getIssueWorkflowActionId()),
             new DBParam("TRANSITION_OPTIONS", form.getTransitionOptions() != null ? form.getTransitionOptions().toInt() : null),
-            new DBParam("DELETED", false)
+            new DBParam("DELETED", false),
+            new DBParam("ENABLED", true)
         );
 
         String diff = changelogHelper.generateDiff(task.getID(), "", task.getName(), "", task.getScriptBody());
 
-        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK", task.getID(), user.getKey(), diff, "Created.");
+        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, "Created.");
 
         auditLogRepository.create(
             user,
@@ -134,7 +140,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
 
         String diff = changelogHelper.generateDiff(id, task.getName(), form.getName(), task.getScriptBody(), form.getScriptBody());
 
-        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK", task.getID(), user.getKey(), diff, form.getComment());
+        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, form.getComment());
 
         task.setUuid(UUID.randomUUID().toString());
         task.setName(form.getName());
@@ -197,12 +203,12 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         scriptService.parseScript(form.getScriptBody());
 
         if (StringUtils.isEmpty(form.getName())) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
+            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
         }
 
         if (!isNew) {
             if (StringUtils.isEmpty(form.getComment())) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
+                throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
         }
 
@@ -210,19 +216,19 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         form.setScheduleExpression(scheduleExpression);
 
         if (scheduleExpression == null) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scheduleExpression");
+            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scheduleExpression");
         }
         Integer schedulePeriod = Ints.tryParse(scheduleExpression);
         boolean isPeriod = schedulePeriod != null;
         if (isPeriod) {
             if (schedulePeriod == 0) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.invalidValue"), "scheduleExpression");
+                throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.invalidValue"), "scheduleExpression");
             }
         } else {
             try {
                 CronExpressionParser.parse(scheduleExpression);
             } catch (CronSyntaxException e) {
-                throw new RestFieldException(e.getMessage(), "scheduleExpression");
+                throw new ValidationException(e.getMessage(), "scheduleExpression");
             }
         }
 
@@ -230,19 +236,25 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         form.setUserKey(userKey);
 
         if (userKey == null) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "userKey");
+            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "userKey");
         }
 
         ApplicationUser user = userManager.getUserByKey(userKey);
 
         if (user == null) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.unknownUser"), "userKey");
+            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.unknownUser"), "userKey");
         }
 
         boolean requiresScript = false;
         boolean requiresJql = false;
 
-        switch(form.getType()) {
+        ScheduledTaskType type = form.getType();
+
+        if (type == null) {
+            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "type");
+        }
+
+        switch(type) {
             case BASIC_SCRIPT:
                 requiresScript = true;
                 break;
@@ -255,11 +267,11 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
                 requiresJql = true;
 
                 if (StringUtils.isEmpty(form.getIssueWorkflowName())) {
-                    throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "issueWorkflowName");
+                    throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "issueWorkflowName");
                 }
 
                 if (form.getIssueWorkflowActionId() == null) {
-                    throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "issueWorkflowActionId");
+                    throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "issueWorkflowActionId");
                 }
 
                 if (form.getTransitionOptions() == null) {
@@ -270,7 +282,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
 
         if (requiresScript) {
             if (StringUtils.isEmpty(form.getScriptBody())) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
+                throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
             }
         } else {
             form.setScriptBody(null);
@@ -278,7 +290,12 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
 
         if (requiresJql) {
             if (StringUtils.isEmpty(form.getIssueJql())) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "issueJql");
+                throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "issueJql");
+            }
+
+            SearchService.ParseResult parseResult = searchService.parseQuery(user, form.getIssueJql());
+            if (!parseResult.isValid()) {
+                throw new ValidationException(Lists.newArrayList(parseResult.getErrors().getErrorMessages()), "issueJql");
             }
         } else {
             form.setIssueJql(null);
@@ -299,7 +316,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         result.setIssueWorkflowActionId(task.getWorkflowAction());
         result.setEnabled(task.isEnabled());
 
-        result.setUser(userMapper.buildUserNullable(task.getUserKey()));
+        result.setUser(userMapper.buildUserOption(task.getUserKey()));
 
         if (task.getType() == ScheduledTaskType.ISSUE_JQL_TRANSITION) {
             JiraWorkflow workflow = workflowManager.getWorkflow(task.getWorkflow());

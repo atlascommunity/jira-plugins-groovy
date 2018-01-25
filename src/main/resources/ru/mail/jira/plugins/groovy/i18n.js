@@ -14,7 +14,9 @@ define('/mailru/groovy/i18n-react', function() {
             eventTypes: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.eventTypes'),
             type: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.type'),
             customField: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.customField'),
-            cacheable: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.cacheable')
+            cacheable: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.cacheable'),
+            schedule: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.schedule'),
+            issueJql: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.issueJql'),
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),
@@ -85,7 +87,8 @@ define('/mailru/groovy/i18n-react', function() {
         field: {
             scriptFor: function(...params) {
                 return AJS.I18n.getText('ru.mail.jira.plugins.groovy.field.scriptFor', ...params);
-            }
+            },
+            noFields: AJS.I18n.getText('ru.mail.jira.plugins.groovy.field.noFields')
         },
         titles: {
             console: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.console'),
@@ -94,7 +97,16 @@ define('/mailru/groovy/i18n-react', function() {
             audit: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.audit'),
             rest: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.rest'),
             fields: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.fields'),
+            scheduled: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.scheduled'),
             extras: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.extras'),
+        },
+        scheduled: {
+            noTasks: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.noTasks'),
+            addTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.addTask'),
+            runAs: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.runAs'),
+            jqlLimitDescription: function(...params) {
+                return AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.jqlLimitDescription', ...params);
+            }
         }
     };
 });

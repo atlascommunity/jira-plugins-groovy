@@ -102,6 +102,15 @@
         <context>ru.mail.jira.plugins.groovy.cf</context>
     </web-resource>
 
+    <web-resource key="scheduled-resources" name="groovy scheduled Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="scheduled.js" location="/ru/mail/jira/plugins/groovy/js/scheduled.js"/>
+        <resource type="download" name="scheduled.js.map" location="/ru/mail/jira/plugins/groovy/js/scheduled.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.scheduled</context>
+    </web-resource>
+
     <web-resource key="extras-resources" name="groovy extras Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
@@ -346,6 +355,16 @@
         <description>Link to groovy fields page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.fields" />
         <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/fields</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
+    <web-item key="groovy-scheduled-menu-item" name="Groovy scheduled menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy scheduled page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.scheduled" />
+        <link linkId="mailru-groovy-scheduled-link">/plugins/servlet/my-groovy/scheduled</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>

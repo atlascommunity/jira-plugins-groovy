@@ -16,7 +16,9 @@ export const FieldMessages = {
     eventTypes: i18n.fields.eventTypes,
     type: i18n.fields.type,
     customField: i18n.fields.customField,
-    cacheable: i18n.fields.cacheable
+    cacheable: i18n.fields.cacheable,
+    schedule: i18n.fields.schedule,
+    issueJql: i18n.fields.issueJql
 };
 
 export const CommonMessages = {
@@ -61,5 +63,6 @@ export const TitleMessages = {
     audit: i18n.titles.audit,
     rest: i18n.titles.rest,
     fields: i18n.titles.fields,
+    scheduled: i18n.titles.scheduled,
     extras: i18n.titles.extras,
 };

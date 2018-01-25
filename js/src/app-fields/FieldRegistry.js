@@ -4,10 +4,13 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 import Icon from 'aui-react/lib/AUIIcon';
+import Message from 'aui-react/lib/AUIMessage';
 
 import {Script} from '../common/Script';
 import {getBaseUrl} from '../service/ajaxHelper';
 import {JiraMessages, FieldMessages, ErrorMessages, CommonMessages, TitleMessages} from '../i18n/common.i18n';
+import {RegistryMessages} from '../i18n/registry.i18n';
+import {ScriptFieldMessages} from '../i18n/cf.i18n';
 
 
 @connect(
@@ -40,9 +43,11 @@ export class FieldRegistry extends React.Component {
                 </div>
             </header>
             <div className="page-content ScriptList">
-                {configs && configs.map(config =>
+                {!!configs.length && configs.map(config =>
                     <Field key={config.id} config={config}/>
                 )}
+
+                {!configs.length && <Message type="info" title={ScriptFieldMessages.noFields}>{ScriptFieldMessages.noFields}</Message>}
             </div>
         </div>;
     }

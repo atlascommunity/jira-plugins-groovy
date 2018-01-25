@@ -155,7 +155,7 @@ public class JiraApiResource {
             .getAllActions()
             .stream()
             .map(action -> new PickerOption(
-                action.getName(),
+                action.getName() + " (" + action.getId() + ")",
                 String.valueOf(action.getId()),
                 null
             ))
