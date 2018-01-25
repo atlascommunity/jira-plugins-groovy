@@ -53,6 +53,10 @@ const typeList = Object
         };
     });
 
+function getValue(option) {
+    return option ? option.value : null;
+}
+
 @connect(
     null,
     TaskActionCreators
@@ -135,7 +139,9 @@ export class ScheduledTaskDialog extends React.Component {
         const jsData = this.state.values.toJS();
         const data = {
             ...jsData,
-            userKey: jsData.userKey ? jsData.userKey.value : null
+            userKey: getValue(jsData.userKey),
+            issueWorkflowName: getValue(jsData.issueWorkflowName),
+            issueWorkflowActionId: getValue(jsData.issueWorkflowActionId)
         };
 
         if (isNew) {

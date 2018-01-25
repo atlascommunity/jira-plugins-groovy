@@ -90,6 +90,7 @@ export class ScheduledTaskRegistry extends React.Component {
     }
 }
 
+//todo: delete, enable/disable
 class ScheduledTask extends React.Component {
     static propTypes = {
         task: PropTypes.object.isRequired,

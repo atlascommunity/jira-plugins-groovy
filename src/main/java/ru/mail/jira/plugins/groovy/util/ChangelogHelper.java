@@ -38,6 +38,13 @@ public final class ChangelogHelper {
     }
 
     public String generateDiff(long id, String originalName, String name, String originalSource, String newSource) {
+        if (originalSource == null) {
+            originalSource = "";
+        }
+        if (newSource == null) {
+            newSource = "";
+        }
+
         try {
             List<String> originalLines = Arrays.asList(originalSource.split("\n"));
             List<String> newLines = Arrays.asList(newSource.split("\n"));
