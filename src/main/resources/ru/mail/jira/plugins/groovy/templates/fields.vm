@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Groovy fields</title>
+    <title>$i18n.getText("ru.mail.jira.plugins.groovy.link.fields")</title>
     <meta name="decorator" content="atl.admin">
     <meta name="admin.active.section" content="mailru-groovy-fields-link" />
 </head>
