@@ -1,41 +1,59 @@
 package ru.mail.jira.plugins.groovy.servlet;
 
-import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.websudo.WebSudoManager;
 import com.atlassian.sal.api.websudo.WebSudoSessionException;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.google.common.collect.ImmutableSet;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Set;
 
 @Scanned
-public abstract class AbstractTemplateServlet extends HttpServlet {
+public class GroovyServlet extends HttpServlet {
+    private static final Set<String> ALLOWED_RESOURCES = ImmutableSet.of(
+        "console",
+        "registry",
+        "listeners",
+        "audit",
+        "fields",
+        "custom-field",
+        "rest",
+        "extras"
+    );
+
     private final TemplateRenderer templateRenderer;
     private final WebSudoManager webSudoManager;
     private final PermissionHelper permissionHelper;
 
-    private final String template;
-
-    protected AbstractTemplateServlet(
+    public GroovyServlet(
         @ComponentImport TemplateRenderer templateRenderer,
         @ComponentImport WebSudoManager webSudoManager,
-        PermissionHelper permissionHelper,
-        String template
+        PermissionHelper permissionHelper
     ) {
         this.templateRenderer = templateRenderer;
         this.webSudoManager = webSudoManager;
         this.permissionHelper = permissionHelper;
-        this.template = template;
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
+            String path = req.getPathInfo();
+
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+
+            if (!ALLOWED_RESOURCES.contains(path)) {
+                resp.sendError(404);
+            }
+
             if (!permissionHelper.isAdmin()) {
                 resp.sendError(403);
                 return;
@@ -44,7 +62,7 @@ public abstract class AbstractTemplateServlet extends HttpServlet {
             webSudoManager.willExecuteWebSudoRequest(req);
 
             resp.setContentType("text/html;charset=utf-8");
-            templateRenderer.render(template, resp.getWriter());
+            templateRenderer.render("ru/mail/jira/plugins/groovy/templates/" + path + ".vm", resp.getWriter());
         } catch (WebSudoSessionException wes) {
             webSudoManager.enforceWebSudoProtection(req, resp);
         }

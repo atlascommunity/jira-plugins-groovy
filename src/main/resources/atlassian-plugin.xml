@@ -117,44 +117,9 @@
         <description>Groovy rest module</description>
     </rest>
 
-    <servlet name="Console servlet" key="console-servlet" class="ru.mail.jira.plugins.groovy.servlet.ConsoleServlet">
-        <description>Console servlet</description>
-        <url-pattern>/my-groovy/console</url-pattern>
-    </servlet>
-
-    <servlet name="Registry servlet" key="registry-servlet" class="ru.mail.jira.plugins.groovy.servlet.RegistryServlet">
-        <description>Registry servlet</description>
-        <url-pattern>/my-groovy/registry</url-pattern>
-    </servlet>
-
-    <servlet name="Listeners servlet" key="listeners-servlet" class="ru.mail.jira.plugins.groovy.servlet.ListenersServlet">
-        <description>Listeners servlet</description>
-        <url-pattern>/my-groovy/listeners</url-pattern>
-    </servlet>
-
-    <servlet name="Extras servlet" key="extras-servlet" class="ru.mail.jira.plugins.groovy.servlet.ExtrasServlet">
-        <description>Extras servlet</description>
-        <url-pattern>/my-groovy/extras</url-pattern>
-    </servlet>
-
-    <servlet name="Audit servlet" key="audit-servlet" class="ru.mail.jira.plugins.groovy.servlet.AuditLogServlet">
-        <description>Extras servlet</description>
-        <url-pattern>/my-groovy/audit</url-pattern>
-    </servlet>
-
-    <servlet name="Groovy fields servlet" key="fields-servlet" class="ru.mail.jira.plugins.groovy.servlet.FieldsServlet">
-        <description>Groovy fields servlet</description>
-        <url-pattern>/my-groovy/fields</url-pattern>
-    </servlet>
-
-    <servlet name="Custom field servlet" key="cf-servlet" class="ru.mail.jira.plugins.groovy.servlet.CustomFieldServlet">
-        <description>Custom field servlet</description>
-        <url-pattern>/my-groovy/custom-field</url-pattern>
-    </servlet>
-
-    <servlet name="REST servlet" key="rest-servlet" class="ru.mail.jira.plugins.groovy.servlet.RestServlet">
+    <servlet name="Groovy servlet" key="rest-servlet" class="ru.mail.jira.plugins.groovy.servlet.GroovyServlet">
         <description>REST servlet</description>
-        <url-pattern>/my-groovy/rest</url-pattern>
+        <url-pattern>/my-groovy/*</url-pattern>
     </servlet>
 
     <ao key="ao-entities">
