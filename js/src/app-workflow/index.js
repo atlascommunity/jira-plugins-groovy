@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Avatar from 'aui-react/lib/AUIAvatar';
+import Avatar from '@atlaskit/avatar';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import define from 'extDefine';

@@ -101,7 +101,7 @@ public class RestRepositoryImpl implements RestRepository {
 
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
 
-        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, "Created.");
+        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, form.getComment());
 
         script.setUuid(UUID.randomUUID().toString());
         script.setMethods(joinMethods(form.getMethods()));

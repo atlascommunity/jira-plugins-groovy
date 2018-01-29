@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {Async} from 'react-select';
 import './react-select-common.less';
 
-import Avatar from 'aui-react/lib/AUIAvatar';
+import Avatar from '@atlaskit/avatar';
 import Icon from 'aui-react/lib/AUIIcon';
 
 import {ajaxGet} from '../service/ajaxHelper';

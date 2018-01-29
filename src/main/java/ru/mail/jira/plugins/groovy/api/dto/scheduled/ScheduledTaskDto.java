@@ -28,5 +28,7 @@ public class ScheduledTaskDto extends ScheduledTaskForm {
     @XmlElement
     private RunInfo lastRunInfo;
     @XmlElement
+    private String nextRunDate;
+    @XmlElement
     private List<ChangelogDto> changelogs;
 }

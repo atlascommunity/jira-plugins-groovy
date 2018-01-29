@@ -100,7 +100,11 @@ function directoryReducer(state, action) {
             break;
         case UPDATE_DIRECTORY:
             if (state.id === action.directory.id) {
-                return action.directory;
+                return {
+                    ...action.directory,
+                    children: state.children,
+                    scripts: state.scripts
+                };
             }
             break;
         case DELETE_DIRECTORY:

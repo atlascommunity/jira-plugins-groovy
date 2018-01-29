@@ -1,9 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Avatar from 'aui-react/lib/AUIAvatar';
-import Button from 'aui-react/lib/AUIButton';
 import Icon from 'aui-react/lib/AUIIcon';
+
+import Avatar from '@atlaskit/avatar';
+import Button, {ButtonGroup} from '@atlaskit/button';
+
+import CodeIcon from '@atlaskit/icon/glyph/code';
+import EditIcon from '@atlaskit/icon/glyph/edit-filled';
+import TrashIcon from '@atlaskit/icon/glyph/trash';
+import BitbucketSourceIcon from '@atlaskit/icon/glyph/bitbucket/source';
 
 import {Editor} from './Editor';
 
@@ -15,6 +21,7 @@ import {executionService} from '../service/services';
 import './Script.less';
 
 
+//todo: common component for displaying script parameters, maybe add prop for parameters
 export class Script extends React.Component {
     static propTypes = {
         withChangelog: PropTypes.bool.isRequired,
@@ -27,7 +34,7 @@ export class Script extends React.Component {
             scriptBody: PropTypes.string,
             inline: PropTypes.bool,
             changelogs: PropTypes.array
-        }).isRequired,
+        }),
         onEdit: PropTypes.func,
         onDelete: PropTypes.func,
 
@@ -123,7 +130,7 @@ export class Script extends React.Component {
                         <div key="current" className="scriptChangelog" onClick={this._switchToCurrent}>
                             <strong>{CommonMessages.currentVersion}</strong>
                         </div>
-                        {script.changelogs && script.changelogs.map(changelog =>
+                        {script && script.changelogs && script.changelogs.map(changelog =>
                             <div key={changelog.id} className="scriptChangelog" onClick={this._switchToChangelog(changelog)}>
                                 <div>
                                     <Icon icon="devtools-commit"/>
@@ -167,28 +174,54 @@ export class Script extends React.Component {
         }
 
         return (
-            <div key={script.id} className={`scriptRow ${!isOpen ? 'collapsed' : ''}`}>
+            <div className={`scriptRow ${!isOpen ? 'collapsed' : ''}`}>
                 {!headerless &&
                     <div className="flex-row title">
                         {title ?
-                            <div className="flex-grow">
+                            <div className="flex-grow flex-vertical-middle">
                                 {title}
                             </div>
                             :
-                            <div className="flex-grow">
-                                <h3>
-                                    <Icon icon="file-code"/>{' '}
-                                    {script.name}
-                                </h3>
+                            <div className="flex-grow flex-row">
+                                <div className="flex-vertical-middle">
+                                    <CodeIcon label=""/>
+                                </div>
+                                {' '}
+                                <div className="flex-vertical-middle">
+                                    <h3>
+                                        {script && script.name}
+                                    </h3>
+                                </div>
                             </div>
                         }
-                        <div className="flex-none">
-                            {collapsible && <Button type="subtle" icon={showCode ? 'arrows-up' : 'arrows-down'}
-                                                    onClick={this._showCode}>{CommonMessages.showCode}</Button>}
-                            {onEdit && <Button key="edit-button" type="subtle" icon="edit"
-                                               onClick={onEdit}>{CommonMessages.edit}</Button>}
-                            {onDelete && <Button key="delete-button" type="subtle" icon="delete"
-                                                 onClick={onDelete}>{CommonMessages.delete}</Button>}
+                        <div className="flex-none flex-row">
+                            <ButtonGroup>
+                                {collapsible && script &&
+                                    <Button
+                                        appearance="subtle"
+                                        iconBefore={<BitbucketSourceIcon label=""/>}
+                                        isSelected={showCode}
+                                        onClick={this._showCode}
+                                    >
+                                        {CommonMessages.showCode}
+                                    </Button>}
+                                {onEdit &&
+                                    <Button
+                                        key="edit-button"
+                                        appearance="subtle"
+                                        iconBefore={<EditIcon label=""/>}
+
+                                        onClick={onEdit}
+                                    />}
+                                {onDelete &&
+                                    <Button
+                                        key="delete-button"
+                                        appearance="subtle"
+                                        iconBefore={<TrashIcon label=""/>}
+
+                                        onClick={onDelete}
+                                    />}
+                            </ButtonGroup>
                             {additionalButtons}
                         </div>
                     </div>

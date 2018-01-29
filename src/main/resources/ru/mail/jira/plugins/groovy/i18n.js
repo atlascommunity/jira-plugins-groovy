@@ -17,6 +17,8 @@ define('/mailru/groovy/i18n-react', function() {
             cacheable: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.cacheable'),
             schedule: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.schedule'),
             issueJql: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.issueJql'),
+            workflow: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.workflow'),
+            workflowAction: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.workflowAction'),
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),
@@ -106,6 +108,12 @@ define('/mailru/groovy/i18n-react', function() {
             runAs: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.runAs'),
             jqlLimitDescription: function(...params) {
                 return AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.jqlLimitDescription', ...params);
+            },
+            transitionOptions: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOptions'),
+            transitionOption: {
+                skipConditions: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOption.skipConditions'),
+                skipValidators: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOption.skipValidators'),
+                skipPermissions: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOption.skipPermissions')
             }
         }
     };

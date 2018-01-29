@@ -1,6 +1,8 @@
 import React from 'react';
 
-import Button from 'aui-react/lib/AUIButton';
+import Button from '@atlaskit/button';
+import Page from '@atlaskit/page';
+import PageHeader from '@atlaskit/page-header';
 
 import {extrasService} from '../service/services';
 import {TitleMessages} from '../i18n/common.i18n';
@@ -12,18 +14,14 @@ export class ExtrasPage extends React.Component {
     };
 
     render() {
-        return <div>
-            <header className="aui-page-header">
-                <div className="aui-page-header-inner">
-                    <div className="aui-page-header-main">
-                        <h2>{TitleMessages.extras}</h2>
-                    </div>
-                </div>
-            </header>
+        return <Page>
+            <PageHeader>
+                {TitleMessages.extras}
+            </PageHeader>
             <div className="page-content">
                 Clear cache:
-                <Button type="primary" onClick={this._clearCache}>{'Kill it with fire'}</Button>
+                <Button appearance="primary" onClick={this._clearCache}>{'Kill it with fire'}</Button>
             </div>
-        </div>;
+        </Page>;
     }
 }

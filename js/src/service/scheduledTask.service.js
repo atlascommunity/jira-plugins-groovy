@@ -1,4 +1,4 @@
-import {ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
+import {ajaxDelete, ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
 
 
 export class ScheduledTaskService {
@@ -12,6 +12,10 @@ export class ScheduledTaskService {
 
     create(data) {
         return ajaxPost(`${getPluginBaseUrl()}/scheduled`, data);
+    }
+
+    doDelete(id) {
+        return ajaxDelete(`${getPluginBaseUrl()}/scheduled/${id}`);
     }
 
     update(id, data) {

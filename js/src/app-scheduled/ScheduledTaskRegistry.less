@@ -1,17 +1,10 @@
 @import (reference) "../flex";
+@import (reference) "~@atlaskit/util-shared-styles/src/colors.less";
 
-.TaskRunInfo {
-  .flex-row;
+.TaskRunMessage {
+  .flex-vertical-middle;
 
-  >div {
-    margin-left: 3px;
-    margin-right: 3px;
-
-    &:first-child {
-      margin-left: 0
-    }
-    &:last-child {
-      margin-right: 0;
-    }
-  }
+  color: @ak-color-N600;
+  font-weight: 500;
+  padding: 0 5px;
 }

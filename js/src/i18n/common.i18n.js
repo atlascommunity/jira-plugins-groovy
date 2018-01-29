@@ -18,7 +18,9 @@ export const FieldMessages = {
     customField: i18n.fields.customField,
     cacheable: i18n.fields.cacheable,
     schedule: i18n.fields.schedule,
-    issueJql: i18n.fields.issueJql
+    issueJql: i18n.fields.issueJql,
+    workflow: i18n.fields.workflow,
+    workflowAction: i18n.fields.workflowAction
 };
 
 export const CommonMessages = {

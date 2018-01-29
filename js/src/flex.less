@@ -53,7 +53,7 @@
   margin: 10px 0 0 0;
 }
 
-//todo: add some specific class to our roots
+//todo: add some specific class to our root elements
 #react-content {
   textarea {
     resize: vertical;
@@ -65,5 +65,31 @@
     }
 
     height: ~"calc(100% - 160px)";
+  }
+
+  background-color: #FFF;
+  color: #172B4D;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.42857142857143;
+  letter-spacing: -0.005em;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+  text-decoration-skip: ink;
+}
+
+.space-between {
+  > * {
+    margin-left: 2px;
+    margin-right: 2px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
   }
 }

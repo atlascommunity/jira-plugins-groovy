@@ -9,6 +9,7 @@ import Button from 'aui-react/lib/AUIButton';
 import Modal from 'aui-react/lib/AUIDialog';
 
 import {TaskActionCreators} from './scheduled.reducer';
+import {types, typeList} from './types';
 
 import {AUIRequired} from '../common/aui-components';
 
@@ -24,34 +25,6 @@ import {AsyncPicker} from '../common/AsyncPicker';
 import {JqlInput} from '../common/JqlInput';
 import {Error} from '../common/forms/Error';
 
-
-const types = {
-    BASIC_SCRIPT: {
-        name: 'Basic script',
-        fields: ['scriptBody']
-    },
-    ISSUE_JQL_SCRIPT: {
-        name: 'JQL issue script',
-        fields: ['issueJql', 'scriptBody']
-    },
-    DOCUMENT_ISSUE_JQL_SCRIPT: {
-        name: 'JQL document issue script',
-        fields: ['issueJql', 'scriptBody']
-    },
-    ISSUE_JQL_TRANSITION: {
-        name: 'JQL issue transition',
-        fields: ['issueJql', 'workflowAction', 'transitionOptions']
-    }
-};
-
-const typeList = Object
-    .keys(types)
-    .map(key => {
-        return {
-            ...(types[key]),
-            key
-        };
-    });
 
 function getValue(option) {
     return option ? option.value : null;
@@ -89,6 +62,7 @@ export class ScheduledTaskDialog extends React.Component {
                 ready: true,
                 values: new Map({
                     name: '',
+                    transitionOptions: {},
                     scriptBody: ''
                 }),
                 error: null
@@ -111,6 +85,9 @@ export class ScheduledTaskDialog extends React.Component {
                             userKey: task.user,
                             type: task.type,
                             issueJql: task.issueJql,
+                            issueWorkflowName: task.issueWorkflow,
+                            issueWorkflowActionId: task.issueWorkflowAction,
+                            transitionOptions: task.transitionOptions,
                             comment: ''
                         }),
                         ready: true
@@ -179,6 +156,19 @@ export class ScheduledTaskDialog extends React.Component {
 
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
 
+    _toggleTransitionOption = (option) => () => {
+        this.setState(state => {
+            const options = state.values.get('transitionOptions');
+
+            return {
+                values: state.values.set('transitionOptions', {
+                    ...options,
+                    [option]: !options[option]
+                })
+            };
+        });
+    };
+
     _renderField = (fieldName, error) => {
         const {values} = this.state;
 
@@ -238,10 +228,10 @@ export class ScheduledTaskDialog extends React.Component {
             case 'workflowAction':
                 const workflow = values.get('issueWorkflowName');
                 return (
-                    <div>
-                        <div className="field-group" key={fieldName}>
+                    <div key={fieldName}>
+                        <div className="field-group">
                             <label>
-                                Workflow<AUIRequired/>
+                                {FieldMessages.workflow}<AUIRequired/>
                             </label>
                             <AsyncPicker
                                 src={`${getPluginBaseUrl()}/jira-api/workflowPicker`}
@@ -251,9 +241,9 @@ export class ScheduledTaskDialog extends React.Component {
                             <Error error={error} thisField={fieldName}/>
                         </div>
                         {workflow &&
-                            <div className="field-group" key={fieldName}>
+                            <div className="field-group">
                                 <label>
-                                    Workflow action<AUIRequired/>
+                                    {FieldMessages.workflowAction}<AUIRequired/>
                                 </label>
                                 <AsyncPicker
                                     src={`${getPluginBaseUrl()}/jira-api/workflowActionPicker/${workflow.value}`}
@@ -267,21 +257,49 @@ export class ScheduledTaskDialog extends React.Component {
                 );
             case 'transitionOptions':
                 //todo: link controls
+                const value = values.get(fieldName);
                 return (
-                    <fieldset className="group">
-                    <legend>Transition options</legend>
-                    <div className="checkbox">
-                        <input className="checkbox" type="checkbox" name="checkBoxOne" id="task-dialog-transition-skip-conditions"/>
-                        <label htmlFor="task-dialog-transition-skip-conditions">Skip conditions</label>
-                    </div>
-                    <div className="checkbox">
-                        <input className="checkbox" type="checkbox" name="checkBoxOne" id="task-dialog-transition-skip-validators"/>
-                        <label htmlFor="task-dialog-transition-skip-validators">Skip validators</label>
-                    </div>
-                    <div className="checkbox">
-                        <input className="checkbox" type="checkbox" name="checkBoxOne" id="task-dialog-transition-skip-permissions"/>
-                        <label htmlFor="task-dialog-transition-skip-permissions">Skip permissions</label>
-                    </div>
+                    <fieldset className="group" key={fieldName}>
+                        <legend>{ScheduledTaskMessages.transitionOptions}</legend>
+                        <div className="checkbox">
+                            <input
+                                className="checkbox"
+                                type="checkbox"
+                                name="checkBoxOne"
+                                id="task-dialog-transition-skip-conditions"
+                                checked={value.skipConditions}
+                                onChange={this._toggleTransitionOption('skipConditions')}
+                            />
+                            <label htmlFor="task-dialog-transition-skip-conditions">
+                                {ScheduledTaskMessages.transitionOption.skipConditions}
+                            </label>
+                        </div>
+                        <div className="checkbox">
+                            <input
+                                className="checkbox"
+                                type="checkbox"
+                                name="checkBoxOne"
+                                id="task-dialog-transition-skip-validators"
+                                checked={value.skipValidators}
+                                onChange={this._toggleTransitionOption('skipValidators')}
+                            />
+                            <label htmlFor="task-dialog-transition-skip-validators">
+                                {ScheduledTaskMessages.transitionOption.skipValidators}
+                            </label>
+                        </div>
+                        <div className="checkbox">
+                            <input
+                                className="checkbox"
+                                type="checkbox"
+                                name="checkBoxOne"
+                                id="task-dialog-transition-skip-permissions"
+                                checked={value.skipPermissions}
+                                onChange={this._toggleTransitionOption('skipPermissions')}
+                            />
+                            <label htmlFor="task-dialog-transition-skip-permissions">
+                                {ScheduledTaskMessages.transitionOption.skipPermissions}
+                            </label>
+                        </div>
                     </fieldset>
                 );
             default:

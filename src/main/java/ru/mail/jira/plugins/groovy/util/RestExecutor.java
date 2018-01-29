@@ -90,9 +90,11 @@ public final class RestExecutor<T> {
                 }
             }
 
-
             if (!handled) {
-                entity = ImmutableMap.of("message", e.getMessage() != null ? e.getMessage() : e.getClass().getCanonicalName());
+                entity = ImmutableMap.of(
+                    "message", e.getMessage() != null ? e.getMessage() : e.getClass().getCanonicalName(),
+                    "stack-trace", ExceptionHelper.writeExceptionToString(e)
+                );
                 log.error("REST Exception", e);
             }
 

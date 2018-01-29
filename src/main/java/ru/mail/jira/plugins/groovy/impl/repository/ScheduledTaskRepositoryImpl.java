@@ -11,8 +11,11 @@ import com.atlassian.jira.workflow.JiraWorkflow;
 import com.atlassian.jira.workflow.WorkflowManager;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.scheduler.SchedulerHistoryService;
+import com.atlassian.scheduler.SchedulerService;
 import com.atlassian.scheduler.caesium.cron.parser.CronExpressionParser;
+import com.atlassian.scheduler.config.JobId;
 import com.atlassian.scheduler.cron.CronSyntaxException;
+import com.atlassian.scheduler.status.JobDetails;
 import com.atlassian.scheduler.status.RunDetails;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
@@ -20,6 +23,8 @@ import com.opensymphony.workflow.loader.ActionDescriptor;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
@@ -38,18 +43,22 @@ import ru.mail.jira.plugins.groovy.util.UserMapper;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
+    private final Logger logger = LoggerFactory.getLogger(ScheduledTaskRepositoryImpl.class);
+
     private final ActiveObjects ao;
     private final I18nHelper i18nHelper;
     private final DateTimeFormatter dateTimeFormatter;
     private final WorkflowManager workflowManager;
     private final UserManager userManager;
     private final SchedulerHistoryService schedulerHistoryService;
+    private final SchedulerService schedulerService;
     private final SearchService searchService;
     private final ChangelogHelper changelogHelper;
     private final AuditLogRepository auditLogRepository;
@@ -64,6 +73,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         @ComponentImport WorkflowManager workflowManager,
         @ComponentImport UserManager userManager,
         @ComponentImport SchedulerHistoryService schedulerHistoryService,
+        @ComponentImport SchedulerService schedulerService,
         @ComponentImport SearchService searchService,
         ChangelogHelper changelogHelper,
         AuditLogRepository auditLogRepository,
@@ -76,6 +86,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         this.workflowManager = workflowManager;
         this.userManager = userManager;
         this.schedulerHistoryService = schedulerHistoryService;
+        this.schedulerService = schedulerService;
         this.searchService = searchService;
         this.changelogHelper = changelogHelper;
         this.auditLogRepository = auditLogRepository;
@@ -84,16 +95,16 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
     }
 
     @Override
-    public List<ScheduledTaskDto> getAllTasks(boolean includeChangelogs, boolean includeLastRunInfo) {
+    public List<ScheduledTaskDto> getAllTasks(boolean includeChangelogs, boolean includeRunInfo) {
         return Arrays
             .stream(ao.find(ScheduledTask.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(task -> buildDto(task, includeChangelogs, includeLastRunInfo))
+            .map(task -> buildDto(task, includeChangelogs, includeRunInfo))
             .collect(Collectors.toList());
     }
 
     @Override
-    public ScheduledTaskDto getTaskInfo(int id, boolean includeChangelogs, boolean includeLastRunInfo) {
-        return buildDto(ao.get(ScheduledTask.class, id), includeChangelogs, includeLastRunInfo);
+    public ScheduledTaskDto getTaskInfo(int id, boolean includeChangelogs, boolean includeRunInfo) {
+        return buildDto(ao.get(ScheduledTask.class, id), includeChangelogs, includeRunInfo);
     }
 
     @Override
@@ -188,6 +199,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         ScheduledTask task = ao.get(ScheduledTask.class, id);
 
         task.setDeleted(true);
+        task.save();
 
         auditLogRepository.create(
             user,
@@ -200,8 +212,6 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
     }
 
     private void validateForm(boolean isNew, ScheduledTaskForm form) {
-        scriptService.parseScript(form.getScriptBody());
-
         if (StringUtils.isEmpty(form.getName())) {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
         }
@@ -284,6 +294,8 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             if (StringUtils.isEmpty(form.getScriptBody())) {
                 throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
             }
+
+            scriptService.parseScript(form.getScriptBody());
         } else {
             form.setScriptBody(null);
         }
@@ -302,7 +314,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         }
     }
 
-    private ScheduledTaskDto buildDto(ScheduledTask task, boolean includeChangelogs, boolean includeLastRunInfo) {
+    private ScheduledTaskDto buildDto(ScheduledTask task, boolean includeChangelogs, boolean includeRunInfo) {
         ScheduledTaskDto result = new ScheduledTaskDto();
 
         result.setId(task.getID());
@@ -321,22 +333,22 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         if (task.getType() == ScheduledTaskType.ISSUE_JQL_TRANSITION) {
             JiraWorkflow workflow = workflowManager.getWorkflow(task.getWorkflow());
             if (workflow != null) {
-                ActionDescriptor workflowAction = workflow
+                ActionDescriptor action = workflow
                     .getAllActions()
                     .stream()
-                    .filter(action -> action.getId() == task.getWorkflowAction())
+                    .filter(a -> a.getId() == task.getWorkflowAction())
                     .findAny()
                     .orElse(null);
 
-                if (workflowAction != null) {
+                if (action != null) {
                     result.setIssueWorkflow(new PickerOption(
                         workflow.getDisplayName(),
                         workflow.getName(),
                         null
                     ));
                     result.setIssueWorkflowAction(new PickerOption(
-                        String.valueOf(workflowAction.getId()),
-                        workflowAction.getName(),
+                        action.getName() + " (" + action.getId() + ")",
+                        String.valueOf(action.getId()),
                         null
                     ));
                 }
@@ -349,8 +361,9 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             result.setChangelogs(changelogHelper.collect(task.getChangelogs()));
         }
 
-        if (includeLastRunInfo) {
-            RunDetails runDetails = schedulerHistoryService.getLastRunForJob(JobUtil.getJobId(task.getID()));
+        if (includeRunInfo) {
+            JobId jobId = JobUtil.getJobId(task.getID());
+            RunDetails runDetails = schedulerHistoryService.getLastRunForJob(jobId);
 
             if (runDetails != null) {
                 RunInfo runInfo = new RunInfo();
@@ -360,6 +373,18 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
                 runInfo.setMessage(runDetails.getMessage());
 
                 result.setLastRunInfo(runInfo);
+            }
+
+            if (task.isEnabled()) {
+                JobDetails jobDetails = schedulerService.getJobDetails(jobId);
+                if (jobDetails != null) {
+                    Date nextRunTime = jobDetails.getNextRunTime();
+                    if (nextRunTime != null) {
+                        result.setNextRunDate(dateTimeFormatter.withStyle(DateTimeStyle.COMPLETE).format(nextRunTime));
+                    }
+                } else {
+                    logger.error("cannot get job details for {}", task.getID());
+                }
             }
         }
 

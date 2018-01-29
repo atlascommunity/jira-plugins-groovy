@@ -3,8 +3,11 @@ import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
-import Button from 'aui-react/lib/AUIButton';
 import Message from 'aui-react/lib/AUIMessage';
+
+import Button from '@atlaskit/button';
+import Page from '@atlaskit/page';
+import PageHeader from '@atlaskit/page-header';
 
 import {ScriptActionCreators} from './rest.reducer';
 
@@ -27,19 +30,17 @@ export class RestRegistry extends React.Component {
         const {scripts} = this.props;
 
         return (
-            <div>
-                <header className="aui-page-header">
-                    <div className="aui-page-header-inner">
-                        <div className="aui-page-header-main">
-                            <h2>{TitleMessages.rest}</h2>
-                        </div>
-                        <div className="aui-page-header-actions">
-                            <Button onClick={this._triggerDialog(true)}>
-                                {RestMessages.addScript}
-                            </Button>
-                        </div>
-                    </div>
-                </header>
+            <Page>
+                <PageHeader
+                    actions={
+                        <Button appearance="primary" onClick={this._triggerDialog(true)}>
+                            {RestMessages.addScript}
+                        </Button>
+                    }
+                >
+                    {TitleMessages.rest}
+                </PageHeader>
+
                 <div className="ScriptList page-content">
                     {scripts.map(script =>
                         <RestScript
@@ -50,7 +51,7 @@ export class RestRegistry extends React.Component {
                     )}
                     {!scripts.length && <Message type="info">{RestMessages.noScripts}</Message>}
                 </div>
-            </div>
+            </Page>
         );
     }
 }

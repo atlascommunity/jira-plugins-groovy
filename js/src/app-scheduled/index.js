@@ -11,6 +11,7 @@ import {TaskActionCreators, tasksReducer} from './scheduled.reducer';
 import {ScheduledTaskRegistry} from './ScheduledTaskRegistry';
 
 import {scheduledTaskService} from '../service/services';
+import {fixStyle} from '../common/fixStyle';
 
 import '../flex.less';
 
@@ -18,16 +19,16 @@ import '../flex.less';
 const store = createStore(tasksReducer, {tasks: [], ready: false});
 
 AJS.toInit(() => {
+    fixStyle();
+
     scheduledTaskService
         .getAllTasks()
         .then(scripts => store.dispatch(TaskActionCreators.loadTasks(scripts)));
 
     ReactDOM.render(
-        <div>
-            <Provider store={store}>
-                <ScheduledTaskRegistry/>
-            </Provider>
-        </div>,
+        <Provider store={store}>
+            <ScheduledTaskRegistry/>
+        </Provider>,
         document.getElementById('react-content')
     );
 });

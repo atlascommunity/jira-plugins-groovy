@@ -7,9 +7,9 @@ import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskDto;
 import java.util.List;
 
 public interface ScheduledTaskRepository {
-    List<ScheduledTaskDto> getAllTasks(boolean includeChangelogs, boolean includeLastRunInfo);
+    List<ScheduledTaskDto> getAllTasks(boolean includeChangelogs, boolean includeRunInfo);
 
-    ScheduledTaskDto getTaskInfo(int id, boolean includeChangelogs, boolean includeLastRunInfo);
+    ScheduledTaskDto getTaskInfo(int id, boolean includeChangelogs, boolean includeRunInfo);
 
     /**
      * All mutations must go through {@link ru.mail.jira.plugins.groovy.api.service.ScheduledTaskService}

@@ -18,12 +18,12 @@
             <transformer key="jsI18n"/>
         </transformation>
 
+        <!--todo: remove unused -->
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <dependency>com.atlassian.auiplugin:dialog2</dependency>
         <dependency>com.atlassian.auiplugin:aui-experimental-tooltips</dependency>
         <dependency>com.atlassian.auiplugin:aui-select</dependency>
         <dependency>com.atlassian.auiplugin:aui-select2</dependency>
-        <dependency>com.atlassian.auiplugin:aui-toggle</dependency>
 
         <resource type="download" name="i18n.js" location="/ru/mail/jira/plugins/groovy/i18n.js"/>
         <resource type="download" name="common.js" location="/ru/mail/jira/plugins/groovy/js/common.js"/>
@@ -456,5 +456,17 @@
         <resource type="velocity" name="xml" location="templates/plugins/fields/xml/xml-basictext.vm" />
 
         <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="textsearcher"/>
+    </customfield-type>
+
+    <customfield-type key="groovy-number-field" name="Groovy number field" class="ru.mail.jira.plugins.groovy.impl.cf.NumberCFType">
+        <description>
+            Scripted number custom field type.
+        </description>
+
+        <resource type="velocity" name="view" location="templates/plugins/fields/view/view-number.vm"/>
+        <resource type="velocity" name="xml" location="templates/plugins/fields/xml/xml-number.vm" />
+
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="exactnumber"/>
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="numberrange"/>
     </customfield-type>
 </atlassian-plugin>
