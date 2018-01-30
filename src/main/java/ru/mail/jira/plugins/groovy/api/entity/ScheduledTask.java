@@ -5,7 +5,6 @@ import net.java.ao.OneToMany;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 
-//todo
 public interface ScheduledTask extends Entity {
     @NotNull
     String getUuid();

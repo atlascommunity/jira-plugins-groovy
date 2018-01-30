@@ -61,7 +61,6 @@ class Field extends React.Component {
     render() {
         const {config} = this.props;
 
-        //todo: buttons
         return (
             <Script
                 script={{

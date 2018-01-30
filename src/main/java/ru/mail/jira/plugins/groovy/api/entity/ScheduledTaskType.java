@@ -4,5 +4,5 @@ public enum ScheduledTaskType {
     BASIC_SCRIPT,
     ISSUE_JQL_SCRIPT,
     ISSUE_JQL_TRANSITION,
-    DOCUMENT_ISSUE_JQL_SCRIPT //todo: add warning that only errors will be tracked
+    DOCUMENT_ISSUE_JQL_SCRIPT
 }

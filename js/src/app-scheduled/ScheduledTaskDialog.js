@@ -215,13 +215,19 @@ export class ScheduledTaskDialog extends React.Component {
                         <JqlInput
                             id="task-dialog-jql"
 
-                            value={values.get(fieldName)}
+                            value={values.get(fieldName) || ''}
                             onChange={this._setTextValue(fieldName)}
                         />
                         <div className="description">
                             <span className="aui-icon aui-icon-warning"/>{' '}
                             {ScheduledTaskMessages.jqlLimitDescription(1000) /*todo: insert value from config when its configurable*/}
                         </div>
+                        {['ISSUE_JQL_SCRIPT', 'DOCUMENT_ISSUE_JQL_SCRIPT'].includes(values.get('type')) &&
+                            <div className="description">
+                                <span className="aui-icon aui-icon-warning"/>{' '}
+                                {ScheduledTaskMessages.jqlScriptDescription}
+                            </div>
+                        }
                         <Error error={error} thisField={fieldName}/>
                     </div>
                 );

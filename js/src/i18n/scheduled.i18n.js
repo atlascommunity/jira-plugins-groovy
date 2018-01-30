@@ -7,6 +7,7 @@ export const ScheduledTaskMessages = {
     addTask: i18n.scheduled.addTask,
     runAs: i18n.scheduled.runAs,
     jqlLimitDescription: i18n.scheduled.jqlLimitDescription,
+    jqlScriptDescription: i18n.scheduled.jqlScriptDescription,
     transitionOptions: i18n.scheduled.transitionOptions,
     transitionOption: i18n.scheduled.transitionOption
 };
