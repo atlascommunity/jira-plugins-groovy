@@ -6,6 +6,8 @@ import Dialog from 'aui-react/lib/AUIDialog';
 import Button from 'aui-react/lib/AUIButton';
 import Message from 'aui-react/lib/AUIMessage';
 
+import Spinner from '@atlaskit/spinner';
+
 import {Map} from 'immutable';
 
 import {RegistryActionCreators} from './registry.reducer';
@@ -19,15 +21,16 @@ import {getMarkers} from '../common/error';
 import {StaticField} from '../common/StaticField';
 
 
-//todo: lock when loading
 @connect(null, RegistryActionCreators, null, {withRef: true})
 export class ScriptDialog extends React.Component {
     state = {
         active: false,
         id: null,
         values: new Map(),
+        parentName: '',
         error: null,
-        modified: false
+        modified: false,
+        waiting: false
     };
 
     activateCreate = (directoryId) => {
@@ -41,7 +44,8 @@ export class ScriptDialog extends React.Component {
                         directoryId: directoryId
                     }),
                     parentName: directory.fullName,
-                    error: null
+                    error: null,
+                    waiting: false
                 })
             );
     };
@@ -58,7 +62,8 @@ export class ScriptDialog extends React.Component {
                     directoryId: data.directoryId
                 }),
                 parentName: data.parentName,
-                error: null
+                error: null,
+                waiting: false
             }));
         //todo: show something when loading
     };
@@ -66,6 +71,7 @@ export class ScriptDialog extends React.Component {
     _handleError = (error) => {
         const {response} = error;
 
+        this.setState({ waiting: false });
         if (response.status === 400) {
             this.setState({
                 error: response.data,
@@ -81,6 +87,8 @@ export class ScriptDialog extends React.Component {
             e.preventDefault();
         }
 
+        this.setState({ waiting: true });
+
         const id = this.state.id;
         if (id) {
             registryService
@@ -88,7 +96,7 @@ export class ScriptDialog extends React.Component {
                 .then(
                     data => {
                         this.props.updateScript(data);
-                        this.setState({active: false});
+                        this.setState({ active: false, waiting: false });
                     },
                     this._handleError
                 );
@@ -98,14 +106,14 @@ export class ScriptDialog extends React.Component {
                 .then(
                     data => {
                         this.props.addScript(data);
-                        this.setState({active: false});
+                        this.setState({ active: false, waiting: false });
                     },
                     this._handleError
                 );
         }
     };
 
-    _close = () => this.setState({active: false});
+    _close = () => this.setState({ active: false, waiting: false });
 
     mutateValue = (field, value) => {
         this.setState(state => {
@@ -121,7 +129,7 @@ export class ScriptDialog extends React.Component {
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
 
     render() {
-        const {values, parentName, error, modified} = this.state;
+        const {values, parentName, error, modified, waiting} = this.state;
         let errorMessage = null;
         let errorField = null;
 
@@ -151,10 +159,22 @@ export class ScriptDialog extends React.Component {
                         titleContent={`${this.state.id ? CommonMessages.update : CommonMessages.create} script`}
                         onClose={this._close}
                         footerActionContent={[
-                            <Button key="create" onClick={this._onSubmit}>
-                                {this.state.id ? CommonMessages.update : CommonMessages.create}
+                            <Button
+                                key="create"
+                                onClick={this._onSubmit}
+                                disabled={waiting}
+                            >
+                                {waiting && <Spinner size={15}/>}
+                                {!waiting && (this.state.id ? CommonMessages.update : CommonMessages.create)}
                             </Button>,
-                            <Button key="close" type="link" onClick={this._close}>{CommonMessages.cancel}</Button>
+                            <Button
+                                key="close"
+                                type="link"
+                                onClick={this._close}
+                                disabled={waiting}
+                            >
+                                {CommonMessages.cancel}
+                            </Button>
                         ]}
                         type="modal"
                         styles={{zIndex: '3000'}}
@@ -184,6 +204,7 @@ export class ScriptDialog extends React.Component {
                                     id="directory-dialog-name"
                                     value={values.get('name') || ''}
                                     onChange={this._setTextValue('name')}
+                                    disabled={waiting}
                                 />
                                 {errorField === 'name' && <div className="error">{errorMessage}</div>}
                             </div>
@@ -198,6 +219,7 @@ export class ScriptDialog extends React.Component {
 
                                     onChange={this._setObjectValue('scriptBody')}
                                     value={values.get('scriptBody') || ''}
+                                    isDisabled={waiting}
 
                                     markers={markers}
                                 />
@@ -214,6 +236,7 @@ export class ScriptDialog extends React.Component {
                                     className="textarea full-width-field"
                                     value={values.get('comment')}
                                     onChange={this._setTextValue('comment')}
+                                    disabled={waiting}
                                 />
                                 {errorField === 'comment' && <div className="error">{errorMessage}</div>}
                             </div> : null}

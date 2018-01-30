@@ -25,6 +25,7 @@ export class Editor extends React.Component {
     static propTypes = {
         mode: PropTypes.string.isRequired,
         value: PropTypes.string.isRequired,
+        isDisabled: PropTypes.bool,
         onChange: PropTypes.func,
         readyOnly: PropTypes.bool,
         markers: PropTypes.arrayOf(
@@ -89,14 +90,14 @@ export class Editor extends React.Component {
     }
 
     render() {
-        const {onChange, value, readyOnly, mode, decorated, resizable} = this.props;
+        const {onChange, value, readyOnly, isDisabled, mode, decorated, resizable} = this.props;
 
         let el = <CodeMirror
             options={{
                 theme: this.state.isLight ? 'eclipse' : 'lesser-dark',
                 mode: mode,
                 lineNumbers: true,
-                readOnly: readyOnly || false,
+                readOnly: readyOnly || isDisabled || false,
                 gutters: ['CodeMirror-lint-markers'],
                 lint: {
                     getAnnotations: this._getAnnotations,
