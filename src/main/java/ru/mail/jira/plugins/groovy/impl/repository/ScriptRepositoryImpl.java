@@ -307,6 +307,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         result.setDirectoryId(script.getDirectory().getID());
         result.setScriptBody(script.getScriptBody());
         result.setDeleted(script.isDeleted());
+        result.setParentName(getExpandedName(script.getDirectory()));
 
         if (expandName) {
             result.setName(getExpandedName(script));
@@ -329,6 +330,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
         result.setId(directory.getID());
         result.setName(directory.getName());
+        result.setFullName(getExpandedName(directory));
 
         ScriptDirectory parent = directory.getParent();
         if (parent != null) {
@@ -399,14 +401,16 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return result;
     }
 
-    private String getExpandedName(Script script) {
-        List<String> nameElements = new ArrayList<>();
-        nameElements.add(script.getName());
+    private static String getExpandedName(Script script) {
+        return getExpandedName(script.getDirectory()) + "/" + script.getName();
+    }
 
-        ScriptDirectory directory = script.getDirectory();
-        while (directory != null) {
-            nameElements.add(directory.getName());
-            directory = directory.getParent();
+    private static String getExpandedName(ScriptDirectory directory) {
+        List<String> nameElements = new ArrayList<>();
+        ScriptDirectory dir = directory;
+        while (dir != null) {
+            nameElements.add(dir.getName());
+            dir = dir.getParent();
         }
 
         return Lists.reverse(nameElements).stream().collect(Collectors.joining("/"));

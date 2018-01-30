@@ -17,6 +17,8 @@ public class RegistryScriptDto extends RegistryScriptForm {
     @XmlElement
     private boolean deleted;
     @XmlElement
+    private String parentName;
+    @XmlElement
     private List<ChangelogDto> changelogs;
     @XmlElement
     private List<ScriptParamDto> params;

@@ -9,6 +9,8 @@ import {consoleService} from '../service/services';
 import {Editor} from '../common/Editor';
 import {getMarkers} from '../common/error';
 
+import './ScriptConsole.less';
+
 
 export class ScriptConsole extends React.Component {
     state = {
@@ -84,10 +86,9 @@ export class ScriptConsole extends React.Component {
         }
 
         return (
-            <div className="flex-column">
+            <div className="ScriptConsole">
                 <Editor
                     mode="groovy"
-                    decorated={true}
                     resizable={true}
 
                     onChange={this._scriptChange}

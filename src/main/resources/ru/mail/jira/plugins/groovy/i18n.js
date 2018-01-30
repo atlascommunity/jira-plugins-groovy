@@ -19,6 +19,7 @@ define('/mailru/groovy/i18n-react', function() {
             issueJql: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.issueJql'),
             workflow: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.workflow'),
             workflowAction: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.workflowAction'),
+            parentName: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.parentName'),
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),

@@ -19,6 +19,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class DelegatingClassLoader extends ClassLoader {
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final Logger logger = LoggerFactory.getLogger(DelegatingClassLoader.class);
+    //todo: maybe change to Map<String, String(plugin key)> with LoadingCache<String, ClassLoader>
     private final Map<String, WeakReference<ClassLoader>> classLoaders;
 
     public DelegatingClassLoader() {

@@ -16,8 +16,10 @@ import {registryService} from '../service/services';
 import {Editor} from '../common/Editor';
 
 import {getMarkers} from '../common/error';
+import {StaticField} from '../common/StaticField';
 
 
+//todo: lock when loading
 @connect(null, RegistryActionCreators, null, {withRef: true})
 export class ScriptDialog extends React.Component {
     state = {
@@ -29,14 +31,19 @@ export class ScriptDialog extends React.Component {
     };
 
     activateCreate = (directoryId) => {
-        this.setState({
-            active: true,
-            id: null,
-            values: new Map({
-                directoryId: directoryId
-            }),
-            error: null
-        });
+        registryService
+            .getDirectory(directoryId)
+            .then(directory =>
+                this.setState({
+                    active: true,
+                    id: null,
+                    values: new Map({
+                        directoryId: directoryId
+                    }),
+                    parentName: directory.fullName,
+                    error: null
+                })
+            );
     };
 
     activateEdit = (id) => {
@@ -50,6 +57,7 @@ export class ScriptDialog extends React.Component {
                     scriptBody: data.scriptBody,
                     directoryId: data.directoryId
                 }),
+                parentName: data.parentName,
                 error: null
             }));
         //todo: show something when loading
@@ -113,7 +121,7 @@ export class ScriptDialog extends React.Component {
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
 
     render() {
-        const {values, error, modified} = this.state;
+        const {values, parentName, error, modified} = this.state;
         let errorMessage = null;
         let errorField = null;
 
@@ -157,6 +165,14 @@ export class ScriptDialog extends React.Component {
                             </Message>
                         : null}
                         <form className="aui" onSubmit={this._onSubmit}>
+                            <div className="field-group">
+                                <label htmlFor="directory-dialog-name">
+                                    {FieldMessages.parentName}
+                                </label>
+                                <StaticField>
+                                    {parentName}
+                                </StaticField>
+                            </div>
                             <div className="field-group">
                                 <label htmlFor="directory-dialog-name">
                                     {FieldMessages.name}

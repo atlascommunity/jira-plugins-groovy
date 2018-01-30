@@ -11,4 +11,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ScriptDirectoryDto extends ScriptDirectoryForm {
     @XmlElement
     private Integer id;
+    @XmlElement
+    private String fullName;
 }

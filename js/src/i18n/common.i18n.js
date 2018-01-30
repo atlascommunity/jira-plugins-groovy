@@ -20,7 +20,8 @@ export const FieldMessages = {
     schedule: i18n.fields.schedule,
     issueJql: i18n.fields.issueJql,
     workflow: i18n.fields.workflow,
-    workflowAction: i18n.fields.workflowAction
+    workflowAction: i18n.fields.workflowAction,
+    parentName: i18n.fields.parentName
 };
 
 export const CommonMessages = {
