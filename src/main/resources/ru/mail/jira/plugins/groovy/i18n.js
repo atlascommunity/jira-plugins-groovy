@@ -29,6 +29,7 @@ define('/mailru/groovy/i18n-react', function() {
             edit: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.edit'),
             delete: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.delete'),
             showCode: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.showCode'),
+            hideCode: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.hideCode'),
             prev: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.prev'),
             next: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.next'),
             of: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.of'),

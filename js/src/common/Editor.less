@@ -1,3 +1,5 @@
+@import (reference) '../flex';
+
 @import '~codemirror/lib/codemirror.css';
 @import "~codemirror/addon/lint/lint.css";
 @import '~codemirror/theme/lesser-dark.css';
@@ -9,6 +11,12 @@
 
 .cm-s-lesser-dark pre {
   padding: 0 4px;
+}
+
+.cm-s-eclipse {
+  .CodeMirror-gutters {
+    background-color: #fdfdfd;
+  }
 }
 
 .error-marker {
@@ -23,6 +31,10 @@
   z-index: 3001;
 }
 
+.Editor {
+  .flex-column;
+}
+
 .DecoratedEditor {
   border-radius: 3.01px;
   border: 1px solid #cccccc;
@@ -32,6 +44,7 @@
 .react-resizable {
   position: relative;
 }
+
 .react-resizable-handle {
   position: absolute;
   width: 20px;
@@ -45,4 +58,6 @@
   background-origin: content-box;
   box-sizing: border-box;
   cursor: se-resize;
+  z-index: 500;
 }
+

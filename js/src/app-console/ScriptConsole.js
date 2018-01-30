@@ -88,6 +88,7 @@ export class ScriptConsole extends React.Component {
                 <Editor
                     mode="groovy"
                     decorated={true}
+                    resizable={true}
 
                     onChange={this._scriptChange}
                     value={script}

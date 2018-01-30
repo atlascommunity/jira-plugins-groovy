@@ -20,6 +20,7 @@ function isLight() {
     return !(preferenceService.get('ru.mail.groovy.isLight') === 'false');
 }
 
+//todo: remember height for console
 export class Editor extends React.Component {
     static propTypes = {
         mode: PropTypes.string.isRequired,
@@ -39,10 +40,13 @@ export class Editor extends React.Component {
         resizable: PropTypes.bool
     };
 
+    cm = null;
     state = {
         isLight: isLight(),
         height: 300
     };
+
+    _setEditor = (editor) => this.cm = editor;
 
     _switchTheme = (e) => {
         if (e) {
@@ -78,6 +82,12 @@ export class Editor extends React.Component {
         this.setState({height: size.height});
     };
 
+    componentDidUpdate(_prevProps, prevState) {
+        if (prevState.height !== this.state.height) {
+            this.cm.setSize(null, this.state.height);
+        }
+    }
+
     render() {
         const {onChange, value, readyOnly, mode, decorated, resizable} = this.props;
 
@@ -97,19 +107,20 @@ export class Editor extends React.Component {
 
             onBeforeChange={onChange && this._onChange}
             value={value}
+            editorDidMount={this._setEditor}
         />;
 
         if (resizable) {
             el =
                 <Resizable height={this.state.height} width={100} axis="y" onResize={this._resize}>
-                    <div style={{width: '100%', height: `${this.state.height}px`}}>
+                    <div style={{width: '100%', height: `${this.state.height}px`, overflow: 'hidden'}}>
                         {el}
                     </div>
                 </Resizable>;
         }
 
         return (
-            <div className="flex-column">
+            <div className="Editor">
                 <div className={`CodeEditor ${decorated ? 'DecoratedEditor' : ''}`}>
                     {el}
                 </div>

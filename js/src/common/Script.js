@@ -5,6 +5,7 @@ import Icon from 'aui-react/lib/AUIIcon';
 
 import Avatar from '@atlaskit/avatar';
 import Button, {ButtonGroup} from '@atlaskit/button';
+import Spinner from '@atlaskit/spinner';
 
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
@@ -128,22 +129,26 @@ export class Script extends React.Component {
                 changelog = (
                     <div className="scriptChangelogs" style={{width: '150px'}}>
                         <div key="current" className="scriptChangelog" onClick={this._switchToCurrent}>
-                            <strong>{CommonMessages.currentVersion}</strong>
+                            <div className="changelogContent">
+                                <strong>{CommonMessages.currentVersion}</strong>
+                            </div>
                         </div>
                         {script && script.changelogs && script.changelogs.map(changelog =>
                             <div key={changelog.id} className="scriptChangelog" onClick={this._switchToChangelog(changelog)}>
-                                <div>
-                                    <Icon icon="devtools-commit"/>
-                                    <strong>
-                                        {changelog.comment}
-                                    </strong>
-                                </div>
-                                <div>
-                                    {changelog.date}
-                                </div>
-                                <div>
-                                    {changelog.author.avatarUrl ? <Avatar src={changelog.author.avatarUrl} size="xsmall"/> : null}
-                                    {' '}{changelog.author.displayName}
+                                <div className="changelogContent">
+                                    <div>
+                                        <Icon icon="devtools-commit"/>
+                                        <strong>
+                                            {changelog.comment}
+                                        </strong>
+                                    </div>
+                                    <div>
+                                        {changelog.date}
+                                    </div>
+                                    <div>
+                                        {changelog.author.avatarUrl ? <Avatar src={changelog.author.avatarUrl} size="xsmall"/> : null}
+                                        {' '}{changelog.author.displayName}
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -165,12 +170,14 @@ export class Script extends React.Component {
                 </div>
             );
 
-            executionBar = (
-                <div className="flex-none full-width executions">
-                    {executionsReady && <ExecutionBar executions={executions}/>}
-                    {!executionsReady && <div className="aui-icon aui-icon-wait"/>}
-                </div>
-            );
+            if (executions || !executionsReady) {
+                executionBar = (
+                    <div className="flex-none full-width executions">
+                        {executionsReady && <ExecutionBar executions={executions}/>}
+                        {!executionsReady && <Spinner size="small"/>}
+                    </div>
+                );
+            }
         }
 
         return (
@@ -200,10 +207,9 @@ export class Script extends React.Component {
                                     <Button
                                         appearance="subtle"
                                         iconBefore={<BitbucketSourceIcon label=""/>}
-                                        isSelected={showCode}
                                         onClick={this._showCode}
                                     >
-                                        {CommonMessages.showCode}
+                                        {showCode ? CommonMessages.hideCode : CommonMessages.showCode}
                                     </Button>}
                                 {onEdit &&
                                     <Button
@@ -229,8 +235,10 @@ export class Script extends React.Component {
                 <div className="children">
                     {children}
                 </div>
-                {codeBlock}
-                {executionBar}
+                {isOpen && <div className="ScriptBody">
+                    {codeBlock}
+                    {executionBar}
+                </div>}
             </div>
         );
     }

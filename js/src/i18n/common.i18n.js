@@ -32,6 +32,7 @@ export const CommonMessages = {
     edit: i18n.common.edit,
     delete: i18n.common.delete,
     showCode: i18n.common.showCode,
+    hideCode: i18n.common.hideCode,
     prev: i18n.common.prev,
     next: i18n.common.next,
     of: i18n.common.of,
