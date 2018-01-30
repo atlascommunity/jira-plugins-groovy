@@ -1,8 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import Icon from 'aui-react/lib/AUIIcon';
-
 import Avatar from '@atlaskit/avatar';
 import Button, {ButtonGroup} from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
@@ -137,7 +135,6 @@ export class Script extends React.Component {
                             <div key={changelog.id} className="scriptChangelog" onClick={this._switchToChangelog(changelog)}>
                                 <div className="changelogContent">
                                     <div>
-                                        <Icon icon="devtools-commit"/>
                                         <strong>
                                             {changelog.comment}
                                         </strong>
@@ -172,7 +169,7 @@ export class Script extends React.Component {
 
             if (executions || !executionsReady) {
                 executionBar = (
-                    <div className="flex-none full-width executions">
+                    <div className="executions">
                         {executionsReady && <ExecutionBar executions={executions}/>}
                         {!executionsReady && <Spinner size="small"/>}
                     </div>

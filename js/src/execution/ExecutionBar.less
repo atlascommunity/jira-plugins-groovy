@@ -1,4 +1,7 @@
 @import (reference) "../flex";
+@import (reference) "../const";
+@import (reference) "~@atlaskit/util-shared-styles/src/borders";
+@import (reference) "~@atlaskit/util-shared-styles/src/colors";
 
 .executionBar {
   .flex-row;
@@ -13,11 +16,11 @@
   cursor: pointer;
   padding: 0 2px;
 
-  border: 1px solid gray;
+  border: 1px solid @border-color;
   margin-left: -1px;
   margin-top: -1px;
 
   &:hover {
-    background-color: lightgrey;
+    background-color: @ak-color-N30A;
   }
 }

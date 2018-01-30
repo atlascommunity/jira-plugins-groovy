@@ -69,6 +69,8 @@
     }
 
     >.executions {
+      .flex-none;
+
       margin: 0 15px 15px;
     }
   }
@@ -98,14 +100,15 @@
   }
 
   .changelogContent {
+    border-radius: @ak-border-radius;
     padding-left: 3px;
 
     &:hover {
-      background-color: lightgray;
+      background-color: @ak-color-N30A;
     }
 
     &.active {
-      background-color: lightgray;
+      background-color: @ak-color-N30A;
     }
   }
 }
