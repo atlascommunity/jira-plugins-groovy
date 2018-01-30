@@ -42,7 +42,8 @@ export const CommonMessages = {
     error: i18n.common.error,
     script: i18n.common.script,
     switchTheme: i18n.common.switchTheme,
-    editorMode: i18n.common.editorMode
+    editorMode: i18n.common.editorMode,
+    clearCache: i18n.common.clearCache
 };
 
 export const DialogMessages = {
@@ -52,7 +53,8 @@ export const DialogMessages = {
 export const ErrorMessages = {
     noValue: i18n.error.noValue,
     notConfigured: i18n.error.notConfigured,
-    errorOccurred: i18n.error.errorOccurred
+    errorOccurred: i18n.error.errorOccurred,
+    incorrectConfigId: i18n.error.incorrectConfigId
 };
 
 export const JiraMessages = {

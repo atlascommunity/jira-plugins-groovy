@@ -309,7 +309,7 @@ export class ScheduledTaskDialog extends React.Component {
                     </fieldset>
                 );
             default:
-                return <div key={fieldName}>NOT IMPLEMENTED</div>;
+                return <div key={fieldName}>{'NOT IMPLEMENTED'}</div>;
         }
     };
 

@@ -12,6 +12,7 @@ import Button, {ButtonGroup} from '@atlaskit/button';
 
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 import TrashIcon from '@atlaskit/icon/glyph/trash';
+import AddIcon from '@atlaskit/icon/glyph/add';
 
 import {ScriptDialog} from './ScriptDialog';
 import {ScriptDirectoryDialog} from './ScriptDirectoryDialog';
@@ -167,11 +168,17 @@ class ScriptDirectory extends React.Component {
                     <div className="pull-right">
                         <ButtonGroup>
                             <Button
+                                appearance="subtle"
+                                iconBefore={<AddIcon label=""/>}
+
                                 onClick={this.props.onCreate(directory.id, 'directory')}
                             >
                                 {RegistryMessages.addDirectory}
                             </Button>
                             <Button
+                                appearance="subtle"
+                                iconBefore={<AddIcon label=""/>}
+
                                 onClick={this.props.onCreate(directory.id, 'script')}
                             >
                                 {RegistryMessages.addScript}

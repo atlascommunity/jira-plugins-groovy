@@ -5,7 +5,7 @@ import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 
 import {extrasService} from '../service/services';
-import {TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 
 
 export class ExtrasPage extends React.Component {
@@ -19,8 +19,7 @@ export class ExtrasPage extends React.Component {
                 {TitleMessages.extras}
             </PageHeader>
             <div className="page-content">
-                Clear cache:
-                <Button appearance="primary" onClick={this._clearCache}>{'Kill it with fire'}</Button>
+                <Button appearance="primary" onClick={this._clearCache}>{CommonMessages.clearCache}</Button>
             </div>
         </Page>;
     }

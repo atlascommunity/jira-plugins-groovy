@@ -104,7 +104,7 @@ export class CustomFieldForm extends React.Component {
                             onChange={this._setToggleValue('cacheable')}
                             checked={values.get('cacheable')}
                         />
-                        <label htmlFor="field-form-cacheable">Cacheable</label>
+                        <label htmlFor="field-form-cacheable">{FieldMessages.cacheable}</label>
                     </div>
                 </div>
                 <div className="field-group">

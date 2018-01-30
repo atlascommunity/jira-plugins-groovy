@@ -40,11 +40,13 @@ define('/mailru/groovy/i18n-react', function() {
             script: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.script'),
             switchTheme: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.switchTheme'),
             editorMode: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.editorMode'),
+            clearCache: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.clearCache')
         },
         error: {
             noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue'),
             notConfigured: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.notConfigured'),
             errorOccurred: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.errorOccurred'),
+            incorrectConfigId: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.incorrectConfigId')
         },
         console: {
             execute: AJS.I18n.getText('ru.mail.jira.plugins.groovy.console.execute'),
@@ -108,6 +110,8 @@ define('/mailru/groovy/i18n-react', function() {
             noTasks: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.noTasks'),
             addTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.addTask'),
             runAs: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.runAs'),
+            lastRun: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.lastRun'),
+            nextRun: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.nextRun'),
             jqlLimitDescription: function(...params) {
                 return AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.jqlLimitDescription', ...params);
             },

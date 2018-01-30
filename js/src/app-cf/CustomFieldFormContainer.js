@@ -11,7 +11,7 @@ import {CustomFieldForm} from './CustomFieldForm';
 import {Script} from '../common/Script';
 import {fieldConfigService} from '../service/services';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
-import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
+import {CommonMessages, ErrorMessages, FieldMessages} from '../i18n/common.i18n';
 
 
 export class CustomFieldFormContainer extends React.Component {
@@ -47,7 +47,7 @@ export class CustomFieldFormContainer extends React.Component {
         }
 
         if (Number.isNaN(this.props.id)) {
-            return <Message type="error" title="Error">Incorrect config id</Message>;
+            return <Message type="error" title="Error">{ErrorMessages.incorrectConfigId}</Message>;
         }
 
         return <Page>

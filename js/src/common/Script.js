@@ -139,12 +139,12 @@ export class Script extends React.Component {
                                             {changelog.comment}
                                         </strong>
                                     </div>
-                                    <div>
+                                    <div className="changelogSecondary">
                                         {changelog.date}
-                                    </div>
-                                    <div>
-                                        {changelog.author.avatarUrl ? <Avatar src={changelog.author.avatarUrl} size="xsmall"/> : null}
-                                        {' '}{changelog.author.displayName}
+                                        <div>
+                                            {changelog.author.avatarUrl ? <Avatar src={changelog.author.avatarUrl} size="xsmall"/> : null}
+                                            {' '}{changelog.author.displayName}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

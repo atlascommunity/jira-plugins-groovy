@@ -154,7 +154,7 @@ class ScheduledTask extends React.Component {
         const isError = outcome === 'FAILED';
         const lastRun = lastRunInfo ?
             <div className="flex-column">
-                <strong>Last run:</strong>
+                <strong>{ScheduledTaskMessages.lastRun}{':'}</strong>
                 <div>
                     {lastRunInfo.startDate}{' - '}{lastRunInfo.duration/1000}{'s'}
                 </div>
@@ -170,7 +170,7 @@ class ScheduledTask extends React.Component {
 
         const popup = <div className="flex-column">
             <div>
-                <strong>Next run:</strong>
+                <strong>{ScheduledTaskMessages.nextRun}{':'}</strong>
                 <div>{task.nextRunDate || 'unavailable'}</div>
             </div>
             {lastRun}

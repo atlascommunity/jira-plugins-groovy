@@ -127,7 +127,8 @@ export class Editor extends React.Component {
                 </div>
                 <div className="flex-row" style={{margin: '0 3px'}}>
                     <div style={{color: 'grey'}}>
-                        <strong>{CommonMessages.editorMode}{':'}</strong> {mode}
+                        {CommonMessages.editorMode}{' '}
+                        <strong>{mode}</strong>
                     </div>
                     <div className="flex-grow"/>
                     <div>
