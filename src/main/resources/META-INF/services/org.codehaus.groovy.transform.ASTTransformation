@@ -18,3 +18,4 @@
 
 #global transformation for AST Builder
 org.codehaus.groovy.ast.builder.AstBuilderTransformation
+org.codehaus.groovy.transform.sc.StaticCompileTransformation

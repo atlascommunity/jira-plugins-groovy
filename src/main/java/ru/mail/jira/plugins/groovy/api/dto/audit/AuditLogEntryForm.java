@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
+import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

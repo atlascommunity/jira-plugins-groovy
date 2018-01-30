@@ -1,0 +1,13 @@
+<html>
+<head>
+    <title>$i18n.getText("ru.mail.jira.plugins.groovy.link.scheduled")</title>
+    <meta name="decorator" content="atl.admin">
+    <meta name="admin.active.section" content="mailru-groovy-scheduled-link" />
+</head>
+<body>
+<div id="react-content">
+</div>
+
+    $webResourceManager.requireResource("ru.mail.jira.plugins.groovy:scheduled-resources")
+</body>
+</html>

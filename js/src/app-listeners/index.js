@@ -14,9 +14,12 @@ import {jiraService, listenerService} from '../service/services';
 
 import '../flex.less';
 import {fillListenerKeys} from '../model/listener.model';
+import {fixStyle} from '../common/fixStyle';
 
 
 AJS.toInit(() => {
+    fixStyle();
+
     const store = createStore(listenersReducer, {
         ready: {
             listeners: false,

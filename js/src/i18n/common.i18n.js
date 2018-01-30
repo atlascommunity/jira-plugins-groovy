@@ -16,7 +16,11 @@ export const FieldMessages = {
     eventTypes: i18n.fields.eventTypes,
     type: i18n.fields.type,
     customField: i18n.fields.customField,
-    cacheable: i18n.fields.cacheable
+    cacheable: i18n.fields.cacheable,
+    schedule: i18n.fields.schedule,
+    issueJql: i18n.fields.issueJql,
+    workflow: i18n.fields.workflow,
+    workflowAction: i18n.fields.workflowAction
 };
 
 export const CommonMessages = {
@@ -28,6 +32,7 @@ export const CommonMessages = {
     edit: i18n.common.edit,
     delete: i18n.common.delete,
     showCode: i18n.common.showCode,
+    hideCode: i18n.common.hideCode,
     prev: i18n.common.prev,
     next: i18n.common.next,
     of: i18n.common.of,
@@ -61,5 +66,6 @@ export const TitleMessages = {
     audit: i18n.titles.audit,
     rest: i18n.titles.rest,
     fields: i18n.titles.fields,
+    scheduled: i18n.titles.scheduled,
     extras: i18n.titles.extras,
 };

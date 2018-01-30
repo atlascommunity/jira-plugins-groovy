@@ -6,23 +6,25 @@ import '../flex.less';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
+import Page from '@atlaskit/page';
+import PageHeader from '@atlaskit/page-header';
+
 import {ScriptConsole} from './ScriptConsole';
 
 import {TitleMessages} from '../i18n/common.i18n';
 
+import {fixStyle} from '../common/fixStyle';
+
 
 AJS.toInit(() => {
+    fixStyle();
     ReactDOM.render(
-        <div>
-            <header className="aui-page-header">
-                <div className="aui-page-header-inner">
-                    <div className="aui-page-header-main">
-                        <h2>{TitleMessages.console}</h2>
-                    </div>
-                </div>
-            </header>
+        <Page>
+            <PageHeader>
+                {TitleMessages.console}
+            </PageHeader>
             <ScriptConsole/>
-        </div>,
+        </Page>,
         document.getElementById('react-content')
     );
 });

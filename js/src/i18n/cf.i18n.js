@@ -3,5 +3,6 @@ import i18n from 'external-i18n';
 
 
 export const ScriptFieldMessages = {
-    scriptFor: i18n.field.scriptFor
+    scriptFor: i18n.field.scriptFor,
+    noFields: i18n.field.noFields
 };

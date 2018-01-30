@@ -10,23 +10,25 @@ import AJS from 'AJS';
 import {ScriptActionCreators, scriptsReducer} from './rest.reducer';
 import {RestRegistryContainer} from './RestRegistryContainer';
 
-import '../flex.less';
 import {restService} from '../service/services';
+import {fixStyle} from '../common/fixStyle';
+
+import '../flex.less';
 
 
 const store = createStore(scriptsReducer, {scripts: [], ready: false});
 
 AJS.toInit(() => {
+    fixStyle();
+
     restService
         .getAllScripts()
         .then(scripts => store.dispatch(ScriptActionCreators.loadScripts(scripts)));
 
     ReactDOM.render(
-        <div>
-            <Provider store={store}>
-                <RestRegistryContainer/>
-            </Provider>
-        </div>,
+        <Provider store={store}>
+            <RestRegistryContainer/>
+        </Provider>,
         document.getElementById('react-content')
     );
 });

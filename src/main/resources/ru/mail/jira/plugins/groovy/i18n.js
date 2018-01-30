@@ -14,7 +14,11 @@ define('/mailru/groovy/i18n-react', function() {
             eventTypes: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.eventTypes'),
             type: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.type'),
             customField: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.customField'),
-            cacheable: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.cacheable')
+            cacheable: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.cacheable'),
+            schedule: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.schedule'),
+            issueJql: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.issueJql'),
+            workflow: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.workflow'),
+            workflowAction: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.workflowAction'),
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),
@@ -25,6 +29,7 @@ define('/mailru/groovy/i18n-react', function() {
             edit: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.edit'),
             delete: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.delete'),
             showCode: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.showCode'),
+            hideCode: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.hideCode'),
             prev: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.prev'),
             next: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.next'),
             of: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.of'),
@@ -85,7 +90,8 @@ define('/mailru/groovy/i18n-react', function() {
         field: {
             scriptFor: function(...params) {
                 return AJS.I18n.getText('ru.mail.jira.plugins.groovy.field.scriptFor', ...params);
-            }
+            },
+            noFields: AJS.I18n.getText('ru.mail.jira.plugins.groovy.field.noFields')
         },
         titles: {
             console: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.console'),
@@ -94,7 +100,23 @@ define('/mailru/groovy/i18n-react', function() {
             audit: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.audit'),
             rest: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.rest'),
             fields: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.fields'),
+            scheduled: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.scheduled'),
             extras: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.extras'),
+        },
+        scheduled: {
+            noTasks: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.noTasks'),
+            addTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.addTask'),
+            runAs: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.runAs'),
+            jqlLimitDescription: function(...params) {
+                return AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.jqlLimitDescription', ...params);
+            },
+            jqlScriptDescription: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.jqlScriptDescription'),
+            transitionOptions: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOptions'),
+            transitionOption: {
+                skipConditions: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOption.skipConditions'),
+                skipValidators: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOption.skipValidators'),
+                skipPermissions: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOption.skipPermissions')
+            }
         }
     };
 });

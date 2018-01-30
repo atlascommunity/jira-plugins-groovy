@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Button from 'aui-react/lib/AUIButton';
+import Button, {ButtonGroup} from '@atlaskit/button';
+import Page from '@atlaskit/page';
+import PageHeader from '@atlaskit/page-header';
 
 import {AuditLogEntryModel} from '../model/audit.model';
 import {auditLogService} from '../service/services';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {AuditMessages} from '../i18n/audit.i18n';
-import {ListenerMessages} from '../i18n/listener.i18n';
 
 
+//todo: migrate to Dynamic table: https://ak-mk-2-prod.netlify.com/mk-2/packages/elements/dynamic-table
 export class AuditLogContainer extends React.Component {
     state = {
         offset: 0,
@@ -40,14 +42,10 @@ export class AuditLogContainer extends React.Component {
             return <div className="spinner"/>;
         }
 
-        return <div>
-            <header className="aui-page-header">
-                <div className="aui-page-header-inner">
-                    <div className="aui-page-header-main">
-                        <h2>{TitleMessages.audit}</h2>
-                    </div>
-                </div>
-            </header>
+        return <Page>
+            <PageHeader>
+                {TitleMessages.audit}
+            </PageHeader>
 
             <div className="page-content">
                 <div>
@@ -60,24 +58,22 @@ export class AuditLogContainer extends React.Component {
                         </strong>
                 </div>
                 <AuditLog entries={data.values}/>
-                <div>
+                <ButtonGroup appearance="link">
                     <Button
-                        type="link"
-                        disabled={data.offset === 0}
+                        isDisabled={data.offset === 0}
                         onClick={this._goToOffset(data.offset - data.limit)}
                     >
                         {CommonMessages.prev}
                     </Button>
                     <Button
-                        type="link"
-                        disabled={data.isLast}
+                        isDisabled={data.isLast}
                         onClick={this._goToOffset(data.offset + data.limit)}
                     >
                         {CommonMessages.next}
                     </Button>
-                </div>
+                </ButtonGroup>
             </div>
-        </div>;
+        </Page>;
     }
 }
 

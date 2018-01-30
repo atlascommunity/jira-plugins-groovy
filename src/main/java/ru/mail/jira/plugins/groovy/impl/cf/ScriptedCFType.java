@@ -9,7 +9,7 @@ import com.atlassian.jira.issue.fields.rest.FieldTypeInfo;
 import com.atlassian.jira.issue.fields.rest.FieldTypeInfoContext;
 import com.atlassian.jira.issue.fields.rest.RestAwareCustomFieldType;
 import com.google.common.collect.Lists;
-import ru.mail.jira.plugins.groovy.api.FieldConfigRepository;
+import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.api;
+package ru.mail.jira.plugins.groovy.api.service;
 
 import java.util.Map;
 

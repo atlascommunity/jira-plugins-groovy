@@ -7,6 +7,7 @@ import 'codemirror/addon/selection/mark-selection';
 import 'codemirror/addon/lint/lint';
 
 import {Controlled as CodeMirror} from 'react-codemirror2';
+import {Resizable} from 'react-resizable';
 
 import {preferenceService} from '../service/services';
 
@@ -19,6 +20,7 @@ function isLight() {
     return !(preferenceService.get('ru.mail.groovy.isLight') === 'false');
 }
 
+//todo: remember height for console
 export class Editor extends React.Component {
     static propTypes = {
         mode: PropTypes.string.isRequired,
@@ -34,12 +36,17 @@ export class Editor extends React.Component {
                 className: PropTypes.string
             })
         ),
-        decorated: PropTypes.bool
+        decorated: PropTypes.bool,
+        resizable: PropTypes.bool
     };
 
+    cm = null;
     state = {
-        isLight: isLight()
+        isLight: isLight(),
+        height: 300
     };
+
+    _setEditor = (editor) => this.cm = editor;
 
     _switchTheme = (e) => {
         if (e) {
@@ -70,34 +77,55 @@ export class Editor extends React.Component {
         return [];
     };
 
+    _resize = (_e, {size}) => {
+        console.log(size);
+        this.setState({height: size.height});
+    };
+
+    componentDidUpdate(_prevProps, prevState) {
+        if (prevState.height !== this.state.height) {
+            this.cm.setSize(null, this.state.height);
+        }
+    }
+
     render() {
-       const {onChange, value, readyOnly, mode, decorated} = this.props;
+        const {onChange, value, readyOnly, mode, decorated, resizable} = this.props;
+
+        let el = <CodeMirror
+            options={{
+                theme: this.state.isLight ? 'eclipse' : 'lesser-dark',
+                mode: mode,
+                lineNumbers: true,
+                readOnly: readyOnly || false,
+                gutters: ['CodeMirror-lint-markers'],
+                lint: {
+                    getAnnotations: this._getAnnotations,
+                    tooltips: true
+                },
+                viewportMargin: Infinity
+            }}
+
+            onBeforeChange={onChange && this._onChange}
+            value={value}
+            editorDidMount={this._setEditor}
+        />;
+
+        if (resizable) {
+            el =
+                <Resizable height={this.state.height} width={100} axis="y" onResize={this._resize}>
+                    <div style={{width: '100%', height: `${this.state.height}px`, overflow: 'hidden'}}>
+                        {el}
+                    </div>
+                </Resizable>;
+        }
 
         return (
-            <div className="flex-column">
+            <div className="Editor">
                 <div className={`CodeEditor ${decorated ? 'DecoratedEditor' : ''}`}>
-                    <CodeMirror
-                        options={{
-                            theme: this.state.isLight ? 'eclipse' : 'lesser-dark',
-                            mode: mode,
-                            lineNumbers: true,
-                            readOnly: readyOnly || false,
-                            gutters: ['CodeMirror-lint-markers'],
-                            lint: {
-                                getAnnotations: this._getAnnotations,
-                                tooltips: true
-                            }
-                        }}
-
-                        height="300px"
-                        width="100%"
-
-                        onBeforeChange={onChange && this._onChange}
-                        value={value}
-                    />
+                    {el}
                 </div>
                 <div className="flex-row" style={{margin: '0 3px'}}>
-                    <div style={{ color: 'grey' }}>
+                    <div style={{color: 'grey'}}>
                         <strong>{CommonMessages.editorMode}{':'}</strong> {mode}
                     </div>
                     <div className="flex-grow"/>

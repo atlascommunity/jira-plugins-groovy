@@ -2,8 +2,8 @@ package ru.mail.jira.plugins.groovy.rest;
 
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.sal.api.websudo.WebSudoRequired;
-import ru.mail.jira.plugins.groovy.api.EventListenerRepository;
-import ru.mail.jira.plugins.groovy.api.FieldConfigRepository;
+import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
+import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.cf.FieldValueExtractor;

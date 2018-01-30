@@ -15,7 +15,7 @@ import com.atlassian.jira.rest.Dates;
 import com.atlassian.jira.util.DateFieldFormat;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import ru.mail.jira.plugins.groovy.api.FieldConfigRepository;
+import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

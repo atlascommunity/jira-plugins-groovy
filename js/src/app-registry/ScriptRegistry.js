@@ -1,12 +1,17 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
-import Button from 'aui-react/lib/AUIButton';
-import Icon from 'aui-react/lib/AUIIcon';
 import Message from 'aui-react/lib/AUIMessage';
+import Icon from 'aui-react/lib/AUIIcon';
 
-import PropTypes from 'prop-types';
+import Page from '@atlaskit/page';
+import PageHeader from '@atlaskit/page-header';
+import Button, {ButtonGroup} from '@atlaskit/button';
+
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
+import TrashIcon from '@atlaskit/icon/glyph/trash';
 
 import {ScriptDialog} from './ScriptDialog';
 import {ScriptDirectoryDialog} from './ScriptDirectoryDialog';
@@ -16,7 +21,7 @@ import {Script} from '../common/Script';
 
 import {registryService} from '../service/services';
 
-import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
+import {TitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import './ScriptRegistry.less';
@@ -64,21 +69,17 @@ export class ScriptRegistry extends React.Component {
 
     render() {
         return (
-            <div className="full-width">
-                <header className="aui-page-header">
-                    <div className="aui-page-header-inner">
-                        <div className="aui-page-header-main">
-                            <h2>{TitleMessages.registry}</h2>
-                        </div>
-                        <div className="aui-page-header-actions">
-                            <Button
-                                onClick={this._activateCreateDialog(null, 'directory')}
-                            >
-                                {RegistryMessages.addDirectory}
-                            </Button>
-                        </div>
-                    </div>
-                </header>
+            <Page>
+                <PageHeader actions={
+                    <Button
+                        appearance="primary"
+                        onClick={this._activateCreateDialog(null, 'directory')}
+                    >
+                        {RegistryMessages.addDirectory}
+                    </Button>
+                }>
+                    {TitleMessages.registry}
+                </PageHeader>
 
                 <div className="page-content ScriptList">
                     {this.props.directories.map(directory =>
@@ -95,7 +96,7 @@ export class ScriptRegistry extends React.Component {
                     <ScriptDirectoryDialog ref={this._setRef('directoryDialogRef')}/>
                     <ScriptDialog ref={this._setRef('scriptDialogRef')}/>
                 </div>
-            </div>
+            </Page>
         );
     }
 }
@@ -164,10 +165,30 @@ class ScriptDirectory extends React.Component {
                         </h3>
                     </div>
                     <div className="pull-right">
-                        <Button icon="add" type="subtle" onClick={this.props.onCreate(directory.id, 'directory')}>{RegistryMessages.addDirectory}</Button>
-                        <Button icon="add" type="subtle" onClick={this.props.onCreate(directory.id, 'script')}>{RegistryMessages.addScript}</Button>
-                        <Button icon="edit" type="subtle" onClick={this.props.onEdit(directory.id, 'directory')}>{CommonMessages.edit}</Button>
-                        <Button icon="delete" type="subtle" onClick={this.props.onDelete(directory.id, 'directory', directory.name)}>{CommonMessages.delete}</Button>
+                        <ButtonGroup>
+                            <Button
+                                onClick={this.props.onCreate(directory.id, 'directory')}
+                            >
+                                {RegistryMessages.addDirectory}
+                            </Button>
+                            <Button
+                                onClick={this.props.onCreate(directory.id, 'script')}
+                            >
+                                {RegistryMessages.addScript}
+                            </Button>
+                            <Button
+                                appearance="subtle"
+                                iconBefore={<EditFilledIcon label=""/>}
+
+                                onClick={this.props.onEdit(directory.id, 'directory')}
+                            />
+                            <Button
+                                appearance="subtle"
+                                iconBefore={<TrashIcon label=""/>}
+
+                                onClick={this.props.onDelete(directory.id, 'directory', directory.name)}
+                            />
+                        </ButtonGroup>
                     </div>
                 </div>
                 {children}

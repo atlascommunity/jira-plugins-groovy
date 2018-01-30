@@ -6,10 +6,14 @@ import AJS from 'AJS';
 
 import {CustomFieldFormContainer} from './CustomFieldFormContainer';
 
+import {fixStyle} from '../common/fixStyle';
+
 import '../flex.less';
 
 
 AJS.toInit(() => {
+    fixStyle();
+
     const params = new URLSearchParams(window.location.search);
 
     ReactDOM.render(

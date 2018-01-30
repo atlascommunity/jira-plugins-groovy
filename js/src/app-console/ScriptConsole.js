@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Message from 'aui-react/lib/AUIMessage';
+import Button from '@atlaskit/button';
 
 import {ConsoleMessages} from '../i18n/console.i18n';
 
@@ -83,10 +84,11 @@ export class ScriptConsole extends React.Component {
         }
 
         return (
-            <form className="aui flex-column" onSubmit={this._submit}>
+            <div className="flex-column">
                 <Editor
                     mode="groovy"
                     decorated={true}
+                    resizable={true}
 
                     onChange={this._scriptChange}
                     value={script}
@@ -95,7 +97,7 @@ export class ScriptConsole extends React.Component {
                 />
                 <br/>
                 <div>
-                    <button className="button" disabled={waiting}>{ConsoleMessages.execute}</button>
+                    <Button appearance="primary" isDisabled={waiting} onClick={this._submit}>{ConsoleMessages.execute}</Button>
                 </div>
                 <br/>
                 {!waiting && <div id="console-result">
@@ -114,7 +116,7 @@ export class ScriptConsole extends React.Component {
                     : null}
                 </div>}
                 {waiting && <div className="aui-icon aui-icon-wait"/>}
-            </form>
+            </div>
         );
     }
 }

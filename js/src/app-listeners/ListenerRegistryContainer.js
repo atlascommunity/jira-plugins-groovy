@@ -63,10 +63,8 @@ export class ListenerRegistryContainer extends React.Component {
         let content = null;
 
         if (!this._isReady()) {
-            console.log('loading');
             content = <div>{CommonMessages.loading}</div>;
         } else {
-            console.log(listeners);
             content = <ListenerRegistry listeners={listeners} triggerDialog={this._triggerDialog}/>;
         }
 

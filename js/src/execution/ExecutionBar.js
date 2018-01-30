@@ -2,10 +2,10 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-import Icon from 'aui-react/lib/AUIIcon';
-
-// eslint-disable-next-line import/no-extraneous-dependencies
-import AJS from 'AJS';
+import ErrorIcon from '@atlaskit/icon/glyph/error';
+import EditorSuccessIcon from '@atlaskit/icon/glyph/editor/success';
+import Tooltip from '@atlaskit/tooltip';
+import {colors} from '@atlaskit/theme';
 
 import './ExecutionBar.less';
 import {ExecutionDialog} from './ExecutionDialog';
@@ -48,26 +48,21 @@ class ExecutionItem extends React.Component {
         hovered: false
     };
 
-    _addTooltip = (el) => {
-        AJS.$(el).tooltip({gravity: 'n'});
-    };
-
     render() {
         const execution = this.props.execution;
 
         return (
-            <div
-                key={execution.id}
-                className="executionItem"
-                title={`${execution.date} - ${execution.time} ms`}
-                ref={this._addTooltip}
+            <Tooltip
+                content={`${execution.date} - ${execution.time} ms`}
                 onClick={this.props.onClick}
             >
-                <Icon
-                    icon={execution.success ? 'approve' : 'error'}
-                    style={{ color: execution.success ? 'green' : 'red'}}
-                />
-            </div>
+                <div className="executionItem">
+                    {execution.success ?
+                        <EditorSuccessIcon label="success" size="small" primaryColor={colors.G300}/> :
+                        <ErrorIcon label="error" size="small" primaryColor={colors.R300}/>
+                    }
+                </div>
+            </Tooltip>
         );
     }
 }

@@ -11,6 +11,7 @@ import {ScriptRegistry} from './ScriptRegistry';
 import {RegistryActionCreators, registryReducer} from './registry.reducer';
 
 import {registryService} from '../service/services';
+import {fixStyle} from '../common/fixStyle';
 
 import '../flex.less';
 
@@ -18,16 +19,16 @@ import '../flex.less';
 const store = createStore(registryReducer, {directories: []});
 
 AJS.toInit(() => {
+    fixStyle();
+
     registryService
         .getAllDirectories()
         .then(directories => store.dispatch(RegistryActionCreators.loadState(directories)));
 
     ReactDOM.render(
-        <div>
-            <Provider store={store}>
-                <ScriptRegistry/>
-            </Provider>
-        </div>,
+        <Provider store={store}>
+            <ScriptRegistry/>
+        </Provider>,
         document.getElementById('react-content')
     );
 });

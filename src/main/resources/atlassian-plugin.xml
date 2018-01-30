@@ -18,12 +18,12 @@
             <transformer key="jsI18n"/>
         </transformation>
 
+        <!--todo: remove unused -->
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <dependency>com.atlassian.auiplugin:dialog2</dependency>
         <dependency>com.atlassian.auiplugin:aui-experimental-tooltips</dependency>
         <dependency>com.atlassian.auiplugin:aui-select</dependency>
         <dependency>com.atlassian.auiplugin:aui-select2</dependency>
-        <dependency>com.atlassian.auiplugin:aui-toggle</dependency>
 
         <resource type="download" name="i18n.js" location="/ru/mail/jira/plugins/groovy/i18n.js"/>
         <resource type="download" name="common.js" location="/ru/mail/jira/plugins/groovy/js/common.js"/>
@@ -102,6 +102,15 @@
         <context>ru.mail.jira.plugins.groovy.cf</context>
     </web-resource>
 
+    <web-resource key="scheduled-resources" name="groovy scheduled Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="scheduled.js" location="/ru/mail/jira/plugins/groovy/js/scheduled.js"/>
+        <resource type="download" name="scheduled.js.map" location="/ru/mail/jira/plugins/groovy/js/scheduled.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.scheduled</context>
+    </web-resource>
+
     <web-resource key="extras-resources" name="groovy extras Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
@@ -117,44 +126,9 @@
         <description>Groovy rest module</description>
     </rest>
 
-    <servlet name="Console servlet" key="console-servlet" class="ru.mail.jira.plugins.groovy.servlet.ConsoleServlet">
-        <description>Console servlet</description>
-        <url-pattern>/my-groovy/console</url-pattern>
-    </servlet>
-
-    <servlet name="Registry servlet" key="registry-servlet" class="ru.mail.jira.plugins.groovy.servlet.RegistryServlet">
-        <description>Registry servlet</description>
-        <url-pattern>/my-groovy/registry</url-pattern>
-    </servlet>
-
-    <servlet name="Listeners servlet" key="listeners-servlet" class="ru.mail.jira.plugins.groovy.servlet.ListenersServlet">
-        <description>Listeners servlet</description>
-        <url-pattern>/my-groovy/listeners</url-pattern>
-    </servlet>
-
-    <servlet name="Extras servlet" key="extras-servlet" class="ru.mail.jira.plugins.groovy.servlet.ExtrasServlet">
-        <description>Extras servlet</description>
-        <url-pattern>/my-groovy/extras</url-pattern>
-    </servlet>
-
-    <servlet name="Audit servlet" key="audit-servlet" class="ru.mail.jira.plugins.groovy.servlet.AuditLogServlet">
-        <description>Extras servlet</description>
-        <url-pattern>/my-groovy/audit</url-pattern>
-    </servlet>
-
-    <servlet name="Groovy fields servlet" key="fields-servlet" class="ru.mail.jira.plugins.groovy.servlet.FieldsServlet">
-        <description>Groovy fields servlet</description>
-        <url-pattern>/my-groovy/fields</url-pattern>
-    </servlet>
-
-    <servlet name="Custom field servlet" key="cf-servlet" class="ru.mail.jira.plugins.groovy.servlet.CustomFieldServlet">
-        <description>Custom field servlet</description>
-        <url-pattern>/my-groovy/custom-field</url-pattern>
-    </servlet>
-
-    <servlet name="REST servlet" key="rest-servlet" class="ru.mail.jira.plugins.groovy.servlet.RestServlet">
+    <servlet name="Groovy servlet" key="rest-servlet" class="ru.mail.jira.plugins.groovy.servlet.GroovyServlet">
         <description>REST servlet</description>
-        <url-pattern>/my-groovy/rest</url-pattern>
+        <url-pattern>/my-groovy/*</url-pattern>
     </servlet>
 
     <ao key="ao-entities">
@@ -169,6 +143,8 @@
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.FieldConfig</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.ScheduledTask</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.ScheduledTaskChangelog</entity>
     </ao>
 
     <workflow-condition
@@ -385,6 +361,16 @@
         </condition>
     </web-item>
 
+    <web-item key="groovy-scheduled-menu-item" name="Groovy scheduled menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy scheduled page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.scheduled" />
+        <link linkId="mailru-groovy-scheduled-link">/plugins/servlet/my-groovy/scheduled</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
     <web-item key="groovy-audit-menu-item" name="Groovy audit menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy audit page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.audit" />
@@ -470,5 +456,17 @@
         <resource type="velocity" name="xml" location="templates/plugins/fields/xml/xml-basictext.vm" />
 
         <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="textsearcher"/>
+    </customfield-type>
+
+    <customfield-type key="groovy-number-field" name="Groovy number field" class="ru.mail.jira.plugins.groovy.impl.cf.NumberCFType">
+        <description>
+            Scripted number custom field type.
+        </description>
+
+        <resource type="velocity" name="view" location="templates/plugins/fields/view/view-number.vm"/>
+        <resource type="velocity" name="xml" location="templates/plugins/fields/xml/xml-number.vm" />
+
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="exactnumber"/>
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="numberrange"/>
     </customfield-type>
 </atlassian-plugin>

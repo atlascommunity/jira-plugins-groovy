@@ -1,5 +1,7 @@
 @import (reference) "../flex";
 @import (reference) "../const";
+@import (reference) "~@atlaskit/util-shared-styles/src/borders";
+@import (reference) "~@atlaskit/util-shared-styles/src/colors";
 
 .ScriptList {
   .flex-column;
@@ -20,21 +22,18 @@
 
   padding: 3px 0 0;
 
-  border-radius: 3.01px 3.01px 0 0;
-
-  &.collapsed {
-    border-radius: 3.01px
-  }
+  border-radius: @ak-border-radius;
 
   >.title {
     margin-left: 8px;
     margin-right: 3px;
+    padding-bottom: 3px;
+
+    h3 {
+      margin-top: 0;
+    }
   }
 
-  >.editor {
-    border-top: 1px solid @border-color;
-    border-bottom: 1px solid @border-color;
-  }
 
   >.children {
     .flex-column;
@@ -43,40 +42,73 @@
     margin-right: 3px;
   }
 
-  >.executions {
+  > .ScriptBody {
+    background-color: #f1f2f6;
+    border-top: 1px solid @border-color;
 
-  }
+    >.editor {
+      .Editor {
+        margin: 15px;
 
-  .CodeEditor {
-    border-bottom: 1px solid @border-color;
+        .CodeEditor {
+          border-radius: @ak-border-radius;
+          border: 1px solid @border-color;
+          overflow: hidden;
+        }
+      }
+
+      .scriptChangelogs {
+        margin: 15px;
+
+        .flex-none;
+
+        max-height: 321px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+    }
+
+    >.executions {
+      .flex-none;
+
+      margin: 0 15px 15px;
+    }
   }
 }
 
-.scriptChangelogs {
-  .flex-none;
-
-  border-right: 1px solid @border-color;
-  max-height: 321px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
 
 .scriptChangelog {
   .flex-column;
 
-  border-bottom: 1px solid @border-color;
   cursor: pointer;
-  padding-left: 3px;
 
   &:last-child {
-    border-bottom: none;
+    margin-bottom: 5px;
+
+    &:after {
+      margin-bottom: 0;
+      border-bottom: none;
+    }
   }
 
-  &:hover {
-    background-color: lightgray;
+  &:after {
+    content: '';
+    width: 100%;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    border-bottom: 1px solid @border-color;
   }
 
-  &.active {
-    background-color: lightgray;
+  .changelogContent {
+    border-radius: @ak-border-radius;
+    padding-left: 3px;
+
+    &:hover {
+      background-color: @ak-color-N30A;
+    }
+
+    &.active {
+      background-color: @ak-color-N30A;
+    }
   }
 }

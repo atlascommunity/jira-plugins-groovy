@@ -12,6 +12,35 @@ form.aui .Select {
   }
 }
 
+.Select-control {
+  border-radius: 3.01px;
+  height: 30px;
+}
+
+.Select-placeholder,
+.Select--single > .Select-control .Select-value {
+  line-height: 28px;
+}
+
+.Select-input {
+  line-height: 28px;
+  height: 28px;
+
+  > input {
+    padding: 6px 0 8px;
+  }
+}
+
 .Select-menu-outer {
   z-index: 3001;
+}
+
+.Select--multi {
+  .Select-value {
+    line-height: 1;
+  }
+
+  .Select-value-icon {
+    padding: 1px 5px 0;
+  }
 }

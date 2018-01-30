@@ -6,14 +6,16 @@ import AJS from 'AJS';
 
 import {ExtrasPage} from './ExtrasPage';
 
+import {fixStyle} from '../common/fixStyle';
+
 import '../flex.less';
 
 
 AJS.toInit(() => {
+    fixStyle();
+
     ReactDOM.render(
-        <div>
-            <ExtrasPage/>
-        </div>,
+        <ExtrasPage/>,
         document.getElementById('react-content')
     );
 });

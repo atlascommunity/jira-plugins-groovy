@@ -4,7 +4,7 @@ import com.atlassian.jira.plugin.workflow.WorkflowPluginConditionFactory;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.opensymphony.workflow.loader.AbstractDescriptor;
 import com.opensymphony.workflow.loader.ConditionDescriptor;
-import ru.mail.jira.plugins.groovy.api.ScriptRepository;
+import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 

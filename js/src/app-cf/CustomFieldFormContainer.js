@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Message from 'aui-react/lib/AUIMessage';
+import Button from '@atlaskit/button';
+import Page from '@atlaskit/page';
+import PageHeader from '@atlaskit/page-header';
 
 import {CustomFieldForm} from './CustomFieldForm';
 
@@ -47,22 +50,20 @@ export class CustomFieldFormContainer extends React.Component {
             return <Message type="error" title="Error">Incorrect config id</Message>;
         }
 
-        return <div>
-            <header className="aui-page-header">
-                <div className="aui-page-header-inner">
-                    <div className="aui-page-header-main">
-                        <h2>{ScriptFieldMessages.scriptFor(`${config.customFieldName} - ${config.contextName}`)}</h2>
-                    </div>
-                    <div className="aui-page-header-actions">
-                        {config.uuid && !editing && <button
-                            className="aui-button"
-                            onClick={this._setEditing(true)}
-                        >
-                            {CommonMessages.edit}
-                        </button>}
-                    </div>
-                </div>
-            </header>
+        return <Page>
+            <PageHeader
+                actions = {config.uuid && !editing &&
+                    <Button
+                        appearance="primary"
+                        onClick={this._setEditing(true)}
+                    >
+                        {CommonMessages.edit}
+                    </Button>
+                }
+            >
+                {ScriptFieldMessages.scriptFor(`${config.customFieldName} - ${config.contextName}`)}
+            </PageHeader>
+
             <div className="page-content">
                 {config.uuid && !editing &&
                     <Script
@@ -89,6 +90,6 @@ export class CustomFieldFormContainer extends React.Component {
                     <CustomFieldForm id={this.props.id} fieldConfig={config} onChange={this._onChange} onCancel={this._setEditing(false)}/>
                 }
             </div>
-        </div>;
+        </Page>;
     }
 }

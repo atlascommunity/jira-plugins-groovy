@@ -16,6 +16,7 @@ import ru.mail.jira.plugins.groovy.api.entity.AbstractChangelog;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,13 @@ public final class ChangelogHelper {
     }
 
     public String generateDiff(long id, String originalName, String name, String originalSource, String newSource) {
+        if (originalSource == null) {
+            originalSource = "";
+        }
+        if (newSource == null) {
+            newSource = "";
+        }
+
         try {
             List<String> originalLines = Arrays.asList(originalSource.split("\n"));
             List<String> newLines = Arrays.asList(newSource.split("\n"));
@@ -51,7 +59,7 @@ public final class ChangelogHelper {
         }
     }
 
-    public ChangelogDto buildDto(AbstractChangelog changelog) {
+    private ChangelogDto buildDto(AbstractChangelog changelog) {
         ChangelogDto result = new ChangelogDto();
 
         result.setId(changelog.getID());
@@ -61,6 +69,17 @@ public final class ChangelogHelper {
         result.setDate(dateTimeFormatter.forLoggedInUser().format(changelog.getDate()));
 
         return result;
+    }
+
+    public List<ChangelogDto> collect(AbstractChangelog[] changelogs) {
+        if (changelogs != null) {
+            return Arrays
+                .stream(changelogs)
+                .sorted(Comparator.comparing(AbstractChangelog::getDate).reversed())
+                .map(this::buildDto)
+                .collect(Collectors.toList());
+        }
+        return null;
     }
 
     public void addChangelog(Class<? extends AbstractChangelog> clazz, int scriptId, String userKey, String diff, String comment) {

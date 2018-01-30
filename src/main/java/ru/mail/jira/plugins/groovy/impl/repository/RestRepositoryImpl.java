@@ -10,10 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.commons.RestFieldException;
-import ru.mail.jira.plugins.groovy.api.AuditLogRepository;
-import ru.mail.jira.plugins.groovy.api.RestRepository;
-import ru.mail.jira.plugins.groovy.api.ScriptService;
-import ru.mail.jira.plugins.groovy.api.dto.audit.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
+import ru.mail.jira.plugins.groovy.api.repository.RestRepository;
+import ru.mail.jira.plugins.groovy.api.service.ScriptService;
+import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.rest.HttpMethod;
 import ru.mail.jira.plugins.groovy.api.dto.rest.RestScriptDto;
@@ -101,7 +101,7 @@ public class RestRepositoryImpl implements RestRepository {
 
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
 
-        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, "Created.");
+        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, form.getComment());
 
         script.setUuid(UUID.randomUUID().toString());
         script.setMethods(joinMethods(form.getMethods()));
@@ -204,16 +204,7 @@ public class RestRepositoryImpl implements RestRepository {
         result.setDeleted(script.isDeleted());
 
         if (includeChangelogs) {
-            RestChangelog[] changelogs = script.getChangelogs();
-            if (changelogs != null) {
-                result.setChangelogs(
-                    Arrays
-                        .stream(changelogs)
-                        .sorted(Comparator.comparing(RestChangelog::getDate).reversed())
-                        .map(changelogHelper::buildDto)
-                        .collect(Collectors.toList())
-                );
-            }
+            result.setChangelogs(changelogHelper.collect(script.getChangelogs()));
         }
 
         return result;

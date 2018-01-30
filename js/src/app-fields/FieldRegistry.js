@@ -3,11 +3,18 @@ import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
-import Icon from 'aui-react/lib/AUIIcon';
+import Message from 'aui-react/lib/AUIMessage';
+
+import DropdownMenu, {DropdownItem, DropdownItemGroup} from '@atlaskit/dropdown-menu';
+import Spinner from '@atlaskit/spinner';
+import Page from '@atlaskit/page';
+import PageHeader from '@atlaskit/page-header';
+import SettingsIcon from '@atlaskit/icon/glyph/settings';
 
 import {Script} from '../common/Script';
 import {getBaseUrl} from '../service/ajaxHelper';
 import {JiraMessages, FieldMessages, ErrorMessages, CommonMessages, TitleMessages} from '../i18n/common.i18n';
+import {ScriptFieldMessages} from '../i18n/cf.i18n';
 
 
 @connect(
@@ -28,23 +35,21 @@ export class FieldRegistry extends React.Component {
         const {configs, ready} = this.props;
 
         if (!ready) {
-            return <div className="aui-icon aui-icon-wait"/>;
+            return <Spinner size="xlarge" />;
         }
 
-        return <div>
-            <header className="aui-page-header">
-                <div className="aui-page-header-inner">
-                    <div className="aui-page-header-main">
-                        <h2>{TitleMessages.fields}</h2>
-                    </div>
-                </div>
-            </header>
+        return <Page>
+            <PageHeader>
+                {TitleMessages.fields}
+            </PageHeader>
             <div className="page-content ScriptList">
-                {configs && configs.map(config =>
+                {!!configs.length && configs.map(config =>
                     <Field key={config.id} config={config}/>
                 )}
+
+                {!configs.length && <Message type="info" title={ScriptFieldMessages.noFields}>{ScriptFieldMessages.noFields}</Message>}
             </div>
-        </div>;
+        </Page>;
     }
 }
 
@@ -55,8 +60,6 @@ class Field extends React.Component {
 
     render() {
         const {config} = this.props;
-
-        const actionsElId = `field-${config.id}-actions`;
 
         return (
             <Script
@@ -71,29 +74,26 @@ class Field extends React.Component {
                 withChangelog={true}
 
                 additionalButtons={
-                    <button type="button" className="aui-button aui-button-subtle aui-dropdown2-trigger" aria-owns={actionsElId}>
-                        <Icon icon="configure"/>
+                    <div style={{marginLeft: '5px'}}>
+                        <DropdownMenu
+                            triggerType="button"
+                            triggerButtonProps={{appearance: 'subtle', iconBefore: <SettingsIcon label=""/>}}
 
-                        <div id={actionsElId} className="aui-dropdown2 aui-style-default">
-                            <ul className="aui-list-truncate">
-                                <li>
-                                    <a href={`${getBaseUrl()}/plugins/servlet/my-groovy/custom-field?fieldConfigId=${config.id}`}>
-                                        {JiraMessages.edit}{' '}{CommonMessages.script}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href={`${getBaseUrl()}/secure/admin/EditCustomField!default.jspa?id=${config.customFieldId}`}>
-                                        {JiraMessages.edit}{' '}{FieldMessages.customField}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href={`${getBaseUrl()}/secure/admin/ConfigureCustomField!default.jspa?customFieldId=${config.customFieldId}`}>
-                                        {JiraMessages.configure}{' '}{FieldMessages.customField}
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </button>
+                            position="bottom right"
+                        >
+                            <DropdownItemGroup>
+                                <DropdownItem href={`${getBaseUrl()}/plugins/servlet/my-groovy/custom-field?fieldConfigId=${config.id}`}>
+                                    {JiraMessages.edit}{' '}{CommonMessages.script}
+                                </DropdownItem>
+                                <DropdownItem href={`${getBaseUrl()}/secure/admin/EditCustomField!default.jspa?id=${config.customFieldId}`}>
+                                    {JiraMessages.edit}{' '}{FieldMessages.customField}
+                                </DropdownItem>
+                                <DropdownItem href={`${getBaseUrl()}/secure/admin/ConfigureCustomField!default.jspa?customFieldId=${config.customFieldId}`}>
+                                    {JiraMessages.configure}{' '}{FieldMessages.customField}
+                                </DropdownItem>
+                            </DropdownItemGroup>
+                        </DropdownMenu>
+                    </div>
                 }
             >
                 <div className="field-group">

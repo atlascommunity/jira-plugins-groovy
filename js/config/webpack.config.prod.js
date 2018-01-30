@@ -96,6 +96,7 @@ module.exports = {
         cf: [require.resolve('./polyfills'), paths.resolveApp('src/app-cf/index.js')],
         fields: [require.resolve('./polyfills'), paths.resolveApp('src/app-fields/index.js')],
         extras: [require.resolve('./polyfills'), paths.resolveApp('src/app-extras/index.js')],
+        scheduled: [require.resolve('./polyfills'), paths.resolveApp('src/app-scheduled/index.js')],
     },
     output: {
         // The build folder.
@@ -308,7 +309,9 @@ module.exports = {
         AJS: 'AJS',
         jquery: 'AJS.$',
         'external-i18n': 'require(\'/mailru/groovy/i18n-react\')',
-        extDefine: 'define'
+        extDefine: 'define',
+        'jira/jql/jql-parser': 'require(\'jira/jql/jql-parser\')',
+        'jira/autocomplete/jql-autocomplete': 'require(\'jira/autocomplete/jql-autocomplete\')'
     },
     watch: watch
 };

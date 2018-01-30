@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import {Async} from 'react-select';
 import './react-select-common.less';
 
-import Avatar from 'aui-react/lib/AUIAvatar';
+import Avatar from '@atlaskit/avatar';
+import Icon from 'aui-react/lib/AUIIcon';
 
 import {ajaxGet} from '../service/ajaxHelper';
 
@@ -35,15 +36,22 @@ export class AsyncPicker extends React.Component {
         );
     };
 
+    _renderClearer = () => {
+        return <Icon icon="remove-label"/>;
+    };
+
     render() {
         const {name, value, onChange, ...otherProps} = this.props;
 
         return <Async
             {...otherProps}
-            value={value}
-            onChange={onChange}
+
+            clearRenderer={this._renderClearer}
             loadOptions={this._getOptions}
             optionRenderer={this._renderOption}
+
+            value={value}
+            onChange={onChange}
             name={name}
         />;
     }

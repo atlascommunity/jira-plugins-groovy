@@ -3,8 +3,11 @@ import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
-import Button from 'aui-react/lib/AUIButton';
 import Message from 'aui-react/lib/AUIMessage';
+
+import Button from '@atlaskit/button';
+import Page from '@atlaskit/page';
+import PageHeader from '@atlaskit/page-header';
 
 import {ListenerActionCreators} from './listeners.reducer';
 
@@ -18,7 +21,6 @@ import {FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {Script} from '../common/Script';
 
 import './ListenerRegistry.less';
-import {RegistryMessages} from '../i18n/registry.i18n';
 
 
 export class ListenerRegistry extends React.Component {
@@ -33,19 +35,19 @@ export class ListenerRegistry extends React.Component {
         const {listeners} = this.props;
 
         return (
-            <div className="flex-column">
-                <header className="aui-page-header">
-                    <div className="aui-page-header-inner">
-                        <div className="aui-page-header-main">
-                            <h2>{TitleMessages.listeners}</h2>
-                        </div>
-                        <div className="aui-page-header-actions">
-                            <Button onClick={this._triggerDialog(true)}>
-                                {ListenerMessages.addListener}
-                            </Button>
-                        </div>
-                    </div>
-                </header>
+            <Page>
+                <PageHeader
+                    actions={
+                        <Button
+                            appearance="primary"
+                            onClick={this._triggerDialog(true)}
+                        >
+                            {ListenerMessages.addListener}
+                        </Button>
+                    }
+                >
+                    {TitleMessages.listeners}
+                </PageHeader>
 
                 <div className="page-content ScriptList">
                     {listeners.map(listener =>
@@ -57,7 +59,7 @@ export class ListenerRegistry extends React.Component {
                     )}
                     {!listeners.length && <Message type="info" title={ListenerMessages.noListeners}>{ListenerMessages.noListeners}</Message>}
                 </div>
-            </div>
+            </Page>
         );
     }
 }

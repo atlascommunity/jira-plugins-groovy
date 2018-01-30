@@ -9,4 +9,8 @@ export class JiraService {
     getEventTypes() {
         return ajaxGet(`${getPluginBaseUrl()}/jira-api/eventType`);
     }
+
+    getAutoCompleteData() {
+        return ajaxGet(`${getBaseUrl()}/rest/api/2/jql/autocompletedata`);
+    }
 }
