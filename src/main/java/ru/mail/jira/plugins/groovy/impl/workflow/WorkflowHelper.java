@@ -127,7 +127,7 @@ public class WorkflowHelper {
         } catch (Exception e) {
             success = false;
             error = ExceptionHelper.writeExceptionToString(e);
-            logger.error("Exception occurred while executing script {}", id, e);
+            logger.error("Exception occurred while executing script {} for issue {}", id, issue.getKey(), e);
         } finally {
             t = System.currentTimeMillis() - t;
         }
