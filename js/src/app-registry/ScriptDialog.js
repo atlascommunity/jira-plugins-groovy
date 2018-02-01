@@ -19,6 +19,7 @@ import {Editor} from '../common/Editor';
 
 import {getMarkers} from '../common/error';
 import {StaticField} from '../common/StaticField';
+import {Bindings} from '../common/bindings';
 
 
 @connect(null, RegistryActionCreators, null, {withRef: true})
@@ -216,6 +217,9 @@ export class ScriptDialog extends React.Component {
                                 <Editor
                                     mode="groovy"
                                     decorated={true}
+                                    bindings={[
+                                        Bindings.issue, Bindings.currentUser, Bindings.transientVars
+                                    ]}
 
                                     onChange={this._setObjectValue('scriptBody')}
                                     value={values.get('scriptBody') || ''}

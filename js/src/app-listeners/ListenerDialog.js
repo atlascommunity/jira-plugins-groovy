@@ -22,6 +22,7 @@ import {fillListenerKeys} from '../model/listener.model';
 import {listenerService} from '../service/services';
 import {Editor} from '../common/Editor';
 import {getMarkers} from '../common/error';
+import {Bindings} from '../common/bindings';
 
 
 //AbstractProjectEvent
@@ -36,6 +37,12 @@ import {getMarkers} from '../common/error';
 //IssueWatcherAddedEvent
 //IssueWatcherDeletedEvent
 
+function extractShortClassName(className) {
+    if (className.indexOf('.') !== -1) {
+        const tokens = className.split('.');
+        return tokens[tokens.length-1];
+    }
+}
 
 @connect(
     () => { return{}; },
@@ -177,6 +184,27 @@ export class ListenerDialog extends React.Component {
                 errorField = error.field;
             }
 
+            let bindings = null;
+
+            const condition = values.get('condition');
+            if (condition && condition.type) {
+                if (condition.type === 'ISSUE') {
+                    bindings = [Bindings.issueEvent];
+                } else {
+                    const className = condition.className;
+                    if (className) {
+                        const extractedName = extractShortClassName(className);
+                        if (extractedName) {
+                            bindings = [{
+                                ...Bindings.event,
+                                className: extractedName,
+                                fullClassName: className
+                            }];
+                        }
+                    }
+                }
+            }
+
             body =
                 <form className="aui" onSubmit={this._onSubmit}>
                     {error && !errorField ?
@@ -204,7 +232,7 @@ export class ListenerDialog extends React.Component {
                             {FieldMessages.condition}
                             <AUIRequired/>
                         </label>
-                        <ConditionPicker value={values.get('condition')} onChange={this._setObjectValue('condition')}/>
+                        <ConditionPicker value={condition} onChange={this._setObjectValue('condition')}/>
                         {errorField === 'condition' && <div className="error">{errorMessage}</div>}
                     </div>
                     <div className="field-group">
@@ -215,6 +243,7 @@ export class ListenerDialog extends React.Component {
                         <Editor
                             mode="groovy"
                             decorated={true}
+                            bindings={bindings}
 
                             onChange={this._setObjectValue('scriptBody')}
                             value={values.get('scriptBody') || ''}

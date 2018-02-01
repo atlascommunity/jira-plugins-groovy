@@ -79,11 +79,21 @@
     styled-components "^1.4.6"
     uuid "^3.1.0"
 
-"@atlaskit/inline-dialog@^5.1.2":
+"@atlaskit/inline-dialog@^5.1.1", "@atlaskit/inline-dialog@^5.1.2":
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/@atlaskit/inline-dialog/-/inline-dialog-5.1.2.tgz#83f0e38d82f597b0d83bae75d3e24a2f982bf8c7"
   dependencies:
     "@atlaskit/layer" "^2.6.0"
+    "@atlaskit/theme" "^2.3.1"
+    styled-components "^1.4.6"
+
+"@atlaskit/inline-message@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/inline-message/-/inline-message-3.1.1.tgz#08c4505068d82272994be5eb406e36e089877b66"
+  dependencies:
+    "@atlaskit/button" "^6.3.1"
+    "@atlaskit/icon" "^10.7.1"
+    "@atlaskit/inline-dialog" "^5.1.1"
     "@atlaskit/theme" "^2.3.1"
     styled-components "^1.4.6"
 

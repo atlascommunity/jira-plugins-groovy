@@ -24,6 +24,7 @@ import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {AsyncPicker} from '../common/AsyncPicker';
 import {JqlInput} from '../common/JqlInput';
 import {Error} from '../common/forms/Error';
+import {Bindings} from '../common/bindings';
 
 
 function getValue(option) {
@@ -187,6 +188,19 @@ export class ScheduledTaskDialog extends React.Component {
                     }
                 }
 
+                const currentType = values.get('type');
+
+                let bindings = null;
+
+                switch (currentType) {
+                    case 'ISSUE_JQL_SCRIPT':
+                    case 'DOCUMENT_ISSUE_JQL_SCRIPT':
+                        bindings = [Bindings.issue];
+                        break;
+                    default:
+                        bindings = [];
+                }
+
                 return (
                     <div className="field-group" key={fieldName}>
                         <label>
@@ -196,6 +210,7 @@ export class ScheduledTaskDialog extends React.Component {
                         <Editor
                             mode="groovy"
                             decorated={true}
+                            bindings={bindings}
 
                             value={values.get(fieldName) || ''}
                             onChange={this._setObjectValue(fieldName)}

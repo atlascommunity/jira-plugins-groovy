@@ -28,6 +28,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+//todo: consider deleting executions when their count > 50
 @Component
 @ExportAsService(LifecycleAware.class)
 public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAware {

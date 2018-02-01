@@ -8,6 +8,7 @@ import {ConsoleMessages} from '../i18n/console.i18n';
 import {consoleService} from '../service/services';
 import {Editor} from '../common/Editor';
 import {getMarkers} from '../common/error';
+import {Bindings} from '../common/bindings';
 
 import './ScriptConsole.less';
 
@@ -90,6 +91,9 @@ export class ScriptConsole extends React.Component {
                 <Editor
                     mode="groovy"
                     resizable={true}
+                    bindings={[
+                        Bindings.currentUser
+                    ]}
 
                     onChange={this._scriptChange}
                     value={script}

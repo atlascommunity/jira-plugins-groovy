@@ -10,6 +10,7 @@ import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {Editor} from '../common/Editor';
 import {AUIRequired} from '../common/aui-components';
 import {getMarkers} from '../common/error';
+import {Bindings} from '../common/bindings';
 
 
 export class CustomFieldForm extends React.Component {
@@ -112,6 +113,9 @@ export class CustomFieldForm extends React.Component {
                     <Editor
                         mode="groovy"
                         decorated={true}
+                        bindings={[
+                            Bindings.issue
+                        ]}
 
                         value={values.get('scriptBody')}
                         onChange={this._setObjectValue('scriptBody')}

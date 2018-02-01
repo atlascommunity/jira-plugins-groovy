@@ -6,19 +6,28 @@ import 'codemirror/mode/diff/diff';
 import 'codemirror/addon/selection/mark-selection';
 import 'codemirror/addon/lint/lint';
 
+import InlineMessage from '@atlaskit/inline-message';
+
 import {Controlled as CodeMirror} from 'react-codemirror2';
 import {Resizable} from 'react-resizable';
 
+import {globalBindings} from './bindings';
+
 import {preferenceService} from '../service/services';
+import {CommonMessages} from '../i18n/common.i18n';
 
 import './Editor.less';
-
-import {CommonMessages} from '../i18n/common.i18n';
 
 
 function isLight() {
     return !(preferenceService.get('ru.mail.groovy.isLight') === 'false');
 }
+
+const bindingShape = PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    className: PropTypes.string.isRequired,
+    fullClassName: PropTypes.string.isRequired
+});
 
 //todo: remember height for console
 export class Editor extends React.Component {
@@ -37,6 +46,7 @@ export class Editor extends React.Component {
                 className: PropTypes.string
             })
         ),
+        bindings: PropTypes.arrayOf(bindingShape.isRequired),
         decorated: PropTypes.bool,
         resizable: PropTypes.bool
     };
@@ -90,7 +100,7 @@ export class Editor extends React.Component {
     }
 
     render() {
-        const {onChange, value, readyOnly, isDisabled, mode, decorated, resizable} = this.props;
+        const {onChange, value, readyOnly, isDisabled, mode, bindings, decorated, resizable} = this.props;
 
         let el = <CodeMirror
             options={{
@@ -125,19 +135,46 @@ export class Editor extends React.Component {
                 <div className={`CodeEditor ${decorated ? 'DecoratedEditor' : ''}`}>
                     {el}
                 </div>
-                <div className="flex-row" style={{margin: '0 3px'}}>
+                <div className="flex-row">
                     <div style={{color: 'grey'}}>
                         {CommonMessages.editorMode}{' '}
                         <strong>{mode}</strong>
                     </div>
                     <div className="flex-grow"/>
-                    <div>
+                    <div className="flex-vertical-middle">
                         <a href="" onClick={this._switchTheme}>
                             {CommonMessages.switchTheme}
                         </a>
                     </div>
+                    { bindings &&
+                        <div style={{marginLeft: '5px'}}>
+                            <InlineMessage type="info" position="top right">
+                                <div className="flex-column">
+                                    {globalBindings.map(binding => <Binding key={binding.name} binding={binding}/>)}
+                                    <hr className="full-width"/>
+                                    {bindings.map(binding => <Binding key={binding.name} binding={binding}/>)}
+                                </div>
+                            </InlineMessage>
+                        </div>
+                    }
                 </div>
             </div>
         );
     }
 }
+
+function Binding({binding}) {
+    return (
+        <div className="flex-row">
+            <div className="flex-none">{binding.name}</div>
+            <div className="flex-grow"/>
+            <div className="flex-none" style={{marginLeft: '5px'}}>
+                <abbr title={binding.fullClassName}>{binding.className}</abbr>
+            </div>
+        </div>
+    );
+}
+
+Binding.propTypes = {
+    binding: bindingShape.isRequired
+};

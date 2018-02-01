@@ -10,6 +10,7 @@
     "@atlaskit/flag": "^6.2.2",
     "@atlaskit/icon": "^10.8.0",
     "@atlaskit/inline-dialog": "^5.1.2",
+    "@atlaskit/inline-message": "^3.1.1",
     "@atlaskit/layer-manager": "^2.7.1",
     "@atlaskit/lozenge": "^3.5.0",
     "@atlaskit/page": "^5.0.10",

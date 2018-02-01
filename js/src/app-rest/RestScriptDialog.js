@@ -20,6 +20,7 @@ import {restService} from '../service/services';
 import {Editor} from '../common/Editor';
 import {MultiSelect2} from '../common/MultiSelect2';
 import {getMarkers} from '../common/error';
+import {Bindings} from '../common/bindings';
 
 
 const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { label: method, value: method }; });
@@ -213,6 +214,9 @@ export class RestScriptDialog extends React.Component {
                         <Editor
                             mode="groovy"
                             decorated={true}
+                            bindings={[
+                                Bindings.issue, Bindings.currentUser, Bindings.transientVars
+                            ]}
 
                             onChange={this._setObjectValue('scriptBody')}
                             value={values.get('scriptBody') || ''}

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {Editor} from '../common/Editor';
+import {Bindings} from '../common/bindings';
 
 
 export class FormEditor extends React.Component {
@@ -20,6 +21,9 @@ export class FormEditor extends React.Component {
         return <div>
             <Editor
                 decorated={true}
+                bindings={[
+                    Bindings.issue, Bindings.currentUser, Bindings.transientVars
+                ]}
 
                 mode="groovy"
                 value={this.state.value}

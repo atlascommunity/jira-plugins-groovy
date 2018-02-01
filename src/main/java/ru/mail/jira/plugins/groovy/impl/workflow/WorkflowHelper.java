@@ -111,7 +111,7 @@ public class WorkflowHelper {
 
         HashMap<String, Object> bindings = new HashMap<>(script.getParams());
         bindings.put("issue", issue);
-        bindings.put("user", user);
+        bindings.put("currentUser", user);
         bindings.put("transientVars", transientVars);
 
         long t = System.currentTimeMillis();
@@ -134,7 +134,7 @@ public class WorkflowHelper {
 
         ImmutableMap<String, String> params = ImmutableMap.of(
             "issue", Objects.toString(issue, ""),
-            "user", Objects.toString(user, ""),
+            "currentUser", Objects.toString(user, ""),
             "transientVars", Objects.toString(transientVars, ""),
             "type", type.name(),
             "params", script.getParams().toString()

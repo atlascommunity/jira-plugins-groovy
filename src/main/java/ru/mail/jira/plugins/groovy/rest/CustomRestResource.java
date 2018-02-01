@@ -99,7 +99,7 @@ public class CustomRestResource {
         bindings.put("method", method);
         bindings.put("uriInfo", uriInfo);
         bindings.put("body", body);
-        bindings.put("user", user);
+        bindings.put("currentUser", user);
 
         Response response = null;
         try {
