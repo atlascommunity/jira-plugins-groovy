@@ -6,6 +6,7 @@ import com.opensymphony.workflow.loader.AbstractDescriptor;
 import com.opensymphony.workflow.loader.ConditionDescriptor;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
+import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import java.util.Map;
@@ -18,7 +19,7 @@ public class RegistryScriptConditionFactory extends RegistryScriptWorkflowPlugin
 
     @Override
     protected String getModuleKey() {
-        return "ru.mail.jira.plugins.groovyregistry-script-condition";
+        return Const.REGISTRY_CONDITION_KEY;
     }
 
     @Override

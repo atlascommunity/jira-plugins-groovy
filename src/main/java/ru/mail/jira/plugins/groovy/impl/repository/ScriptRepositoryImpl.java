@@ -171,6 +171,29 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
+    public void moveDirectory(ApplicationUser user, int id, ParentForm form) {
+        ScriptDirectory directory = ao.get(ScriptDirectory.class, id);
+        ScriptDirectory oldParent = directory.getParent();
+        ScriptDirectory newParent = null;
+
+        if (form.getParentId() != null) {
+            newParent = ao.get(ScriptDirectory.class, form.getParentId());
+        }
+
+        directory.setParent(newParent);
+        directory.save();
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.REGISTRY_DIRECTORY,
+                AuditAction.MOVED,
+                getId(oldParent) + " -> " + getId(newParent)
+            )
+        );
+    }
+
+    @Override
     public List<RegistryScriptDto> getAllScripts(boolean includeChangelog) {
         return Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
@@ -242,6 +265,29 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public void moveScript(ApplicationUser user, int id, ParentForm form) {
+        Script script = ao.get(Script.class, id);
+        ScriptDirectory oldParent = script.getDirectory();
+        ScriptDirectory newParent = null;
+
+        if (form.getParentId() != null) {
+            newParent = ao.get(ScriptDirectory.class, form.getParentId());
+        }
+
+        script.setDirectory(newParent);
+        script.save();
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                AuditCategory.REGISTRY_SCRIPT,
+                AuditAction.MOVED,
+                getId(oldParent) + " -> " + getId(newParent)
+            )
+        );
     }
 
     private RegistryScriptDto doUpdateScript(ApplicationUser user, int id, RegistryScriptForm form, ParseContext parseContext) {
@@ -418,5 +464,9 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     private static String getLockKey(int id) {
         return ScriptRepositoryImpl.class.toString() + "_script_" + id;
+    }
+
+    private static Integer getId(ScriptDirectory directory) {
+        return directory != null ? directory.getID() : null;
     }
 }

@@ -22,7 +22,7 @@ export class FormEditor extends React.Component {
             <Editor
                 decorated={true}
                 bindings={[
-                    Bindings.issue, Bindings.currentUser, Bindings.transientVars
+                    Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars
                 ]}
 
                 mode="groovy"

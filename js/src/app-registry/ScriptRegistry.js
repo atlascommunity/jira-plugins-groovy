@@ -9,12 +9,15 @@ import Icon from 'aui-react/lib/AUIIcon';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 import Button, {ButtonGroup} from '@atlaskit/button';
+import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
 
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 import TrashIcon from '@atlaskit/icon/glyph/trash';
 import AddIcon from '@atlaskit/icon/glyph/add';
+import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
 
 import {ScriptDialog} from './ScriptDialog';
+import {WorkflowsDialog} from './WorkflowsDialog';
 import {ScriptDirectoryDialog} from './ScriptDirectoryDialog';
 import {RegistryActionCreators} from './registry.reducer';
 
@@ -117,11 +120,12 @@ class ScriptDirectory extends React.Component {
     _toggle = () => this.setState({collapsed: !this.state.collapsed});
 
     render() {
-        const directory = this.props.directory;
+        const {collapsed} = this.state;
+        const {directory, onCreate, onEdit, onDelete} = this.props;
 
         let children = null;
 
-        if (!this.state.collapsed) {
+        if (!collapsed) {
             children = (
                 <div className="scriptDirectoryChildren">
                     <div>
@@ -129,24 +133,22 @@ class ScriptDirectory extends React.Component {
                             <ScriptDirectory
                                 directory={child}
                                 key={child.id}
-                                onCreate={this.props.onCreate}
-                                onEdit={this.props.onEdit}
-                                onDelete={this.props.onDelete}
+                                onCreate={onCreate}
+                                onEdit={onEdit}
+                                onDelete={onDelete}
                             />
                         ) : null}
                     </div>
                     <div className="ScriptList">
-                        {directory.scripts ? directory.scripts.map(script =>
-                            <Script
+                        {directory.scripts && directory.scripts.map(script =>
+                            <RegistryScript
                                 key={script.id}
                                 script={script}
 
-                                withChangelog={true}
-
-                                onEdit={this.props.onEdit(script.id, 'script')}
-                                onDelete={this.props.onDelete(script.id, 'script', script.name)}
+                                onEdit={onEdit(script.id, 'script')}
+                                onDelete={onDelete(script.id, 'script', script.name)}
                             />
-                        ) : null}
+                        )}
                     </div>
                 </div>
             );
@@ -160,7 +162,7 @@ class ScriptDirectory extends React.Component {
                         className="aui-button aui-button-link"
                     >
                         <h3>
-                            <Icon icon={this.state.collapsed ? 'devtools-folder-closed' : 'devtools-folder-open'}/>
+                            <Icon icon={collapsed ? 'devtools-folder-closed' : 'devtools-folder-open'}/>
                             {' '}
                             {directory.name}
                         </h3>
@@ -171,7 +173,7 @@ class ScriptDirectory extends React.Component {
                                 appearance="subtle"
                                 iconBefore={<AddIcon label=""/>}
 
-                                onClick={this.props.onCreate(directory.id, 'directory')}
+                                onClick={onCreate(directory.id, 'directory')}
                             >
                                 {RegistryMessages.addDirectory}
                             </Button>
@@ -179,7 +181,7 @@ class ScriptDirectory extends React.Component {
                                 appearance="subtle"
                                 iconBefore={<AddIcon label=""/>}
 
-                                onClick={this.props.onCreate(directory.id, 'script')}
+                                onClick={onCreate(directory.id, 'script')}
                             >
                                 {RegistryMessages.addScript}
                             </Button>
@@ -187,18 +189,76 @@ class ScriptDirectory extends React.Component {
                                 appearance="subtle"
                                 iconBefore={<EditFilledIcon label=""/>}
 
-                                onClick={this.props.onEdit(directory.id, 'directory')}
+                                onClick={onEdit(directory.id, 'directory')}
                             />
                             <Button
                                 appearance="subtle"
                                 iconBefore={<TrashIcon label=""/>}
 
-                                onClick={this.props.onDelete(directory.id, 'directory', directory.name)}
+                                onClick={onDelete(directory.id, 'directory', directory.name)}
                             />
                         </ButtonGroup>
                     </div>
                 </div>
                 {children}
+            </div>
+        );
+    }
+}
+
+class RegistryScript extends React.Component {
+    static propTypes = {
+        script: PropTypes.object.isRequired,
+        onEdit: PropTypes.func.isRequired,
+        onDelete: PropTypes.func.isRequired
+    };
+
+    state = {
+        showWorkflows: false
+    };
+
+    _toggleWorkflows = () => {
+        this.setState(state => {
+            return {
+                showWorkflows: !state.showWorkflows
+            };
+        });
+    };
+
+    render() {
+        const {script, onEdit, onDelete} = this.props;
+        const {showWorkflows} = this.state;
+
+        return (
+            <div>
+                {showWorkflows && <WorkflowsDialog id={script.id} onClose={this._toggleWorkflows}/>}
+                <Script
+                    script={script}
+
+                    withChangelog={true}
+
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    additionalButtons={[
+                        <DropdownMenu
+                            key="etc"
+
+                            position="bottom right"
+
+                            triggerType="button"
+                            triggerButtonProps={{
+                                appearance: 'subtle',
+                                iconBefore: <MoreVerticalIcon label=""/>
+                            }}
+                        >
+                            <DropdownItemGroup>
+                                <DropdownItem onClick={this._toggleWorkflows}>
+                                    Find workflows
+                                </DropdownItem>
+                            </DropdownItemGroup>
+                        </DropdownMenu>
+                    ]}
+                />
             </div>
         );
     }

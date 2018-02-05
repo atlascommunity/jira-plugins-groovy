@@ -6,6 +6,7 @@ import com.opensymphony.workflow.loader.AbstractDescriptor;
 import com.opensymphony.workflow.loader.FunctionDescriptor;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
+import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import java.util.Map;
@@ -18,7 +19,7 @@ public class RegistryScriptFunctionFactory extends RegistryScriptWorkflowPluginF
 
     @Override
     protected String getModuleKey() {
-        return "ru.mail.jira.plugins.groovyregistry-script-function";
+        return Const.REGISTRY_FUNCTION_KEY;
     }
 
     @Override

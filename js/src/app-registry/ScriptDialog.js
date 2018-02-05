@@ -218,7 +218,7 @@ export class ScriptDialog extends React.Component {
                                     mode="groovy"
                                     decorated={true}
                                     bindings={[
-                                        Bindings.issue, Bindings.currentUser, Bindings.transientVars
+                                        Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars
                                     ]}
 
                                     onChange={this._setObjectValue('scriptBody')}

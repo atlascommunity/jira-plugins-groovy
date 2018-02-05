@@ -13,6 +13,7 @@
     "@atlaskit/inline-message": "^3.1.1",
     "@atlaskit/layer-manager": "^2.7.1",
     "@atlaskit/lozenge": "^3.5.0",
+    "@atlaskit/modal-dialog": "^3.3.8",
     "@atlaskit/page": "^5.0.10",
     "@atlaskit/page-header": "^2.2.0",
     "@atlaskit/spinner": "^4.1.2",

@@ -5,5 +5,6 @@ public enum AuditAction {
     UPDATED,
     DELETED,
     ENABLED,
-    DISABLED
+    DISABLED,
+    MOVED
 }

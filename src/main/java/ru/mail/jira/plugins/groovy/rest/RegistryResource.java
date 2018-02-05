@@ -5,10 +5,12 @@ import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.websudo.WebSudoRequired;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
+import ru.mail.jira.plugins.groovy.api.dto.directory.ParentForm;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.dto.directory.ScriptDirectoryForm;
 import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptForm;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
+import ru.mail.jira.plugins.groovy.impl.workflow.WorkflowSearchService;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.RestExecutor;
 
@@ -23,15 +25,18 @@ import javax.ws.rs.core.Response;
 public class RegistryResource {
     private final JiraAuthenticationContext authenticationContext;
     private final ScriptRepository scriptRepository;
+    private final WorkflowSearchService workflowSearchService;
     private final PermissionHelper permissionHelper;
 
     public RegistryResource(
         @ComponentImport JiraAuthenticationContext authenticationContext,
         ScriptRepository scriptRepository,
+        WorkflowSearchService workflowSearchService,
         PermissionHelper permissionHelper
     ) {
         this.authenticationContext = authenticationContext;
         this.scriptRepository = scriptRepository;
+        this.workflowSearchService = workflowSearchService;
         this.permissionHelper = permissionHelper;
     }
 
@@ -87,6 +92,19 @@ public class RegistryResource {
             permissionHelper.checkIfAdmin();
 
             scriptRepository.deleteDirectory(authenticationContext.getLoggedInUser(), id);
+
+            return null;
+        }).getResponse();
+    }
+
+    @PUT
+    @Path("/directory/{id}/parent")
+    @WebSudoRequired
+    public Response moveDirectory(@PathParam("id") int id, ParentForm form) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            scriptRepository.moveDirectory(authenticationContext.getLoggedInUser(), id, form);
 
             return null;
         }).getResponse();
@@ -149,6 +167,29 @@ public class RegistryResource {
             scriptRepository.deleteScript(authenticationContext.getLoggedInUser(), id);
 
             return null;
+        }).getResponse();
+    }
+
+    @PUT
+    @Path("/script/{id}/parent")
+    @WebSudoRequired
+    public Response moveScript(@PathParam("id") int id, ParentForm form) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            scriptRepository.moveScript(authenticationContext.getLoggedInUser(), id, form);
+
+            return null;
+        }).getResponse();
+    }
+
+    @GET
+    @Path("/script/{id}/workflows")
+    @WebSudoRequired
+    public Response findScriptWorkflows(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+            return workflowSearchService.findScriptUsages(id);
         }).getResponse();
     }
 }

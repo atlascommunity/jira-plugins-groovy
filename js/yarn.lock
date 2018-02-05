@@ -13,6 +13,13 @@
     "@atlaskit/tooltip" "^8.1.0"
     styled-components "^1.4.6"
 
+"@atlaskit/blanket@^4.0.7":
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/@atlaskit/blanket/-/blanket-4.0.7.tgz#0c1a124f4d6133de0a51bd9162a525d8dfc3f8d8"
+  dependencies:
+    "@atlaskit/theme" "^2.3.1"
+    styled-components "^1.4.6"
+
 "@atlaskit/button@^6.3.0", "@atlaskit/button@^6.3.1":
   version "6.3.1"
   resolved "https://registry.yarnpkg.com/@atlaskit/button/-/button-6.3.1.tgz#dd40c16eda7d1efddbbcb226e05696423987810d"
@@ -130,6 +137,22 @@
     "@atlaskit/util-shared-styles" "^2.10.3"
     babel-runtime "^6.26.0"
     styled-components "^1.4.6"
+
+"@atlaskit/modal-dialog@^3.3.8":
+  version "3.3.8"
+  resolved "https://registry.yarnpkg.com/@atlaskit/modal-dialog/-/modal-dialog-3.3.8.tgz#457c86ddabda8245e26b22ca8cfd82b0c617c654"
+  dependencies:
+    "@atlaskit/blanket" "^4.0.7"
+    "@atlaskit/button" "^6.3.1"
+    "@atlaskit/icon" "^10.7.1"
+    "@atlaskit/layer-manager" "^2.7.1"
+    "@atlaskit/theme" "^2.3.1"
+    focusin "^2.0.0"
+    prop-types "^15.5.10"
+    raf-schd "^2.1.0"
+    react-transition-group "^2.2.1"
+    styled-components "^1.4.6"
+    tabbable "^1.1.0"
 
 "@atlaskit/page-header@^2.2.0":
   version "2.2.0"
@@ -5319,6 +5342,10 @@ querystringify@0.0.x:
 querystringify@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-1.0.0.tgz#6286242112c5b712fa654e526652bf6a13ff05cb"
+
+raf-schd@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/raf-schd/-/raf-schd-2.1.0.tgz#64d645723380ec25cc1714e909b953ef1cf254bf"
 
 railroad-diagrams@^1.0.0:
   version "1.0.0"

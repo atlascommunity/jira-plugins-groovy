@@ -87,7 +87,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
 
         String scriptIdString = extractSingleParam(input, "script");
         params.put(Const.WF_REPOSITORY_SCRIPT_ID, scriptIdString);
-        params.put("full.module.key", getModuleKey());
+        params.put(Const.JIRA_WF_FULL_MODULE_KEY, getModuleKey());
 
         Integer scriptId = Ints.tryParse(scriptIdString);
 
