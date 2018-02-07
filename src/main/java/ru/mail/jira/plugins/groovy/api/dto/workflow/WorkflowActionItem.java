@@ -15,5 +15,5 @@ public class WorkflowActionItem {
     @XmlElement
     private WorkflowScriptType type;
     @XmlElement
-    private int order;
+    private Integer order;
 }

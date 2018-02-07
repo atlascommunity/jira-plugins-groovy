@@ -52,26 +52,32 @@ public class WorkflowSearchService {
         return Stream.of();
     }
 
-    private Stream<WorkflowActionDto> getAction(ActionDescriptor action, int scriptId) {
-        List<WorkflowActionItem> items = new ArrayList<>();
-
-        int i = 1;
-        RestrictionDescriptor restriction = action.getRestriction();
-        if (restriction != null) {
-            for (Object cond : restriction.getConditionsDescriptor().getConditions()) {
+    private void collectConditions(List input, int scriptId, List<WorkflowActionItem> result) {
+        for (Object cond : input) {
+            if (cond instanceof ConditionDescriptor) {
                 ConditionDescriptor condition = (ConditionDescriptor) cond;
 
                 Map args = condition.getArgs();
 
                 if (isUsed(WorkflowScriptType.CONDITION, args, scriptId)) {
-                    items.add(new WorkflowActionItem(WorkflowScriptType.CONDITION, i));
+                    result.add(new WorkflowActionItem(WorkflowScriptType.CONDITION, null));
                 }
-
-                ++i;
+            } else if (cond instanceof ConditionsDescriptor) {
+                ConditionsDescriptor conditions = (ConditionsDescriptor) cond;
+                collectConditions(conditions.getConditions(), scriptId, result);
             }
         }
+    }
 
-        i = 1;
+    private Stream<WorkflowActionDto> getAction(ActionDescriptor action, int scriptId) {
+        List<WorkflowActionItem> items = new ArrayList<>();
+
+        RestrictionDescriptor restriction = action.getRestriction();
+        if (restriction != null) {
+            collectConditions(restriction.getConditionsDescriptor().getConditions(), scriptId, items);
+        }
+
+        int i = 1;
         for (Object cond : action.getValidators()) {
             ValidatorDescriptor condition = (ValidatorDescriptor) cond;
 
