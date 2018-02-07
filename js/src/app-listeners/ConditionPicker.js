@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {AkFieldRadioGroup} from '@atlaskit/field-radio-group';
+import {FieldTextStateless} from '@atlaskit/field-text';
+
 import {jiraService} from '../service/services';
-import {AsyncLoadingMultiSelect} from '../common/AsyncLoadingMultiSelect';
+import {AsyncLoadingMultiSelect} from '../common/ak/AsyncLoadingMultiSelect';
 
 import {ConditionModel} from '../model/listener.model';
 
@@ -33,6 +36,7 @@ export class ConditionPicker extends React.Component {
     static propTypes = {
         value: ConditionModel.isRequired,
         onChange: PropTypes.func.isRequired,
+        error: PropTypes.object
     };
 
     _onChange = property => {
@@ -46,12 +50,12 @@ export class ConditionPicker extends React.Component {
         };
     };
 
-    _onTypeChange = (val) => () => {
+    _onTypeChange = (e) => {
         const {value, onChange} = this.props;
 
         onChange({
             ...value,
-            type: val
+            type: e.target.value
         });
     };
 
@@ -67,88 +71,85 @@ export class ConditionPicker extends React.Component {
     };
 
     render() {
-        const {value} = this.props;
+        const {value, error} = this.props;
+
+        let errorField = null;
+        let errorMessage = null;
+
+        if (error) {
+            errorField = error.field;
+            errorMessage = error.message;
+        }
 
         let paramEl = null;
 
         if (value.type) {
             switch (value.type) {
                 case 'CLASS_NAME':
-                    paramEl = <div className="field-group">
-                            <label>
-                                {ListenerTypeMessages.CLASS_NAME}
-                            </label>
-                            <input
-                                type="text"
-                                className="text long-field"
+                    paramEl = <FieldTextStateless
+                        key="className"
 
-                                value={value.className || ''}
-                                onChange={this._onInputChange('className')}
-                            />
-                        </div>;
+                        shouldFitContainer={true}
+                        required={true}
+
+                        isInvalid={errorField === 'condition.className'}
+                        invalidMessage={errorField === 'name' ? errorMessage : null}
+
+                        label={FieldMessages.name}
+                        value={value.className || ''}
+                        onChange={this._onInputChange('className')}
+                    />;
                     break;
                 case 'ISSUE':
                     paramEl = [
-                            <div className="field-group" key="project">
-                                <label>
-                                    {FieldMessages.projects}
-                                </label>
-                                <AsyncLoadingMultiSelect
-                                    value={value.projectIds || []}
-                                    onChange={this._onChange('projectIds')}
-                                    loader={projectsLoader}
-                                />
-                            </div>,
-                            <div className="field-group" key="type">
-                                <label>
-                                    {FieldMessages.eventTypes}
-                                </label>
-                                <AsyncLoadingMultiSelect
-                                    value={value.typeIds || []}
-                                    onChange={this._onChange('typeIds')}
-                                    loader={eventTypeLoader}
-                                />
-                            </div>
-                        ];
+                        <AsyncLoadingMultiSelect
+                            key="project"
+                            label={FieldMessages.projects}
+                            isRequired={true}
+
+                            value={value.projectIds || []}
+                            onChange={this._onChange('projectIds')}
+                            loader={projectsLoader}
+                        />,
+                        <AsyncLoadingMultiSelect
+                            key="type"
+                            label={FieldMessages.eventTypes}
+                            isRequired={true}
+
+                            value={value.typeIds || []}
+                            onChange={this._onChange('typeIds')}
+                            loader={eventTypeLoader}
+                        />
+                    ];
                     break;
                 default:
                     paramEl = 'not implemented'; //todo: ???
             }
         }
 
-        return <div className="ConditionPicker">
-            <div className="flex-row">
-                <fieldset className="group">
-                    <legend>
-                        <span>{FieldMessages.type}</span>
-                    </legend>
-                    <div className="radio">
-                        <input
-                            className="radio"
-                            type="radio"
-                            name="listener-condition-type"
-                            id="listener-condition-type-issue"
+        return (
+            <div className="flex-column">
+                <AkFieldRadioGroup
+                    label={FieldMessages.type}
+                    isRequired={true}
 
-                            checked={value.type === 'ISSUE'}
-                            onClick={this._onTypeChange('ISSUE')}
-                        />
-                        <label htmlFor="listener-condition-type-issue">{ListenerTypeMessages.ISSUE}</label>
-                    </div>
-                    <div className="radio">
-                        <input
-                            className="radio"
-                            type="radio"
-                            name="listener-condition-type"
-                            id="listener-condition-type-class-name"
-
-                            checked={value.type === 'CLASS_NAME'}
-                            onClick={this._onTypeChange('CLASS_NAME')}
-                        />
-                        <label htmlFor="listener-condition-type-class-name">{ListenerTypeMessages.CLASS_NAME}</label>
-                    </div>
-                </fieldset>
+                    items={[
+                        {
+                            label: ListenerTypeMessages.ISSUE,
+                            value: 'ISSUE',
+                            isSelected: value.type === 'ISSUE'
+                        },
+                        {
+                            label: ListenerTypeMessages.CLASS_NAME,
+                            value: 'CLASS_NAME',
+                            isSelected: value.type === 'CLASS_NAME'
+                        }
+                    ]}
+                    value={value.type}
+                    onRadioChange={this._onTypeChange}
+                />
+                {paramEl}
             </div>
-            {paramEl}
-        </div>;
+        );
     }
 }

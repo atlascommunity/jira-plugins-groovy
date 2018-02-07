@@ -23,10 +23,18 @@ function isLight() {
     return !(preferenceService.get('ru.mail.groovy.isLight') === 'false');
 }
 
-const bindingShape = PropTypes.shape({
+export const BindingShape = PropTypes.shape({
     name: PropTypes.string.isRequired,
     className: PropTypes.string.isRequired,
     fullClassName: PropTypes.string.isRequired
+});
+
+export const MarkerShape = PropTypes.shape({
+    startRow: PropTypes.number,
+    endRow: PropTypes.number,
+    startCol: PropTypes.number,
+    endCol: PropTypes.number,
+    className: PropTypes.string
 });
 
 //todo: remember height for console
@@ -34,21 +42,14 @@ export class Editor extends React.Component {
     static propTypes = {
         mode: PropTypes.string.isRequired,
         value: PropTypes.string.isRequired,
-        isDisabled: PropTypes.bool,
         onChange: PropTypes.func,
+        isDisabled: PropTypes.bool,
+        markers: PropTypes.arrayOf(MarkerShape.isRequired),
+        bindings: PropTypes.arrayOf(BindingShape.isRequired),
         readyOnly: PropTypes.bool,
-        markers: PropTypes.arrayOf(
-            PropTypes.shape({
-                startRow: PropTypes.number,
-                endRow: PropTypes.number,
-                startCol: PropTypes.number,
-                endCol: PropTypes.number,
-                className: PropTypes.string
-            })
-        ),
-        bindings: PropTypes.arrayOf(bindingShape.isRequired),
         decorated: PropTypes.bool,
-        resizable: PropTypes.bool
+        resizable: PropTypes.bool,
+        decorator: PropTypes.func
     };
 
     cm = null;
@@ -100,7 +101,7 @@ export class Editor extends React.Component {
     }
 
     render() {
-        const {onChange, value, readyOnly, isDisabled, mode, bindings, decorated, resizable} = this.props;
+        const {onChange, value, readyOnly, isDisabled, mode, bindings, decorated, resizable, decorator} = this.props;
 
         let el = <CodeMirror
             options={{
@@ -128,6 +129,10 @@ export class Editor extends React.Component {
                         {el}
                     </div>
                 </Resizable>;
+        }
+
+        if (decorator) {
+            el = decorator(el);
         }
 
         return (
@@ -176,5 +181,5 @@ function Binding({binding}) {
 }
 
 Binding.propTypes = {
-    binding: bindingShape.isRequired
+    binding: BindingShape.isRequired
 };

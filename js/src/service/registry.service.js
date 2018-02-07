@@ -42,6 +42,10 @@ export class RegistryService {
         return ajaxDelete(`${getPluginBaseUrl()}/registry/script/${id}`);
     }
 
+    moveScript(id, parentId) {
+        return ajaxPut(`${getPluginBaseUrl()}/registry/script/${id}/parent`, { parentId: parentId ? parentId : null });
+    }
+
     getScriptWorkflows(id) {
         return ajaxGet(`${getPluginBaseUrl()}/registry/script/${id}/workflows`);
     }

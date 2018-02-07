@@ -2,9 +2,10 @@ import React from 'react';
 
 import {connect} from 'react-redux';
 
-import Dialog from 'aui-react/lib/AUIDialog';
-import Button from 'aui-react/lib/AUIButton';
 import Message from 'aui-react/lib/AUIMessage';
+
+import ModalDialog from '@atlaskit/modal-dialog';
+import {FieldTextStateless} from '@atlaskit/field-text';
 
 import {RegistryActionCreators} from './registry.reducer';
 
@@ -110,38 +111,40 @@ export class ScriptDirectoryDialog extends React.Component {
         return (
             <div>
                 {this.state.active ?
-                    <Dialog
-                        size="medium"
-                        titleContent="Create directory"
+                    <ModalDialog
+                        width="medium"
+                        heading="Create directory"
                         onClose={this._close}
-                        footerActionContent={[
-                            <Button key="create" onClick={this._onSubmit}>{CommonMessages.create}</Button>,
-                            <Button key="close" type="link" onClick={this._close}>{CommonMessages.cancel}</Button>
+                        actions={[
+                            {
+                                text: CommonMessages.create,
+                                onClick: this._onSubmit
+                            },
+                            {
+                                text: CommonMessages.cancel,
+                                onClick: this._close
+                            }
                         ]}
-                        type="modal"
-                        styles={{zIndex: '3000'}}
                     >
                         {error && !errorField ?
                             <Message type="error">
                                 {errorMessage}
                             </Message>
                         : null}
-                        <form className="aui" onSubmit={this._onSubmit}>
-                            <div className="field-group">
-                                <label htmlFor="directory-dialog-name">
-                                    {FieldMessages.name} <span className="aui-icon icon-required"/>
-                                </label>
-                                <input
-                                    type="text"
-                                    className="text long-field"
-                                    id="directory-dialog-name"
-                                    value={this.state.name}
-                                    onChange={this._setName}
-                                />
-                                {errorField === 'name' && <div className="error">{errorMessage}</div>}
-                            </div>
-                        </form>
-                    </Dialog>
+                        <div className="flex-column">
+                            <FieldTextStateless
+                                shouldFitContainer={true}
+                                required={true}
+
+                                isInvalid={errorField === 'name'}
+                                invalidMessage={errorMessage}
+
+                                label={FieldMessages.name}
+                                value={this.state.name}
+                                onChange={this._setName}
+                            />
+                        </div>
+                    </ModalDialog>
                     : null}
             </div>
         );

@@ -219,14 +219,14 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         ConditionDescriptor condition = form.getCondition();
         if (condition == null) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "condition");
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "condition.type");
         }
 
         if (condition.getType() == ConditionType.CLASS_NAME) {
             try {
                 Class.forName(condition.getClassName());
             } catch (ClassNotFoundException e) {
-                throw new RestFieldException("Unable to resolve class: " + e.getMessage(), "condition");
+                throw new RestFieldException("Unable to resolve class: " + e.getMessage(), "condition.className");
             }
         } else {
             if (condition.getProjectIds() == null) {

@@ -1,4 +1,5 @@
 import {combineReducers} from 'redux';
+import sortBy from 'lodash.sortby';
 
 
 export const registryReducer = combineReducers({
@@ -14,6 +15,7 @@ const DELETE_DIRECTORY = 'DELETE_DIRECTORY';
 const ADD_SCRIPT = 'ADD_SCRIPT';
 const UPDATE_SCRIPT = 'UPDATE_SCRIPT';
 const DELETE_SCRIPT = 'DELETE_SCRIPT';
+const MOVE_SCRIPT = 'MOVE_SCRIPT';
 
 
 export const RegistryActionCreators = {
@@ -59,9 +61,14 @@ export const RegistryActionCreators = {
             type: DELETE_SCRIPT,
             id: id
         };
+    },
+    moveScript: (src, dst, script) => {
+        return {
+            type: MOVE_SCRIPT,
+            src, dst, script
+        };
     }
 };
-
 
 function directoriesReducer(state, action) {
     if (state === undefined) {
@@ -118,6 +125,20 @@ function directoryReducer(state, action) {
                 scripts: (state.scripts || []).filter(script => script.id !== action.id)
             };
             break;
+        case MOVE_SCRIPT:
+            if (state.id === action.src) {
+                result = {
+                    ...state,
+                    scripts: (state.scripts || []).filter(script => script.id !== action.script.id)
+                };
+            }
+            if (state.id === action.dst) {
+                result = {
+                    ...state,
+                    scripts: order([...state.scripts, action.script])
+                };
+            }
+            break;
         case UPDATE_SCRIPT:
             result = {
                 ...state,
@@ -134,7 +155,7 @@ function directoryReducer(state, action) {
             if (action.script.directoryId === state.id) {
                 result = {
                     ...state,
-                    scripts: [...state.scripts, action.script]
+                    scripts: order([...state.scripts, action.script])
                 };
             }
             break;
@@ -146,4 +167,8 @@ function directoryReducer(state, action) {
         ...result,
         children: (result.children || []).map(child => directoryReducer(child, action)).filter(e => e)
     };
+}
+
+function order(items) {
+    return sortBy(items, 'name');
 }

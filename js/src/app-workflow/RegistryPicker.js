@@ -7,7 +7,7 @@ import {registryService} from '../service/services';
 import {SingleSelect} from '../common/SingleSelect';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {CommonMessages} from '../i18n/common.i18n';
-import {AsyncPicker} from '../common/AsyncPicker';
+import {AsyncPicker} from '../common/ak/AsyncPicker';
 
 
 function mapScriptToOption(script) {
@@ -49,6 +49,9 @@ export class RegistryPicker extends React.Component {
         switch (param.paramType) {
             case 'USER':
                 return <AsyncPicker
+                    label=""
+                    isLabelHidden={true}
+
                     src={`${getPluginBaseUrl()}/jira-api/userPicker`}
                     name={inputName}
                     onChange={this._setValue(paramName)}
@@ -57,6 +60,9 @@ export class RegistryPicker extends React.Component {
                 />;
             case 'GROUP':
                 return <AsyncPicker
+                    label=""
+                    isLabelHidden={true}
+
                     src={`${getPluginBaseUrl()}/jira-api/groupPicker`}
                     name={inputName}
                     onChange={this._setValue(paramName)}
@@ -65,6 +71,9 @@ export class RegistryPicker extends React.Component {
                 />;
             case 'CUSTOM_FIELD':
                 return <AsyncPicker
+                    label=""
+                    isLabelHidden={true}
+
                     src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`}
                     name={inputName}
                     onChange={this._setValue(paramName)}

@@ -416,8 +416,6 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     private ParseContext validateScriptForm(boolean isNew, RegistryScriptForm form) {
-        ParseContext parseContext = scriptService.parseScript(form.getScriptBody());
-
         if (StringUtils.isEmpty(form.getName())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
         }
@@ -425,6 +423,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         if (StringUtils.isEmpty(form.getScriptBody())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
+        ParseContext parseContext = scriptService.parseScript(form.getScriptBody());
 
         if (!isNew) {
             if (StringUtils.isEmpty(form.getComment())) {

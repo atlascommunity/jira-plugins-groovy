@@ -76,7 +76,7 @@ export class WorkflowsDialog extends React.Component {
                 onClose={onClose}
             >
                 {!ready && <Spinner/>}
-                {ready &&
+                {ready && workflows.length !== 0 &&
                     <table className="aui">
                         <thead>
                             <tr>
@@ -146,6 +146,7 @@ export class WorkflowsDialog extends React.Component {
                         </tbody>
                     </table>
                 }
+                {ready && !workflows.length && 'no workflows'}
             </Modal>
         );
     }

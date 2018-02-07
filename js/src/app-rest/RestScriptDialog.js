@@ -5,25 +5,25 @@ import {connect} from 'react-redux';
 
 import {Map} from 'immutable';
 
-import Button from 'aui-react/lib/AUIButton';
-import Modal from 'aui-react/lib/AUIDialog';
+import ModalDialog from '@atlaskit/modal-dialog';
+import {FieldTextStateless} from '@atlaskit/field-text';
+import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
+
 import Message from 'aui-react/lib/AUIMessage';
 
 import {ScriptActionCreators} from './rest.reducer';
-
-import {AUIRequired} from '../common/aui-components';
 
 import {RestMessages} from '../i18n/rest.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 
 import {restService} from '../service/services';
-import {Editor} from '../common/Editor';
-import {MultiSelect2} from '../common/MultiSelect2';
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
+import {MultiSelect} from '../common/ak/MultiSelect';
+import {EditorField} from '../common/ak/EditorField';
 
 
-const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { label: method, value: method }; });
+const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { content: method, value: method }; });
 
 @connect(
     () => { return{}; },
@@ -75,7 +75,7 @@ export class RestScriptDialog extends React.Component {
                     this.setState({
                         values: new Map({
                             name: script.name,
-                            methods: script.methods.map(method => { return { label: method, value: method }; }),
+                            methods: script.methods,
                             scriptBody: script.scriptBody,
                             comment: ''
                         }),
@@ -102,11 +102,7 @@ export class RestScriptDialog extends React.Component {
 
         const {isNew, id, onClose} = this.props;
 
-        const jsData = this.state.values.toJS();
-        const data = {
-            ...jsData,
-            methods: jsData.methods ? jsData.methods.map(option => option.value) : null
-        };
+        const data = this.state.values.toJS();
 
         if (isNew) {
             restService
@@ -171,91 +167,84 @@ export class RestScriptDialog extends React.Component {
             }
 
             body =
-                <form className="aui" onSubmit={this._onSubmit}>
+                <div className="flex-column">
                     {error && !errorField ?
                         <Message type="error">
                             {errorMessage}
                         </Message>
                     : null}
 
-                    <div className="field-group">
-                        <label htmlFor="rest-script-dialog-name">
-                            {FieldMessages.name}
-                            <AUIRequired/>
-                        </label>
-                        <input
-                            type="text"
-                            className="text full-width-field"
-                            id="rest-script-dialog-name"
-                            value={values.get('name') || ''}
-                            onChange={this._setTextValue('name')}
-                        />
-                        <div className="description">{RestMessages.nameDescription}</div>
-                        {errorField === 'name' && <div className="error">{errorMessage}</div>}
-                    </div>
-                    <div className="field-group">
-                        <label>
-                            {FieldMessages.httpMethods}
-                        </label>
-                        <MultiSelect2
-                            className="full-width-field"
+                    <FieldTextStateless
+                        shouldFitContainer={true}
+                        required={true}
 
-                            options={httpMethods}
-                            value={values.get('methods')}
-                            onChange={this._setObjectValue('methods')}
-                        />
-                        {errorField === 'methods' && <div className="error">{errorMessage}</div>}
-                    </div>
-                    <div className="field-group">
-                        <label>
-                            {FieldMessages.scriptCode}
-                            <AUIRequired/>
-                        </label>
-                        <Editor
-                            mode="groovy"
-                            decorated={true}
-                            bindings={[
-                                Bindings.issue, Bindings.currentUser, Bindings.transientVars
-                            ]}
+                        isInvalid={errorField === 'name'}
+                        invalidMessage={errorField === 'name' ? errorMessage : null}
 
-                            onChange={this._setObjectValue('scriptBody')}
-                            value={values.get('scriptBody') || ''}
+                        label={FieldMessages.name}
+                        value={values.get('name') || ''}
+                        onChange={this._setTextValue('name')}
+                    />
+                    <div className="ak-description">{RestMessages.nameDescription}</div>
 
-                            markers={markers}
-                        />
-                        {errorField === 'scriptBody' && <div className="error">{errorMessage}</div>}
-                    </div>
-                    {!isNew && <div className="field-group">
-                        <label htmlFor="rest-script-dialog-comment">
-                            {FieldMessages.comment}
-                            <AUIRequired/>
-                        </label>
-                        <textarea
-                            id="rest-script-dialog-comment"
-                            className="textarea full-width-field"
+                    <MultiSelect
+                        label={FieldMessages.httpMethods}
 
+                        isInvalid={errorField === 'methods'}
+                        invalidMessage={errorField === 'methods' ? <div className="error">{errorMessage}</div> : ''}
+
+                        items={httpMethods}
+                        value={values.get('methods')}
+                        onChange={this._setObjectValue('methods')}
+                    />
+                    <EditorField
+                        label={FieldMessages.scriptCode}
+                        isRequired={true}
+
+                        isInvalid={errorField === 'scriptBody'}
+                        invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
+                        markers={markers}
+
+                        bindings={[
+                            Bindings.method, Bindings.uriInfo, Bindings.body, Bindings.currentUser
+                        ]}
+
+                        value={values.get('scriptBody') || ''}
+                        onChange={this._setObjectValue('scriptBody')}
+                    />
+                    {!isNew &&
+                        <FieldTextAreaStateless
+                            shouldFitContainer={true}
+                            required={true}
+
+                            isInvalid={errorField === 'comment'}
+                            invalidMessage={errorField === 'comment' ? errorMessage : null}
+
+                            label={FieldMessages.comment}
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}
                         />
-                        {errorField === 'comment' && <div className="error">{errorMessage}</div>}
-                    </div> }
-                </form>;
+                    }
+                </div>;
         }
 
-        return <Modal
-            size="xlarge"
-            titleContent={`${isNew ? RestMessages.createScript : RestMessages.updateScript}`}
+        return <ModalDialog
+            width="x-large"
+            scrollBehavior="outside"
+            heading={`${isNew ? RestMessages.createScript : RestMessages.updateScript}`}
             onClose={onClose}
-            footerActionContent={[
-                <Button key="create" onClick={this._onSubmit}>
-                    {isNew ? CommonMessages.create : CommonMessages.update}
-                </Button>,
-                <Button key="close" type="link" onClick={onClose}>{CommonMessages.cancel}</Button>
+            actions={[
+                {
+                    text: isNew ? CommonMessages.create : CommonMessages.update,
+                    onClick: this._onSubmit,
+                },
+                {
+                    text: CommonMessages.cancel,
+                    onClick: onClose,
+                }
             ]}
-            type="modal"
-            styles={{zIndex: '3000'}}
         >
             {body}
-        </Modal>;
+        </ModalDialog>;
     }
 }

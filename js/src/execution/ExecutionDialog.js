@@ -6,7 +6,7 @@ import Button from 'aui-react/lib/AUIButton';
 
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {ExecutionModel} from '../model/execution.model';
-import {StaticField} from '../common/StaticField';
+import {StaticFieldValue} from '../common/StaticField';
 
 
 export class ExecutionDialog extends React.Component {
@@ -35,45 +35,45 @@ export class ExecutionDialog extends React.Component {
                     <label>
                         {FieldMessages.date}{':'}
                     </label>
-                    <StaticField>
+                    <StaticFieldValue>
                         {execution.date}
-                    </StaticField>
+                    </StaticFieldValue>
                 </div>
                 <div className="field-group">
                     <label>
                         {FieldMessages.time}{':'}
                     </label>
-                    <StaticField>
+                    <StaticFieldValue>
                         {execution.time} {' ms'}
-                    </StaticField>
+                    </StaticFieldValue>
                 </div>
                 <div className="field-group">
                     <label>
                         {FieldMessages.successful}{':'}
                     </label>
-                    <StaticField>
+                    <StaticFieldValue>
                         {execution.success ? 'yes' : 'no'}
-                    </StaticField>
+                    </StaticFieldValue>
                 </div>
                 {bindings &&
                     <div className="field-group">
                         <label>
                             {FieldMessages.bindings}{':'}
                         </label>
-                        <StaticField>
+                        <StaticFieldValue>
                             {Object.keys(bindings).map(key =>
                                 <div className="field-group" key={key}>
                                     <label>
                                         {key}
                                     </label>
-                                    <StaticField>
+                                    <StaticFieldValue>
                                         <pre>
                                             {bindings[key]}
                                         </pre>
-                                    </StaticField>
+                                    </StaticFieldValue>
                                 </div>
                             )}
-                        </StaticField>
+                        </StaticFieldValue>
                     </div>
                 }
                 {execution.error &&
@@ -81,11 +81,11 @@ export class ExecutionDialog extends React.Component {
                         <label>
                             {CommonMessages.error}{':'}
                             </label>
-                        <StaticField>
+                        <StaticFieldValue>
                             <pre>
                                 {execution.error}
                             </pre>
-                        </StaticField>
+                        </StaticFieldValue>
                     </div>
                 }
             </form>

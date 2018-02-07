@@ -10,7 +10,7 @@ import {FormEditor} from './FormEditor';
 import {RegistryPicker} from './RegistryPicker';
 
 import {Script} from '../common/Script';
-import {StaticField} from '../common/StaticField';
+import {StaticFieldValue} from '../common/StaticField';
 
 import {ErrorMessages} from '../i18n/common.i18n';
 
@@ -59,9 +59,9 @@ define('mailru/groovy/renderRegistryScript', () => {
                             <label>
                                 {param.displayName}{':'}
                             </label>
-                            <StaticField>
+                            <StaticFieldValue>
                                 <ScriptParamValue value={paramValues[param.name]} param={param}/>
-                            </StaticField>
+                            </StaticFieldValue>
                         </div>
                     )}
                 </form>}

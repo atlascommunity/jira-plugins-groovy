@@ -1,25 +1,54 @@
 @import (reference) "../flex";
 @import (reference) "../const";
+@import (reference) '~@atlaskit/util-shared-styles/src/borders';
+
+
+.ScriptList {
+    > .DraggableScript {
+        margin: 4px;
+
+        &:not(:first-child) {
+            margin-top: 10px;
+        }
+    }
+}
 
 .scriptDirectory {
-    margin: 2px;
+    //margin: 2px;
 }
 
 .scriptDirectoryTitle {
-    border: 1px solid @border-color;
+    .flex-row;
 
-    padding: 3px 3px 3px 8px;
-    margin: 2px;
-
-    border-radius: 5px;
+    padding: 0 3px 0 8px;
+    margin: 0 5px;
 }
 
 .scriptDirectoryChildren {
-    margin-left: 5px;
-    padding-left: 5px;
-    border-left: 5px solid @border-color;
+    //margin-left: 5px;
+    //padding-left: 5px;
+    //border-left: 5px solid @border-color;
 
     > .ScriptList > .scriptRow:first-child {
         margin-top: 5px;
     }
+}
+
+.scriptDropArea {
+    border-radius: @ak-border-radius;
+
+    .dragging & {
+        background-color: #f1f2f6;
+        border-color: #d8d9dd;
+    }
+
+    &.draggingOver {
+        background-color: #eeeff3;
+        border-color: #cacbcf;
+    }
+
+    border: 3px dashed transparent;;
+    min-height: 10px;
+
+    transition: all .2s ease-in;
 }

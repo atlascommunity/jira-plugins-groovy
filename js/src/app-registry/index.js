@@ -4,6 +4,8 @@ import {Provider} from 'react-redux';
 
 import {createStore} from 'redux';
 
+import {DragDropContext} from 'react-beautiful-dnd';
+
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
@@ -16,7 +18,7 @@ import {fixStyle} from '../common/fixStyle';
 import '../flex.less';
 
 
-const store = createStore(registryReducer, {directories: []});
+const store = createStore(registryReducer, {directories: [], collapsed: []});
 
 AJS.toInit(() => {
     fixStyle();

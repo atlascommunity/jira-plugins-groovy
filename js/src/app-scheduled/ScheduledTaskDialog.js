@@ -5,26 +5,31 @@ import {connect} from 'react-redux';
 
 import {Map} from 'immutable';
 
-import Button from 'aui-react/lib/AUIButton';
-import Modal from 'aui-react/lib/AUIDialog';
+import ModalDialog from '@atlaskit/modal-dialog';
+import {FieldTextStateless} from '@atlaskit/field-text';
+import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
+import {AkFieldRadioGroup} from '@atlaskit/field-radio-group';
+import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
+import {colors} from '@atlaskit/theme';
+import {Label} from '@atlaskit/field-base';
+
+import WarningIcon from '@atlaskit/icon/glyph/warning';
 
 import {TaskActionCreators} from './scheduled.reducer';
 import {types, typeList} from './types';
 
-import {AUIRequired} from '../common/aui-components';
-
 import {RestMessages} from '../i18n/rest.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
+import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 
 import {scheduledTaskService} from '../service/services';
-import {Editor} from '../common/Editor';
 import {getMarkers} from '../common/error';
-import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
-import {AsyncPicker} from '../common/AsyncPicker';
-import {JqlInput} from '../common/JqlInput';
 import {Error} from '../common/forms/Error';
 import {Bindings} from '../common/bindings';
+import {AsyncPicker} from '../common/ak/AsyncPicker';
+import {EditorField} from '../common/ak/EditorField';
+import {JqlInput} from '../common/ak/JqlInput';
 
 
 function getValue(option) {
@@ -88,7 +93,7 @@ export class ScheduledTaskDialog extends React.Component {
                             issueJql: task.issueJql,
                             issueWorkflowName: task.issueWorkflow,
                             issueWorkflowActionId: task.issueWorkflowAction,
-                            transitionOptions: task.transitionOptions,
+                            transitionOptions: task.transitionOptions || {},
                             comment: ''
                         }),
                         ready: true
@@ -170,8 +175,31 @@ export class ScheduledTaskDialog extends React.Component {
         });
     };
 
+    _toggleTransitionOption2 = (e) => {
+        const option = e.currentTarget.value;
+
+        this.setState(state => {
+            const options = state.values.get('transitionOptions');
+
+            return {
+                values: state.values.set('transitionOptions', {
+                    ...options,
+                    [option]: !options[option]
+                })
+            };
+        });
+    };
+
     _renderField = (fieldName, error) => {
         const {values} = this.state;
+
+        let errorMessage = null;
+        let errorField = null;
+
+        if (error) {
+            errorMessage = error.message;
+            errorField = error.field;
+        }
 
         switch (fieldName) {
             case 'scriptBody':
@@ -202,44 +230,46 @@ export class ScheduledTaskDialog extends React.Component {
                 }
 
                 return (
-                    <div className="field-group" key={fieldName}>
-                        <label>
-                            {FieldMessages.scriptCode}
-                            <AUIRequired/>
-                        </label>
-                        <Editor
-                            mode="groovy"
-                            decorated={true}
-                            bindings={bindings}
+                    <EditorField
+                        key={fieldName}
 
-                            value={values.get(fieldName) || ''}
-                            onChange={this._setObjectValue(fieldName)}
+                        label={FieldMessages.scriptCode}
+                        isRequired={true}
 
-                            markers={markers}
-                        />
-                        <Error error={error} thisField={fieldName}/>
-                    </div>
+                        isInvalid={errorField === 'scriptBody'}
+                        invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
+                        markers={markers}
+
+                        bindings={bindings}
+
+                        value={values.get(fieldName) || ''}
+                        onChange={this._setObjectValue(fieldName)}
+                    />
                 );
             case 'issueJql':
-                //todo: jql select
                 return (
-                    <div className="field-group" key={fieldName}>
-                        <label htmlFor="task-dialog-jql">
-                            {FieldMessages.issueJql}<AUIRequired/>
-                        </label>
+                    <div key={fieldName}>
                         <JqlInput
-                            id="task-dialog-jql"
+                            label={FieldMessages.issueJql}
+                            isRequired={true}
+
+                            shouldFitContainer={true}
 
                             value={values.get(fieldName) || ''}
                             onChange={this._setTextValue(fieldName)}
+
+                            isInvalid={errorField === fieldName}
+                            invalidMessage={errorField === fieldName ? errorMessage : ''}
                         />
-                        <div className="description">
-                            <span className="aui-icon aui-icon-warning"/>{' '}
+                        <div className="ak-description">
+                            <WarningIcon size="small" label="" primaryColor={colors.Y500}/>
+                            {' '}
                             {ScheduledTaskMessages.jqlLimitDescription(1000) /*todo: insert value from config when its configurable*/}
                         </div>
                         {['ISSUE_JQL_SCRIPT', 'DOCUMENT_ISSUE_JQL_SCRIPT'].includes(values.get('type')) &&
-                            <div className="description">
-                                <span className="aui-icon aui-icon-warning"/>{' '}
+                            <div className="ak-description">
+                                <WarningIcon size="small" label="" primaryColor={colors.Y500}/>
+                                {' '}
                                 {ScheduledTaskMessages.jqlScriptDescription}
                             </div>
                         }
@@ -250,78 +280,61 @@ export class ScheduledTaskDialog extends React.Component {
                 const workflow = values.get('issueWorkflowName');
                 return (
                     <div key={fieldName}>
-                        <div className="field-group">
-                            <label>
-                                {FieldMessages.workflow}<AUIRequired/>
-                            </label>
-                            <AsyncPicker
-                                src={`${getPluginBaseUrl()}/jira-api/workflowPicker`}
-                                value={workflow}
-                                onChange={this._setObjectValue('issueWorkflowName')}
-                            />
-                            <Error error={error} thisField={fieldName}/>
-                        </div>
+                        <AsyncPicker
+                            label={FieldMessages.workflow}
+                            isRequired={true}
+
+                            src={`${getPluginBaseUrl()}/jira-api/workflowPicker`}
+                            value={workflow}
+                            onChange={this._setObjectValue('issueWorkflowName')}
+
+                            isInvalid={errorField === fieldName}
+                            invalidMessage={errorField === fieldName ? errorMessage : ''}
+                        />
                         {workflow &&
-                            <div className="field-group">
-                                <label>
-                                    {FieldMessages.workflowAction}<AUIRequired/>
-                                </label>
-                                <AsyncPicker
-                                    src={`${getPluginBaseUrl()}/jira-api/workflowActionPicker/${workflow.value}`}
-                                    value={values.get('issueWorkflowActionId')}
-                                    onChange={this._setObjectValue('issueWorkflowActionId')}
-                                />
-                                <Error error={error} thisField={fieldName}/>
-                            </div>
+                            <AsyncPicker
+                                label={FieldMessages.workflowAction}
+                                isRequired={true}
+
+                                src={`${getPluginBaseUrl()}/jira-api/workflowActionPicker/${workflow.value}`}
+                                value={values.get('issueWorkflowActionId')}
+                                onChange={this._setObjectValue('issueWorkflowActionId')}
+
+                                isInvalid={errorField === fieldName}
+                                invalidMessage={errorField === fieldName ? errorMessage : ''}
+                            />
                         }
                     </div>
                 );
             case 'transitionOptions':
-                //todo: link controls
                 const value = values.get(fieldName);
                 return (
-                    <fieldset className="group" key={fieldName}>
-                        <legend>{ScheduledTaskMessages.transitionOptions}</legend>
-                        <div className="checkbox">
-                            <input
-                                className="checkbox"
-                                type="checkbox"
-                                name="checkBoxOne"
-                                id="task-dialog-transition-skip-conditions"
-                                checked={value.skipConditions}
-                                onChange={this._toggleTransitionOption('skipConditions')}
+                    <div key={fieldName}>
+                        <Label label={ScheduledTaskMessages.transitionOptions}/>
+                        <CheckboxGroup>
+                            <CheckboxStateless
+                                isChecked={value.skipConditions || false}
+                                onChange={this._toggleTransitionOption2}
+                                label={ScheduledTaskMessages.transitionOption.skipConditions}
+                                value="skipConditions"
+                                name="transition-options"
                             />
-                            <label htmlFor="task-dialog-transition-skip-conditions">
-                                {ScheduledTaskMessages.transitionOption.skipConditions}
-                            </label>
-                        </div>
-                        <div className="checkbox">
-                            <input
-                                className="checkbox"
-                                type="checkbox"
-                                name="checkBoxOne"
-                                id="task-dialog-transition-skip-validators"
-                                checked={value.skipValidators}
-                                onChange={this._toggleTransitionOption('skipValidators')}
+                            <CheckboxStateless
+                                isChecked={value.skipValidators || false}
+                                onChange={this._toggleTransitionOption2}
+                                label={ScheduledTaskMessages.transitionOption.skipValidators}
+                                value="skipValidators"
+                                name="transition-options"
                             />
-                            <label htmlFor="task-dialog-transition-skip-validators">
-                                {ScheduledTaskMessages.transitionOption.skipValidators}
-                            </label>
-                        </div>
-                        <div className="checkbox">
-                            <input
-                                className="checkbox"
-                                type="checkbox"
-                                name="checkBoxOne"
-                                id="task-dialog-transition-skip-permissions"
-                                checked={value.skipPermissions}
-                                onChange={this._toggleTransitionOption('skipPermissions')}
+                            <CheckboxStateless
+                                isChecked={value.skipPermissions || false}
+                                onChange={this._toggleTransitionOption2}
+                                label={ScheduledTaskMessages.transitionOption.skipPermissions}
+                                value="skipPermissions"
+                                name="transition-options"
                             />
-                            <label htmlFor="task-dialog-transition-skip-permissions">
-                                {ScheduledTaskMessages.transitionOption.skipPermissions}
-                            </label>
-                        </div>
-                    </fieldset>
+                        </CheckboxGroup>
+                    </div>
                 );
             default:
                 return <div key={fieldName}>{'NOT IMPLEMENTED'}</div>;
@@ -339,102 +352,102 @@ export class ScheduledTaskDialog extends React.Component {
         } else {
             const currentType = values.get('type');
 
+            let errorMessage = null;
+            let errorField = null;
+
+            if (error) {
+                errorMessage = error.message;
+                errorField = error.field;
+            }
+
             body =
-                <form className="aui" onSubmit={this._onSubmit}>
+                <div className="flex-column">
                     <Error error={error}/>
 
-                    <div className="field-group">
-                        <label htmlFor="task-dialog-name">
-                            {FieldMessages.name}
-                            <AUIRequired/>
-                        </label>
-                        <input
-                            type="text"
-                            className="text full-width-field"
-                            id="task-dialog-name"
-                            value={values.get('name') || ''}
-                            onChange={this._setTextValue('name')}
-                        />
-                        <Error error={error} thisField="name"/>
-                    </div>
-                    <div className="field-group">
-                        <label htmlFor="task-dialog-schedule">
-                            {FieldMessages.schedule}<AUIRequired/>
-                        </label>
-                        <input
-                            type="text"
-                            className="text full-width-field"
-                            id="task-dialog-schedule"
-                            value={values.get('scheduleExpression') || ''}
-                            onChange={this._setTextValue('scheduleExpression')}
-                        />
-                        <Error error={error} thisField="scheduleExpression"/>
-                    </div>
-                    <div className="field-group">
-                        <label>
-                            {ScheduledTaskMessages.runAs}<AUIRequired/>
-                        </label>
-                        <AsyncPicker
-                            src={`${getPluginBaseUrl()}/jira-api/userPicker`}
-                            onChange={this._setObjectValue('userKey')}
-                            value={values.get('userKey')}
-                            className="full-width-field"
-                        />
-                        <Error error={error} thisField="userKey"/>
-                    </div>
-                    <fieldset className="group">
-                        <legend>{FieldMessages.type}<AUIRequired/></legend>
-                        {typeList.map(type =>
-                            <div className="radio" key={type.key}>
-                                <input
-                                    className="radio"
-                                    type="radio"
-                                    name="task-dialog-type"
+                    <FieldTextStateless
+                        shouldFitContainer={true}
+                        required={true}
 
-                                    id={`task-dialog-type-${type.key}`}
-                                    value={type.key}
-                                    checked={values.get('type') === type.key}
-                                    onChange={this._setTextValue('type')}
-                                />
-                                <label htmlFor={`task-dialog-type-${type.key}`}>
-                                    {type.name}
-                                </label>
-                            </div>
-                        )}
-                        <Error error={error} thisField="type"/>
-                    </fieldset>
+                        isInvalid={errorField === 'name'}
+                        invalidMessage={errorField === 'name' ? errorMessage : null}
+
+                        label={FieldMessages.name}
+                        value={values.get('name') || ''}
+                        onChange={this._setTextValue('name')}
+                    />
+                    <FieldTextStateless
+                        shouldFitContainer={true}
+                        required={true}
+
+                        isInvalid={errorField === 'scheduleExpression'}
+                        invalidMessage={errorField === 'scheduleExpression' ? errorMessage : null}
+
+                        label={FieldMessages.schedule}
+                        value={values.get('scheduleExpression') || ''}
+                        onChange={this._setTextValue('scheduleExpression')}
+                    />
+
+                    <AsyncPicker
+                        label={ScheduledTaskMessages.runAs}
+                        isRequired={true}
+
+                        src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                        onChange={this._setObjectValue('userKey')}
+                        value={values.get('userKey')}
+
+                        isInvalid={errorField === 'userKey'}
+                        invalidMessage={errorField === 'userKey' ? errorMessage : ''}
+                    />
+
+                    <AkFieldRadioGroup
+                        label={FieldMessages.type}
+                        isRequired={true}
+
+                        items={typeList.map(type => {
+                            return {
+                                label: type.name,
+                                value: type.key,
+                                isSelected: values.get('type') === type.key
+                            };
+                        })}
+                        value={values.get('type')}
+                        onRadioChange={this._setTextValue('type')}
+                    />
+
                     {currentType && types[currentType].fields.map(field => this._renderField(field, error))}
-                    {!isNew && <div className="field-group">
-                        <label htmlFor="task-dialog-comment">
-                            {FieldMessages.comment}
-                            <AUIRequired/>
-                        </label>
-                        <textarea
-                            id="task-dialog-comment"
-                            className="textarea full-width-field"
+                    {!isNew &&
+                        <FieldTextAreaStateless
+                            shouldFitContainer={true}
+                            required={true}
 
+                            isInvalid={errorField === 'comment'}
+                            invalidMessage={errorField === 'comment' ? errorMessage : null}
+
+                            label={FieldMessages.comment}
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}
                         />
-                        <Error error={error} thisField="comment"/>
-                    </div> }
-                </form>;
+                    }
+                </div>;
         }
 
-        return <Modal
-            size="xlarge"
-            titleContent={`${isNew ? RestMessages.createScript : RestMessages.updateScript}`}
+        return <ModalDialog
+            width="x-large"
+            scrollBehavior="outside"
+            heading={`${isNew ? RestMessages.createScript : RestMessages.updateScript}`}
             onClose={onClose}
-            footerActionContent={[
-                <Button key="create" onClick={this._onSubmit}>
-                    {isNew ? CommonMessages.create : CommonMessages.update}
-                </Button>,
-                <Button key="close" type="link" onClick={onClose}>{CommonMessages.cancel}</Button>
+            actions={[
+                {
+                    text: isNew ? CommonMessages.create : CommonMessages.update,
+                    onClick: this._onSubmit,
+                },
+                {
+                    text: CommonMessages.cancel,
+                    onClick: onClose,
+                }
             ]}
-            type="modal"
-            styles={{zIndex: '3000'}}
         >
             {body}
-        </Modal>;
+        </ModalDialog>;
     }
 }

@@ -27,7 +27,7 @@ import {Script} from '../common/Script';
 
 import './ScheduledTaskRegistry.less';
 import {scheduledTaskService} from '../service/services';
-import {StaticField} from '../common/StaticField';
+import {StaticFieldValue} from '../common/StaticField';
 
 
 function getOutcomeLozengeAppearance(outcome) {
@@ -231,46 +231,46 @@ class ScheduledTask extends React.Component {
                         <label>
                             {FieldMessages.schedule}{':'}
                         </label>
-                        <StaticField>
+                        <StaticFieldValue>
                             {task.scheduleExpression}
-                        </StaticField>
+                        </StaticFieldValue>
                     </div>
                     {task.user && <div className="field-group">
                         <label>
                             {ScheduledTaskMessages.runAs}{':'}
                         </label>
-                        <StaticField>
+                        <StaticFieldValue>
                             <Avatar size="xsmall" src={task.user.imgSrc}/>{' '}{task.user.label}
-                        </StaticField>
+                        </StaticFieldValue>
                     </div>}
                     {task.issueJql && <div className="field-group">
                         <label>
                             {FieldMessages.issueJql}{':'}
                         </label>
-                        <StaticField>
+                        <StaticFieldValue>
                             {task.issueJql}
-                        </StaticField>
+                        </StaticFieldValue>
                     </div>}
                     {task.issueWorkflow && task.issueWorkflowAction && <div className="field-group">
                         <label>
                             {FieldMessages.workflowAction}{':'}
                         </label>
-                        <StaticField>
+                        <StaticFieldValue>
                             {task.issueWorkflow.label}{' - '}{task.issueWorkflowAction.label}
-                        </StaticField>
+                        </StaticFieldValue>
                     </div>}
                     {(task.type === 'ISSUE_JQL_TRANSITION') && task.transitionOptions && <div className="field-group">
                         <label>
                             {ScheduledTaskMessages.transitionOptions}{':'}
                         </label>
-                        <StaticField>
+                        <StaticFieldValue>
                             {Object
                                 .keys(task.transitionOptions)
                                 .filter(key => task.transitionOptions[key])
                                 .map(key => ScheduledTaskMessages.transitionOption[key])
                                 .join(', ')
                             || 'None'}
-                        </StaticField>
+                        </StaticFieldValue>
                     </div>}
                 </form>
             </Script>
