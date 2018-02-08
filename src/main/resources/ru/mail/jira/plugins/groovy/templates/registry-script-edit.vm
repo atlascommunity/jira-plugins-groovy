@@ -1,3 +1,4 @@
+#* @vtlvariable name="type" type="ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType" *#
 <br/>
 
 <div id="mailru-registry-script-picker"/>
@@ -12,6 +13,7 @@ $webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.work
         renderRegistryScript(
             document.getElementById("mailru-registry-script-picker"),
             "script",
+            "$type.name()",
             #if ($id) $id #else null #end,
             $valuesHtml
         );

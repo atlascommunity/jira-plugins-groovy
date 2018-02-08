@@ -40,7 +40,10 @@ define('/mailru/groovy/i18n-react', function() {
             script: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.script'),
             switchTheme: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.switchTheme'),
             editorMode: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.editorMode'),
-            clearCache: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.clearCache')
+            clearCache: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.clearCache'),
+            condition: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.condition'),
+            validator: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.validator'),
+            function: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.function'),
         },
         error: {
             noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue'),

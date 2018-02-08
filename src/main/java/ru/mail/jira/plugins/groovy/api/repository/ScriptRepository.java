@@ -3,6 +3,7 @@ package ru.mail.jira.plugins.groovy.api.repository;
 import com.atlassian.jira.user.ApplicationUser;
 import ru.mail.jira.plugins.groovy.api.dto.*;
 import ru.mail.jira.plugins.groovy.api.dto.directory.*;
+import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface ScriptRepository {
 
     List<RegistryScriptDto> getAllScripts(boolean includeChangelog);
 
-    List<ScriptDescription> getAllScriptDescriptions();
+    List<ScriptDescription> getAllScriptDescriptions(WorkflowScriptType type);
 
     ScriptDirectoryDto createDirectory(ApplicationUser user, ScriptDirectoryForm form);
 

@@ -4,9 +4,9 @@ import com.atlassian.jira.plugin.workflow.WorkflowPluginValidatorFactory;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.opensymphony.workflow.loader.AbstractDescriptor;
 import com.opensymphony.workflow.loader.ValidatorDescriptor;
+import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
-import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import java.util.Map;
@@ -18,8 +18,8 @@ public class RegistryScriptValidatorFactory extends RegistryScriptWorkflowPlugin
     }
 
     @Override
-    protected String getModuleKey() {
-        return Const.REGISTRY_VALIDATOR_KEY;
+    protected WorkflowScriptType getType() {
+        return WorkflowScriptType.VALIDATOR;
     }
 
     @Override

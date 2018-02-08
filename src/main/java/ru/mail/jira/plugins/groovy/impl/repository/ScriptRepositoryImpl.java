@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.commons.RestFieldException;
+import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
@@ -29,10 +30,7 @@ import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -202,10 +200,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public List<ScriptDescription> getAllScriptDescriptions() {
+    public List<ScriptDescription> getAllScriptDescriptions(WorkflowScriptType type) {
         return Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
             .map(this::buildScriptDescription)
+            .filter(description -> description.getTypes().contains(type))
             .sorted(Comparator.comparing(ScriptDescription::getName))
             .collect(Collectors.toList());
     }
@@ -232,7 +231,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             new DBParam("SCRIPT_BODY", scriptForm.getScriptBody()),
             new DBParam("DIRECTORY_ID", scriptForm.getDirectoryId()),
             new DBParam("DELETED", false),
-            new DBParam("PARAMETERS", parameters)
+            new DBParam("PARAMETERS", parameters),
+            new DBParam("TYPES", scriptForm.getTypes().stream().map(WorkflowScriptType::name).collect(Collectors.joining(",")))
         );
 
         String diff = changelogHelper.generateDiff(script.getID(), "", script.getName(), "", scriptForm.getScriptBody());
@@ -306,6 +306,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         script.setName(form.getName());
         script.setScriptBody(form.getScriptBody());
         script.setParameters(parameters);
+        script.setTypes(form.getTypes().stream().map(WorkflowScriptType::name).collect(Collectors.joining(",")));
         script.save();
 
         auditLogRepository.create(
@@ -368,7 +369,17 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             result.setParams(jsonMapper.read(script.getParameters(), Const.PARAM_LIST_TYPE_REF));
         }
 
+        result.setTypes(parseTypes(script.getTypes()));
+
         return result;
+    }
+
+    private static Set<WorkflowScriptType> parseTypes(String types) {
+        if (types == null) {
+            return EnumSet.allOf(WorkflowScriptType.class);
+        } else {
+            return Arrays.stream(types.split(",")).map(WorkflowScriptType::valueOf).collect(Collectors.toSet());
+        }
     }
 
     private static ScriptDirectoryDto buildDirectoryDto(ScriptDirectory directory) {
@@ -431,6 +442,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             }
         }
 
+        if (form.getTypes() == null || form.getTypes().size() == 0) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "types");
+        }
+
         return parseContext;
     }
 
@@ -438,6 +453,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         ScriptDescription result = new ScriptDescription();
         result.setId(script.getID());
         result.setName(getExpandedName(script));
+        result.setTypes(parseTypes(script.getTypes()));
 
         if (script.getParameters() != null) {
             result.setParams(jsonMapper.read(script.getParameters(), Const.PARAM_LIST_TYPE_REF));

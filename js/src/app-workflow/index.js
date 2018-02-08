@@ -101,9 +101,9 @@ define('mailru/groovy/renderEditor', () => {
 });
 
 define('mailru/groovy/renderRegistryPicker', () => {
-    return (element, fieldName, scriptId, values) => {
+    return (element, fieldName, type, scriptId, values) => {
         ReactDOM.render(
-            <RegistryPicker scriptId={scriptId} values={values} fieldName={fieldName}/>,
+            <RegistryPicker type={type} scriptId={scriptId} values={values} fieldName={fieldName}/>,
             element
         );
     };

@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {Editor} from '../common/Editor';
 import {Bindings} from '../common/bindings';
+import {EditorField} from '../common/ak/EditorField';
+import {CommonMessages} from '../i18n/common.i18n';
 
 
 export class FormEditor extends React.Component {
@@ -19,13 +20,12 @@ export class FormEditor extends React.Component {
 
     render() {
         return <div>
-            <Editor
-                decorated={true}
-                bindings={[
-                    Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars
-                ]}
+            <EditorField
+                label={CommonMessages.script}
+                isRequired={true}
 
-                mode="groovy"
+                bindings={[ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ]}
+
                 value={this.state.value}
                 onChange={this._setValue}
             />

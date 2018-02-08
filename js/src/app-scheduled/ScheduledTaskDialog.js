@@ -162,19 +162,6 @@ export class ScheduledTaskDialog extends React.Component {
 
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
 
-    _toggleTransitionOption = (option) => () => {
-        this.setState(state => {
-            const options = state.values.get('transitionOptions');
-
-            return {
-                values: state.values.set('transitionOptions', {
-                    ...options,
-                    [option]: !options[option]
-                })
-            };
-        });
-    };
-
     _toggleTransitionOption2 = (e) => {
         const option = e.currentTarget.value;
 

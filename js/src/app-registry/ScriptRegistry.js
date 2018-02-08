@@ -13,6 +13,7 @@ import PageHeader from '@atlaskit/page-header';
 import Button, {ButtonGroup} from '@atlaskit/button';
 import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
 import {FieldTextStateless} from '@atlaskit/field-text';
+import Lozenge from '@atlaskit/lozenge';
 
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 import TrashIcon from '@atlaskit/icon/glyph/trash';
@@ -478,7 +479,15 @@ class RegistryScript extends React.Component {
                     ]}
 
                     {...props}
-                />
+                >
+                    <div className="flex-row" style={{marginBottom: '5px'}}>
+                        {script.types.map(type =>
+                            <div style={{marginRight: '5px'}} key={type}>
+                                <Lozenge appearance="new" isBold={true}>{type}</Lozenge>
+                            </div>
+                        )}
+                    </div>
+                </Script>
             </div>
         );
     }

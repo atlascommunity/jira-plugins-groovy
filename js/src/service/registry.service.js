@@ -22,8 +22,8 @@ export class RegistryService {
         return ajaxDelete(`${getPluginBaseUrl()}/registry/directory/${id}`);
     }
 
-    getAllScripts() {
-        return ajaxGet(`${getPluginBaseUrl()}/registry/script/all`);
+    getAllScripts(type) {
+        return ajaxGet(`${getPluginBaseUrl()}/registry/script/${type}/all`);
     }
 
     getScript(id) {

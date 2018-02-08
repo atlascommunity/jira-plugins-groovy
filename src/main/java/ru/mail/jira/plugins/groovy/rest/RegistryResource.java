@@ -6,6 +6,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.websudo.WebSudoRequired;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import ru.mail.jira.plugins.groovy.api.dto.directory.ParentForm;
+import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.dto.directory.ScriptDirectoryForm;
 import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptForm;
@@ -111,13 +112,13 @@ public class RegistryResource {
     }
 
     @GET
-    @Path("/script/all")
+    @Path("/script/{type}/all")
     @WebSudoRequired
-    public Response getAllScripts() {
+    public Response getAllScripts(@PathParam("type") WorkflowScriptType workflowScriptType) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
-            return scriptRepository.getAllScriptDescriptions();
+            return scriptRepository.getAllScriptDescriptions(workflowScriptType);
         }).getResponse();
     }
 

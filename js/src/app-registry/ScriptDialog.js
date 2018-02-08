@@ -6,6 +6,8 @@ import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import Spinner from '@atlaskit/spinner';
+import {Label} from '@atlaskit/field-base';
+import {CheckboxStateless} from '@atlaskit/checkbox';
 
 import Message from 'aui-react/lib/AUIMessage';
 
@@ -47,7 +49,8 @@ export class ScriptDialog extends React.Component {
                     active: true,
                     id: null,
                     values: new Map({
-                        directoryId: directoryId
+                        directoryId: directoryId,
+                        types: []
                     }),
                     parentName: directory.fullName,
                     error: null,
@@ -67,6 +70,7 @@ export class ScriptDialog extends React.Component {
                 id: id,
                 values: new Map({
                     name: data.name,
+                    types: data.types,
                     scriptBody: data.scriptBody,
                     directoryId: data.directoryId
                 }),
@@ -136,6 +140,20 @@ export class ScriptDialog extends React.Component {
 
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
 
+    _toggleType = (e) => {
+        const option = e.currentTarget.value;
+
+        this.setState(state => {
+            const types = state.values.get('types');
+
+            const isRemove = types.includes(option);
+
+            return {
+                values: state.values.set('types', isRemove ? types.filter(type => type !== option) : [...types, option])
+            };
+        });
+    };
+
     render() {
         const {values, parentName, error, modified, active, fetching, waiting} = this.state;
         let errorMessage = null;
@@ -157,7 +175,7 @@ export class ScriptDialog extends React.Component {
             errorField = error.field;
         }
 
-        console.log(error, markers);
+        const types = values.get('types');
 
         return (
             <div>
@@ -191,6 +209,7 @@ export class ScriptDialog extends React.Component {
                             <StaticField label={FieldMessages.parentName}>
                                 {parentName}
                             </StaticField>
+
                             <FieldTextStateless
                                 shouldFitContainer={true}
                                 required={true}
@@ -203,6 +222,31 @@ export class ScriptDialog extends React.Component {
                                 value={values.get('name') || ''}
                                 onChange={this._setTextValue('name')}
                             />
+
+                            <div>
+                                <Label isRequired={true} label={FieldMessages.type}/>
+                                <CheckboxStateless
+                                    isChecked={types.includes('CONDITION')}
+                                    onChange={this._toggleType}
+                                    label={CommonMessages.condition}
+                                    value="CONDITION"
+                                    name="script-type-options"
+                                />
+                                <CheckboxStateless
+                                    isChecked={types.includes('VALIDATOR')}
+                                    onChange={this._toggleType}
+                                    label={CommonMessages.validator}
+                                    value="VALIDATOR"
+                                    name="script-type-options"
+                                />
+                                <CheckboxStateless
+                                    isChecked={types.includes('FUNCTION')}
+                                    onChange={this._toggleType}
+                                    label={CommonMessages.function}
+                                    value="FUNCTION"
+                                    name="script-type-options"
+                                />
+                            </div>
 
                             <EditorField
                                 label={FieldMessages.scriptCode}

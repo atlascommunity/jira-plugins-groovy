@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
@@ -47,7 +48,7 @@ public class WorkflowHelper {
         this.scriptParamFactory = scriptParamFactory;
     }
 
-    public ScriptDescriptor getScript(Map args) {
+    public ScriptDescriptor getScript(Map args, WorkflowScriptType type) {
         Map<String, Object> paramBindings = ImmutableMap.of();
         String scriptString = Base64Util.decode((String) args.get(Const.WF_INLINE_SCRIPT));
         String id = (String) args.get(Const.WF_UUID);
@@ -63,6 +64,10 @@ public class WorkflowHelper {
                         id = String.valueOf(script.getId());
                         scriptString = script.getScriptBody();
                         fromRegistry = true;
+
+                        if (!script.getTypes().contains(type)) {
+                            logger.warn("Script {}({}) is executed with unsupported type: {}", script.getName(), script.getId(), type);
+                        }
 
                         if (script.getParams() != null) {
                             paramBindings = new HashMap<>();
