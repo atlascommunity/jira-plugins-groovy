@@ -190,6 +190,10 @@ public class RestRepositoryImpl implements RestRepository {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
+
+            if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
+            }
         }
     }
 

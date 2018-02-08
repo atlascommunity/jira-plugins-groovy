@@ -28,6 +28,8 @@ public final class Const {
 
     public static final Pattern REST_NAME_PATTERN = Pattern.compile("[a-z0-9_-]{1,64}");
 
+    public static final int COMMENT_MAX_LENGTH = 200;
+
     public static final TypeReference<List<ScriptParamDto>> PARAM_LIST_TYPE_REF = new TypeReference<List<ScriptParamDto>>() {
     };
 

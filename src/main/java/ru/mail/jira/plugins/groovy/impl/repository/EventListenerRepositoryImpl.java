@@ -32,6 +32,7 @@ import ru.mail.jira.plugins.groovy.impl.listener.ConditionType;
 import ru.mail.jira.plugins.groovy.impl.listener.ScriptedEventListener;
 import ru.mail.jira.plugins.groovy.impl.listener.ConditionDescriptor;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
+import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import javax.annotation.Nonnull;
@@ -214,6 +215,10 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         if (!isNew) {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
+            }
+
+            if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
             }
         }
 

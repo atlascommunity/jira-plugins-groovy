@@ -440,6 +440,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
+
+            if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
+            }
         }
 
         if (form.getTypes() == null || form.getTypes().size() == 0) {

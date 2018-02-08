@@ -32,6 +32,7 @@ import ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.cf.ScriptedCFType;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
+import ru.mail.jira.plugins.groovy.util.Const;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -199,6 +200,10 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         if (!isNew) {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
+            }
+
+            if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
             }
         }
     }
