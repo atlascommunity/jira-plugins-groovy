@@ -74,6 +74,9 @@ export class CustomFieldFormContainer extends React.Component {
                             scriptBody: config.scriptBody,
                             changelogs: config.changelogs,
                         }}
+                        template={config.needsTemplate && {
+                            body: config.template
+                        }}
 
                         withChangelog={true}
                         collapsible={false}

@@ -36,7 +36,9 @@ import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.Const;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -139,14 +141,27 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
 
             String diff = changelogHelper.generateDiff(configId, "", "field", "", form.getScriptBody());
 
-            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, "Created.");
+            Map<String, Object> additionalParams = new HashMap<>();
+            if (isTemplated) {
+                String templateDiff = changelogHelper.generateDiff(configId, "", "field", "", form.getTemplate());
+                additionalParams.put("TEMPLATE_DIFF", StringUtils.isEmpty(templateDiff) ? "no changes" : templateDiff);
+            }
+
+            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, "Created.", additionalParams);
 
             action = AuditAction.CREATED;
         } else {
             validate(false, isTemplated, form);
 
             String diff = changelogHelper.generateDiff(configId, "field", "field", fieldConfig.getScriptBody(), form.getScriptBody());
-            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, form.getComment());
+
+            Map<String, Object> additionalParams = new HashMap<>();
+            if (isTemplated) {
+                String templateDiff = changelogHelper.generateDiff(configId, "field", "field", fieldConfig.getTemplate(), form.getTemplate());
+                additionalParams.put("TEMPLATE_DIFF", StringUtils.isEmpty(templateDiff) ? "no changes" : templateDiff);
+            }
+
+            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, form.getComment(), additionalParams);
 
             fieldConfig.setCacheable(form.isCacheable());
             fieldConfig.setScriptBody(form.getScriptBody());

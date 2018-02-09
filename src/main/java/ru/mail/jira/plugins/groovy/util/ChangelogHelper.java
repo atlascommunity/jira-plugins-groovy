@@ -7,17 +7,16 @@ import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.Patch;
-import net.java.ao.DBParam;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.entity.AbstractChangelog;
+import ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog;
 
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -68,6 +67,10 @@ public final class ChangelogHelper {
         result.setDiff(changelog.getDiff());
         result.setDate(dateTimeFormatter.forLoggedInUser().format(changelog.getDate()));
 
+        if (changelog instanceof FieldConfigChangelog) {
+            result.setTemplateDiff(((FieldConfigChangelog) changelog).getTemplateDiff());
+        }
+
         return result;
     }
 
@@ -87,13 +90,29 @@ public final class ChangelogHelper {
     }
 
     public void addChangelog(Class<? extends AbstractChangelog> clazz, String fkField, int scriptId, String userKey, String diff, String comment) {
+        addChangelog(clazz, fkField, scriptId, userKey, diff, comment, ImmutableMap.of());
+    }
+
+    public void addChangelog(
+        Class<? extends AbstractChangelog> clazz,
+        String fkField,
+        int scriptId,
+        String userKey,
+        String diff,
+        String comment,
+        Map<String, Object> additionalParams
+    ) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("AUTHOR_KEY", userKey);
+        params.put(fkField, scriptId);
+        params.put("DATE", new Timestamp(System.currentTimeMillis()));
+        params.put("DIFF", StringUtils.isEmpty(diff) ? "no changes" : diff);
+        params.put("COMMENT", comment);
+        params.putAll(additionalParams);
+
         ao.create(
             clazz,
-            new DBParam("AUTHOR_KEY", userKey),
-            new DBParam(fkField, scriptId),
-            new DBParam("DATE", new Timestamp(System.currentTimeMillis())),
-            new DBParam("DIFF", StringUtils.isEmpty(diff) ? "no changes" : diff),
-            new DBParam("COMMENT", comment)
+            params
         );
     }
 

@@ -8,4 +8,7 @@ public interface FieldConfigChangelog extends AbstractChangelog {
     @NotNull
     void setFieldConfig(FieldConfig fieldConfig);
     FieldConfig getFieldConfig();
+
+    String getTemplateDiff();
+    void setTemplateDiff();
 }

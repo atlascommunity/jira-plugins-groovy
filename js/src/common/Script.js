@@ -35,6 +35,9 @@ export class Script extends React.Component {
             inline: PropTypes.bool,
             changelogs: PropTypes.array
         }),
+        template: PropTypes.shape({
+            body: PropTypes.string
+        }),
         onEdit: PropTypes.func,
         onDelete: PropTypes.func,
 
@@ -107,63 +110,53 @@ export class Script extends React.Component {
             activeSource: {
                 type: 'diff',
                 id: changelog.id,
-                source: changelog.diff
+                source: changelog.diff,
+                templateSource: changelog.templateDiff
             }
         });
     };
 
     render() {
-        const {script, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons, headerless} = this.props;
+        const {script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons, headerless} = this.props;
         const {activeSource, showCode, executions, executionsReady} = this.state;
 
         let codeBlock = null;
+        let templateBlock = null;
         let executionBar = null;
 
         const isOpen = showCode || !collapsible;
 
         if (isOpen) {
-            let changelog = null;
-
-            if (withChangelog) {
-                changelog = (
-                    <div className="scriptChangelogs" style={{width: '150px'}}>
-                        <div key="current" className="scriptChangelog" onClick={this._switchToCurrent}>
-                            <div className="changelogContent">
-                                <strong>{CommonMessages.currentVersion}</strong>
-                            </div>
-                        </div>
-                        {script && script.changelogs && script.changelogs.map(changelog =>
-                            <div key={changelog.id} className="scriptChangelog" onClick={this._switchToChangelog(changelog)}>
-                                <div className="changelogContent">
-                                    <div>
-                                        <strong>
-                                            {changelog.comment}
-                                        </strong>
-                                    </div>
-                                    <div className="changelogSecondary">
-                                        {changelog.date}
-                                        <div>
-                                            {changelog.author.avatarUrl ? <Avatar src={changelog.author.avatarUrl} size="xsmall"/> : null}
-                                            {' '}{changelog.author.displayName}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+            if (template) {
+                templateBlock = (
+                    <div style={{overflow: 'hidden'}}>
+                        <Editor
+                            readOnly={true}
+                            mode={activeSource.id === 'current' ? 'velocity' : 'diff'}
+                            value={activeSource.id === 'current' ? template.body : activeSource.templateSource}
+                        />
                     </div>
                 );
             }
 
             codeBlock = (
                 <div className="flex-row editor">
-                    {changelog}
-                    <div className="flex-grow" style={{overflow: 'hidden'}}>
-                        <Editor
-                            mode={activeSource.type}
-
-                            readOnly={true}
-                            value={activeSource.id === 'current' ? script.scriptBody : activeSource.source}
+                    {withChangelog &&
+                        <Changelog
+                            changelogs={script && script.changelogs}
+                            switchToChangelog={this._switchToChangelog}
+                            switchToCurrent={this._switchToCurrent}
                         />
+                    }
+                    <div className="flex-grow flex-column">
+                        <div style={{overflow: 'hidden'}}>
+                            <Editor
+                                readOnly={true}
+                                mode={activeSource.id === 'current' ? 'groovy' : 'diff'}
+                                value={activeSource.id === 'current' ? script.scriptBody : activeSource.source}
+                            />
+                        </div>
+                        {templateBlock}
                     </div>
                 </div>
             );
@@ -179,7 +172,7 @@ export class Script extends React.Component {
         }
 
         return (
-            <div className={`scriptRow ${!isOpen ? 'collapsed' : ''}`}>
+            <div className={`scriptRow ${!isOpen ? 'collapsed' : ''} ${template ? 'withTemplate' : ''}`}>
                 {!headerless &&
                     <div className="flex-row title">
                         {title ?
@@ -241,3 +234,39 @@ export class Script extends React.Component {
         );
     }
 }
+
+function Changelog({changelogs, switchToCurrent, switchToChangelog}) {
+    return (
+        <div className="scriptChangelogs" style={{width: '150px'}}>
+            <div key="current" className="scriptChangelog" onClick={switchToCurrent}>
+                <div className="changelogContent">
+                    <strong>{CommonMessages.currentVersion}</strong>
+                </div>
+            </div>
+            {changelogs && changelogs.map(changelog =>
+                <div key={changelog.id} className="scriptChangelog" onClick={switchToChangelog(changelog)}>
+                    <div className="changelogContent">
+                        <div>
+                            <strong>
+                                {changelog.comment}
+                            </strong>
+                        </div>
+                        <div className="changelogSecondary">
+                            {changelog.date}
+                            <div>
+                                {changelog.author.avatarUrl ? <Avatar src={changelog.author.avatarUrl} size="xsmall"/> : null}
+                                {' '}{changelog.author.displayName}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+Changelog.propTypes = {
+    changelogs: PropTypes.array,
+    switchToCurrent: PropTypes.func,
+    switchToChangelog: PropTypes.func
+};
