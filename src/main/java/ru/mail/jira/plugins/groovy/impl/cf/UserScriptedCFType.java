@@ -17,6 +17,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 
 //todo: maybe extend UserCFType, so it can be used in permission schemes
 @Scanned
@@ -51,4 +52,10 @@ public class UserScriptedCFType extends ScriptedCFType<ApplicationUser, Applicat
             )
         );
     }
+
+    @Override
+    public void fillStaticVelocityParams(Map<String, Object> params) {}
+
+    @Override
+    public void fillDynamicVelocityParams(Map<String, Object> params, Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {}
 }

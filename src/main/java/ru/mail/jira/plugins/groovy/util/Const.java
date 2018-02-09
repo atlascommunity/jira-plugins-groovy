@@ -1,14 +1,29 @@
 package ru.mail.jira.plugins.groovy.util;
 
+import com.google.common.collect.ImmutableMap;
 import org.codehaus.jackson.type.TypeReference;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public final class Const {
     private Const() {
     }
+
+    public static final Map<String, Class> SEARCHER_TYPES = ImmutableMap
+        .<String, Class>builder()
+        .put("com.atlassian.jira.plugin.system.customfieldtypes:exactnumber", Double.class)
+        .put("com.atlassian.jira.plugin.system.customfieldtypes:numberrange", Double.class)
+        .put("com.atlassian.jira.plugin.system.customfieldtypes:textsearcher", String.class)
+        .put("com.atlassian.jira.plugin.system.customfieldtypes:exacttextsearcher", String.class)
+        .put("com.atlassian.jira.plugin.system.customfieldtypes:datetimerange", Date.class)
+        .put("com.atlassian.jira.plugin.system.customfieldtypes:daterange", Date.class)
+        //todo: leave object for now, need to figure out how to provide several types
+        .put("com.atlassian.jira.plugin.system.customfieldtypes:userpickergroupsearcher", Object.class)
+        .build();
 
     public static final String PLUGIN_KEY = "ru.mail.jira.plugins.groovy";
 

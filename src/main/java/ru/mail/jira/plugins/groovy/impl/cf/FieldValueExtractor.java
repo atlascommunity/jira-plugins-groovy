@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.impl.cf;
 
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.customfields.CustomFieldSearcher;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.config.FieldConfig;
 import com.google.common.collect.ImmutableMap;
@@ -13,6 +14,7 @@ import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScript;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
+import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
 import java.util.HashMap;
@@ -50,6 +52,13 @@ public class FieldValueExtractor {
         return null;
     }
 
+    public ValueHolder preview(Issue issue, CustomField field, FieldScript script) {
+        CustomFieldSearcher searcher = field.getCustomFieldSearcher();
+        Class type = searcher != null ?
+            Const.SEARCHER_TYPES.getOrDefault(searcher.getDescriptor().getCompleteKey(), Object.class) : Object.class;
+        return extractValueHolder(script, field, issue, type);
+    }
+
     public <T> T extractValue(CustomField field, Issue issue, Class<T> tType) {
         return tType.cast(extractValueHolder(field, issue, tType).getValue());
     }
@@ -61,6 +70,10 @@ public class FieldValueExtractor {
 
         FieldScript script = getScript(field, issue);
 
+        return extractValueHolder(script, field, issue, tType);
+    }
+
+    public ValueHolder extractValueHolder(FieldScript script, CustomField field, Issue issue, Class tType) {
         if (script != null && script.getScriptBody() != null && script.getId() != null) {
             if (script.isCacheable()) {
                 try {

@@ -58,12 +58,12 @@ public class DateScriptedCFType extends ScriptedCFType<Date, Date> implements Da
         }
     }
 
-    @Nonnull
     @Override
-    public Map<String, Object> getVelocityParameters(Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
-        Map<String, Object> parameters = super.getVelocityParameters(issue, field, fieldLayoutItem);
-        parameters.put("dateFieldFormat", this.dateFieldFormat);
-        parameters.put("iso8601Formatter", this.iso8601Formatter);
-        return parameters;
+    public void fillStaticVelocityParams(Map<String, Object> params) {
+        params.put("dateFieldFormat", this.dateFieldFormat);
+        params.put("iso8601Formatter", this.iso8601Formatter);
     }
+
+    @Override
+    public void fillDynamicVelocityParams(Map<String, Object> params, Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {}
 }

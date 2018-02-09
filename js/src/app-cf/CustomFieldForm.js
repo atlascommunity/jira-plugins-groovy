@@ -6,6 +6,7 @@ import {Map} from 'immutable';
 import Button, {ButtonGroup} from '@atlaskit/button';
 import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
+import {FieldTextStateless} from '@atlaskit/field-text';
 
 import {fieldConfigService} from '../service/services';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
@@ -38,6 +39,8 @@ export class CustomFieldForm extends React.Component {
                 velocityParamsEnabled: fieldConfig.velocityParamsEnabled,
                 comment: fieldConfig.comment
             }),
+            previewKey: '',
+            previewResult: null,
             error: null
         };
     }
@@ -80,9 +83,25 @@ export class CustomFieldForm extends React.Component {
     _setTemplate = this._setObjectValue('template');
     _setScript = this._setObjectValue('scriptBody');
 
+    _setPreviewKey = (e) => this.setState({previewKey: e.target.value});
+
+    _preview = () => {
+        fieldConfigService
+            .preview(
+                this.props.id,
+                {
+                    issueKey: this.state.previewKey,
+                    configForm: this.state.values.toJS()
+                }
+            )
+            .then(
+                previewResult => this.setState({ previewResult })
+            );
+    };
+
     render() {
         const {fieldConfig} = this.props;
-        const {values, error} = this.state;
+        const {values, error, previewKey, previewResult} = this.state;
 
         let errorMessage = null;
         let errorField = null;
@@ -164,6 +183,26 @@ export class CustomFieldForm extends React.Component {
                             <Button appearance="link" onClick={this.props.onCancel}>{CommonMessages.cancel}</Button>
                         }
                     </ButtonGroup>
+                </div>
+
+                <div className="flex-column" style={{marginTop: '20px'}}>
+                    <FieldTextStateless
+                        label="Issue key"
+
+                        value={previewKey}
+                        onChange={this._setPreviewKey}
+                    />
+                    <div style={{marginTop: '10px'}}>
+                        <Button appearance="primary" onClick={this._preview}>Preview</Button>
+                    </div>
+
+                    {previewResult &&
+                        <div>
+                            Completed in {previewResult.time}:
+
+                            <div dangerouslySetInnerHTML={{__html: previewResult.htmlResult}}/>
+                        </div>
+                    }
                 </div>
             </div>
         );

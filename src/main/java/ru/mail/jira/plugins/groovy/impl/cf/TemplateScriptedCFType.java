@@ -10,33 +10,19 @@ import com.atlassian.jira.issue.fields.rest.json.JsonType;
 import com.atlassian.jira.issue.fields.rest.json.JsonTypeBuilder;
 import com.atlassian.jira.util.velocity.NumberTool;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
-import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScript;
 import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
+import ru.mail.jira.plugins.groovy.util.Const;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Date;
 import java.util.Map;
 
 //todo: preview
 //todo: show template (&changelog) along with script
 @Scanned
 public class TemplateScriptedCFType extends ScriptedCFType<Object, Object> {
-    private static final Map<String, Class> searcherTypes = ImmutableMap
-        .<String, Class>builder()
-        .put("com.atlassian.jira.plugin.system.customfieldtypes:exactnumber", Double.class)
-        .put("com.atlassian.jira.plugin.system.customfieldtypes:numberrange", Double.class)
-        .put("com.atlassian.jira.plugin.system.customfieldtypes:textsearcher", String.class)
-        .put("com.atlassian.jira.plugin.system.customfieldtypes:exacttextsearcher", String.class)
-        .put("com.atlassian.jira.plugin.system.customfieldtypes:datetimerange", Date.class)
-        .put("com.atlassian.jira.plugin.system.customfieldtypes:daterange", Date.class)
-        //todo: leave object for now, need to figure out how to provide several types
-        .put("com.atlassian.jira.plugin.system.customfieldtypes:userpickergroupsearcher", Object.class)
-        .build();
-
     private final Logger logger = LoggerFactory.getLogger(TemplateScriptedCFType.class);
     private final FieldValueExtractor valueExtractor;
 
@@ -48,19 +34,20 @@ public class TemplateScriptedCFType extends ScriptedCFType<Object, Object> {
         this.valueExtractor = valueExtractor;
     }
 
-    @Nonnull
     @Override
-    public Map<String, Object> getVelocityParameters(Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
+    public void fillStaticVelocityParams(Map<String, Object> params) {
+        params.put("numberTool", new NumberTool(this.getI18nBean().getLocale()));
+    }
+
+    @Override
+    public void fillDynamicVelocityParams(Map<String, Object> params, Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
         FieldScript script = valueExtractor.getScript(field, issue);
 
-        Map<String, Object> params = super.getVelocityParameters(issue, field, fieldLayoutItem);
         params.put("template", script != null ? script.getTemplate() : "");
-        params.put("numberTool", new NumberTool(this.getI18nBean().getLocale()));
 
         if (script != null && script.isWithVelocityParams()) {
             params.putAll(valueExtractor.extractValueHolder(field, issue, getType(field)).getVelocityParams());
         }
-        return params;
     }
 
     @Nullable
@@ -73,7 +60,7 @@ public class TemplateScriptedCFType extends ScriptedCFType<Object, Object> {
         CustomFieldSearcher searcher = field.getCustomFieldSearcher();
         if (searcher != null) {
             String searcherKey = searcher.getDescriptor().getCompleteKey();
-            Class searcherType = searcherTypes.get(searcherKey);
+            Class searcherType = Const.SEARCHER_TYPES.get(searcherKey);
             if (searcherType != null) {
                 return searcherType;
             } else {

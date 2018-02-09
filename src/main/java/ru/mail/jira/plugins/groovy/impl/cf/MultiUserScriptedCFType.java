@@ -18,6 +18,7 @@ import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 //todo: maybe extend MultiUserCFType, so it can be used in permission schemes
 @Scanned
@@ -52,4 +53,10 @@ public class MultiUserScriptedCFType extends ScriptedCFType<List, ApplicationUse
             )
         );
     }
+
+    @Override
+    public void fillStaticVelocityParams(Map<String, Object> params) {}
+
+    @Override
+    public void fillDynamicVelocityParams(Map<String, Object> params, Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {}
 }

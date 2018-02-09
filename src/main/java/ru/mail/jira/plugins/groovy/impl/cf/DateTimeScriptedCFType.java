@@ -56,14 +56,14 @@ public class DateTimeScriptedCFType extends ScriptedCFType<Date, Date> implement
         }
     }
 
-    @Nonnull
     @Override
-    public Map<String, Object> getVelocityParameters(Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
-        Map<String, Object> parameters = super.getVelocityParameters(issue, field, fieldLayoutItem);
-        parameters.put("dateTimePicker", Boolean.TRUE);
-        parameters.put("datePickerFormatter", this.datePickerFormatter);
-        parameters.put("titleFormatter", this.datePickerFormatter.withStyle(DateTimeStyle.COMPLETE));
-        parameters.put("iso8601Formatter", this.datePickerFormatter.withStyle(DateTimeStyle.ISO_8601_DATE_TIME));
-        return parameters;
+    public void fillStaticVelocityParams(Map<String, Object> params) {
+        params.put("dateTimePicker", Boolean.TRUE);
+        params.put("datePickerFormatter", this.datePickerFormatter);
+        params.put("titleFormatter", this.datePickerFormatter.withStyle(DateTimeStyle.COMPLETE));
+        params.put("iso8601Formatter", this.datePickerFormatter.withStyle(DateTimeStyle.ISO_8601_DATE_TIME));
     }
+
+    @Override
+    public void fillDynamicVelocityParams(Map<String, Object> params, Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {}
 }
