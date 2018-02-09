@@ -14,6 +14,8 @@ import {EditorField} from '../common/ak/EditorField';
 import {CommonMessages} from '../i18n/common.i18n';
 
 
+const bindings = [Bindings.currentUser];
+
 export class ScriptConsole extends React.Component {
     state = {
         script: '',
@@ -94,7 +96,7 @@ export class ScriptConsole extends React.Component {
 
                     resizable={true}
                     markers={markers}
-                    bindings={[Bindings.currentUser]}
+                    bindings={bindings}
 
                     value={script}
                     onChange={this._scriptChange}

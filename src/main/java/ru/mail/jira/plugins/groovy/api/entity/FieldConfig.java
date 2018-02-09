@@ -21,6 +21,13 @@ public interface FieldConfig extends Entity {
     String getScriptBody();
     void setScriptBody(String scriptBody);
 
+    @StringLength(StringLength.UNLIMITED)
+    String getTemplate();
+    void setTemplate(String template);
+
+    boolean isVelocityParamsEnabled();
+    void setVelocityParamsEnabled(boolean velocityParamsEnabled);
+
     @NotNull
     Boolean getCacheable();
     void setCacheable(Boolean cacheable);

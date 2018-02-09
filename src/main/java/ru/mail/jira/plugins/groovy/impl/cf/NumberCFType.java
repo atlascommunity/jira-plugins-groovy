@@ -25,7 +25,6 @@ public class NumberCFType extends ScriptedCFType<Number, Number> {
         Map<String, Object> map = super.getVelocityParameters(issue, field, fieldLayoutItem);
         map.put("numberTool", new NumberTool(this.getI18nBean().getLocale()));
         return map;
-
     }
 
     @Override

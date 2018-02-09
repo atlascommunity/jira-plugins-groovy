@@ -17,5 +17,9 @@ public class FieldScript {
     @XmlElement
     private String scriptBody;
     @XmlElement
+    private String template;
+    @XmlElement
     private boolean cacheable;
+    @XmlElement
+    private boolean withVelocityParams;
 }

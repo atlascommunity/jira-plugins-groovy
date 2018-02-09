@@ -25,6 +25,8 @@ import {EditorField} from '../common/ak/EditorField';
 import {StaticField} from '../common/ak/StaticField';
 
 
+const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
+
 @connect(null, RegistryActionCreators, null, {withRef: true})
 export class ScriptDialog extends React.Component {
     state = {
@@ -139,6 +141,8 @@ export class ScriptDialog extends React.Component {
     _setTextValue = (field) => (event) => this.mutateValue(field, event.target.value);
 
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
+
+    _setScript = this._setObjectValue('scriptBody');
 
     _toggleType = (e) => {
         const option = e.currentTarget.value;
@@ -257,12 +261,10 @@ export class ScriptDialog extends React.Component {
                                 invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
                                 markers={markers}
 
-                                bindings={[
-                                    Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars
-                                ]}
+                                bindings={bindings}
 
                                 value={values.get('scriptBody') || ''}
-                                onChange={this._setObjectValue('scriptBody')}
+                                onChange={this._setScript}
                             />
 
                             {!!this.state.id &&

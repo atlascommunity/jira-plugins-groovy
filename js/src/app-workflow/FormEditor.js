@@ -6,6 +6,8 @@ import {EditorField} from '../common/ak/EditorField';
 import {CommonMessages} from '../i18n/common.i18n';
 
 
+const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
+
 export class FormEditor extends React.Component {
     static propTypes = {
         initialValue: PropTypes.string,
@@ -24,7 +26,7 @@ export class FormEditor extends React.Component {
                 label={CommonMessages.script}
                 isRequired={true}
 
-                bindings={[ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ]}
+                bindings={bindings}
 
                 value={this.state.value}
                 onChange={this._setValue}

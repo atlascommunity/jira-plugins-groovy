@@ -37,6 +37,8 @@ import {EditorField} from '../common/ak/EditorField';
 //IssueWatcherAddedEvent
 //IssueWatcherDeletedEvent
 
+const issueEventBindings = [Bindings.issueEvent];
+
 function extractShortClassName(className) {
     if (className.indexOf('.') !== -1) {
         const tokens = className.split('.');
@@ -188,7 +190,7 @@ export class ListenerDialog extends React.Component {
             const condition = values.get('condition');
             if (condition && condition.type) {
                 if (condition.type === 'ISSUE') {
-                    bindings = [Bindings.issueEvent];
+                    bindings = issueEventBindings;
                 } else {
                     const className = condition.className;
                     if (className) {

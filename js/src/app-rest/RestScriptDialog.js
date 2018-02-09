@@ -24,6 +24,7 @@ import {EditorField} from '../common/ak/EditorField';
 
 
 const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { content: method, value: method }; });
+const bindings = [ Bindings.method, Bindings.uriInfo, Bindings.body, Bindings.currentUser ];
 
 @connect(
     () => { return{}; },
@@ -205,9 +206,7 @@ export class RestScriptDialog extends React.Component {
                         invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
                         markers={markers}
 
-                        bindings={[
-                            Bindings.method, Bindings.uriInfo, Bindings.body, Bindings.currentUser
-                        ]}
+                        bindings={bindings}
 
                         value={values.get('scriptBody') || ''}
                         onChange={this._setObjectValue('scriptBody')}

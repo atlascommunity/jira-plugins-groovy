@@ -3,15 +3,19 @@ import PropTypes from 'prop-types';
 
 import {Map} from 'immutable';
 
-import Button from 'aui-react/lib/AUIButton';
+import Button, {ButtonGroup} from '@atlaskit/button';
+import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
+import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 
 import {fieldConfigService} from '../service/services';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
-import {Editor} from '../common/Editor';
-import {AUIRequired} from '../common/aui-components';
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
+import {EditorField} from '../common/ak/EditorField';
 
+
+const bindings = [ Bindings.issue ];
+const bindingsWithVelocity = [ Bindings.issue, Bindings.velocityParams ];
 
 export class CustomFieldForm extends React.Component {
     static propTypes = {
@@ -30,6 +34,8 @@ export class CustomFieldForm extends React.Component {
             values: new Map({
                 scriptBody: fieldConfig.scriptBody,
                 cacheable: fieldConfig.cacheable,
+                template: fieldConfig.template,
+                velocityParamsEnabled: fieldConfig.velocityParamsEnabled,
                 comment: fieldConfig.comment
             }),
             error: null
@@ -69,16 +75,19 @@ export class CustomFieldForm extends React.Component {
 
     _setTextValue = (field) => (event) => this._mutateValue(field, event.target.value);
 
-    _setToggleValue = (field) => e => this._mutateValue(field, e.target.checked);
+    _setToggleValue = field => e => this._mutateValue(field, e.currentTarget.checked);
+
+    _setTemplate = this._setObjectValue('template');
+    _setScript = this._setObjectValue('scriptBody');
 
     render() {
+        const {fieldConfig} = this.props;
         const {values, error} = this.state;
 
         let errorMessage = null;
         let errorField = null;
 
         let markers = null;
-        let annotations = null;
 
         if (error) {
             if (error.field === 'scriptBody' && Array.isArray(error.error)) {
@@ -93,61 +102,70 @@ export class CustomFieldForm extends React.Component {
             errorField = error.field;
         }
 
+        const velocityParamsEnabled = values.get('velocityParamsEnabled');
         return (
-            <form className="aui top-label" onSubmit={this._onSubmit}>
-                <div className="field-group">
-                    <div className="checkbox">
-                        <input
-                            className="checkbox"
-                            type="checkbox"
-                            id="field-form-cacheable"
+            <div className="flex-column">
+                <CheckboxGroup>
+                    <CheckboxStateless
+                        label={FieldMessages.cacheable}
 
-                            onChange={this._setToggleValue('cacheable')}
-                            checked={values.get('cacheable')}
-                        />
-                        <label htmlFor="field-form-cacheable">{FieldMessages.cacheable}</label>
-                    </div>
-                </div>
-                <div className="field-group">
-                    <label>{FieldMessages.scriptCode}</label>
-                    <Editor
-                        mode="groovy"
-                        decorated={true}
-                        bindings={[
-                            Bindings.issue
-                        ]}
-
-                        value={values.get('scriptBody')}
-                        onChange={this._setObjectValue('scriptBody')}
-
-                        markers={markers}
-                        annotations={annotations}
+                        onChange={this._setToggleValue('cacheable')}
+                        isChecked={values.get('cacheable')}
                     />
-                    {errorField === 'scriptBody' && <div className="error">{errorMessage}</div>}
-                </div>
-                {this.props.fieldConfig.uuid &&
-                    <div className="field-group">
-                        <label htmlFor="field-form-comment">
-                            {FieldMessages.comment}
-                            <AUIRequired/>
-                        </label>
-                        <textarea
-                            id="field-form-comment"
-                            className="textarea full-width-field"
+                    <CheckboxStateless
+                        label="Velocity params"
 
-                            value={values.get('comment') || ''}
-                            onChange={this._setTextValue('comment')}
-                        />
-                        {errorField === 'comment' && <div className="error">{errorMessage}</div>}
-                    </div>
+                        onChange={this._setToggleValue('velocityParamsEnabled')}
+                        isChecked={velocityParamsEnabled}
+                    />
+                </CheckboxGroup>
+                <EditorField
+                    label={FieldMessages.scriptCode}
+                    isRequired={true}
+
+                    bindings={velocityParamsEnabled ? bindingsWithVelocity : bindings}
+
+                    value={values.get('scriptBody')}
+                    onChange={this._setScript}
+
+                    markers={markers}
+                />
+
+                {fieldConfig.needsTemplate &&
+                    <EditorField
+                        label="Template" //todo
+                        isRequired={true}
+
+                        mode="velocity"
+                        //todo: bindings={[ Bindings.issue ]}
+
+                        value={values.get('template')}
+                        onChange={this._setTemplate}
+                    />
                 }
-                <div className="field-group">
-                    <Button type="primary" onClick={this._onSubmit}>{CommonMessages.update}</Button>
-                    {this.props.fieldConfig.uuid &&
-                        <button className="aui-button aui-button-link" onClick={this.props.onCancel}>{CommonMessages.cancel}</button>
-                    }
+
+                {fieldConfig.uuid &&
+                    <FieldTextAreaStateless
+                        shouldFitContainer={true}
+                        required={true}
+
+                        isInvalid={errorField === 'comment'}
+                        invalidMessage={errorField === 'comment' ? errorMessage : null}
+
+                        label={FieldMessages.comment}
+                        value={values.get('comment') || ''}
+                        onChange={this._setTextValue('comment')}
+                    />
+                }
+                <div style={{marginTop: '10px'}}>
+                    <ButtonGroup>
+                        <Button appearance="primary" onClick={this._onSubmit}>{CommonMessages.update}</Button>
+                        {fieldConfig.uuid &&
+                            <Button appearance="link" onClick={this.props.onCancel}>{CommonMessages.cancel}</Button>
+                        }
+                    </ButtonGroup>
                 </div>
-            </form>
+            </div>
         );
     }
 }

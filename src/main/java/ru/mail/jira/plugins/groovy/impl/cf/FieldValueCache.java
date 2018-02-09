@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Component
 public class FieldValueCache {
@@ -38,13 +37,6 @@ public class FieldValueCache {
     public void invalidateAll() {
         logger.debug("invalidating all values");
         cache.invalidateAll();
-    }
-
-    @AllArgsConstructor
-    @Getter
-    public static class ValueHolder {
-        private final long lastModified;
-        private final Object value;
     }
 
     @Getter

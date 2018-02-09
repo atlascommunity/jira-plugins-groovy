@@ -12,7 +12,11 @@ public class FieldConfigForm {
     @XmlElement
     private String scriptBody;
     @XmlElement
+    private String template;
+    @XmlElement
     private String comment;
     @XmlElement
     private boolean cacheable;
+    @XmlElement
+    private boolean velocityParamsEnabled;
 }

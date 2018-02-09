@@ -32,6 +32,9 @@ import {EditorField} from '../common/ak/EditorField';
 import {JqlInput} from '../common/ak/JqlInput';
 
 
+const issueBindings = [Bindings.issue];
+const emptyBindings = [];
+
 function getValue(option) {
     return option ? option.value : null;
 }
@@ -210,10 +213,10 @@ export class ScheduledTaskDialog extends React.Component {
                 switch (currentType) {
                     case 'ISSUE_JQL_SCRIPT':
                     case 'DOCUMENT_ISSUE_JQL_SCRIPT':
-                        bindings = [Bindings.issue];
+                        bindings = issueBindings;
                         break;
                     default:
-                        bindings = [];
+                        bindings = emptyBindings;
                 }
 
                 return (

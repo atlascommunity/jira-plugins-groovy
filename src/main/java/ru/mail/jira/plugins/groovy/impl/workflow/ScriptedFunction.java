@@ -6,6 +6,7 @@ import com.opensymphony.module.propertyset.PropertySet;
 import com.opensymphony.workflow.WorkflowException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 
 import java.util.Map;
@@ -21,7 +22,7 @@ public class ScriptedFunction extends AbstractJiraFunctionProvider {
 
     @Override
     public void execute(Map transientVars, Map args, PropertySet ps) throws WorkflowException {
-        ScriptDescriptor script = workflowHelper.getScript(args);
+        ScriptDescriptor script = workflowHelper.getScript(args, WorkflowScriptType.FUNCTION);
 
         if (script == null) {
             logger.error("script must be present");

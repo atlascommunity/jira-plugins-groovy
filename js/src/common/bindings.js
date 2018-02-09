@@ -61,5 +61,10 @@ export const Bindings = {
         name: 'body',
         className: 'String',
         fullClassName: 'java.lang.String'
+    },
+    velocityParams: {
+        name: 'velocityParams',
+        className: 'Map<String, Object>',
+        fullClassName: 'java.util.map'
     }
 };

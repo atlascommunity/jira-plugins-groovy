@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import Base, {Label} from '@atlaskit/field-base';
 
-import {Editor, MarkerShape, BindingShape} from '../Editor';
+import {Editor, MarkerShape, BindingShape} from '../editor/Editor';
 
 import './EditorField.less';
 
@@ -11,6 +11,7 @@ import './EditorField.less';
 export class EditorField extends React.Component {
     static propTypes = {
         label: PropTypes.string.isRequired,
+        mode: PropTypes.string.isRequired,
         isLabelHidden: PropTypes.bool,
 
         value: PropTypes.string.isRequired,
@@ -25,6 +26,10 @@ export class EditorField extends React.Component {
 
         isRequired: PropTypes.bool,
         isDisabled: PropTypes.bool
+    };
+
+    static defaultProps = {
+        mode: 'groovy'
     };
 
     _decorateEditor = (editor) => {
@@ -45,23 +50,14 @@ export class EditorField extends React.Component {
     };
 
     render() {
-        const {label, isRequired, isLabelHidden, isDisabled, markers, resizable, bindings, value, onChange} = this.props;
+        const {label, isRequired, isLabelHidden, ...props} = this.props;
 
         return (
             <div className="ak-editor">
                 <Label label={label} isRequired={isRequired} isLabelHidden={isLabelHidden}/>
                 <Editor
-                    mode="groovy"
                     decorator={this._decorateEditor}
-
-                    isDisabled={isDisabled}
-                    markers={markers}
-
-                    bindings={bindings}
-                    resizable={resizable}
-
-                    onChange={onChange}
-                    value={value}
+                    {...props}
                 />
             </div>
         );

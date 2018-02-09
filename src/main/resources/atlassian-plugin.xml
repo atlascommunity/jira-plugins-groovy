@@ -469,4 +469,21 @@
         <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="exactnumber"/>
         <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="numberrange"/>
     </customfield-type>
+
+    <customfield-type key="groovy-template-field" name="Groovy template field" class="ru.mail.jira.plugins.groovy.impl.cf.TemplateScriptedCFType">
+        <description>
+            Scripted template custom field type.
+        </description>
+
+        <resource type="velocity" name="view" location="ru/mail/jira/plugins/groovy/templates/template-cf.vm"/>
+        <resource type="velocity" name="xml" location="templates/plugins/fields/xml/xml-basictext.vm"/>
+
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="exactnumber"/>
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="numberrange"/>
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="textsearcher"/>
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="exacttextsearcher"/>
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="datetimerange"/>
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="daterange"/>
+        <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="userpickergroupsearcher"/>
+    </customfield-type>
 </atlassian-plugin>

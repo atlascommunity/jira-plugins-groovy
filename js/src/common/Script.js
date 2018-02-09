@@ -10,7 +10,7 @@ import EditIcon from '@atlaskit/icon/glyph/edit-filled';
 import TrashIcon from '@atlaskit/icon/glyph/trash';
 import BitbucketSourceIcon from '@atlaskit/icon/glyph/bitbucket/source';
 
-import {Editor} from './Editor';
+import {Editor} from './editor/Editor';
 
 import {ExecutionBar} from '../execution/ExecutionBar';
 import {CommonMessages} from '../i18n/common.i18n';

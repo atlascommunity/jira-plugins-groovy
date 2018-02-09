@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import 'codemirror/mode/groovy/groovy';
 import 'codemirror/mode/diff/diff';
+import 'codemirror/mode/velocity/velocity';
 import 'codemirror/addon/selection/mark-selection';
 import 'codemirror/addon/lint/lint';
 
@@ -11,10 +12,10 @@ import InlineMessage from '@atlaskit/inline-message';
 import {Controlled as CodeMirror} from 'react-codemirror2';
 import {Resizable} from 'react-resizable';
 
-import {globalBindings} from './bindings';
+import {globalBindings} from '../bindings';
 
-import {preferenceService} from '../service/services';
-import {CommonMessages} from '../i18n/common.i18n';
+import {preferenceService} from '../../service/services';
+import {CommonMessages} from '../../i18n/common.i18n';
 
 import './Editor.less';
 
@@ -38,6 +39,7 @@ export const MarkerShape = PropTypes.shape({
 });
 
 //todo: remember height for console
+//todo: change to PureComponent
 export class Editor extends React.Component {
     static propTypes = {
         mode: PropTypes.string.isRequired,
@@ -46,7 +48,7 @@ export class Editor extends React.Component {
         isDisabled: PropTypes.bool,
         markers: PropTypes.arrayOf(MarkerShape.isRequired),
         bindings: PropTypes.arrayOf(BindingShape.isRequired),
-        readyOnly: PropTypes.bool,
+        readOnly: PropTypes.bool,
         decorated: PropTypes.bool,
         resizable: PropTypes.bool,
         decorator: PropTypes.func
@@ -94,28 +96,58 @@ export class Editor extends React.Component {
         this.setState({height: size.height});
     };
 
+    componentWillUpdate(_props, state) {
+        if (this.state.isLight !== state.isLight) {
+            this.options = null;
+        }
+    }
+
     componentDidUpdate(_prevProps, prevState) {
         if (prevState.height !== this.state.height) {
             this.cm.setSize(null, this.state.height);
         }
     }
 
-    render() {
-        const {onChange, value, readyOnly, isDisabled, mode, bindings, decorated, resizable, decorator} = this.props;
+    componentWillReceiveProps(props) {
+        const {readOnly, isDisabled, mode} = this.props;
 
-        let el = <CodeMirror
-            options={{
-                theme: this.state.isLight ? 'eclipse' : 'lesser-dark',
+        const invalidateOptions = props.readOnly !== readOnly || props.isDisabled !== isDisabled || props.mode !== mode;
+
+        if (invalidateOptions) {
+            this.options = null;
+            //todo: consider setting options through cm instance
+        }
+    }
+
+    options = null;
+
+    _getOptions = () => {
+        if (!this.options) {
+            const {readOnly, isDisabled, mode} = this.props;
+            const {isLight} = this.state;
+
+            this.options = {
+                theme: isLight ? 'eclipse' : 'lesser-dark',
                 mode: mode,
                 lineNumbers: true,
-                readOnly: readyOnly || isDisabled || false,
+                readOnly: readOnly || isDisabled || false,
                 gutters: ['CodeMirror-lint-markers'],
                 lint: {
                     getAnnotations: this._getAnnotations,
                     tooltips: true
                 },
-                viewportMargin: Infinity
-            }}
+                //todo: remove for now, too big performance hit viewportMargin: Infinity
+            };
+        }
+        return this.options;
+    };
+
+    render() {
+        const {onChange, value, bindings, decorated, resizable, decorator} = this.props;
+
+        const options = this._getOptions();
+        let el = <CodeMirror
+            options={options}
 
             onBeforeChange={onChange && this._onChange}
             value={value}
@@ -143,7 +175,7 @@ export class Editor extends React.Component {
                 <div className="flex-row">
                     <div style={{color: 'grey'}}>
                         {CommonMessages.editorMode}{' '}
-                        <strong>{mode}</strong>
+                        <strong>{options.mode}</strong>
                     </div>
                     <div className="flex-grow"/>
                     <div className="flex-vertical-middle">

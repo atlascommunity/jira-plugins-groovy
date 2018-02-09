@@ -122,7 +122,7 @@
                     <enableFastdev>false</enableFastdev>
 
                     <jvmArgs>
-                        -Xmx1024m
+                        -Xmx1536m
                     </jvmArgs>
 
                     <instructions>
@@ -134,6 +134,8 @@
                             org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             com.atlassian.jira.plugin.webfragment.conditions,
+                            com.atlassian.jira.issue.customfields.searchers,
+                            com.atlassian.jira.jql.operand,
                             *;resolution:=optional
                         </Import-Package>
                         <Spring-Context>*</Spring-Context>
