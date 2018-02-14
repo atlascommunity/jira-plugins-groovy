@@ -60,7 +60,13 @@ public class FieldValueExtractor {
     }
 
     public <T> T extractValue(CustomField field, Issue issue, Class<T> tType) {
-        return tType.cast(extractValueHolder(field, issue, tType).getValue());
+        ValueHolder valueHolder = extractValueHolder(field, issue, tType);
+
+        if (valueHolder != null) {
+            return tType.cast(valueHolder.getValue());
+        }
+
+        return null;
     }
 
     public ValueHolder extractValueHolder(CustomField field, Issue issue, Class tType) {
@@ -73,7 +79,7 @@ public class FieldValueExtractor {
         return extractValueHolder(script, field, issue, tType);
     }
 
-    public ValueHolder extractValueHolder(FieldScript script, CustomField field, Issue issue, Class tType) {
+    private ValueHolder extractValueHolder(FieldScript script, CustomField field, Issue issue, Class tType) {
         if (script != null && script.getScriptBody() != null && script.getId() != null) {
             if (script.isCacheable()) {
                 try {

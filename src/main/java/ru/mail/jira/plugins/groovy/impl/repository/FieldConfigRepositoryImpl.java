@@ -96,6 +96,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             .stream()
             .filter(field -> field.getCustomFieldType() instanceof ScriptedCFType)
             .flatMap(this::getConfigs)
+            .distinct()
             .collect(Collectors.toList());
     }
 
