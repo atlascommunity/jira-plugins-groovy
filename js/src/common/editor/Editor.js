@@ -109,9 +109,10 @@ export class Editor extends React.Component {
     }
 
     componentWillReceiveProps(props) {
-        const {readOnly, isDisabled, mode} = this.props;
+        const {readOnly, isDisabled, mode, markers} = this.props;
 
-        const invalidateOptions = props.readOnly !== readOnly || props.isDisabled !== isDisabled || props.mode !== mode;
+        const invalidateOptions =
+            props.readOnly !== readOnly || props.isDisabled !== isDisabled || props.mode !== mode || props.markers !== markers;
 
         if (invalidateOptions) {
             this.options = null;
