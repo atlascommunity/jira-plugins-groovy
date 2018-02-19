@@ -147,6 +147,9 @@ export class CustomFieldForm extends React.Component {
                     value={values.get('scriptBody')}
                     onChange={this._setScript}
 
+                    isInvalid={errorField === 'scriptBody'}
+                    invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
+
                     markers={markers}
                 />
 
