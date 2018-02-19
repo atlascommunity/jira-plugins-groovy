@@ -3,14 +3,20 @@ import PropTypes from 'prop-types';
 
 import {Map} from 'immutable';
 
+import {FieldTextStateless} from '@atlaskit/field-text';
+import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
+
 import {registryService} from '../service/services';
-import {SingleSelect} from '../common/SingleSelect';
+import {SingleSelect} from '../common/ak/SingleSelect';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {CommonMessages} from '../i18n/common.i18n';
-import {AsyncPicker} from '../common/AsyncPicker';
+import {AsyncPicker} from '../common/ak/AsyncPicker';
 
 
 function mapScriptToOption(script) {
+    if (!script) {
+        return null;
+    }
     return {
         value: script.id,
         label: script.name
@@ -19,6 +25,7 @@ function mapScriptToOption(script) {
 
 export class RegistryPicker extends React.Component {
     static propTypes = {
+        type: PropTypes.string.isRequired,
         values: PropTypes.object,
         scriptId: PropTypes.number,
         fieldName: PropTypes.string
@@ -40,7 +47,7 @@ export class RegistryPicker extends React.Component {
         };
     });
 
-    _renderParam(param) {
+    _renderParam(param, label) {
         const {values} = this.state;
         const {fieldName} = this.props;
         const paramName = param.name;
@@ -49,58 +56,76 @@ export class RegistryPicker extends React.Component {
         switch (param.paramType) {
             case 'USER':
                 return <AsyncPicker
+                    label={label}
+                    isRequired={true}
+
                     src={`${getPluginBaseUrl()}/jira-api/userPicker`}
                     name={inputName}
                     onChange={this._setValue(paramName)}
                     value={value}
-                    className="long-field"
                 />;
             case 'GROUP':
                 return <AsyncPicker
+                    label={label}
+                    isRequired={true}
+
                     src={`${getPluginBaseUrl()}/jira-api/groupPicker`}
                     name={inputName}
                     onChange={this._setValue(paramName)}
                     value={value}
-                    className="long-field"
                 />;
             case 'CUSTOM_FIELD':
                 return <AsyncPicker
+                    label={label}
+                    isRequired={true}
+
                     src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`}
                     name={inputName}
                     onChange={this._setValue(paramName)}
                     value={value}
-                    className="long-field"
                 />;
             case 'STRING':
-                return <input
+                return <FieldTextStateless
+                    label={label}
+                    required={true}
+                    shouldFitContainer={true}
                     type="text"
-                    className="text long-field"
+
                     name={inputName}
-                    value={value}
+                    value={value || ''}
                     onChange={this._setInputValue(paramName)}
                 />;
             case 'TEXT':
-                return <textarea
-                    className="textarea long-field"
+                return <FieldTextAreaStateless
+                    label={label}
+                    required={true}
+                    shouldFitContainer={true}
+
                     name={inputName}
-                    value={value}
+                    value={value || ''}
                     onChange={this._setInputValue(paramName)}
                 />;
             case 'LONG':
-                return <input
+                return <FieldTextStateless
+                    label={label}
+                    required={true}
+                    shouldFitContainer={true}
                     type="number"
-                    className="text long-field"
+
                     name={inputName}
-                    value={value}
+                    value={value || ''}
                     onChange={this._setInputValue(paramName)}
                 />;
             case 'DOUBLE':
-                return <input
+                return <FieldTextStateless
+                    label={label}
+                    required={true}
+                    shouldFitContainer={true}
                     type="text"
-                    className="text long-field"
+
                     pattern="[0-9.]+"
                     name={inputName}
-                    value={value}
+                    value={value || ''}
                     onChange={this._setInputValue(paramName)}
                 />;
             default:
@@ -115,7 +140,7 @@ export class RegistryPicker extends React.Component {
 
     componentDidMount() {
         registryService
-            .getAllScripts()
+            .getAllScripts(this.props.type)
             .then(scripts =>
                 this.setState({
                     scripts,
@@ -132,25 +157,23 @@ export class RegistryPicker extends React.Component {
             return <span className="aui-icon aui-icon-wait"/>;
         }
 
-        return <div>
-            <div className="field-group">
-                <label>{CommonMessages.script}</label>
-                <SingleSelect
-                    options={scripts.map(mapScriptToOption)}
-                    onChange={this._onChange}
-                    value={script ? script.id.toString() : ''}
+        return <div className="flex-column">
+            <SingleSelect
+                options={scripts.map(mapScriptToOption)}
+                onChange={this._onChange}
+                value={mapScriptToOption(script)}
 
-                    name={this.props.fieldName}
+                name={this.props.fieldName}
 
-                    className="long-field"
-                />
-            </div>
+                label={CommonMessages.script}
+                isRequired={true}
+                shouldFitContainer={true}
+            />
 
             {script && script.params &&
                 script.params.map(param =>
-                    <div className="field-group" key={param.name}>
-                        <label>{param.displayName}</label>
-                        {this._renderParam(param)}
+                    <div key={param.name}>
+                        {this._renderParam(param, param.displayName)}
                     </div>
                 )
             }

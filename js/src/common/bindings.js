@@ -38,7 +38,7 @@ export const Bindings = {
         fullClassName: 'java.lang.Object'
     },
     issueEvent: {
-        name: 'issueEvent',
+        name: 'event',
         className: 'IssueEvent',
         fullClassName: 'com.atlassian.jira.event.issue.IssueEvent'
     },
@@ -61,5 +61,10 @@ export const Bindings = {
         name: 'body',
         className: 'String',
         fullClassName: 'java.lang.String'
+    },
+    velocityParams: {
+        name: 'velocityParams',
+        className: 'Map<String, Object>',
+        fullClassName: 'java.util.map'
     }
 };

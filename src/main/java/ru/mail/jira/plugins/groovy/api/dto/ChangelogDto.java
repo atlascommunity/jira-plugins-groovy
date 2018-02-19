@@ -16,6 +16,8 @@ public class ChangelogDto {
     @XmlElement
     private String diff;
     @XmlElement
+    private String templateDiff;
+    @XmlElement
     private JiraUser author;
     @XmlElement
     private String date;

@@ -43,7 +43,10 @@ export const CommonMessages = {
     script: i18n.common.script,
     switchTheme: i18n.common.switchTheme,
     editorMode: i18n.common.editorMode,
-    clearCache: i18n.common.clearCache
+    clearCache: i18n.common.clearCache,
+    condition: i18n.common.condition,
+    validator: i18n.common.validator,
+    function: i18n.common.function
 };
 
 export const DialogMessages = {

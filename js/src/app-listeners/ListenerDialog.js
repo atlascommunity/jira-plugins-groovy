@@ -5,14 +5,14 @@ import {connect} from 'react-redux';
 
 import {Map} from 'immutable';
 
-import Button from 'aui-react/lib/AUIButton';
-import Modal from 'aui-react/lib/AUIDialog';
+import ModalDialog from '@atlaskit/modal-dialog';
+import {FieldTextStateless} from '@atlaskit/field-text';
+import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
+
 import Message from 'aui-react/lib/AUIMessage';
 
 import {ConditionPicker} from './ConditionPicker';
 import {ListenerActionCreators} from './listeners.reducer';
-
-import {AUIRequired} from '../common/aui-components';
 
 import {ListenerMessages} from '../i18n/listener.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
@@ -20,9 +20,9 @@ import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n
 import {fillListenerKeys} from '../model/listener.model';
 
 import {listenerService} from '../service/services';
-import {Editor} from '../common/Editor';
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
+import {EditorField} from '../common/ak/EditorField';
 
 
 //AbstractProjectEvent
@@ -36,6 +36,8 @@ import {Bindings} from '../common/bindings';
 //AbstractRemoteIssueLinkEvent
 //IssueWatcherAddedEvent
 //IssueWatcherDeletedEvent
+
+const issueEventBindings = [Bindings.issueEvent];
 
 function extractShortClassName(className) {
     if (className.indexOf('.') !== -1) {
@@ -169,7 +171,6 @@ export class ListenerDialog extends React.Component {
             let errorField = null;
 
             let markers = null;
-            let annotations = null;
 
             if (error) {
                 if (error.field === 'scriptBody' && Array.isArray(error.error)) {
@@ -189,7 +190,7 @@ export class ListenerDialog extends React.Component {
             const condition = values.get('condition');
             if (condition && condition.type) {
                 if (condition.type === 'ISSUE') {
-                    bindings = [Bindings.issueEvent];
+                    bindings = issueEventBindings;
                 } else {
                     const className = condition.className;
                     if (className) {
@@ -206,84 +207,70 @@ export class ListenerDialog extends React.Component {
             }
 
             body =
-                <form className="aui" onSubmit={this._onSubmit}>
+                <div className="flex-column">
                     {error && !errorField ?
                         <Message type="error">
                             {errorMessage}
                         </Message>
                     : null}
 
-                    <div className="field-group">
-                        <label htmlFor="listener-dialog-name">
-                            {FieldMessages.name}
-                            <AUIRequired/>
-                        </label>
-                        <input
-                            type="text"
-                            className="text full-width-field"
-                            id="listener-dialog-name"
-                            value={values.get('name') || ''}
-                            onChange={this._setTextValue('name')}
-                        />
-                        {errorField === 'name' && <div className="error">{errorMessage}</div>}
-                    </div>
-                    <div className="field-group">
-                        <label>
-                            {FieldMessages.condition}
-                            <AUIRequired/>
-                        </label>
-                        <ConditionPicker value={condition} onChange={this._setObjectValue('condition')}/>
-                        {errorField === 'condition' && <div className="error">{errorMessage}</div>}
-                    </div>
-                    <div className="field-group">
-                        <label>
-                            {FieldMessages.scriptCode}
-                            <AUIRequired/>
-                        </label>
-                        <Editor
-                            mode="groovy"
-                            decorated={true}
-                            bindings={bindings}
+                    <FieldTextStateless
+                        shouldFitContainer={true}
+                        required={true}
 
-                            onChange={this._setObjectValue('scriptBody')}
-                            value={values.get('scriptBody') || ''}
+                        isInvalid={errorField === 'name'}
+                        invalidMessage={errorField === 'name' ? errorMessage : null}
 
-                            markers={markers}
-                            annotations={annotations}
-                        />
-                        {errorField === 'scriptBody' && <div className="error">{errorMessage}</div>}
-                    </div>
-                    {!isNew && <div className="field-group">
-                        <label htmlFor="listener-dialog-comment">
-                            {FieldMessages.comment}
-                            <AUIRequired/>
-                        </label>
-                        <textarea
-                            id="listener-dialog-comment"
-                            className="textarea full-width-field"
+                        label={FieldMessages.name}
+                        value={values.get('name') || ''}
+                        onChange={this._setTextValue('name')}
+                    />
+                    <ConditionPicker value={condition} onChange={this._setObjectValue('condition')} error={error}/>
+                    <EditorField
+                        label={FieldMessages.scriptCode}
+                        isRequired={true}
 
-                            value={values.get('comment') || ''}
-                            onChange={this._setTextValue('comment')}
-                        />
-                        {errorField === 'comment' && <div className="error">{errorMessage}</div>}
-                    </div> }
-                </form>;
+                        isInvalid={errorField === 'scriptBody'}
+                        invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
+                        markers={markers}
+
+                        bindings={bindings}
+
+                        value={values.get('scriptBody') || ''}
+                        onChange={this._setObjectValue('scriptBody')}
+                    />
+                    {!isNew && <FieldTextAreaStateless
+                        shouldFitContainer={true}
+                        required={true}
+
+                        isInvalid={errorField === 'comment'}
+                        invalidMessage={errorField === 'comment' ? errorMessage : null}
+
+                        label={FieldMessages.comment}
+                        value={values.get('comment') || ''}
+                        onChange={this._setTextValue('comment')}
+                    />}
+                </div>;
         }
 
-        return <Modal
-            size="xlarge"
-            titleContent={`${isNew ? ListenerMessages.createListener : ListenerMessages.updateListener}`}
+        return <ModalDialog
+            width="x-large"
+            scrollBehavior="outside"
+            heading={`${isNew ? ListenerMessages.createListener : ListenerMessages.updateListener}`}
             onClose={onClose}
-            footerActionContent={[
-                <Button key="create" onClick={this._onSubmit}>
-                    {isNew ? CommonMessages.create : CommonMessages.update}
-                </Button>,
-                <Button key="close" type="link" onClick={onClose}>{CommonMessages.cancel}</Button>
+
+            actions={[
+                {
+                    text: isNew ? CommonMessages.create : CommonMessages.update,
+                    onClick: this._onSubmit
+                },
+                {
+                    text: CommonMessages.cancel,
+                    onClick: onClose
+                }
             ]}
-            type="modal"
-            styles={{zIndex: '3000'}}
         >
             {body}
-        </Modal>;
+        </ModalDialog>;
     }
 }

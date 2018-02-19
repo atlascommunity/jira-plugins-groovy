@@ -10,7 +10,6 @@ import com.atlassian.jira.issue.fields.rest.json.JsonTypeBuilder;
 import com.atlassian.jira.util.velocity.NumberTool;
 import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
 
@@ -19,14 +18,13 @@ public class NumberCFType extends ScriptedCFType<Number, Number> {
         super(configRepository, valueExtractor, Number.class);
     }
 
-    @Nonnull
     @Override
-    public Map<String, Object> getVelocityParameters(Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
-        Map<String, Object> map = super.getVelocityParameters(issue, field, fieldLayoutItem);
-        map.put("numberTool", new NumberTool(this.getI18nBean().getLocale()));
-        return map;
-
+    public void fillStaticVelocityParams(Map<String, Object> params) {
+        params.put("numberTool", new NumberTool(this.getI18nBean().getLocale()));
     }
+
+    @Override
+    public void fillDynamicVelocityParams(Map<String, Object> params, Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {}
 
     @Override
     public JsonType getJsonSchema(CustomField customField) {

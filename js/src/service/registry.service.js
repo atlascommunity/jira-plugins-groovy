@@ -22,8 +22,8 @@ export class RegistryService {
         return ajaxDelete(`${getPluginBaseUrl()}/registry/directory/${id}`);
     }
 
-    getAllScripts() {
-        return ajaxGet(`${getPluginBaseUrl()}/registry/script/all`);
+    getAllScripts(type) {
+        return ajaxGet(`${getPluginBaseUrl()}/registry/script/${type}/all`);
     }
 
     getScript(id) {
@@ -40,5 +40,13 @@ export class RegistryService {
 
     deleteScript(id) {
         return ajaxDelete(`${getPluginBaseUrl()}/registry/script/${id}`);
+    }
+
+    moveScript(id, parentId) {
+        return ajaxPut(`${getPluginBaseUrl()}/registry/script/${id}/parent`, { parentId: parentId ? parentId : null });
+    }
+
+    getScriptWorkflows(id) {
+        return ajaxGet(`${getPluginBaseUrl()}/registry/script/${id}/workflows`);
     }
 }

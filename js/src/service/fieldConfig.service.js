@@ -1,4 +1,4 @@
-import {ajaxGet, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
+import {ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
 
 
 export class FieldConfigService {
@@ -12,5 +12,9 @@ export class FieldConfigService {
 
     updateFieldConfig(id, data) {
         return ajaxPut(`${getPluginBaseUrl()}/fieldConfig/${id}`, data);
+    }
+
+    preview(id, data) {
+        return ajaxPost(`${getPluginBaseUrl()}/fieldConfig/${id}/preview`, data);
     }
 }

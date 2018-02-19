@@ -32,6 +32,7 @@ import ru.mail.jira.plugins.groovy.impl.listener.ConditionType;
 import ru.mail.jira.plugins.groovy.impl.listener.ScriptedEventListener;
 import ru.mail.jira.plugins.groovy.impl.listener.ConditionDescriptor;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
+import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import javax.annotation.Nonnull;
@@ -215,18 +216,22 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
+
+            if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
+            }
         }
 
         ConditionDescriptor condition = form.getCondition();
         if (condition == null) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "condition");
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "condition.type");
         }
 
         if (condition.getType() == ConditionType.CLASS_NAME) {
             try {
                 Class.forName(condition.getClassName());
             } catch (ClassNotFoundException e) {
-                throw new RestFieldException("Unable to resolve class: " + e.getMessage(), "condition");
+                throw new RestFieldException("Unable to resolve class: " + e.getMessage(), "condition.className");
             }
         } else {
             if (condition.getProjectIds() == null) {

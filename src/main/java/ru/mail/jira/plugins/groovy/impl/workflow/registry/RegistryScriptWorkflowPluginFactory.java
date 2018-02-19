@@ -6,6 +6,7 @@ import com.atlassian.templaterenderer.JavaScriptEscaper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 import com.opensymphony.workflow.loader.AbstractDescriptor;
+import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
@@ -33,7 +34,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
 
     @Override
     protected void getVelocityParamsForInput(Map<String, Object> map) {
-        map.put("scripts", scriptRepository.getAllScriptDescriptions());
+        map.put("type", getType());
         map.put("escapeJs", (Function<String, String>) JavaScriptEscaper::escape);
         map.put("values", jsonMapper.write(ImmutableMap.of()));
     }
@@ -49,6 +50,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
             script = scriptRepository.getScript(scriptId, false, false);
         }
 
+        map.put("type", getType());
         map.put("id", scriptId);
         map.put("escapeJs", (Function<String, String>) JavaScriptEscaper::escape);
 
@@ -72,6 +74,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
 
             if (script != null) {
                 map.put("script", script);
+                map.put("typeMatching", script.getTypes().contains(getType()));
 
                 if (script.getParams() != null) {
                     map.put("paramsHtml", jsonMapper.write(script.getParams()));
@@ -87,7 +90,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
 
         String scriptIdString = extractSingleParam(input, "script");
         params.put(Const.WF_REPOSITORY_SCRIPT_ID, scriptIdString);
-        params.put("full.module.key", getModuleKey());
+        params.put(Const.JIRA_WF_FULL_MODULE_KEY, getType().getModuleKey());
 
         Integer scriptId = Ints.tryParse(scriptIdString);
 
@@ -126,7 +129,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
         return values;
     }
 
-    abstract protected String getModuleKey();
+    abstract protected WorkflowScriptType getType();
 
     abstract protected Map<String, Object> getArgs(AbstractDescriptor descriptor);
 }

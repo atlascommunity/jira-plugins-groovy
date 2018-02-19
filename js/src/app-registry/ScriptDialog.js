@@ -2,11 +2,14 @@ import React from 'react';
 
 import {connect} from 'react-redux';
 
-import Dialog from 'aui-react/lib/AUIDialog';
-import Button from 'aui-react/lib/AUIButton';
-import Message from 'aui-react/lib/AUIMessage';
-
+import ModalDialog from '@atlaskit/modal-dialog';
+import {FieldTextStateless} from '@atlaskit/field-text';
+import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import Spinner from '@atlaskit/spinner';
+import {Label} from '@atlaskit/field-base';
+import {CheckboxStateless} from '@atlaskit/checkbox';
+
+import Message from 'aui-react/lib/AUIMessage';
 
 import {Map} from 'immutable';
 
@@ -15,17 +18,20 @@ import {RegistryActionCreators} from './registry.reducer';
 import {FieldMessages, CommonMessages} from '../i18n/common.i18n';
 
 import {registryService} from '../service/services';
-import {Editor} from '../common/Editor';
 
 import {getMarkers} from '../common/error';
-import {StaticField} from '../common/StaticField';
 import {Bindings} from '../common/bindings';
+import {EditorField} from '../common/ak/EditorField';
+import {StaticField} from '../common/ak/StaticField';
 
+
+const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
 
 @connect(null, RegistryActionCreators, null, {withRef: true})
 export class ScriptDialog extends React.Component {
     state = {
         active: false,
+        fetching: false,
         id: null,
         values: new Map(),
         parentName: '',
@@ -35,14 +41,18 @@ export class ScriptDialog extends React.Component {
     };
 
     activateCreate = (directoryId) => {
+        this.setState({ active: true, fetching: true });
+
         registryService
             .getDirectory(directoryId)
             .then(directory =>
                 this.setState({
+                    fetching: false,
                     active: true,
                     id: null,
                     values: new Map({
-                        directoryId: directoryId
+                        directoryId: directoryId,
+                        types: []
                     }),
                     parentName: directory.fullName,
                     error: null,
@@ -52,13 +62,17 @@ export class ScriptDialog extends React.Component {
     };
 
     activateEdit = (id) => {
+        this.setState({ active: true, fetching: true });
+
         registryService
             .getScript(id)
             .then(data => this.setState({
+                fetching: false,
                 active: true,
                 id: id,
                 values: new Map({
                     name: data.name,
+                    types: data.types,
                     scriptBody: data.scriptBody,
                     directoryId: data.directoryId
                 }),
@@ -66,7 +80,6 @@ export class ScriptDialog extends React.Component {
                 error: null,
                 waiting: false
             }));
-        //todo: show something when loading
     };
 
     _handleError = (error) => {
@@ -114,7 +127,7 @@ export class ScriptDialog extends React.Component {
         }
     };
 
-    _close = () => this.setState({ active: false, waiting: false });
+    _close = () => this.setState({ active: false, waiting: false, values: Map() });
 
     mutateValue = (field, value) => {
         this.setState(state => {
@@ -129,8 +142,24 @@ export class ScriptDialog extends React.Component {
 
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
 
+    _setScript = this._setObjectValue('scriptBody');
+
+    _toggleType = (e) => {
+        const option = e.currentTarget.value;
+
+        this.setState(state => {
+            const types = state.values.get('types');
+
+            const isRemove = types.includes(option);
+
+            return {
+                values: state.values.set('types', isRemove ? types.filter(type => type !== option) : [...types, option])
+            };
+        });
+    };
+
     render() {
-        const {values, parentName, error, modified, waiting} = this.state;
+        const {values, parentName, error, modified, active, fetching, waiting} = this.state;
         let errorMessage = null;
         let errorField = null;
 
@@ -150,102 +179,110 @@ export class ScriptDialog extends React.Component {
             errorField = error.field;
         }
 
-        console.log(error, markers);
+        const types = values.get('types');
 
         return (
             <div>
-                {this.state.active ?
-                    <Dialog
-                        size="xlarge"
-                        titleContent={`${this.state.id ? CommonMessages.update : CommonMessages.create} script`}
+                {active ?
+                    <ModalDialog
+                        width="x-large"
+                        scrollBehavior="outside"
+                        heading={`${this.state.id ? CommonMessages.update : CommonMessages.create} script`}
                         onClose={this._close}
-                        footerActionContent={[
-                            <Button
-                                key="create"
-                                onClick={this._onSubmit}
-                                disabled={waiting}
-                            >
-                                {waiting && <Spinner size={15}/>}
-                                {!waiting && (this.state.id ? CommonMessages.update : CommonMessages.create)}
-                            </Button>,
-                            <Button
-                                key="close"
-                                type="link"
-                                onClick={this._close}
-                                disabled={waiting}
-                            >
-                                {CommonMessages.cancel}
-                            </Button>
+
+                        actions={[
+                            {
+                                text: this.state.id ? CommonMessages.update : CommonMessages.create,
+                                onClick: this._onSubmit,
+                                isDisabled: waiting || fetching
+                            },
+                            {
+                                text: CommonMessages.cancel,
+                                onClick: this._close,
+                                isDisabled: waiting || fetching
+                            }
                         ]}
-                        type="modal"
-                        styles={{zIndex: '3000'}}
                     >
-                        {error && !errorField ?
-                            <Message type="error">
-                                {errorMessage}
-                            </Message>
-                        : null}
-                        <form className="aui" onSubmit={this._onSubmit}>
-                            <div className="field-group">
-                                <label htmlFor="directory-dialog-name">
-                                    {FieldMessages.parentName}
-                                </label>
-                                <StaticField>
-                                    {parentName}
-                                </StaticField>
+                        {fetching && <div className="flex-horizontal-middle"><div className="flex-vertical-middle"><Spinner size="medium"/></div></div>}
+                        {!fetching && <div className="flex-column">
+                            {error && !errorField ?
+                                <Message type="error">
+                                    {errorMessage}
+                                </Message>
+                                : null}
+                            <StaticField label={FieldMessages.parentName}>
+                                {parentName}
+                            </StaticField>
+
+                            <FieldTextStateless
+                                shouldFitContainer={true}
+                                required={true}
+
+                                disabled={waiting}
+                                isInvalid={errorField === 'name'}
+                                invalidMessage={errorField === 'name' ? errorMessage : null}
+
+                                label={FieldMessages.name}
+                                value={values.get('name') || ''}
+                                onChange={this._setTextValue('name')}
+                            />
+
+                            <div>
+                                <Label isRequired={true} label={FieldMessages.type}/>
+                                <CheckboxStateless
+                                    isChecked={types.includes('CONDITION')}
+                                    onChange={this._toggleType}
+                                    label={CommonMessages.condition}
+                                    value="CONDITION"
+                                    name="script-type-options"
+                                />
+                                <CheckboxStateless
+                                    isChecked={types.includes('VALIDATOR')}
+                                    onChange={this._toggleType}
+                                    label={CommonMessages.validator}
+                                    value="VALIDATOR"
+                                    name="script-type-options"
+                                />
+                                <CheckboxStateless
+                                    isChecked={types.includes('FUNCTION')}
+                                    onChange={this._toggleType}
+                                    label={CommonMessages.function}
+                                    value="FUNCTION"
+                                    name="script-type-options"
+                                />
                             </div>
-                            <div className="field-group">
-                                <label htmlFor="directory-dialog-name">
-                                    {FieldMessages.name}
-                                    <span className="aui-icon icon-required"/>
-                                </label>
-                                <input
-                                    type="text"
-                                    className="text full-width-field"
-                                    id="directory-dialog-name"
-                                    value={values.get('name') || ''}
-                                    onChange={this._setTextValue('name')}
+
+                            <EditorField
+                                label={FieldMessages.scriptCode}
+                                isRequired={true}
+
+                                isDisabled={waiting}
+                                isInvalid={errorField === 'scriptBody'}
+                                invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
+                                markers={markers}
+
+                                bindings={bindings}
+
+                                value={values.get('scriptBody') || ''}
+                                onChange={this._setScript}
+                            />
+
+                            {!!this.state.id &&
+                                <FieldTextAreaStateless
+                                    shouldFitContainer={true}
+                                    required={true}
+
                                     disabled={waiting}
-                                />
-                                {errorField === 'name' && <div className="error">{errorMessage}</div>}
-                            </div>
-                            <div className="field-group">
-                                <label>
-                                    {FieldMessages.scriptCode}
-                                    <span className="aui-icon icon-required"/>
-                                </label>
-                                <Editor
-                                    mode="groovy"
-                                    decorated={true}
-                                    bindings={[
-                                        Bindings.issue, Bindings.currentUser, Bindings.transientVars
-                                    ]}
+                                    isInvalid={errorField === 'comment'}
+                                    invalidMessage={errorField === 'comment' ? errorMessage : null}
 
-                                    onChange={this._setObjectValue('scriptBody')}
-                                    value={values.get('scriptBody') || ''}
-                                    isDisabled={waiting}
-
-                                    markers={markers}
-                                />
-                                {errorField === 'scriptBody' && <div className="error">{errorMessage}</div>}
-                            </div>
-                            {this.state.id ? <div className="field-group">
-                                <label htmlFor="directory-dialog-comment">
-                                    {FieldMessages.comment}
-                                    <span className="aui-icon icon-required"/>
-                                </label>
-                                <textarea
-                                    id="directory-dialog-comment"
-
-                                    className="textarea full-width-field"
-                                    value={values.get('comment')}
+                                    label={FieldMessages.comment}
+                                    value={values.get('comment') || ''}
                                     onChange={this._setTextValue('comment')}
-                                    disabled={waiting}
                                 />
-                                {errorField === 'comment' && <div className="error">{errorMessage}</div>}
-                            </div> : null}
-                        </form>
-                    </Dialog>
+                            }
+                        </div>}
+                    </ModalDialog>
                     : null}
             </div>
         );

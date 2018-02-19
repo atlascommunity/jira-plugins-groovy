@@ -26,6 +26,9 @@ public interface Script extends Entity {
     @OneToMany(reverse = "getScript")
     Changelog[] getChangelogs();
 
+    void setTypes(String types);
+    String getTypes();
+
     @NotNull
     void setDeleted(boolean deleted);
     boolean isDeleted();

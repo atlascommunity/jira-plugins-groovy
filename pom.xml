@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.mail.jira.plugins</groupId>
     <artifactId>groovy</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.6</version>
     <organization>
         <name>Mail.Ru Group</name>
         <url>https://mail.ru</url>
@@ -84,7 +84,6 @@
             <version>${ao.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>com.github.wumpz</groupId>
             <artifactId>diffutils</artifactId>
@@ -101,7 +100,6 @@
             <artifactId>caffeine</artifactId>
             <version>2.6.1</version>
         </dependency>
-
         <dependency>
             <groupId>ru.mail.jira.plugins</groupId>
             <artifactId>commons</artifactId>
@@ -120,27 +118,15 @@
                     <productDataVersion>${jira.version}</productDataVersion>
                     <enableQuickReload>true</enableQuickReload>
                     <enableFastdev>false</enableFastdev>
-
-                    <jvmArgs>
-                        -Xmx1024m
-                    </jvmArgs>
-
+                    <jvmArgs>-Xmx1536m</jvmArgs>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
-                        <Export-Package>
-                            ru.mail.jira.plugins.api,
-                        </Export-Package>
-                        <Import-Package>
-                            org.springframework.osgi.*;resolution:="optional",
-                            org.eclipse.gemini.blueprint.*;resolution:="optional",
-                            com.atlassian.jira.plugin.webfragment.conditions,
-                            *;resolution:=optional
-                        </Import-Package>
+                        <Export-Package>ru.mail.jira.plugins.api,</Export-Package>
+                        <Import-Package>org.springframework.osgi.*;resolution:="optional", org.eclipse.gemini.blueprint.*;resolution:="optional", com.atlassian.jira.plugin.webfragment.conditions, com.atlassian.jira.issue.customfields.searchers, com.atlassian.jira.jql.operand, *;resolution:=optional</Import-Package>
                         <Spring-Context>*</Spring-Context>
                     </instructions>
                     <compressJs>false</compressJs>
                     <compressCss>false</compressCss>
-
                     <enablePde>false</enablePde>
                     <skipRestDocGeneration>true</skipRestDocGeneration>
                     <allowGoogleTracking>false</allowGoogleTracking>
@@ -181,7 +167,7 @@
     </build>
     <properties>
         <jira.version>7.6.3</jira.version>
-        <amps.version>6.3.11</amps.version>
+        <amps.version>6.3.14</amps.version>
         <ao.version>1.5.0</ao.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>

@@ -31,10 +31,14 @@ import ru.mail.jira.plugins.groovy.api.entity.FieldConfig;
 import ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.cf.ScriptedCFType;
+import ru.mail.jira.plugins.groovy.impl.cf.TemplateScriptedCFType;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
+import ru.mail.jira.plugins.groovy.util.Const;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -92,6 +96,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             .stream()
             .filter(field -> field.getCustomFieldType() instanceof ScriptedCFType)
             .flatMap(this::getConfigs)
+            .distinct()
             .collect(Collectors.toList());
     }
 
@@ -118,33 +123,52 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             throw new IllegalArgumentException("Coudn't find field config with id " + configId);
         }
 
+        boolean isTemplated = isTemplated(jiraFieldConfig);
+
         AuditAction action;
 
         if (fieldConfig == null) {
-            validate(true, form);
+            validate(true, isTemplated, form);
 
             fieldConfig = ao.create(
                 FieldConfig.class,
                 new DBParam("FIELD_CONFIG_ID", configId),
                 new DBParam("UUID", UUID.randomUUID().toString()),
                 new DBParam("SCRIPT_BODY", form.getScriptBody()),
-                new DBParam("CACHEABLE", form.isCacheable())
+                new DBParam("CACHEABLE", form.isCacheable()),
+                new DBParam("TEMPLATE", form.getTemplate()),
+                new DBParam("VELOCITY_PARAMS_ENABLED", form.isVelocityParamsEnabled())
             );
 
             String diff = changelogHelper.generateDiff(configId, "", "field", "", form.getScriptBody());
 
-            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, "Created.");
+            Map<String, Object> additionalParams = new HashMap<>();
+            if (isTemplated) {
+                String templateDiff = changelogHelper.generateDiff(configId, "", "field", "", form.getTemplate());
+                additionalParams.put("TEMPLATE_DIFF", StringUtils.isEmpty(templateDiff) ? "no changes" : templateDiff);
+            }
+
+            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, "Created.", additionalParams);
 
             action = AuditAction.CREATED;
         } else {
-            validate(false, form);
+            validate(false, isTemplated, form);
 
             String diff = changelogHelper.generateDiff(configId, "field", "field", fieldConfig.getScriptBody(), form.getScriptBody());
-            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, form.getComment());
+
+            Map<String, Object> additionalParams = new HashMap<>();
+            if (isTemplated) {
+                String templateDiff = changelogHelper.generateDiff(configId, "field", "field", fieldConfig.getTemplate(), form.getTemplate());
+                additionalParams.put("TEMPLATE_DIFF", StringUtils.isEmpty(templateDiff) ? "no changes" : templateDiff);
+            }
+
+            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, form.getComment(), additionalParams);
 
             fieldConfig.setCacheable(form.isCacheable());
             fieldConfig.setScriptBody(form.getScriptBody());
             fieldConfig.setUuid(UUID.randomUUID().toString());
+            fieldConfig.setTemplate(form.getTemplate());
+            fieldConfig.setVelocityParamsEnabled(form.isVelocityParamsEnabled());
             fieldConfig.save();
 
             action = AuditAction.UPDATED;
@@ -185,11 +209,13 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         return new FieldScript(
             fieldConfig.getUuid(),
             fieldConfig.getScriptBody(),
-            fieldConfig.getCacheable()
+            fieldConfig.getTemplate(),
+            fieldConfig.getCacheable(),
+            fieldConfig.isVelocityParamsEnabled()
         );
     }
 
-    private void validate(boolean isNew, FieldConfigForm form) {
+    private void validate(boolean isNew, boolean template, FieldConfigForm form) {
         scriptService.parseScript(form.getScriptBody());
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
@@ -200,6 +226,18 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
+
+            if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
+            }
+        }
+
+        if (template) {
+            if (StringUtils.isEmpty(form.getTemplate())) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "template");
+            }
+        } else {
+            form.setTemplate("");
         }
     }
 
@@ -208,19 +246,30 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
 
         CustomField customField = jiraConfig.getCustomField();
 
+        boolean isTemplated = isTemplated(jiraConfig);
+
         result.setId(jiraConfig.getId());
         result.setCustomFieldName(customField.getName());
         result.setCustomFieldId(customField.getIdAsLong());
         result.setContextName(fieldConfigSchemeManager.getConfigSchemeForFieldConfig(jiraConfig).getName());
+        result.setNeedsTemplate(isTemplated);
 
         if (fieldConfig == null) {
             result.setCacheable(true);
             result.setScriptBody("");
+            if (isTemplated) {
+                result.setTemplate("");
+            }
             result.setChangelogs(ImmutableList.of());
         } else {
             result.setCacheable(fieldConfig.getCacheable());
+            result.setVelocityParamsEnabled(fieldConfig.isVelocityParamsEnabled());
             result.setScriptBody(fieldConfig.getScriptBody());
             result.setUuid(fieldConfig.getUuid());
+
+            if (isTemplated) {
+                result.setTemplate(fieldConfig.getTemplate());
+            }
 
             if (includeChangelogs) {
                 result.setChangelogs(changelogHelper.collect(fieldConfig.getChangelogs()));
@@ -234,5 +283,9 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         FieldConfig[] fieldConfigs = ao.find(FieldConfig.class, Query.select().where("FIELD_CONFIG_ID = ?", fieldConfigId));
 
         return fieldConfigs.length > 0 ? fieldConfigs[0] : null;
+    }
+
+    private boolean isTemplated(com.atlassian.jira.issue.fields.config.FieldConfig jiraFieldConfig) {
+        return TemplateScriptedCFType.class.equals(jiraFieldConfig.getCustomField().getCustomFieldType().getClass());
     }
 }

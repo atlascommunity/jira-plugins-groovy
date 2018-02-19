@@ -36,6 +36,10 @@ public class PermissionHelper {
         return isAdmin(authenticationContext.getLoggedInUser());
     }
 
+    public boolean isAnon() {
+        return !authenticationContext.isLoggedInUser();
+    }
+
     public boolean isAdmin(ApplicationUser user) {
         return globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, user);
     }

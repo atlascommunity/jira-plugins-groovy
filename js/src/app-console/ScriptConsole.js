@@ -6,12 +6,15 @@ import Button from '@atlaskit/button';
 import {ConsoleMessages} from '../i18n/console.i18n';
 
 import {consoleService} from '../service/services';
-import {Editor} from '../common/Editor';
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 
 import './ScriptConsole.less';
+import {EditorField} from '../common/ak/EditorField';
+import {CommonMessages} from '../i18n/common.i18n';
 
+
+const bindings = [Bindings.currentUser];
 
 export class ScriptConsole extends React.Component {
     state = {
@@ -88,17 +91,15 @@ export class ScriptConsole extends React.Component {
 
         return (
             <div className="ScriptConsole">
-                <Editor
-                    mode="groovy"
+                <EditorField
+                    label={CommonMessages.script}
+
                     resizable={true}
-                    bindings={[
-                        Bindings.currentUser
-                    ]}
-
-                    onChange={this._scriptChange}
-                    value={script}
-
                     markers={markers}
+                    bindings={bindings}
+
+                    value={script}
+                    onChange={this._scriptChange}
                 />
                 <br/>
                 <div>

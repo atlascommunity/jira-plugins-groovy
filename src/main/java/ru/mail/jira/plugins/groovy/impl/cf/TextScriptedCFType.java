@@ -13,6 +13,7 @@ import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 
 @Scanned
 public class TextScriptedCFType extends ScriptedCFType<String, String> {
@@ -40,4 +41,10 @@ public class TextScriptedCFType extends ScriptedCFType<String, String> {
 
         return bean;
     }
+
+    @Override
+    public void fillStaticVelocityParams(Map<String, Object> params) {}
+
+    @Override
+    public void fillDynamicVelocityParams(Map<String, Object> params, Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {}
 }

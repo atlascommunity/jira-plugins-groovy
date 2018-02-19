@@ -53,6 +53,7 @@ export class FieldRegistry extends React.Component {
     }
 }
 
+//todo: velocity vars, searcher
 class Field extends React.Component {
     static propTypes = {
         config: PropTypes.object.isRequired
@@ -69,6 +70,9 @@ class Field extends React.Component {
                     inline: true,
                     scriptBody: config.scriptBody,
                     changelogs: config.changelogs,
+                }}
+                template={config.needsTemplate && {
+                    body: config.template
                 }}
 
                 withChangelog={true}

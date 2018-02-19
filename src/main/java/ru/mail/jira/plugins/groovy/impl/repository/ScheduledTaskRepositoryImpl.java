@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.commons.RestFieldException;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.RunInfo;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskForm;
@@ -39,6 +40,7 @@ import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
 import ru.mail.jira.plugins.groovy.impl.scheduled.JobUtil;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
+import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 
@@ -219,6 +221,10 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         if (!isNew) {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
+            }
+
+            if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
             }
         }
 

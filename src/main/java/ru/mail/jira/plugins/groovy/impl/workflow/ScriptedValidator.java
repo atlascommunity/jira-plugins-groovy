@@ -11,6 +11,7 @@ import com.opensymphony.workflow.Validator;
 import com.opensymphony.workflow.WorkflowException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 
 import java.util.Map;
@@ -26,7 +27,7 @@ public class ScriptedValidator implements Validator {
 
     @Override
     public void validate(Map transientVars, Map args, PropertySet ps) throws WorkflowException {
-        ScriptDescriptor script = workflowHelper.getScript(args);
+        ScriptDescriptor script = workflowHelper.getScript(args, WorkflowScriptType.VALIDATOR);
 
         if (script == null) {
             logger.error("script must be present");

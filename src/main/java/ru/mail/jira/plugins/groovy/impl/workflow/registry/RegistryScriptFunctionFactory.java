@@ -4,6 +4,7 @@ import com.atlassian.jira.plugin.workflow.WorkflowPluginFunctionFactory;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.opensymphony.workflow.loader.AbstractDescriptor;
 import com.opensymphony.workflow.loader.FunctionDescriptor;
+import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
@@ -17,8 +18,8 @@ public class RegistryScriptFunctionFactory extends RegistryScriptWorkflowPluginF
     }
 
     @Override
-    protected String getModuleKey() {
-        return "ru.mail.jira.plugins.groovyregistry-script-function";
+    protected WorkflowScriptType getType() {
+        return WorkflowScriptType.FUNCTION;
     }
 
     @Override
