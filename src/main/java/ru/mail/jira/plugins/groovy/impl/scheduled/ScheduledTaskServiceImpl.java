@@ -353,7 +353,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
 
                                 if (error != null) {
                                     errors++;
-                                    logger.error("Exception occurred in task {} for issue {}", task.getId(), issue.getKey());
+                                    logger.error("Exception occurred in task {} for issue {}", task.getId(), issue.getKey(), error);
                                 }
                             }
                         }
