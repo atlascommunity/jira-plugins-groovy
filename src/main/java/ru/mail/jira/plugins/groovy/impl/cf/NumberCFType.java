@@ -13,9 +13,9 @@ import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public class NumberCFType extends ScriptedCFType<Number, Number> {
+public class NumberCFType extends ScriptedCFType<Double, Double> {
     protected NumberCFType(FieldConfigRepository configRepository, FieldValueExtractor valueExtractor) {
-        super(configRepository, valueExtractor, Number.class);
+        super(configRepository, valueExtractor, Double.class);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class NumberCFType extends ScriptedCFType<Number, Number> {
 
     @Override
     public FieldJsonRepresentation getJsonFromIssue(CustomField field, Issue issue, boolean b, @Nullable FieldLayoutItem fieldLayoutItem) {
-        Double number = (Double)this.getValueFromIssue(field, issue);
+        Double number = this.getValueFromIssue(field, issue);
         return new FieldJsonRepresentation(new JsonData(number));
     }
 }
