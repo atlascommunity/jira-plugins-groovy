@@ -26,6 +26,8 @@
         <dependency>com.atlassian.auiplugin:aui-select2</dependency>
 
         <resource type="download" name="i18n.js" location="/ru/mail/jira/plugins/groovy/i18n.js"/>
+        <resource type="download" name="common.css" location="/ru/mail/jira/plugins/groovy/css/common.css"/>
+        <resource type="download" name="common.css.map" location="/ru/mail/jira/plugins/groovy/css/common.css.map"/>
         <resource type="download" name="common.js" location="/ru/mail/jira/plugins/groovy/js/common.js"/>
         <resource type="download" name="common.js.map" location="/ru/mail/jira/plugins/groovy/js/common.js.map"/>
     </web-resource>
@@ -33,6 +35,8 @@
     <web-resource key="workflow" name="groovy workflow Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
+        <resource type="download" name="workflow.css" location="/ru/mail/jira/plugins/groovy/css/workflow.css"/>
+        <resource type="download" name="workflow.css.map" location="/ru/mail/jira/plugins/groovy/css/workflow.css.map"/>
         <resource type="download" name="workflow.js" location="/ru/mail/jira/plugins/groovy/js/workflow.js"/>
         <resource type="download" name="workflow.js.map" location="/ru/mail/jira/plugins/groovy/js/workflow.js.map"/>
 
@@ -41,6 +45,9 @@
 
     <web-resource key="console-resources" name="groovy console Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="console.css" location="/ru/mail/jira/plugins/groovy/css/console.css"/>
+        <resource type="download" name="console.css.map" location="/ru/mail/jira/plugins/groovy/css/console.css.map"/>
 
         <resource type="download" name="console.js" location="/ru/mail/jira/plugins/groovy/js/console.js"/>
         <resource type="download" name="console.js.map" location="/ru/mail/jira/plugins/groovy/js/console.js.map"/>
@@ -51,6 +58,9 @@
     <web-resource key="registry-resources" name="groovy script registry Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
+        <resource type="download" name="repository.css" location="/ru/mail/jira/plugins/groovy/css/repository.css"/>
+        <resource type="download" name="repository.css.map" location="/ru/mail/jira/plugins/groovy/css/repository.css.map"/>
+
         <resource type="download" name="repository.js" location="/ru/mail/jira/plugins/groovy/js/repository.js"/>
         <resource type="download" name="repository.js.map" location="/ru/mail/jira/plugins/groovy/js/repository.js.map"/>
 
@@ -59,6 +69,9 @@
 
     <web-resource key="listeners-resources" name="groovy listeners Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="listeners.css" location="/ru/mail/jira/plugins/groovy/css/listeners.css"/>
+        <resource type="download" name="listeners.css.map" location="/ru/mail/jira/plugins/groovy/css/listeners.css.map"/>
 
         <resource type="download" name="listeners.js" location="/ru/mail/jira/plugins/groovy/js/listeners.js"/>
         <resource type="download" name="listeners.js.map" location="/ru/mail/jira/plugins/groovy/js/listeners.js.map"/>
@@ -69,6 +82,9 @@
     <web-resource key="audit-resources" name="groovy audit Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
+        <resource type="download" name="audit.css" location="/ru/mail/jira/plugins/groovy/css/audit.css"/>
+        <resource type="download" name="audit.css.map" location="/ru/mail/jira/plugins/groovy/css/audit.css.map"/>
+
         <resource type="download" name="audit.js" location="/ru/mail/jira/plugins/groovy/js/audit.js"/>
         <resource type="download" name="audit.js.map" location="/ru/mail/jira/plugins/groovy/js/audit.js.map"/>
 
@@ -77,6 +93,9 @@
 
     <web-resource key="rest-resources" name="groovy rest Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="rest.css" location="/ru/mail/jira/plugins/groovy/css/rest.css"/>
+        <resource type="download" name="rest.css.map" location="/ru/mail/jira/plugins/groovy/css/rest.css.map"/>
 
         <resource type="download" name="rest.js" location="/ru/mail/jira/plugins/groovy/js/rest.js"/>
         <resource type="download" name="rest.js.map" location="/ru/mail/jira/plugins/groovy/js/rest.js.map"/>
@@ -87,6 +106,9 @@
     <web-resource key="fields-resources" name="groovy fields Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
+        <resource type="download" name="fields.css" location="/ru/mail/jira/plugins/groovy/css/fields.css"/>
+        <resource type="download" name="fields.css.map" location="/ru/mail/jira/plugins/groovy/css/fields.css.map"/>
+
         <resource type="download" name="fields.js" location="/ru/mail/jira/plugins/groovy/js/fields.js"/>
         <resource type="download" name="fields.js.map" location="/ru/mail/jira/plugins/groovy/js/fields.js.map"/>
 
@@ -95,6 +117,9 @@
 
     <web-resource key="cf-resources" name="groovy custom field Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="cf.css" location="/ru/mail/jira/plugins/groovy/css/cf.css"/>
+        <resource type="download" name="cf.css.map" location="/ru/mail/jira/plugins/groovy/css/cf.css.map"/>
 
         <resource type="download" name="cf.js" location="/ru/mail/jira/plugins/groovy/js/cf.js"/>
         <resource type="download" name="cf.js.map" location="/ru/mail/jira/plugins/groovy/js/cf.js.map"/>
@@ -105,6 +130,9 @@
     <web-resource key="scheduled-resources" name="groovy scheduled Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
+        <resource type="download" name="scheduled.css" location="/ru/mail/jira/plugins/groovy/css/scheduled.css"/>
+        <resource type="download" name="scheduled.css.map" location="/ru/mail/jira/plugins/groovy/css/scheduled.css.map"/>
+
         <resource type="download" name="scheduled.js" location="/ru/mail/jira/plugins/groovy/js/scheduled.js"/>
         <resource type="download" name="scheduled.js.map" location="/ru/mail/jira/plugins/groovy/js/scheduled.js.map"/>
 
@@ -113,6 +141,9 @@
 
     <web-resource key="extras-resources" name="groovy extras Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="extras.css" location="/ru/mail/jira/plugins/groovy/css/extras.css"/>
+        <resource type="download" name="extras.css.map" location="/ru/mail/jira/plugins/groovy/css/extras.css.map"/>
 
         <resource type="download" name="extras.js" location="/ru/mail/jira/plugins/groovy/js/extras.js"/>
         <resource type="download" name="extras.js.map" location="/ru/mail/jira/plugins/groovy/js/extras.js.map"/>

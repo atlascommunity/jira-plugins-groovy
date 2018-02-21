@@ -1,9 +1,9 @@
 'use strict';
 
-const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
@@ -24,22 +24,24 @@ const publicUrl = publicPath.slice(0, -1);
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
 
-// Note: defined here because it will be used more than once.
-const cssFilename = '../../src/main/resources/ru/mail/jira/plugins/groovy/css/[name].css';
+const cssDir = '../../src/main/resources/ru/mail/jira/plugins/groovy/css/';
 
-// ExtractTextPlugin expects the build output to be flat.
-// (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
-// However, our output is structured with css, js and media folders.
-// To have this structure working with relative paths, we have to use custom options.
-const extractTextPluginOptions = shouldUseRelativeAssetPaths
-    ? // Making sure that the publicPath goes back to to build folder.
-    {publicPath: Array(cssFilename.split('/').length).join('../')}
-    : {};
-
+const extractLess = new ExtractTextPlugin({
+    filename: cssDir + '[name].css',
+    disable: process.env.NODE_ENV === "development"
+});
 
 let watch = true;
 let uglify = [];
-let bundle = [];
+let extraPlugins = [];
+let devtool = 'cheap-module-source-map';
+let minimizeCss = false;
+
+let styleLoader = [
+    {
+        loader: 'style-loader'
+    }
+];
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
@@ -65,26 +67,26 @@ if (process.env.NODE_ENV === 'production') {
         })
     ];
 
+    styleLoader = [];
     watch = false;
+    minimizeCss = true;
+    devtool = 'source-map';
+
+    extraPlugins.push(new webpack.optimize.ModuleConcatenationPlugin());
 }
 
 console.log(`sourcemap: ${shouldUseSourceMap}`);
 
 if (process.env.ANALYZE) {
-    bundle = [
-        new BundleAnalyzerPlugin()
-    ];
+    extraPlugins.push(new BundleAnalyzerPlugin());
 }
 
-// This is the production configuration.
-// It compiles slowly and is focused on producing a fast and minimal bundle.
-// The development configuration is different and lives in a separate file.
 module.exports = {
     // Don't attempt to continue if there are any errors.
     bail: true,
     // We generate sourcemaps in production. This is slow but gives good results.
     // You can exclude the *.map files from the build during deployment.
-    devtool: shouldUseSourceMap ? 'source-map' : false,
+    devtool: shouldUseSourceMap ? devtool : false,
     // In production, we only want to load the polyfills and the app code.
     entry: {
         repository: [require.resolve('./polyfills'), paths.resolveApp('src/app-registry/index.js')],
@@ -195,50 +197,23 @@ module.exports = {
                         },
                     },
                     {
-                        test: /\.css$/,
-                        use: [
-                            require.resolve('style-loader'),
-                            {
-                                loader: require.resolve('css-loader'),
-                                options: {
-                                    importLoaders: 1,
-                                },
-                            },
-                            {
-                                loader: require.resolve('postcss-loader'),
-                                options: {
-                                    // Necessary for external CSS imports to work
-                                    // https://github.com/facebookincubator/create-react-app/issues/2677
-                                    ident: 'postcss',
-                                    plugins: () => [
-                                        require('postcss-flexbugs-fixes'),
-                                        autoprefixer({
-                                            browsers: [
-                                                '>1%',
-                                                'last 4 versions',
-                                                'Firefox ESR',
-                                                'not ie < 9', // React doesn't support IE8 anyway
-                                            ],
-                                            flexbox: 'no-2009',
-                                        }),
-                                    ],
-                                },
-                            },
-                        ],
-                    },
-                    {
                         test: /\.less$/,
-                        use: [
-                            {
-                                loader: 'style-loader'
-                            },
-                            {
-                                loader: 'css-loader'
-                            },
-                            {
-                                loader: 'less-loader'
-                            }
-                        ]
+                        use: extractLess.extract({
+                            fallback: 'style-loader',
+                            use: [
+                                ...styleLoader,
+                                {
+                                    loader: 'css-loader',
+                                    options: {
+                                        minimize: minimizeCss,
+                                        sourceMap: shouldUseSourceMap
+                                    }
+                                },
+                                {
+                                    loader: 'less-loader'
+                                }
+                            ]
+                        })
                     },
                     {
                         test: /\.properties/,
@@ -279,13 +254,17 @@ module.exports = {
             minChunks: 2
         }),
         // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
-        new ExtractTextPlugin({
-            filename: cssFilename,
-            allChunks: true
-        }),
+        extractLess,
         new ManifestPlugin({
             fileName: 'asset-manifest.json',
         }),
+        new CleanWebpackPlugin(
+            cssDir + "*.*",
+            {
+                dry: false,
+                allowExternal: true
+            }
+        ),
         // Moment.js is an extremely popular library that bundles large locale files
         // by default due to how Webpack interprets its code. This is a practical
         // solution that requires the user to opt into importing specific locales.
@@ -294,7 +273,7 @@ module.exports = {
         //todo:
         //new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /ru|en/),
         //new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-        ...bundle
+        ...extraPlugins
     ],
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
