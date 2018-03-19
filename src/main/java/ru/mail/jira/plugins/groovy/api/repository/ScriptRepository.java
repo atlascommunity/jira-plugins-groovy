@@ -12,7 +12,7 @@ public interface ScriptRepository {
 
     ScriptDirectoryDto getDirectory(int id);
 
-    List<RegistryScriptDto> getAllScripts(boolean includeChangelog);
+    List<RegistryScriptDto> getAllScripts(boolean includeChangelog, boolean includeErrorCount);
 
     List<ScriptDescription> getAllScriptDescriptions(WorkflowScriptType type);
 
@@ -24,7 +24,7 @@ public interface ScriptRepository {
 
     void moveDirectory(ApplicationUser user, int id, ParentForm form);
 
-    RegistryScriptDto getScript(int id, boolean includeChangelogs, boolean expandName);
+    RegistryScriptDto getScript(int id, boolean includeChangelogs, boolean expandName, boolean includeErrorCount);
 
     RegistryScriptDto createScript(ApplicationUser user, RegistryScriptForm scriptForm);
 

@@ -59,7 +59,7 @@ public class WorkflowHelper {
             if (scriptIdString != null) {
                 Integer scriptId = Ints.tryParse(scriptIdString);
                 if (scriptId != null) {
-                    RegistryScriptDto script = scriptRepository.getScript(scriptId, false, false);
+                    RegistryScriptDto script = scriptRepository.getScript(scriptId, false, false, false);
                     if (script != null) {
                         id = String.valueOf(script.getId());
                         scriptString = script.getScriptBody();

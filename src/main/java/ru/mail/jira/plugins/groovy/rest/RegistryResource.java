@@ -129,7 +129,7 @@ public class RegistryResource {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
-            return scriptRepository.getScript(id, true, false);
+            return scriptRepository.getScript(id, true, false, false);
         }).getResponse();
     }
 

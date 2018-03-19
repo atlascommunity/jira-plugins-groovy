@@ -47,7 +47,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
         Integer scriptId = Ints.tryParse(idString);
         RegistryScriptDto script = null;
         if (scriptId != null) {
-            script = scriptRepository.getScript(scriptId, false, false);
+            script = scriptRepository.getScript(scriptId, false, false, false);
         }
 
         map.put("type", getType());
@@ -70,7 +70,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
 
         Integer id = Ints.tryParse(idString);
         if (id != null) {
-            RegistryScriptDto script = scriptRepository.getScript(id, false, true);
+            RegistryScriptDto script = scriptRepository.getScript(id, false, true, false);
 
             if (script != null) {
                 map.put("script", script);
@@ -98,7 +98,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
             throw new RuntimeException("script is not a number");
         }
 
-        RegistryScriptDto script = scriptRepository.getScript(scriptId, false, false);
+        RegistryScriptDto script = scriptRepository.getScript(scriptId, false, false, false);
 
         if (script.getParams() != null) {
             for (ScriptParamDto scriptParamDto : script.getParams()) {

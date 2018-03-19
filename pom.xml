@@ -118,7 +118,7 @@
                     <productDataVersion>${jira.version}</productDataVersion>
                     <enableQuickReload>true</enableQuickReload>
                     <enableFastdev>false</enableFastdev>
-                    <jvmArgs>-Xmx1536m</jvmArgs>
+                    <jvmArgs>-Xmx1536m -Djira.websudo.is.disabled=false</jvmArgs>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <Export-Package>ru.mail.jira.plugins.api,</Export-Package>

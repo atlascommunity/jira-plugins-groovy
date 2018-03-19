@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.commons.RestFieldException;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
+import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.*;
@@ -42,6 +43,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     private final ScriptService scriptService;
     private final JsonMapper jsonMapper;
     private final AuditLogRepository auditLogRepository;
+    private final ExecutionRepository executionRepository;
     private final ChangelogHelper changelogHelper;
 
     @Autowired
@@ -53,6 +55,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         ScriptService scriptService,
         JsonMapper jsonMapper,
         AuditLogRepository auditLogRepository,
+        ExecutionRepository executionRepository,
         ChangelogHelper changelogHelper
     ) {
         this.i18nHelper = i18nHelper;
@@ -62,6 +65,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         this.scriptService = scriptService;
         this.jsonMapper = jsonMapper;
         this.auditLogRepository = auditLogRepository;
+        this.executionRepository = executionRepository;
         this.changelogHelper = changelogHelper;
     }
 
@@ -84,7 +88,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     @Override
     public List<ScriptDirectoryTreeDto> getAllDirectories() {
         Multimap<Integer, RegistryScriptDto> scripts = HashMultimap.create();
-        for (RegistryScriptDto scriptDto : getAllScripts(true)) {
+        for (RegistryScriptDto scriptDto : getAllScripts(true, true)) {
             scripts.put(scriptDto.getDirectoryId(), scriptDto);
         }
 
@@ -192,10 +196,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public List<RegistryScriptDto> getAllScripts(boolean includeChangelog) {
+    public List<RegistryScriptDto> getAllScripts(boolean includeChangelog, boolean includeErrorCount) {
         return Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(script -> buildScriptDto(script, includeChangelog, false))
+            .map(script -> buildScriptDto(script, includeChangelog, false, includeErrorCount))
             .collect(Collectors.toList());
     }
 
@@ -211,8 +215,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     //todo: cache result, maybe add new method for workflow functions
     @Override
-    public RegistryScriptDto getScript(int id, boolean includeChangelogs, boolean expandName) {
-        return buildScriptDto(ao.get(Script.class, id), includeChangelogs, expandName);
+    public RegistryScriptDto getScript(int id, boolean includeChangelogs, boolean expandName, boolean includeErrorCount) {
+        return buildScriptDto(ao.get(Script.class, id), includeChangelogs, expandName, includeErrorCount);
     }
 
     @Override
@@ -248,7 +252,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             )
         );
 
-        return buildScriptDto(script, true, false);
+        return buildScriptDto(script, true, false, true);
     }
 
     @Override
@@ -318,7 +322,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             )
         );
 
-        return buildScriptDto(script, true, false);
+        return buildScriptDto(script, true, false, true);
     }
 
     @Override
@@ -347,7 +351,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         );
     }
 
-    private RegistryScriptDto buildScriptDto(Script script, boolean includeChangelogs, boolean expandName) {
+    private RegistryScriptDto buildScriptDto(Script script, boolean includeChangelogs, boolean expandName, boolean includeErrorCount) {
         RegistryScriptDto result = new RegistryScriptDto();
 
         result.setId(script.getID());
@@ -363,6 +367,9 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
         if (includeChangelogs) {
             result.setChangelogs(changelogHelper.collect(script.getChangelogs()));
+        }
+        if (includeErrorCount) {
+            result.setErrorCount(executionRepository.getErrorCount(script.getID()));
         }
 
         if (script.getParameters() != null) {

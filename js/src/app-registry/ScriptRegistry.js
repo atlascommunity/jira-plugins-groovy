@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
+import memoize from 'fast-memoize';
+import memoizeOne from 'memoize-one';
+
 import Message from 'aui-react/lib/AUIMessage';
 
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
@@ -14,6 +17,7 @@ import Button, {ButtonGroup} from '@atlaskit/button';
 import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import Lozenge from '@atlaskit/lozenge';
+import Badge from '@atlaskit/badge';
 
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 import TrashIcon from '@atlaskit/icon/glyph/trash';
@@ -39,15 +43,29 @@ import {RegistryMessages} from '../i18n/registry.i18n';
 import './ScriptRegistry.less';
 
 
+const countErrors = memoize((directory) => {
+    let errors = 0;
+    if (directory.scripts) {
+        errors += directory.scripts.map(script => script.errorCount || 0).reduce((a, b) => a + b, 0);
+    }
+    if (directory.children) {
+        errors += directory.children.map(child => countErrors(child)).reduce((a, b) => a + b, 0);
+    }
+    return errors;
+});
+
+
 //todo: разобраться почему исходный блок ужимается при перетаскивании.
 //todo: anchor to parent
 //todo: collapse/uncollapse all
 @connect(
-    state => {
-        return {
-            directories: state.directories
-        };
-    },
+    memoizeOne(
+        state => {
+            return {
+                directories: state.directories
+            };
+        }
+    ),
     RegistryActionCreators
 )
 export class ScriptRegistry extends React.Component {
@@ -297,6 +315,8 @@ class ScriptDirectory extends React.Component {
             );
         }
 
+        const errorCount = countErrors(directory);
+
         return (
             <div className="flex full-width flex-column scriptDirectory">
                 <div className="scriptDirectoryTitle">
@@ -316,6 +336,13 @@ class ScriptDirectory extends React.Component {
                                 </h3>
                             </Button>
                         </div>
+                        {errorCount > 0 &&
+                            <div className="flex-vertical-middle" style={{marginLeft: '5px'}}>
+                                <div>
+                                    <Badge max={99} value={errorCount} appearance="important"/>
+                                </div>
+                            </div>
+                        }
                         <div className="muted-text flex-vertical-middle">
                             <div className="flex-row">
                                 {parents.map((parent) =>
@@ -391,6 +418,8 @@ class DraggableScript extends React.Component {
     };
 
     render() {
+        const {script} = this.props;
+
         return (
             <div className="DraggableScript">
                 <Draggable draggableId={`${this.props.script.id}`} type="script">
@@ -408,9 +437,16 @@ class DraggableScript extends React.Component {
                                         {' '}
                                         <div className="flex-vertical-middle">
                                             <h3>
-                                                {this.props.script.name}
+                                                {script.name}
                                             </h3>
                                         </div>
+                                        {script.errorCount > 0 &&
+                                            <div className="flex-vertical-middle" style={{marginLeft: '5px'}}>
+                                                <div>
+                                                    <Badge max={99} value={script.errorCount} appearance="important"/>
+                                                </div>
+                                            </div>
+                                        }
                                     </div>
                                 }
                                 {...this.props}

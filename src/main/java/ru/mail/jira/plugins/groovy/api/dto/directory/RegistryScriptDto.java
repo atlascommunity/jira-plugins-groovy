@@ -22,4 +22,6 @@ public class RegistryScriptDto extends RegistryScriptForm {
     private List<ChangelogDto> changelogs;
     @XmlElement
     private List<ScriptParamDto> params;
+    @XmlElement
+    private Integer errorCount;
 }
