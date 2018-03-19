@@ -9,8 +9,9 @@ import 'codemirror/addon/lint/lint';
 
 import InlineMessage from '@atlaskit/inline-message';
 
-import {Controlled as CodeMirror} from 'react-codemirror2';
 import {Resizable} from 'react-resizable';
+
+import {CodeMirror} from './CM';
 
 import {globalBindings} from '../bindings';
 
@@ -137,7 +138,8 @@ export class Editor extends React.Component {
                     getAnnotations: this._getAnnotations,
                     tooltips: true
                 },
-                //todo: remove for now, too big performance hit viewportMargin: Infinity
+                //todo: remove for now, too big performance hit
+                //viewportMargin: Infinity
             };
         }
         return this.options;
