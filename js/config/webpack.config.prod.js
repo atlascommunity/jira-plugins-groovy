@@ -10,6 +10,7 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
+const saveLicense = require('uglify-save-license');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -58,7 +59,7 @@ if (process.env.NODE_ENV === 'production') {
                 comparisons: false,
             },
             output: {
-                comments: false,
+                comments: saveLicense,
                 // Turned on because emoji and regex is not minified properly using default
                 // https://github.com/facebookincubator/create-react-app/issues/2488
                 ascii_only: true,

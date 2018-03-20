@@ -396,9 +396,10 @@ class ScriptDirectory extends React.Component {
                             <div
                                 ref={provided.innerRef}
                                 className={`ScriptList scriptDropArea ${snapshot.isDraggingOver ? 'draggingOver' : ''}`}
+                                style={{minHeight: (scripts && scripts.length) ? (65*scripts.length + 10*(scripts.length-1)) : null}}
+                                {...provided.droppableProps}
                             >
                                 {scripts}
-                                {!(scripts && scripts.length) && <div className="dropFiller"/>}
                                 {provided.placeholder}
                             </div>
                         )}

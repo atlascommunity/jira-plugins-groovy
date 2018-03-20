@@ -9,7 +9,7 @@
         <name>Mail.Ru Group</name>
         <url>https://mail.ru</url>
     </organization>
-    <name>groovy</name>
+    <name>Groovy Amigo</name>
     <description>Mail.Ru Groovy plugin.</description>
     <packaging>atlassian-plugin</packaging>
     <dependencies>
