@@ -390,7 +390,7 @@ class ScriptDirectory extends React.Component {
                         </ButtonGroup>
                     </div>
                 </div>
-                <div className="scriptDirectoryChildren">
+                <div className={`scriptDirectoryChildren ${(!collapsed || forceOpen) ? 'open' : ''}`}>
                     <Droppable droppableId={`${directory.id}`}>
                         {(provided, snapshot) => (
                             <div
