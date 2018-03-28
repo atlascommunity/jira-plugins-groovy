@@ -14,6 +14,10 @@ public interface ExecutionRepository {
 
     List<ScriptExecutionDto> getInlineExecutions(String scriptId);
 
+    List<ScriptExecutionDto> getLastRegistryExecutions(int scriptId);
+
+    List<ScriptExecutionDto> getLastInlineExecutions(String scriptId);
+
     void deleteOldExecutions();
 
     int getErrorCount(int id);

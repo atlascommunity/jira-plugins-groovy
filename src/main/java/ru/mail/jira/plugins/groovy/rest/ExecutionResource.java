@@ -36,12 +36,32 @@ public class ExecutionResource {
     }
 
     @GET
+    @Path("/forRegistry/{scriptId}/last")
+    public Response getLastExecutions(@PathParam("scriptId") int scriptId) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return executionRepository.getLastRegistryExecutions(scriptId);
+        }).getResponse();
+    }
+
+    @GET
     @Path("/forInline/{scriptId}")
     public Response getExecutions(@PathParam("scriptId") String scriptId) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
             return executionRepository.getInlineExecutions(scriptId);
+        }).getResponse();
+    }
+
+    @GET
+    @Path("/forInline/{scriptId}/last")
+    public Response getLastExecutions(@PathParam("scriptId") String scriptId) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return executionRepository.getLastInlineExecutions(scriptId);
         }).getResponse();
     }
 }

@@ -46,7 +46,8 @@ export const CommonMessages = {
     clearCache: i18n.common.clearCache,
     condition: i18n.common.condition,
     validator: i18n.common.validator,
-    function: i18n.common.function
+    function: i18n.common.function,
+    showAll: i18n.common.showAll
 };
 
 export const DialogMessages = {

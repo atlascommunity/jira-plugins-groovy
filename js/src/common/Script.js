@@ -9,6 +9,7 @@ import CodeIcon from '@atlaskit/icon/glyph/code';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
 import TrashIcon from '@atlaskit/icon/glyph/trash';
 import BitbucketSourceIcon from '@atlaskit/icon/glyph/bitbucket/source';
+import RecentIcon from '@atlaskit/icon/glyph/recent';
 
 import {Editor} from './editor/Editor';
 
@@ -69,6 +70,7 @@ export class Script extends React.Component {
             id: 'current'
         },
         executions: [],
+        onlyLastExecutions: true,
         executionsReady: false
     };
 
@@ -81,20 +83,24 @@ export class Script extends React.Component {
     _showCode = () => {
         const {showCode} = this.state;
 
-        if (!showCode) {
-            this._fetchExecutions();
-        }
-        this.setState({ showCode: !showCode });
+        this.setState({ showCode: !showCode, onlyLastExecutions: true }, () => {
+            if (this.state.showCode) {
+                this._fetchExecutions();
+            }
+        });
     };
 
-    _fetchExecutions() {
+    _showAllExecutions = () => this.setState({ onlyLastExecutions: false }, this._fetchExecutions);
+
+    _fetchExecutions = () => {
         this.setState({ executionsReady: false });
         const {script} = this.props;
+        const {onlyLastExecutions} = this.state;
 
         executionService
-            .getExecutions(script.inline, script.id)
+            .getExecutions(script.inline, script.id, onlyLastExecutions)
             .then(result => this.setState({executions: result, executionsReady: true}));
-    }
+    };
 
     _switchToCurrent = () => {
         this.setState({
@@ -118,7 +124,7 @@ export class Script extends React.Component {
 
     render() {
         const {script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons, headerless} = this.props;
-        const {activeSource, showCode, executions, executionsReady} = this.state;
+        const {activeSource, showCode, executions, executionsReady, onlyLastExecutions} = this.state;
 
         let codeBlock = null;
         let templateBlock = null;
@@ -161,10 +167,27 @@ export class Script extends React.Component {
                 </div>
             );
 
-            if (executions || !executionsReady) {
+            if ((executions && executions.length) || !executionsReady) {
                 executionBar = (
                     <div className="executions">
-                        {executionsReady && <ExecutionBar executions={executions}/>}
+                        {executionsReady &&
+                            <div className="flex-row">
+                                <ExecutionBar executions={executions}/>
+                                {onlyLastExecutions && <div className="flex-grow"/>}
+                                {onlyLastExecutions &&
+                                    <div>
+                                        <Button
+                                            appearance="subtle"
+                                            iconBefore={<RecentIcon label=""/>}
+                                            spacing="compact"
+
+                                            onClick={this._showAllExecutions}
+                                        >
+                                            {CommonMessages.showAll}
+                                        </Button>
+                                    </div>}
+                            </div>
+                        }
                         {!executionsReady && <Spinner size="small"/>}
                     </div>
                 );

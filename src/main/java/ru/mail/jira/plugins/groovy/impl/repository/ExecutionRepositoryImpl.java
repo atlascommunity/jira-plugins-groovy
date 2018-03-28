@@ -19,10 +19,7 @@ import ru.mail.jira.plugins.groovy.api.dto.ScriptExecutionDto;
 import ru.mail.jira.plugins.groovy.api.entity.ScriptExecution;
 
 import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -87,6 +84,24 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
         return Arrays
             .stream(ao.find(ScriptExecution.class, Query.select().where("INLINE_ID = ?", scriptId)))
             .map(this::buildDto)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ScriptExecutionDto> getLastRegistryExecutions(int scriptId) {
+        return Arrays
+            .stream(ao.find(ScriptExecution.class, Query.select().where("SCRIPT_ID = ?", scriptId).order("ID DESC").limit(25)))
+            .map(this::buildDto)
+            .sorted(Comparator.comparingInt(ScriptExecutionDto::getId))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ScriptExecutionDto> getLastInlineExecutions(String scriptId) {
+        return Arrays
+            .stream(ao.find(ScriptExecution.class, Query.select().where("INLINE_ID = ?", scriptId).order("ID DESC").limit(25)))
+            .map(this::buildDto)
+            .sorted(Comparator.comparingInt(ScriptExecutionDto::getId))
             .collect(Collectors.toList());
     }
 
