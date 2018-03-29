@@ -70,7 +70,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
 
         Integer id = Ints.tryParse(idString);
         if (id != null) {
-            RegistryScriptDto script = scriptRepository.getScript(id, false, true, false);
+            RegistryScriptDto script = scriptRepository.getScript(id, false, true, true);
 
             if (script != null) {
                 map.put("script", script);

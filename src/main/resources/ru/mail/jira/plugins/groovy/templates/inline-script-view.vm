@@ -13,7 +13,8 @@ $webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.work
                 document.getElementById("mailru-groovy-script-react-container-$uuid"),
                 "$uuid",
                 "$nameHtml",
-                "$scriptHtml"
+                "$scriptHtml",
+                #if ($errorCount) $errorCount #else 0 #end,
         );
     });
 </script>

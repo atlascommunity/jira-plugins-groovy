@@ -42,7 +42,7 @@ function ScriptParamValue({value, param}) {
 }
 
 define('mailru/groovy/renderRegistryScript', () => {
-    return (element, id, name, source, params, paramValues) => {
+    return (element, id, name, source, errorCount, params, paramValues) => {
         ReactDOM.render(
             <Script
                 withChangelog={false}
@@ -50,7 +50,8 @@ define('mailru/groovy/renderRegistryScript', () => {
                 script={{
                     id: id,
                     name: name,
-                    scriptBody: source
+                    scriptBody: source,
+                    errorCount
                 }}
             >
                 {params && <form className="aui" style={{margin: 0}}>
@@ -72,7 +73,7 @@ define('mailru/groovy/renderRegistryScript', () => {
 });
 
 define('mailru/groovy/renderInlineScript', () => {
-    return (element, id, name, source) => {
+    return (element, id, name, source, errorCount) => {
         ReactDOM.render(
             <Script
                 withChangelog={false}
@@ -83,7 +84,8 @@ define('mailru/groovy/renderInlineScript', () => {
                     id: id,
                     name: name || 'Inline script',
                     scriptBody: source,
-                    inline: true
+                    inline: true,
+                    errorCount
                 }}
             />,
             element
