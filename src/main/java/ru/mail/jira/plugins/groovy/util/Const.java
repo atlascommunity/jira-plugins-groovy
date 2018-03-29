@@ -41,7 +41,7 @@ public final class Const {
 
     public static final String SCHEDULED_TASK_ID = "SCHEDULED_TASK_ID";
 
-    public static final Pattern REST_NAME_PATTERN = Pattern.compile("[a-z0-9_-]{1,64}");
+    public static final Pattern REST_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_-]{1,64}");
 
     public static final int COMMENT_MAX_LENGTH = 200;
 
