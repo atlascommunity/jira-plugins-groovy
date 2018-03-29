@@ -70,6 +70,7 @@ class Field extends React.Component {
                     inline: true,
                     scriptBody: config.scriptBody,
                     changelogs: config.changelogs,
+                    errorCount: config.errorCount
                 }}
                 template={config.needsTemplate && {
                     body: config.template

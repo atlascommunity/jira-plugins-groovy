@@ -54,8 +54,7 @@ const countErrors = memoize((directory) => {
     return errors;
 });
 
-
-//todo: разобраться почему исходный блок ужимается при перетаскивании.
+//todo: show spinner while loading
 //todo: anchor to parent
 //todo: collapse/uncollapse all
 @connect(

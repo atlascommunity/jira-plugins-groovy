@@ -26,6 +26,8 @@ public class FieldConfigDto extends FieldConfigForm {
     private String contextName;
     @XmlElement
     private List<ChangelogDto> changelogs;
+    @XmlElement
+    private Integer errorCount;
 
     @Override
     public boolean equals(Object o) {

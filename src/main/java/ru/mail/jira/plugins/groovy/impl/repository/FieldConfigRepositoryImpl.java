@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.commons.RestFieldException;
 import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
+import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
@@ -55,6 +56,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
     private final AuditLogRepository auditLogRepository;
     private final Cache<Long, FieldScript> scriptCache;
     private final ScriptInvalidationService invalidationService;
+    private final ExecutionRepository executionRepository;
 
     @Autowired
     public FieldConfigRepositoryImpl(
@@ -67,7 +69,8 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         ScriptService scriptService,
         ChangelogHelper changelogHelper,
         AuditLogRepository auditLogRepository,
-        ScriptInvalidationService invalidationService
+        ScriptInvalidationService invalidationService,
+        ExecutionRepository executionRepository
     ) {
         this.ao = ao;
         this.i18nHelper = i18nHelper;
@@ -87,6 +90,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             );
         this.auditLogRepository = auditLogRepository;
         this.invalidationService = invalidationService;
+        this.executionRepository = executionRepository;
     }
 
     @Override
@@ -105,13 +109,13 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             .getConfigurationSchemes()
             .stream()
             .flatMap(fieldConfigScheme -> fieldConfigScheme.getConfigs().values().stream())
-            .map(config -> buildDto(config, findConfig(config.getId()), true));
+            .map(config -> buildDto(config, findConfig(config.getId()), true, true));
     }
 
     @Override
     public FieldConfigDto getConfig(long id, boolean includeChangelogs) {
         com.atlassian.jira.issue.fields.config.FieldConfig jiraFieldConfig = fieldConfigManager.getFieldConfig(id);
-        return buildDto(jiraFieldConfig, findConfig(id), includeChangelogs);
+        return buildDto(jiraFieldConfig, findConfig(id), includeChangelogs, true);
     }
 
     @Override
@@ -185,7 +189,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
 
         scriptCache.remove(configId);
         invalidationService.invalidateField(jiraFieldConfig.getCustomField().getIdAsLong());
-        return buildDto(jiraFieldConfig, fieldConfig, true);
+        return buildDto(jiraFieldConfig, fieldConfig, true, true);
     }
 
     @Override
@@ -241,7 +245,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         }
     }
 
-    private FieldConfigDto buildDto(com.atlassian.jira.issue.fields.config.FieldConfig jiraConfig, FieldConfig fieldConfig, boolean includeChangelogs) {
+    private FieldConfigDto buildDto(com.atlassian.jira.issue.fields.config.FieldConfig jiraConfig, FieldConfig fieldConfig, boolean includeChangelogs, boolean includeErrorCount) {
         FieldConfigDto result = new FieldConfigDto();
 
         CustomField customField = jiraConfig.getCustomField();
@@ -273,6 +277,10 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
 
             if (includeChangelogs) {
                 result.setChangelogs(changelogHelper.collect(fieldConfig.getChangelogs()));
+            }
+
+            if (includeErrorCount) {
+                result.setErrorCount(executionRepository.getErrorCount(fieldConfig.getUuid()));
             }
         }
 
