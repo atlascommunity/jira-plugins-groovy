@@ -44,4 +44,11 @@ public final class ExceptionHelper {
         }
         return null;
     }
+
+    public static String getMessageOrClassName(Exception e) {
+        if (e.getMessage() != null) {
+            return e.getMessage();
+        }
+        return e.getClass().getSimpleName();
+    }
 }

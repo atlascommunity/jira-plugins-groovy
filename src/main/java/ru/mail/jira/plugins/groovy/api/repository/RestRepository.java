@@ -13,7 +13,7 @@ public interface RestRepository {
 
     RestScriptDto createScript(ApplicationUser user, RestScriptForm form);
 
-    RestScriptDto getScript(int id, boolean includeChangelogs);
+    RestScriptDto getScript(int id, boolean includeChangelogs, boolean includeErrorCount);
 
     RestScriptDto updateScript(ApplicationUser user, int id, RestScriptForm form);
 

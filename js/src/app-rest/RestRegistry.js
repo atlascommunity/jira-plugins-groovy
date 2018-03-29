@@ -89,7 +89,8 @@ class RestScript extends React.Component {
                     name: script.name,
                     inline: true,
                     scriptBody: script.scriptBody,
-                    changelogs: script.changelogs
+                    changelogs: script.changelogs,
+                    errorCount: script.errorCount
                 }}
 
                 withChangelog={true}

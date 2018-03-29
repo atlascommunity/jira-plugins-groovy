@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.commons.RestFieldException;
 import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
+import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.RestRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
@@ -35,6 +36,7 @@ public class RestRepositoryImpl implements RestRepository {
     private final ChangelogHelper changelogHelper;
     private final ScriptService scriptService;
     private final AuditLogRepository auditLogRepository;
+    private final ExecutionRepository executionRepository;
 
     @Autowired
     public RestRepositoryImpl(
@@ -42,25 +44,27 @@ public class RestRepositoryImpl implements RestRepository {
         @ComponentImport I18nHelper i18nHelper,
         ChangelogHelper changelogHelper,
         ScriptService scriptService,
-        AuditLogRepository auditLogRepository
+        AuditLogRepository auditLogRepository,
+        ExecutionRepository executionRepository
     ) {
         this.ao = ao;
         this.i18nHelper = i18nHelper;
         this.changelogHelper = changelogHelper;
         this.scriptService = scriptService;
         this.auditLogRepository = auditLogRepository;
+        this.executionRepository = executionRepository;
     }
 
     @Override
-    public RestScriptDto getScript(int id, boolean includeChangelogs) {
-        return buildScriptDto(ao.get(RestScript.class, id), includeChangelogs);
+    public RestScriptDto getScript(int id, boolean includeChangelogs, boolean includeErrorCount) {
+        return buildScriptDto(ao.get(RestScript.class, id), includeChangelogs, includeErrorCount);
     }
 
     @Override
     public List<RestScriptDto> getAllScripts() {
         return Arrays
             .stream(ao.find(RestScript.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(script -> buildScriptDto(script, true))
+            .map(script -> buildScriptDto(script, true, true))
             .collect(Collectors.toList());
     }
 
@@ -90,7 +94,7 @@ public class RestRepositoryImpl implements RestRepository {
             )
         );
 
-        return buildScriptDto(script, true);
+        return buildScriptDto(script, true, true);
     }
 
     @Override
@@ -118,7 +122,7 @@ public class RestRepositoryImpl implements RestRepository {
             )
         );
 
-        return buildScriptDto(script, true);
+        return buildScriptDto(script, true, true);
     }
 
     @Override
@@ -197,7 +201,7 @@ public class RestRepositoryImpl implements RestRepository {
         }
     }
 
-    private RestScriptDto buildScriptDto(RestScript script, boolean includeChangelogs) {
+    private RestScriptDto buildScriptDto(RestScript script, boolean includeChangelogs, boolean includeErrorCount) {
         RestScriptDto result = new RestScriptDto();
 
         result.setId(script.getID());
@@ -209,6 +213,10 @@ public class RestRepositoryImpl implements RestRepository {
 
         if (includeChangelogs) {
             result.setChangelogs(changelogHelper.collect(script.getChangelogs()));
+        }
+
+        if (includeErrorCount) {
+            result.setErrorCount(executionRepository.getErrorCount(script.getUuid()));
         }
 
         return result;

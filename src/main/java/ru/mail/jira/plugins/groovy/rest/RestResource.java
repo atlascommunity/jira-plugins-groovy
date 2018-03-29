@@ -64,7 +64,7 @@ public class RestResource {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
-            return restRepository.getScript(id, true);
+            return restRepository.getScript(id, true, true);
         }).getResponse();
     }
 

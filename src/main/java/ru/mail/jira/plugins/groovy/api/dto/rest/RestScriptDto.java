@@ -19,4 +19,6 @@ public class RestScriptDto extends RestScriptForm {
     private boolean deleted;
     @XmlElement
     private List<ChangelogDto> changelogs;
+    @XmlElement
+    private Integer errorCount;
 }

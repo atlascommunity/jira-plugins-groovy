@@ -6,6 +6,8 @@ import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.google.common.collect.ImmutableMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.RestRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
@@ -27,6 +29,8 @@ import java.util.Objects;
 @Produces(MediaType.APPLICATION_JSON)
 @AnonymousAllowed
 public class CustomRestResource {
+    private final Logger logger = LoggerFactory.getLogger(CustomRestResource.class);
+
     private final JiraAuthenticationContext authenticationContext;
     private final RestRepository restRepository;
     private final ScriptService scriptService;
@@ -94,7 +98,7 @@ public class CustomRestResource {
 
         boolean successful = true;
         String error = null;
-        Exception rethrow = null;
+        Exception exception = null;
 
         HashMap<String, Object> bindings = new HashMap<>();
         bindings.put("method", method);
@@ -112,7 +116,8 @@ public class CustomRestResource {
             );
         } catch (Exception e) {
             successful = false;
-            rethrow = e;
+            exception = e;
+            logger.error("Error for rest script {}", key, exception);
             error = ExceptionHelper.writeExceptionToString(e);
         }
 
@@ -130,8 +135,8 @@ public class CustomRestResource {
             )
         );
 
-        if (rethrow != null) {
-            throw rethrow;
+        if (exception != null) {
+            return Response.status(500).entity(ExceptionHelper.getMessageOrClassName(exception)).build();
         }
 
         if (response == null) {
