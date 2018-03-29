@@ -3,7 +3,8 @@ import sortBy from 'lodash.sortby';
 
 
 export const registryReducer = combineReducers({
-    directories: directoriesReducer
+    directories: directoriesReducer,
+    ready: readyReducer
 });
 
 const LOAD_STATE = 'LOAD_STATE';
@@ -69,6 +70,18 @@ export const RegistryActionCreators = {
         };
     }
 };
+
+function readyReducer(state, action) {
+    if (state === undefined) {
+        return false;
+    }
+
+    if (action.type === LOAD_STATE) {
+        return true;
+    }
+
+    return state;
+}
 
 function directoriesReducer(state, action) {
     if (state === undefined) {

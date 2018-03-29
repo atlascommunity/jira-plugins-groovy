@@ -18,6 +18,7 @@ import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-
 import {FieldTextStateless} from '@atlaskit/field-text';
 import Lozenge from '@atlaskit/lozenge';
 import Badge from '@atlaskit/badge';
+import Spinner from '@atlaskit/spinner';
 
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 import TrashIcon from '@atlaskit/icon/glyph/trash';
@@ -54,13 +55,13 @@ const countErrors = memoize((directory) => {
     return errors;
 });
 
-//todo: show spinner while loading
 //todo: anchor to parent
 //todo: collapse/uncollapse all
 @connect(
     memoizeOne(
         state => {
             return {
+                ready: state.ready,
                 directories: state.directories
             };
         }
@@ -68,6 +69,11 @@ const countErrors = memoize((directory) => {
     RegistryActionCreators
 )
 export class ScriptRegistry extends React.Component {
+    static propTypes = {
+        ready: PropTypes.bool.isRequired,
+        directories: PropTypes.arrayOf(PropTypes.object.isRequired)
+    };
+
     state = {
         isDragging: false,
         waiting: false,
@@ -197,8 +203,8 @@ export class ScriptRegistry extends React.Component {
 
     render() {
         const {waiting, filter} = this.state;
+        let {directories, ready} = this.props;
 
-        let directories = this.props.directories;
         let forceOpen = false;
 
         if (filter && filter.length > 0) {
@@ -245,7 +251,8 @@ export class ScriptRegistry extends React.Component {
                             />
                         )}
 
-                        {!directories.length ? <Message type="info" title={RegistryMessages.noScripts}>{RegistryMessages.noScripts}</Message> : null}
+                        {!ready && <div className="flex-horizontal-middle"><Spinner/></div>}
+                        {ready && !directories.length ? <Message type="info" title={RegistryMessages.noScripts}>{RegistryMessages.noScripts}</Message> : null}
                         <ScriptDirectoryDialog ref={this._setRef('directoryDialogRef')}/>
                         <ScriptDialog ref={this._setRef('scriptDialogRef')}/>
 
