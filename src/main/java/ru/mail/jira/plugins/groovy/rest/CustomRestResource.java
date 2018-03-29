@@ -24,6 +24,7 @@ import java.util.Objects;
 
 @Scanned
 @Path("/custom/{scriptKey}")
+@Produces(MediaType.APPLICATION_JSON)
 @AnonymousAllowed
 public class CustomRestResource {
     private final JiraAuthenticationContext authenticationContext;
@@ -124,7 +125,7 @@ public class CustomRestResource {
                 "method", method.name(),
                 "queryParameters", Objects.toString(uriInfo.getQueryParameters()),
                 "body", body != null ? body : "",
-                "user", user.getKey(),
+                "user", user != null ? user.getKey() : "anonymous",
                 "type", ScriptType.REST.name()
             )
         );
@@ -136,6 +137,7 @@ public class CustomRestResource {
         if (response == null) {
             response = Response.noContent().build();
         }
+
         return response;
     }
 }
