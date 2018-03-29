@@ -94,7 +94,8 @@ class Listener extends React.Component {
                     name: listener.name,
                     inline: true,
                     scriptBody: listener.scriptBody,
-                    changelogs: listener.changelogs
+                    changelogs: listener.changelogs,
+                    errorCount: listener.errorCount
                 }}
 
                 withChangelog={true}

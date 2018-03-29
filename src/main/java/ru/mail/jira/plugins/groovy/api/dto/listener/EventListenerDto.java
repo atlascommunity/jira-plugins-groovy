@@ -17,4 +17,6 @@ public class EventListenerDto extends EventListenerForm {
     private String uuid;
     @XmlElement
     private List<ChangelogDto> changelogs;
+    @XmlElement
+    private Integer errorCount;
 }

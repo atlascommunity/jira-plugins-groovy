@@ -21,4 +21,6 @@ public interface ExecutionRepository {
     void deleteOldExecutions();
 
     int getErrorCount(int id);
+
+    int getErrorCount(String id);
 }

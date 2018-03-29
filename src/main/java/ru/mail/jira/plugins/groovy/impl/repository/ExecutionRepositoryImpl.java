@@ -164,6 +164,11 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
     }
 
     @Override
+    public int getErrorCount(String id) {
+        return ao.count(ScriptExecution.class, Query.select().where("INLINE_ID = ? AND SUCCESSFUL = ?", id, Boolean.FALSE));
+    }
+
+    @Override
     public void deleteOldExecutions() {
         int deleted = ao.deleteWithSQL(ScriptExecution.class, "DATE < ?", new Timestamp(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14)));
         logger.info("Deleted {} old executions", deleted);

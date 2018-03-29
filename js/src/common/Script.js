@@ -4,6 +4,7 @@ import React from 'react';
 import Avatar from '@atlaskit/avatar';
 import Button, {ButtonGroup} from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
+import Badge from '@atlaskit/badge';
 
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
@@ -34,7 +35,8 @@ export class Script extends React.Component {
             name: PropTypes.string,
             scriptBody: PropTypes.string,
             inline: PropTypes.bool,
-            changelogs: PropTypes.array
+            changelogs: PropTypes.array,
+            errorCount: PropTypes.number
         }),
         template: PropTypes.shape({
             body: PropTypes.string
@@ -213,6 +215,13 @@ export class Script extends React.Component {
                                         {script && script.name}
                                     </h3>
                                 </div>
+                                {!!script.errorCount &&
+                                    <div className="flex-vertical-middle" style={{marginLeft: '5px'}}>
+                                        <div>
+                                            <Badge max={99} value={script.errorCount} appearance="important"/>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         }
                         <div className="flex-none flex-row">
