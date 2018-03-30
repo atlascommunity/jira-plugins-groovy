@@ -194,7 +194,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                 AuditCategory.REGISTRY_DIRECTORY,
                 (long) directory.getID(),
                 AuditAction.MOVED,
-                getId(oldParent) + " -> " + getId(newParent)
+                getName(oldParent) + " -> " + getName(newParent)
             )
         );
     }
@@ -295,7 +295,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                 AuditCategory.REGISTRY_SCRIPT,
                 (long) script.getID(),
                 AuditAction.MOVED,
-                getId(oldParent) + " -> " + getId(newParent)
+                getName(oldParent) + " -> " + getName(newParent)
             )
         );
     }
@@ -500,7 +500,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return ScriptRepositoryImpl.class.toString() + "_script_" + id;
     }
 
-    private static Integer getId(ScriptDirectory directory) {
-        return directory != null ? directory.getID() : null;
+    private static String getName(ScriptDirectory directory) {
+        return directory != null ? (directory.getName() + "(" + directory.getID() + ")") : null;
     }
 }
