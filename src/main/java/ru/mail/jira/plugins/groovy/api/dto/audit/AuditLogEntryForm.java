@@ -17,6 +17,8 @@ public class AuditLogEntryForm {
     @XmlElement
     private AuditCategory category;
     @XmlElement
+    private Long entityId;
+    @XmlElement
     private AuditAction action;
     @XmlElement
     private String description;

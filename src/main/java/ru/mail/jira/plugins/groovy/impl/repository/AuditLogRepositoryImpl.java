@@ -45,7 +45,8 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
             new DBParam("USER_KEY", user.getKey()),
             new DBParam("CATEGORY", form.getCategory()),
             new DBParam("ACTION", form.getAction()),
-            new DBParam("DESCRIPTION", form.getDescription())
+            new DBParam("DESCRIPTION", form.getDescription()),
+            new DBParam("ENTITY_ID", form.getEntityId())
         );
     }
 

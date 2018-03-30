@@ -18,6 +18,9 @@ public interface AuditLogEntry extends Entity {
     void setCategory(AuditCategory category);
     AuditCategory getCategory();
 
+    void setEntityId(Long entityId);
+    Long getEntityId();
+
     @NotNull
     void setAction(AuditAction action);
     AuditAction getAction();

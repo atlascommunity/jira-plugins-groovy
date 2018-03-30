@@ -125,6 +125,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.LISTENER,
+                (long) listener.getID(),
                 AuditAction.CREATED,
                 listener.getID() + " - " + listener.getName()
             )
@@ -159,6 +160,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.LISTENER,
+                (long) listener.getID(),
                 AuditAction.UPDATED,
                 listener.getID() + " - " + listener.getName()
             )
@@ -179,6 +181,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.LISTENER,
+                (long) listener.getID(),
                 AuditAction.DELETED,
                 listener.getID() + " - " + listener.getName()
             )

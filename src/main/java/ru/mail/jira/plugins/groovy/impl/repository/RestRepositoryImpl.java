@@ -89,6 +89,7 @@ public class RestRepositoryImpl implements RestRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.REST,
+                (long) script.getID(),
                 AuditAction.CREATED,
                 script.getID() + " - " + script.getName()
             )
@@ -117,6 +118,7 @@ public class RestRepositoryImpl implements RestRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.REST,
+                (long) script.getID(),
                 AuditAction.UPDATED,
                 script.getID() + " - " + script.getName()
             )
@@ -138,6 +140,7 @@ public class RestRepositoryImpl implements RestRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.REST,
+                (long) script.getID(),
                 AuditAction.UPDATED,
                 script.getID() + " - " + script.getName()
             )
