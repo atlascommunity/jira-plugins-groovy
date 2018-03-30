@@ -57,6 +57,11 @@ export const Bindings = {
         className: 'UriInfo',
         fullClassName: 'javax.ws.rs.core.UriInfo'
     },
+    headers: {
+        name: 'headers',
+        className: 'HttpHeaders',
+        fullClassName: 'javax.ws.rs.core.HttpHeaders'
+    },
     body: {
         name: 'body',
         className: 'String',

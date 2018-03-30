@@ -24,7 +24,7 @@ import {EditorField} from '../common/ak/EditorField';
 
 
 const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { content: method, value: method }; });
-const bindings = [ Bindings.method, Bindings.uriInfo, Bindings.body, Bindings.currentUser ];
+const bindings = [ Bindings.method, Bindings.headers, Bindings.uriInfo, Bindings.body, Bindings.currentUser ];
 
 @connect(
     () => { return{}; },

@@ -17,10 +17,7 @@ import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -51,42 +48,46 @@ public class CustomRestResource {
     @GET
     public Response customRestGet(
         @PathParam("scriptKey") String scriptKey,
+        @Context HttpHeaders headers,
         @Context UriInfo uriInfo
     ) throws Exception {
-        return runScript(HttpMethod.GET, scriptKey, uriInfo, null);
+        return runScript(HttpMethod.GET, scriptKey, headers, uriInfo, null);
     }
 
     @POST
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes
     public Response customRestPost(
         @PathParam("scriptKey") String scriptKey,
+        @Context HttpHeaders headers,
         @Context UriInfo uriInfo,
         String body
     ) throws Exception {
-        return runScript(HttpMethod.POST, scriptKey, uriInfo, body);
+        return runScript(HttpMethod.POST, scriptKey, headers, uriInfo, body);
     }
 
     @PUT
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes
     public Response customRestPut(
         @PathParam("scriptKey") String scriptKey,
+        @Context HttpHeaders headers,
         @Context UriInfo uriInfo,
         String body
     ) throws Exception {
-        return runScript(HttpMethod.PUT, scriptKey, uriInfo, body);
+        return runScript(HttpMethod.PUT, scriptKey, headers, uriInfo, body);
     }
 
     @DELETE
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes
     public Response customRestDelete(
         @PathParam("scriptKey") String scriptKey,
+        @Context HttpHeaders headers,
         @Context UriInfo uriInfo,
         String body
     ) throws Exception {
-        return runScript(HttpMethod.DELETE, scriptKey, uriInfo, body);
+        return runScript(HttpMethod.DELETE, scriptKey, headers, uriInfo, body);
     }
 
-    private Response runScript(HttpMethod method, String key, UriInfo uriInfo, String body) throws Exception {
+    private Response runScript(HttpMethod method, String key, HttpHeaders headers, UriInfo uriInfo, String body) throws Exception {
         Script script = restRepository.getScript(method, key);
 
         if (script == null) {
@@ -103,6 +104,7 @@ public class CustomRestResource {
         HashMap<String, Object> bindings = new HashMap<>();
         bindings.put("method", method);
         bindings.put("uriInfo", uriInfo);
+        bindings.put("headers", headers);
         bindings.put("body", body);
         bindings.put("currentUser", user);
 
@@ -126,13 +128,14 @@ public class CustomRestResource {
             System.currentTimeMillis() - t,
             successful,
             error,
-            ImmutableMap.of(
-                "method", method.name(),
-                "queryParameters", Objects.toString(uriInfo.getQueryParameters()),
-                "body", body != null ? body : "",
-                "user", user != null ? user.getKey() : "anonymous",
-                "type", ScriptType.REST.name()
-            )
+            ImmutableMap.<String, String>builder()
+                .put("method", method.name())
+                .put("queryParameters", Objects.toString(uriInfo.getQueryParameters()))
+                .put("headers", Objects.toString(headers.getRequestHeaders()))
+                .put("body", body != null ? body : "")
+                .put("user", user != null ? user.getKey() : "anonymous")
+                .put("type", ScriptType.REST.name())
+                .build()
         );
 
         if (exception != null) {
