@@ -4,7 +4,11 @@ export class PreferenceService {
     }
 
     put(key, value) {
-        localStorage.setItem(key, value);
+        try {
+            localStorage.setItem(key, value);
+        } catch (e) {
+            console.error(`unable to setItem ${key} in localStorage`, e);
+        }
     }
 
     remove(key) {
