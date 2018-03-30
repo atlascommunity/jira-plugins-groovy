@@ -5,6 +5,8 @@ import {Map} from 'immutable';
 
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
+import {ToggleStateless} from '@atlaskit/toggle';
+import {Label} from '@atlaskit/field-base';
 
 import {registryService} from '../service/services';
 import {SingleSelect} from '../common/ak/SingleSelect';
@@ -40,6 +42,8 @@ export class RegistryPicker extends React.Component {
     _setInputValue = (field) => (e) => this._mutateValue(field, e.target.value);
 
     _setValue = (field) => (value) => this._mutateValue(field, value);
+
+    _setToggleValue = (field) => (event) => this._mutateValue(field, event.target.checked);
 
     _mutateValue = (field, value) => this.setState((state) => {
         return {
@@ -128,6 +132,20 @@ export class RegistryPicker extends React.Component {
                     value={value || ''}
                     onChange={this._setInputValue(paramName)}
                 />;
+            case 'BOOLEAN':
+                return <div>
+                    <Label label={label}/>
+                    <ToggleStateless
+                        label={label}
+                        size="large"
+
+                        isChecked={value || false}
+                        onChange={this._setToggleValue(paramName)}
+
+                        name={inputName}
+                        value="true"
+                    />
+                </div>;
             default:
                 return <div>{'Unsupported type'}</div>;
         }

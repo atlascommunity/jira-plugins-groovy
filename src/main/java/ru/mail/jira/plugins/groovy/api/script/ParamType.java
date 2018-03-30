@@ -7,6 +7,7 @@ import lombok.Getter;
 
 @Getter
 public enum ParamType {
+    BOOLEAN(Boolean.class),
     STRING(String.class),
     TEXT(String.class),
     LONG(Long.class),

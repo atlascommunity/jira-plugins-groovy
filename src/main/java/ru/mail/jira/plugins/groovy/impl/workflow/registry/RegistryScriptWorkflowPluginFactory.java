@@ -10,6 +10,7 @@ import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
+import ru.mail.jira.plugins.groovy.api.script.ParamType;
 import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.Base64Util;
 import ru.mail.jira.plugins.groovy.util.Const;
@@ -103,7 +104,14 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
         if (script.getParams() != null) {
             for (ScriptParamDto scriptParamDto : script.getParams()) {
                 String paramName = scriptParamDto.getName();
-                String value = extractSingleParam(input, "script-" + paramName);
+                String paramKey = "script-" + paramName;
+
+                String value = input.containsKey(paramKey) ? extractSingleParam(input, paramKey) : null;
+
+                if (scriptParamDto.getParamType() == ParamType.BOOLEAN && value == null) {
+                    value = "false";
+                }
+
                 if (value == null) {
                     throw new RuntimeException("param for " + paramName + " is not specified");
                 }

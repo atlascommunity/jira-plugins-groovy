@@ -19,7 +19,7 @@ import './workflow.less';
 
 
 function ScriptParamValue({value, param}) {
-    if (!value) {
+    if (value === null || value === undefined) {
         return <strong style={{color: 'red'}}>{ErrorMessages.noValue}</strong>;
     }
     switch (param.paramType) {
@@ -35,7 +35,8 @@ function ScriptParamValue({value, param}) {
         case 'TEXT':
         case 'LONG':
         case 'DOUBLE':
-            return value;
+        case 'BOOLEAN':
+            return value.toString();
         default:
             return <div>{'Unsupported type'}</div>;
     }

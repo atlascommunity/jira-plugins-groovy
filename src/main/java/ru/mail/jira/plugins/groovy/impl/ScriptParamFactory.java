@@ -40,6 +40,8 @@ public class ScriptParamFactory {
         }
 
         switch (paramDto.getParamType()) {
+            case BOOLEAN:
+                return Boolean.valueOf(value);
             case STRING:
             case TEXT:
                 return value;
@@ -60,6 +62,8 @@ public class ScriptParamFactory {
 
     public Object getParamFormValue(ScriptParamDto paramDto, String value) {
         switch (paramDto.getParamType()) {
+            case BOOLEAN:
+                return Boolean.valueOf(value); //todo: ?
             case STRING:
             case TEXT:
             case LONG:
