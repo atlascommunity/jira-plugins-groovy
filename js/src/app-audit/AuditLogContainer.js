@@ -113,7 +113,7 @@ export class AuditLogContainer extends React.Component {
                                 content: (
                                     <AvatarItem
                                         backgroundColor="transparent"
-                                        avatar={<Avatar src={value.user.avatarUrl}/>}
+                                        avatar={<Avatar src={value.user.avatarUrl} appearance="square"/>}
 
                                         primaryText={value.user.displayName}
                                         secondaryText={value.user.name}
