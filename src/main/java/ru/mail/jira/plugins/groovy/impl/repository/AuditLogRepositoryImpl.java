@@ -8,11 +8,12 @@ import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryDto;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.Page;
-import ru.mail.jira.plugins.groovy.api.entity.AuditLogEntry;
+import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
 
 import java.sql.Timestamp;
@@ -24,16 +25,19 @@ import java.util.stream.Collectors;
 public class AuditLogRepositoryImpl implements AuditLogRepository {
     private final ActiveObjects activeObjects;
     private final DateTimeFormatter dateTimeFormatter;
+    private final CustomFieldHelper customFieldHelper;
     private final UserMapper userMapper;
 
     @Autowired
     public AuditLogRepositoryImpl(
         @ComponentImport ActiveObjects activeObjects,
         @ComponentImport DateTimeFormatter dateTimeFormatter,
+        CustomFieldHelper customFieldHelper,
         UserMapper userMapper
     ) {
         this.activeObjects = activeObjects;
         this.dateTimeFormatter = dateTimeFormatter;
+        this.customFieldHelper = customFieldHelper;
         this.userMapper = userMapper;
     }
 
@@ -66,15 +70,42 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
         return new Page<>(offset, limit, totalCount, results);
     }
 
-    private AuditLogEntryDto buildEntryDto(AuditLogEntry auditLogEntry) {
+    private AuditLogEntryDto buildEntryDto(AuditLogEntry entry) {
         AuditLogEntryDto result = new AuditLogEntryDto();
 
-        result.setDate(dateTimeFormatter.forLoggedInUser().format(auditLogEntry.getDate()));
-        result.setId(auditLogEntry.getID());
-        result.setUser(userMapper.buildUser(auditLogEntry.getUserKey()));
-        result.setAction(auditLogEntry.getAction());
-        result.setCategory(auditLogEntry.getCategory());
-        result.setDescription(auditLogEntry.getDescription());
+        result.setDate(dateTimeFormatter.forLoggedInUser().format(entry.getDate()));
+        result.setId(entry.getID());
+        result.setUser(userMapper.buildUser(entry.getUserKey()));
+        result.setAction(entry.getAction());
+        result.setCategory(entry.getCategory());
+        result.setDescription(entry.getDescription());
+
+        Integer entityId = entry.getEntityId();
+        if (entityId != null) {
+            String name = null;
+            switch (entry.getCategory()) {
+                case REGISTRY_SCRIPT:
+                    name = activeObjects.get(Script.class, entityId).getName();
+                    break;
+                case REGISTRY_DIRECTORY:
+                    name = activeObjects.get(ScriptDirectory.class, entityId).getName();
+                    break;
+                case LISTENER:
+                    name = activeObjects.get(Listener.class, entityId).getName();
+                    break;
+                case REST:
+                    name = activeObjects.get(RestScript.class, entityId).getName();
+                    break;
+                case CUSTOM_FIELD:
+                    name = customFieldHelper.getFieldName(activeObjects.get(FieldConfig.class, entityId).getFieldConfigId());
+                    break;
+                case SCHEDULED_TASK:
+                    name = activeObjects.get(ScheduledTask.class, entityId).getName();
+                    break;
+            }
+            result.setScriptName(name);
+            result.setScriptId(entityId);
+        }
 
         return result;
     }

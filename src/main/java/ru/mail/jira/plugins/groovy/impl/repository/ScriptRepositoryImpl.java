@@ -118,7 +118,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.REGISTRY_DIRECTORY,
-                (long) directory.getID(),
+                directory.getID(),
                 AuditAction.CREATED,
                 directory.getID() + " - " + directory.getName()
             )
@@ -138,7 +138,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.REGISTRY_DIRECTORY,
-                (long) directory.getID(),
+                directory.getID(),
                 AuditAction.UPDATED,
                 directory.getID() + " - " + directory.getName()
             )
@@ -160,7 +160,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.REGISTRY_DIRECTORY,
-                (long) directory.getID(),
+                directory.getID(),
                 AuditAction.DELETED,
                 directory.getID() + " - " + directory.getName()
             )
@@ -192,7 +192,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.REGISTRY_DIRECTORY,
-                (long) directory.getID(),
+                directory.getID(),
                 AuditAction.MOVED,
                 getName(oldParent) + " -> " + getName(newParent)
             )
@@ -252,7 +252,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.REGISTRY_SCRIPT,
-                (long) script.getID(),
+                script.getID(),
                 AuditAction.CREATED,
                 comment
             )
@@ -294,7 +294,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.REGISTRY_SCRIPT,
-                (long) script.getID(),
+                script.getID(),
                 AuditAction.MOVED,
                 getName(oldParent) + " -> " + getName(newParent)
             )
@@ -325,7 +325,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.REGISTRY_SCRIPT,
-                (long) script.getID(),
+                script.getID(),
                 AuditAction.UPDATED,
                 comment
             )
@@ -354,7 +354,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.REGISTRY_SCRIPT,
-                (long) script.getID(),
+                script.getID(),
                 AuditAction.DELETED,
                 script.getID() + " - " + script.getName()
             )

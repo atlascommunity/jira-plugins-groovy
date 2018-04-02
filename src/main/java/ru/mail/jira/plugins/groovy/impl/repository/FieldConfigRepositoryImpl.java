@@ -185,7 +185,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.CUSTOM_FIELD,
-                configId,
+                fieldConfig.getID(),
                 action,
                 comment
             )

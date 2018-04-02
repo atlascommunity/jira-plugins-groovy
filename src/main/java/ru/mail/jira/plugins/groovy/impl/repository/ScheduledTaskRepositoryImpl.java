@@ -138,7 +138,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.SCHEDULED_TASK,
-                (long) task.getID(),
+                task.getID(),
                 AuditAction.CREATED,
                 comment
             )
@@ -174,7 +174,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.SCHEDULED_TASK,
-                (long) task.getID(),
+                task.getID(),
                 AuditAction.UPDATED,
                 comment
             )
@@ -194,7 +194,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.SCHEDULED_TASK,
-                (long) task.getID(),
+                task.getID(),
                 enabled ? AuditAction.ENABLED : AuditAction.DISABLED,
                 task.getID() + " - " + task.getName()
             )
@@ -212,7 +212,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             user,
             new AuditLogEntryForm(
                 AuditCategory.SCHEDULED_TASK,
-                (long) task.getID(),
+                task.getID(),
                 AuditAction.DELETED,
                 task.getID() + " - " + task.getName()
             )
