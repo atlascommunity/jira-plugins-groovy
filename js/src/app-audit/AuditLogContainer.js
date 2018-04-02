@@ -78,7 +78,6 @@ function ActionsIcon({action}) {
     );
 }
 
-//todo: migrate to Dynamic table: https://ak-mk-2-prod.netlify.com/mk-2/packages/elements/dynamic-table
 export class AuditLogContainer extends React.Component {
     state = {
         offset: 0,
