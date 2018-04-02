@@ -2,33 +2,81 @@ import React from 'react';
 
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
+import Tooltip from '@atlaskit/tooltip';
+import Avatar, {AvatarItem} from '@atlaskit/avatar';
+import Lozenge from '@atlaskit/lozenge';
 import {DynamicTableStateless} from '@atlaskit/dynamic-table';
 import {PaginationStateless} from '@atlaskit/pagination';
 
+import QuestionIcon from '@atlaskit/icon/glyph/question';
+import AddCircleIcon from '@atlaskit/icon/glyph/add-circle';
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
+import TrashIcon from '@atlaskit/icon/glyph/trash';
+import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
+import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
+import ArrowRightCircleIcon from '@atlaskit/icon/glyph/arrow-right-circle';
+
 import {auditLogService} from '../service/services';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
-import {AuditMessages} from '../i18n/audit.i18n';
+import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 
 
 const tableHead = {
     cells: [
         {
-            content: '#'
+            content: '',
+            width: '30px'
         },
         {
-            content: FieldMessages.date
-        }, {
-            content: AuditMessages.user
-        }, {
-            content: AuditMessages.category
-        }, {
-            content: AuditMessages.action
-        }, {
+            content: FieldMessages.date,
+            width: '120px'
+        },
+        {
+            content: AuditMessages.user,
+            width: '200px'
+        },
+        {
+            content: AuditMessages.script,
+            width: '100px'
+        },
+        {
             content: AuditMessages.description
         }
     ]
 };
 
+function ActionsIcon({action}) {
+    let icon = null;
+    switch (action) {
+        case 'CREATED':
+            icon = <AddCircleIcon label={action}/>;
+            break;
+        case 'UPDATED':
+            icon = <EditFilledIcon label={action}/>;
+            break;
+        case 'DELETED':
+            icon = <TrashIcon label={action}/>;
+            break;
+        case 'ENABLED':
+            icon = <CheckCircleIcon label={action}/>;
+            break;
+        case 'DISABLED':
+            icon = <CrossCircleIcon label={action}/>;
+            break;
+        case 'MOVED':
+            icon = <ArrowRightCircleIcon label={action}/>;
+            break;
+        default:
+            icon = <QuestionIcon label={action}/>;
+            break;
+    }
+
+    return (
+        <Tooltip content={action}>
+            {icon}
+        </Tooltip>
+    );
+}
 
 //todo: migrate to Dynamic table: https://ak-mk-2-prod.netlify.com/mk-2/packages/elements/dynamic-table
 export class AuditLogContainer extends React.Component {
@@ -57,27 +105,37 @@ export class AuditLogContainer extends React.Component {
                         key: value.id,
                         cells: [
                             {
-                                content: value.id
+                                content: <ActionsIcon action={value.action}/>
                             },
                             {
                                 content: value.date
-                            }, {
+                            },
+                            {
                                 content: (
-                                    <div>
-                                        <span className="aui-avatar aui-avatar-xsmall">
-                                            <span className="aui-avatar-inner">
-                                                <img src={value.user.avatarUrl} alt=""/>
-                                            </span>
-                                        </span>
-                                        {' '}
-                                        {value.user.displayName}
+                                    <AvatarItem
+                                        backgroundColor="transparent"
+                                        avatar={<Avatar src={value.user.avatarUrl}/>}
+
+                                        primaryText={value.user.displayName}
+                                        secondaryText={value.user.name}
+                                    />
+                                )
+                            },
+                            {
+                                content: (
+                                    <div className="flex-column">
+                                        <div>
+                                            <Lozenge>
+                                                {CategoryNameMessages[value.category]}
+                                            </Lozenge>
+                                        </div>
+                                        <div>
+                                            {value.scriptName}
+                                        </div>
                                     </div>
                                 )
-                            }, {
-                                content: value.category
-                            }, {
-                                content: value.action
-                            }, {
+                            },
+                            {
                                 content: value.description
                             }
                         ]
