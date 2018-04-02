@@ -14,13 +14,13 @@ import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.RestRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.entity.EntityType;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.rest.HttpMethod;
 import ru.mail.jira.plugins.groovy.api.dto.rest.RestScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.rest.RestScriptForm;
 import ru.mail.jira.plugins.groovy.api.dto.rest.Script;
-import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
+import ru.mail.jira.plugins.groovy.api.entity.EntityAction;
 import ru.mail.jira.plugins.groovy.api.entity.RestChangelog;
 import ru.mail.jira.plugins.groovy.api.entity.RestScript;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
@@ -89,9 +89,9 @@ public class RestRepositoryImpl implements RestRepository {
         auditLogRepository.create(
             user,
             new AuditLogEntryForm(
-                AuditCategory.REST,
+                EntityType.REST,
                 script.getID(),
-                AuditAction.CREATED,
+                EntityAction.CREATED,
                 comment
             )
         );
@@ -119,9 +119,9 @@ public class RestRepositoryImpl implements RestRepository {
         auditLogRepository.create(
             user,
             new AuditLogEntryForm(
-                AuditCategory.REST,
+                EntityType.REST,
                 script.getID(),
-                AuditAction.UPDATED,
+                EntityAction.UPDATED,
                 comment
             )
         );
@@ -141,9 +141,9 @@ public class RestRepositoryImpl implements RestRepository {
         auditLogRepository.create(
             user,
             new AuditLogEntryForm(
-                AuditCategory.REST,
+                EntityType.REST,
                 script.getID(),
-                AuditAction.UPDATED,
+                EntityAction.UPDATED,
                 script.getID() + " - " + script.getName()
             )
         );

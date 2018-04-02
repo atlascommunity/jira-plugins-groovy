@@ -22,12 +22,12 @@ import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.entity.EntityType;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigDto;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigForm;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScript;
-import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
+import ru.mail.jira.plugins.groovy.api.entity.EntityAction;
 import ru.mail.jira.plugins.groovy.api.entity.FieldConfig;
 import ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
@@ -129,7 +129,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
 
         boolean isTemplated = isTemplated(jiraFieldConfig);
 
-        AuditAction action;
+        EntityAction action;
         String comment;
 
         if (fieldConfig == null) {
@@ -156,7 +156,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             comment = "Created.";
             changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, comment, additionalParams);
 
-            action = AuditAction.CREATED;
+            action = EntityAction.CREATED;
         } else {
             validate(false, isTemplated, form);
 
@@ -178,13 +178,13 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             fieldConfig.setVelocityParamsEnabled(form.isVelocityParamsEnabled());
             fieldConfig.save();
 
-            action = AuditAction.UPDATED;
+            action = EntityAction.UPDATED;
         }
 
         auditLogRepository.create(
             user,
             new AuditLogEntryForm(
-                AuditCategory.CUSTOM_FIELD,
+                EntityType.CUSTOM_FIELD,
                 fieldConfig.getID(),
                 action,
                 comment

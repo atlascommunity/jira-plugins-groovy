@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
-import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.entity.EntityAction;
+import ru.mail.jira.plugins.groovy.api.entity.EntityType;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -15,11 +15,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class AuditLogEntryForm {
     @XmlElement
-    private AuditCategory category;
+    private EntityType category;
     @XmlElement
     private Integer entityId;
     @XmlElement
-    private AuditAction action;
+    private EntityAction action;
     @XmlElement
     private String description;
 }

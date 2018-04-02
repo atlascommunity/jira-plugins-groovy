@@ -7,6 +7,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import net.java.ao.DBParam;
@@ -15,16 +16,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.commons.RestFieldException;
+import ru.mail.jira.plugins.groovy.api.dto.notification.NotificationDto;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
+import ru.mail.jira.plugins.groovy.api.service.NotificationService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.*;
-import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.entity.EntityType;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.directory.*;
 import ru.mail.jira.plugins.groovy.api.entity.*;
+import ru.mail.jira.plugins.groovy.api.service.WatcherService;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 import ru.mail.jira.plugins.groovy.util.Const;
@@ -45,6 +49,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     private final AuditLogRepository auditLogRepository;
     private final ExecutionRepository executionRepository;
     private final ChangelogHelper changelogHelper;
+    private final NotificationService notificationService;
+    private final WatcherService watcherService;
 
     @Autowired
     public ScriptRepositoryImpl(
@@ -56,7 +62,9 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         JsonMapper jsonMapper,
         AuditLogRepository auditLogRepository,
         ExecutionRepository executionRepository,
-        ChangelogHelper changelogHelper
+        ChangelogHelper changelogHelper,
+        NotificationService notificationService,
+        WatcherService watcherService
     ) {
         this.i18nHelper = i18nHelper;
         this.clusterLockService = clusterLockService;
@@ -67,6 +75,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         this.auditLogRepository = auditLogRepository;
         this.executionRepository = executionRepository;
         this.changelogHelper = changelogHelper;
+        this.notificationService = notificationService;
+        this.watcherService = watcherService;
     }
 
     private ScriptDirectory getParentDirectory(Integer parentId) {
@@ -114,15 +124,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             new DBParam("DELETED", false)
         );
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                AuditCategory.REGISTRY_DIRECTORY,
-                directory.getID(),
-                AuditAction.CREATED,
-                directory.getID() + " - " + directory.getName()
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.CREATED, directory, directory.getID() + " - " + directory.getName());
 
         return buildDirectoryDto(directory);
     }
@@ -134,15 +136,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         directory.setParent(getParentDirectory(form.getParentId()));
         directory.save();
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                AuditCategory.REGISTRY_DIRECTORY,
-                directory.getID(),
-                AuditAction.UPDATED,
-                directory.getID() + " - " + directory.getName()
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.UPDATED, directory, directory.getID() + " - " + directory.getName());
 
         return buildDirectoryDto(directory);
     }
@@ -156,16 +150,6 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         directory.setDeleted(true);
         directory.save();
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                AuditCategory.REGISTRY_DIRECTORY,
-                directory.getID(),
-                AuditAction.DELETED,
-                directory.getID() + " - " + directory.getName()
-            )
-        );
-
         for (ScriptDirectory child : directory.getChildren()) {
             deleteDirectory(user, child);
         }
@@ -173,6 +157,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         for (Script script : directory.getScripts()) {
             deleteScript(user, script);
         }
+
+        addAuditLogAndNotify(user, EntityAction.DELETED, directory, directory.getID() + " - " + directory.getName());
     }
 
     @Override
@@ -188,15 +174,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         directory.setParent(newParent);
         directory.save();
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                AuditCategory.REGISTRY_DIRECTORY,
-                directory.getID(),
-                AuditAction.MOVED,
-                getName(oldParent) + " -> " + getName(newParent)
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.MOVED, directory, getName(oldParent) + " -> " + getName(newParent));
     }
 
     @Override
@@ -248,15 +226,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
         changelogHelper.addChangelog(Changelog.class, script.getID(), user.getKey(), diff, comment);
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                AuditCategory.REGISTRY_SCRIPT,
-                script.getID(),
-                AuditAction.CREATED,
-                comment
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
         return buildScriptDto(script, true, false, true);
     }
@@ -290,15 +260,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         script.setDirectory(newParent);
         script.save();
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                AuditCategory.REGISTRY_SCRIPT,
-                script.getID(),
-                AuditAction.MOVED,
-                getName(oldParent) + " -> " + getName(newParent)
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.MOVED, script, null, getName(oldParent) + " -> " + getName(newParent));
     }
 
     private RegistryScriptDto doUpdateScript(ApplicationUser user, int id, RegistryScriptForm form, ParseContext parseContext) {
@@ -321,15 +283,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         script.setTypes(form.getTypes().stream().map(WorkflowScriptType::name).collect(Collectors.joining(",")));
         script.save();
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                AuditCategory.REGISTRY_SCRIPT,
-                script.getID(),
-                AuditAction.UPDATED,
-                comment
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.UPDATED, script, diff, comment);
 
         return buildScriptDto(script, true, false, true);
     }
@@ -350,14 +304,44 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         script.setDeleted(true);
         script.save();
 
+        addAuditLogAndNotify(user, EntityAction.DELETED, script, null, script.getID() + " - " + script.getName());
+    }
+
+    private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, ScriptDirectory directory, String description) {
         auditLogRepository.create(
             user,
             new AuditLogEntryForm(
-                AuditCategory.REGISTRY_SCRIPT,
-                script.getID(),
-                AuditAction.DELETED,
-                script.getID() + " - " + script.getName()
+                EntityType.REGISTRY_DIRECTORY,
+                directory.getID(),
+                action,
+                description
             )
+        );
+
+        notificationService.sendNotifications(
+            new NotificationDto(
+                user, action, EntityType.REGISTRY_DIRECTORY, directory.getName(), directory.getID(), null, null, description, ImmutableMap.of()
+            ),
+            getWatchers(directory)
+        );
+    }
+
+    private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, Script script, String diff, String description) {
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                EntityType.REGISTRY_SCRIPT,
+                script.getID(),
+                action,
+                description
+            )
+        );
+
+        notificationService.sendNotifications(
+            new NotificationDto(
+                user, action, EntityType.REGISTRY_SCRIPT, script.getName(), script.getID(), diff, null, description, ImmutableMap.of()
+            ),
+            getWatchers(script)
         );
     }
 
@@ -481,6 +465,26 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
 
         return result;
+    }
+
+    private List<ApplicationUser> getWatchers(Script script) {
+        List<ApplicationUser> watchers = getWatchers(script.getDirectory());
+
+        watchers.addAll(watcherService.getWatchers(EntityType.REGISTRY_SCRIPT, script.getID()));
+
+        return watchers;
+    }
+
+    private List<ApplicationUser> getWatchers(ScriptDirectory directory) {
+        List<ApplicationUser> watchers = new ArrayList<>();
+
+        while (directory != null) {
+            watchers.addAll(watcherService.getWatchers(EntityType.REGISTRY_DIRECTORY, directory.getID()));
+
+            directory = directory.getParent();
+        }
+
+        return watchers;
     }
 
     private static String getExpandedName(Script script) {

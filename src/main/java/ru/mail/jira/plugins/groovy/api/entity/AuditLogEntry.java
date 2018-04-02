@@ -15,15 +15,15 @@ public interface AuditLogEntry extends Entity {
     String getUserKey();
 
     @NotNull
-    void setCategory(AuditCategory category);
-    AuditCategory getCategory();
+    void setCategory(EntityType category);
+    EntityType getCategory();
 
     void setEntityId(Integer entityId);
     Integer getEntityId();
 
     @NotNull
-    void setAction(AuditAction action);
-    AuditAction getAction();
+    void setAction(EntityAction action);
+    EntityAction getAction();
 
     void setDescription(String description);
     String getDescription();

@@ -22,11 +22,11 @@ import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.api.entity.AuditCategory;
+import ru.mail.jira.plugins.groovy.api.entity.EntityType;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerDto;
 import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerForm;
-import ru.mail.jira.plugins.groovy.api.entity.AuditAction;
+import ru.mail.jira.plugins.groovy.api.entity.EntityAction;
 import ru.mail.jira.plugins.groovy.api.entity.Listener;
 import ru.mail.jira.plugins.groovy.api.entity.ListenerChangelog;
 import ru.mail.jira.plugins.groovy.impl.listener.ConditionType;
@@ -125,9 +125,9 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         auditLogRepository.create(
             user,
             new AuditLogEntryForm(
-                AuditCategory.LISTENER,
+                EntityType.LISTENER,
                 listener.getID(),
-                AuditAction.CREATED,
+                EntityAction.CREATED,
                 comment
             )
         );
@@ -161,9 +161,9 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         auditLogRepository.create(
             user,
             new AuditLogEntryForm(
-                AuditCategory.LISTENER,
+                EntityType.LISTENER,
                 listener.getID(),
-                AuditAction.UPDATED,
+                EntityAction.UPDATED,
                 comment
             )
         );
@@ -182,9 +182,9 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         auditLogRepository.create(
             user,
             new AuditLogEntryForm(
-                AuditCategory.LISTENER,
+                EntityType.LISTENER,
                 listener.getID(),
-                AuditAction.DELETED,
+                EntityAction.DELETED,
                 listener.getID() + " - " + listener.getName()
             )
         );

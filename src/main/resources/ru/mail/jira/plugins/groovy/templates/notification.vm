@@ -1,0 +1,64 @@
+#* @vtlvariable name="locale" type="java.util.Locale" *#
+#* @vtlvariable name="user" type="com.atlassian.jira.user.ApplicationUser" *#
+#* @vtlvariable name="notification" type="ru.mail.jira.plugins.groovy.api.dto.notification.NotificationDto" *#
+#* @vtlvariable name="i18nResolver" type="com.atlassian.sal.api.message.I18nResolver" *#
+#disable_html_escaping()
+#parse( "templates/email/html/includes/emailconstants.vm" )
+#parse( "templates/email/html/includes/header.vm" )
+
+#rowWrapperNormal( "#parse( 'templates/email/html/includes/patterns/page-title.vm' )" )
+
+#rowWrapperNormalBegin( "", "wrapper-special-margin" )
+
+<table class="keyvalue-table">
+    <tr>
+        <th>#text("common.words.name"):</th>
+        <td>
+            $notification.entityName
+        </td>
+    </tr>
+    <tr>
+        <th>
+            $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.user")
+        </th>
+        <td>
+            $notification.user.displayName ($notification.user.name)
+        </td>
+    </tr>
+    #if($notification.comment)
+        <tr>
+            <th>
+                $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.comment")
+            </th>
+            <td>
+                $notification.comment
+            </td>
+        </tr>
+    #end
+    #if($notification.diff)
+        <tr>
+            <th>
+                $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.diff")
+            </th>
+            <td>
+                <pre>$notification.diff</pre>
+            </td>
+        </tr>
+    #end
+    #if($notification.templateDiff)
+        <tr>
+            <th>
+                $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.templateDiff")
+            </th>
+            <td>
+                <pre>
+                    $notification.templateDiff
+                </pre>
+            </td>
+        </tr>
+    #end
+</table>
+
+#rowWrapperNormalEnd()
+
+#parse( "templates/email/html/includes/footer.vm" )

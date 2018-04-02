@@ -8,11 +8,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CustomFieldHelper {
-    @ComponentImport
     private final FieldConfigManager fieldConfigManager;
 
     @Autowired
-    public CustomFieldHelper(FieldConfigManager fieldConfigManager) {
+    public CustomFieldHelper(
+        @ComponentImport FieldConfigManager fieldConfigManager
+    ) {
         this.fieldConfigManager = fieldConfigManager;
     }
 
