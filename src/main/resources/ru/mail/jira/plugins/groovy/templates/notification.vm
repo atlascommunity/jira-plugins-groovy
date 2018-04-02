@@ -19,7 +19,7 @@
     </tr>
     <tr>
         <th>
-            $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.user")
+            $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.user"):
         </th>
         <td>
             $notification.user.displayName ($notification.user.name)
@@ -28,7 +28,7 @@
     #if($notification.comment)
         <tr>
             <th>
-                $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.comment")
+                $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.comment"):
             </th>
             <td>
                 $notification.comment
@@ -38,7 +38,7 @@
     #if($notification.diff)
         <tr>
             <th>
-                $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.diff")
+                $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.diff"):
             </th>
             <td>
                 <pre>$notification.diff</pre>
@@ -48,12 +48,10 @@
     #if($notification.templateDiff)
         <tr>
             <th>
-                $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.templateDiff")
+                $i18nResolver.getText($locale, "ru.mail.jira.plugins.groovy.notification.templateDiff"):
             </th>
             <td>
-                <pre>
-                    $notification.templateDiff
-                </pre>
+                <pre>$notification.templateDiff</pre>
             </td>
         </tr>
     #end
