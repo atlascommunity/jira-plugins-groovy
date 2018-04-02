@@ -116,8 +116,9 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         );
 
         String diff = changelogHelper.generateDiff(listener.getID(), "", listener.getName(), "", form.getScriptBody());
+        String comment = "Created.";
 
-        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, "Created.");
+        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, comment);
 
         cache.remove(VALUE_KEY);
 
@@ -127,7 +128,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
                 AuditCategory.LISTENER,
                 (long) listener.getID(),
                 AuditAction.CREATED,
-                listener.getID() + " - " + listener.getName()
+                comment
             )
         );
 
@@ -145,8 +146,9 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         }
 
         String diff = changelogHelper.generateDiff(id, listener.getName(), form.getName(), listener.getScriptBody(), form.getScriptBody());
+        String comment = form.getComment();
 
-        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, form.getComment());
+        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, comment);
 
         listener.setName(form.getName());
         listener.setUuid(UUID.randomUUID().toString());
@@ -162,7 +164,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
                 AuditCategory.LISTENER,
                 (long) listener.getID(),
                 AuditAction.UPDATED,
-                listener.getID() + " - " + listener.getName()
+                comment
             )
         );
 

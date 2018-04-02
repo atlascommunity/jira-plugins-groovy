@@ -244,8 +244,9 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         );
 
         String diff = changelogHelper.generateDiff(script.getID(), "", script.getName(), "", scriptForm.getScriptBody());
+        String comment = "Created.";
 
-        changelogHelper.addChangelog(Changelog.class, script.getID(), user.getKey(), diff, "Created.");
+        changelogHelper.addChangelog(Changelog.class, script.getID(), user.getKey(), diff, comment);
 
         auditLogRepository.create(
             user,
@@ -253,7 +254,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                 AuditCategory.REGISTRY_SCRIPT,
                 (long) script.getID(),
                 AuditAction.CREATED,
-                script.getID() + " - " + script.getName()
+                comment
             )
         );
 
@@ -308,8 +309,9 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
 
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
+        String comment = form.getComment();
 
-        changelogHelper.addChangelog(Changelog.class, script.getID(), user.getKey(), diff, form.getComment());
+        changelogHelper.addChangelog(Changelog.class, script.getID(), user.getKey(), diff, comment);
 
         String parameters = parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null;
 
@@ -325,7 +327,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                 AuditCategory.REGISTRY_SCRIPT,
                 (long) script.getID(),
                 AuditAction.UPDATED,
-                script.getID() + " - " + script.getName()
+                comment
             )
         );
 

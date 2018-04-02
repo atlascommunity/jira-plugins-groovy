@@ -130,8 +130,9 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         );
 
         String diff = changelogHelper.generateDiff(task.getID(), "", task.getName(), "", task.getScriptBody());
+        String comment = "Created.";
 
-        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, "Created.");
+        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, comment);
 
         auditLogRepository.create(
             user,
@@ -139,7 +140,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
                 AuditCategory.SCHEDULED_TASK,
                 (long) task.getID(),
                 AuditAction.CREATED,
-                task.getID() + " - " + task.getName()
+                comment
             )
         );
 
@@ -153,8 +154,9 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         ScheduledTask task = ao.get(ScheduledTask.class, id);
 
         String diff = changelogHelper.generateDiff(id, task.getName(), form.getName(), task.getScriptBody(), form.getScriptBody());
+        String comment = form.getComment();
 
-        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, form.getComment());
+        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, comment);
 
         task.setUuid(UUID.randomUUID().toString());
         task.setName(form.getName());
@@ -174,7 +176,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
                 AuditCategory.SCHEDULED_TASK,
                 (long) task.getID(),
                 AuditAction.UPDATED,
-                task.getID() + " - " + task.getName()
+                comment
             )
         );
 

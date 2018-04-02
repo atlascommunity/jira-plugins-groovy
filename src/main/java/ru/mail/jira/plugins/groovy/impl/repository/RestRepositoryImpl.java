@@ -82,8 +82,9 @@ public class RestRepositoryImpl implements RestRepository {
         );
 
         String diff = changelogHelper.generateDiff(script.getID(), "", script.getName(), "", form.getScriptBody());
+        String comment = "Created.";
 
-        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, "Created.");
+        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, comment);
 
         auditLogRepository.create(
             user,
@@ -91,7 +92,7 @@ public class RestRepositoryImpl implements RestRepository {
                 AuditCategory.REST,
                 (long) script.getID(),
                 AuditAction.CREATED,
-                script.getID() + " - " + script.getName()
+                comment
             )
         );
 
@@ -105,8 +106,9 @@ public class RestRepositoryImpl implements RestRepository {
         RestScript script = ao.get(RestScript.class, id);
 
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
+        String comment = form.getComment();
 
-        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, form.getComment());
+        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, comment);
 
         script.setUuid(UUID.randomUUID().toString());
         script.setMethods(joinMethods(form.getMethods()));
@@ -120,7 +122,7 @@ public class RestRepositoryImpl implements RestRepository {
                 AuditCategory.REST,
                 (long) script.getID(),
                 AuditAction.UPDATED,
-                script.getID() + " - " + script.getName()
+                comment
             )
         );
 

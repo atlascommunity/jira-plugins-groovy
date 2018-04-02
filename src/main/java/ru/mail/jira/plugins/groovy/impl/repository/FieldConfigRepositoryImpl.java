@@ -130,6 +130,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         boolean isTemplated = isTemplated(jiraFieldConfig);
 
         AuditAction action;
+        String comment;
 
         if (fieldConfig == null) {
             validate(true, isTemplated, form);
@@ -152,7 +153,8 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
                 additionalParams.put("TEMPLATE_DIFF", StringUtils.isEmpty(templateDiff) ? "no changes" : templateDiff);
             }
 
-            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, "Created.", additionalParams);
+            comment = "Created.";
+            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, comment, additionalParams);
 
             action = AuditAction.CREATED;
         } else {
@@ -166,7 +168,8 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
                 additionalParams.put("TEMPLATE_DIFF", StringUtils.isEmpty(templateDiff) ? "no changes" : templateDiff);
             }
 
-            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, form.getComment(), additionalParams);
+            comment = form.getComment();
+            changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, comment, additionalParams);
 
             fieldConfig.setCacheable(form.isCacheable());
             fieldConfig.setScriptBody(form.getScriptBody());
@@ -184,7 +187,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
                 AuditCategory.CUSTOM_FIELD,
                 configId,
                 action,
-                String.valueOf(fieldConfig.getID())
+                comment
             )
         );
 
