@@ -6,8 +6,6 @@ import lombok.Getter;
 import ru.mail.jira.plugins.groovy.api.entity.EntityAction;
 import ru.mail.jira.plugins.groovy.api.entity.EntityType;
 
-import java.util.Map;
-
 @AllArgsConstructor @Getter
 public class NotificationDto {
     private final ApplicationUser user;
@@ -18,5 +16,4 @@ public class NotificationDto {
     private final String diff;
     private final String templateDiff;
     private final String comment;
-    private final Map<String, String> additionalFields;
 }

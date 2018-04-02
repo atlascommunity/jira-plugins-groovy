@@ -28,6 +28,8 @@ import CodeIcon from '@atlaskit/icon/glyph/code';
 import FolderIcon from '@atlaskit/icon/glyph/folder';
 import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
 import ChevronRightIcon from '@atlaskit/icon/glyph/chevron-right';
+import WatchIcon from '@atlaskit/icon/glyph/watch';
+import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
 
 import {ScriptDialog} from './ScriptDialog';
 import {WorkflowsDialog} from './WorkflowsDialog';
@@ -36,7 +38,7 @@ import {RegistryActionCreators} from './registry.reducer';
 
 import {Script} from '../common/Script';
 
-import {registryService} from '../service/services';
+import {registryService, watcherService} from '../service/services';
 
 import {TitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
@@ -264,14 +266,25 @@ export class ScriptRegistry extends React.Component {
     }
 }
 
+@connect(
+    memoizeOne(state => {
+        return {
+            directoryWatches: state.directoryWatches
+        };
+    }),
+    RegistryActionCreators
+)
 class ScriptDirectory extends React.Component {
     static propTypes = {
         directory: PropTypes.object.isRequired,
+        directoryWatches: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
         onCreate: PropTypes.func.isRequired,
         onEdit: PropTypes.func.isRequired,
         onDelete: PropTypes.func.isRequired,
         parents: PropTypes.array.isRequired,
-        forceOpen: PropTypes.bool.isRequired
+        forceOpen: PropTypes.bool.isRequired,
+        addWatch: PropTypes.func.isRequired,
+        removeWatch: PropTypes.func.isRequired
     };
 
     static defaultProps = {
@@ -279,14 +292,38 @@ class ScriptDirectory extends React.Component {
     };
 
     state = {
-        collapsed: true
+        collapsed: true,
+        waitingWatch: false
     };
 
     _toggle = () => this.setState({collapsed: !this.state.collapsed});
 
+    _toggleWatch = () => {
+        const {directory, directoryWatches, addWatch, removeWatch} = this.props;
+
+        const isWatching = directoryWatches.includes(directory.id);
+
+        this.setState({ waitingWatch: true });
+
+        const promise = isWatching ?
+            watcherService.stopWatching('REGISTRY_DIRECTORY', directory.id) :
+            watcherService.startWatching('REGISTRY_DIRECTORY', directory.id);
+
+        promise.then(
+            () => {
+                (isWatching ? removeWatch : addWatch)('directory', directory.id);
+                this.setState({ waitingWatch: false });
+            },
+            error => {
+                this.setState({ waitingWatch: false });
+                throw error;
+            }
+        );
+    };
+
     render() {
-        const {collapsed} = this.state;
-        const {directory, parents, onCreate, onEdit, onDelete, forceOpen} = this.props;
+        const {collapsed, waitingWatch} = this.state;
+        const {directory, directoryWatches, parents, onCreate, onEdit, onDelete, forceOpen} = this.props;
 
         let directories = null;
         let scripts = null;
@@ -297,6 +334,7 @@ class ScriptDirectory extends React.Component {
                     {directory.children ? directory.children.map(child =>
                         <ScriptDirectory
                             directory={child}
+                            directoryWatches={directoryWatches}
                             key={child.id}
                             onCreate={onCreate}
                             onEdit={onEdit}
@@ -322,6 +360,7 @@ class ScriptDirectory extends React.Component {
         }
 
         const errorCount = countErrors(directory);
+        const isWatching = directoryWatches.includes(directory.id);
 
         return (
             <div className="flex full-width flex-column scriptDirectory">
@@ -388,11 +427,30 @@ class ScriptDirectory extends React.Component {
                                 onClick={onEdit(directory.id, 'directory')}
                             />
                             <Button
+                                key="watch"
                                 appearance="subtle"
-                                iconBefore={<TrashIcon label=""/>}
+                                isDisabled={waitingWatch}
+                                iconBefore={isWatching ? <WatchFilledIcon label=""/> : <WatchIcon label=""/>}
 
-                                onClick={onDelete(directory.id, 'directory', directory.name)}
+                                onClick={this._toggleWatch}
                             />
+                            <DropdownMenu
+                                key="etc"
+
+                                position="bottom right"
+
+                                triggerType="button"
+                                triggerButtonProps={{
+                                    appearance: 'subtle',
+                                    iconBefore: <MoreVerticalIcon label=""/>
+                                }}
+                            >
+                                <DropdownItemGroup>
+                                    <DropdownItem onClick={onDelete(directory.id, 'directory', directory.name)}>
+                                        Delete
+                                    </DropdownItem>
+                                </DropdownItemGroup>
+                            </DropdownMenu>
                         </ButtonGroup>
                     </div>
                 </div>
@@ -467,15 +525,27 @@ class DraggableScript extends React.Component {
     }
 }
 
+@connect(
+    memoizeOne(state => {
+        return {
+            scriptWatches: state.scriptWatches
+        };
+    }),
+    RegistryActionCreators
+)
 class RegistryScript extends React.Component {
     static propTypes = {
         script: PropTypes.object.isRequired,
         onEdit: PropTypes.func.isRequired,
-        onDelete: PropTypes.func.isRequired
+        onDelete: PropTypes.func.isRequired,
+        scriptWatches: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
+        addWatch: PropTypes.func.isRequired,
+        removeWatch: PropTypes.func.isRequired
     };
 
     state = {
-        showWorkflows: false
+        showWorkflows: false,
+        waitingWatch: false
     };
 
     _toggleWorkflows = () => {
@@ -486,12 +556,36 @@ class RegistryScript extends React.Component {
         });
     };
 
+    _toggleWatch = () => {
+        const {script, scriptWatches, addWatch, removeWatch} = this.props;
+
+        const isWatching = scriptWatches.includes(script.id);
+
+        this.setState({ waitingWatch: true });
+
+        const promise = isWatching ?
+            watcherService.stopWatching('REGISTRY_SCRIPT', script.id) :
+            watcherService.startWatching('REGISTRY_SCRIPT', script.id);
+
+        promise.then(
+            () => {
+                (isWatching ? removeWatch : addWatch)('script', script.id);
+                this.setState({ waitingWatch: false });
+            },
+            error => {
+                this.setState({ waitingWatch: false });
+                throw error;
+            }
+        );
+    };
+
     render() {
-        const {script, onEdit, onDelete, ...props} = this.props;
-        const {showWorkflows} = this.state;
+        const {script, onEdit, onDelete, scriptWatches, ...props} = this.props;
+        const {showWorkflows, waitingWatch} = this.state;
+
+        const isWatching = scriptWatches.includes(script.id);
 
         return (
-
             <div>
                 {showWorkflows && <WorkflowsDialog id={script.id} onClose={this._toggleWorkflows}/>}
                 <Script
@@ -500,8 +594,15 @@ class RegistryScript extends React.Component {
                     withChangelog={true}
 
                     onEdit={onEdit}
-                    onDelete={onDelete}
                     additionalButtons={[
+                        <Button
+                            key="watch"
+                            appearance="subtle"
+                            isDisabled={waitingWatch}
+                            iconBefore={isWatching ? <WatchFilledIcon label=""/> : <WatchIcon label=""/>}
+
+                            onClick={this._toggleWatch}
+                        />,
                         <DropdownMenu
                             key="etc"
 
@@ -516,6 +617,9 @@ class RegistryScript extends React.Component {
                             <DropdownItemGroup>
                                 <DropdownItem onClick={this._toggleWorkflows}>
                                     Find workflows
+                                </DropdownItem>
+                                <DropdownItem onClick={onDelete}>
+                                    Delete
                                 </DropdownItem>
                             </DropdownItemGroup>
                         </DropdownMenu>

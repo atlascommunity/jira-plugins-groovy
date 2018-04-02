@@ -62,6 +62,19 @@ public class WatcherServiceImpl implements WatcherService {
             .collect(Collectors.toList());
     }
 
+    @Override
+    public List<Integer> getWatches(EntityType type, ApplicationUser user) {
+        return Arrays
+            .stream(
+                ao.find(
+                    Watcher.class,
+                    Query.select().where("TYPE = ? AND USER_KEY = ?", type, user.getKey())
+                )
+            )
+            .map(Watcher::getEntityId)
+            .collect(Collectors.toList());
+    }
+
     private Optional<ApplicationUser> getUser(String key) {
         ApplicationUser user = userManager.getUserByKey(key);
 

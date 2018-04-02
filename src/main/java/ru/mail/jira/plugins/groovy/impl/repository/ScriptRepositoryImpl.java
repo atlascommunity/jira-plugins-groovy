@@ -7,7 +7,6 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import net.java.ao.DBParam;
@@ -320,7 +319,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
         notificationService.sendNotifications(
             new NotificationDto(
-                user, action, EntityType.REGISTRY_DIRECTORY, directory.getName(), directory.getID(), null, null, description, ImmutableMap.of()
+                user, action, EntityType.REGISTRY_DIRECTORY, directory.getName(), directory.getID(), null, null, description
             ),
             getWatchers(directory)
         );
@@ -339,7 +338,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
         notificationService.sendNotifications(
             new NotificationDto(
-                user, action, EntityType.REGISTRY_SCRIPT, script.getName(), script.getID(), diff, null, description, ImmutableMap.of()
+                user, action, EntityType.REGISTRY_SCRIPT, script.getName(), script.getID(), diff, null, description
             ),
             getWatchers(script)
         );

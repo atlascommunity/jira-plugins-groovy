@@ -5,9 +5,10 @@ import net.java.ao.schema.Index;
 import net.java.ao.schema.Indexes;
 import net.java.ao.schema.NotNull;
 
-@Indexes(
-    @Index(name = "entity_type_id", methodNames = {"setEntityId", "setType"})
-)
+@Indexes({
+    @Index(name = "entity_type_id", methodNames = {"setEntityId", "setType"}),
+    @Index(name = "for_user", methodNames = {"setEntityId", "setType", "setUserKey"})
+})
 public interface Watcher extends Entity {
     @NotNull
     void setEntityId(Integer id);

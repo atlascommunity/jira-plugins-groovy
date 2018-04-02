@@ -233,7 +233,8 @@ export class Script extends React.Component {
                                         onClick={this._showCode}
                                     >
                                         {showCode ? CommonMessages.hideCode : CommonMessages.showCode}
-                                    </Button>}
+                                    </Button>
+                                }
                                 {onEdit &&
                                     <Button
                                         key="edit-button"
@@ -241,7 +242,8 @@ export class Script extends React.Component {
                                         iconBefore={<EditIcon label=""/>}
 
                                         onClick={onEdit}
-                                    />}
+                                    />
+                                }
                                 {onDelete &&
                                     <Button
                                         key="delete-button"
@@ -249,9 +251,10 @@ export class Script extends React.Component {
                                         iconBefore={<TrashIcon label=""/>}
 
                                         onClick={onDelete}
-                                    />}
+                                    />
+                                }
+                                {additionalButtons}
                             </ButtonGroup>
-                            {additionalButtons}
                         </div>
                     </div>
                 }

@@ -4,10 +4,15 @@ import sortBy from 'lodash.sortby';
 
 export const registryReducer = combineReducers({
     directories: directoriesReducer,
-    ready: readyReducer
+    ready: readyReducer,
+    scriptWatches: watchesReducer('script'),
+    directoryWatches: watchesReducer('directory'),
 });
 
 const LOAD_STATE = 'LOAD_STATE';
+
+const ADD_WATCH = 'ADD_WATCHER';
+const REMOVE_WATCH = 'REMOVE_WATCH';
 
 const ADD_DIRECTORY = 'ADD_DIRECTORY';
 const UPDATE_DIRECTORY = 'UPDATE_DIRECTORY';
@@ -20,10 +25,22 @@ const MOVE_SCRIPT = 'MOVE_SCRIPT';
 
 
 export const RegistryActionCreators = {
-    loadState: state => {
+    loadState: (tree, scriptWatches, directoryWatches) => {
         return {
             type: LOAD_STATE,
-            state: state
+            tree, scriptWatches, directoryWatches
+        };
+    },
+    addWatch: (kind, id) => {
+        return {
+            type: ADD_WATCH,
+            kind, id
+        };
+    },
+    removeWatch: (kind, id) => {
+        return {
+            type: REMOVE_WATCH,
+            kind, id
         };
     },
     addDirectory: directory => {
@@ -89,7 +106,7 @@ function directoriesReducer(state, action) {
     }
 
     if (action.type === LOAD_STATE) {
-        return action.state;
+        return action.tree;
     }
 
     if (action.type === ADD_DIRECTORY && !action.directory.parentId) {
@@ -179,6 +196,28 @@ function directoryReducer(state, action) {
     return {
         ...result,
         children: (result.children || []).map(child => directoryReducer(child, action)).filter(e => e)
+    };
+}
+
+function watchesReducer(kind) {
+    return (state, action) => {
+        if (state === undefined) {
+            return [];
+        }
+
+        if (action.type === LOAD_STATE) {
+            return action[`${kind}Watches`];
+        }
+
+        if (action.type === ADD_WATCH && action.kind === kind) {
+            return [...state, action.id];
+        }
+
+        if (action.type === REMOVE_WATCH && action.kind === kind) {
+            return state.filter(id => id !== action.id);
+        }
+
+        return state;
     };
 }
 

@@ -12,6 +12,7 @@ import {RestService} from './rest.service';
 import {FieldConfigService} from './fieldConfig.service';
 import {PreferenceService} from './preference.service';
 import {ScheduledTaskService} from './scheduledTask.service';
+import {WatcherService} from './watcher.service';
 
 import {ErrorMessages} from '../i18n/common.i18n';
 
@@ -27,6 +28,7 @@ export const restService = new RestService();
 export const fieldConfigService = new FieldConfigService();
 export const preferenceService = new PreferenceService();
 export const scheduledTaskService = new ScheduledTaskService();
+export const watcherService = new WatcherService();
 
 
 window.addEventListener('unhandledrejection', function(err) {

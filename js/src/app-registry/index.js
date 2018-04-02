@@ -10,7 +10,7 @@ import AJS from 'AJS';
 import {ScriptRegistry} from './ScriptRegistry';
 import {RegistryActionCreators, registryReducer} from './registry.reducer';
 
-import {registryService} from '../service/services';
+import {registryService, watcherService} from '../service/services';
 import {fixStyle} from '../common/fixStyle';
 
 import '../flex.less';
@@ -21,9 +21,17 @@ const store = createStore(registryReducer, {directories: []});
 AJS.toInit(() => {
     fixStyle();
 
-    registryService
-        .getAllDirectories()
-        .then(directories => store.dispatch(RegistryActionCreators.loadState(directories)));
+    Promise
+        .all([
+            registryService.getAllDirectories(),
+            watcherService.getAllWatches('REGISTRY_SCRIPT'),
+            watcherService.getAllWatches('REGISTRY_DIRECTORY')
+        ])
+        .then(
+            ([tree, scriptWatches, directoryWatches]) => {
+                store.dispatch(RegistryActionCreators.loadState(tree, scriptWatches, directoryWatches));
+            }
+        );
 
     ReactDOM.render(
         <Provider store={store}>

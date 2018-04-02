@@ -11,4 +11,6 @@ public interface WatcherService {
     void removeWatcher(EntityType type, Integer id, ApplicationUser user);
 
     List<ApplicationUser> getWatchers(EntityType type, Integer id);
+
+    List<Integer> getWatches(EntityType type, ApplicationUser user);
 }
