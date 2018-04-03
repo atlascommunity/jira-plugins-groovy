@@ -5,6 +5,7 @@ import Avatar from '@atlaskit/avatar';
 import Button, {ButtonGroup} from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
 import Badge from '@atlaskit/badge';
+import Tooltip from '@atlaskit/tooltip';
 
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
@@ -281,17 +282,21 @@ function Changelog({changelogs, switchToCurrent, switchToChangelog}) {
             {changelogs && changelogs.map(changelog =>
                 <div key={changelog.id} className="scriptChangelog" onClick={switchToChangelog(changelog)}>
                     <div className="changelogContent">
-                        <div>
-                            <strong>
-                                {changelog.comment}
-                            </strong>
-                        </div>
-                        <div className="changelogSecondary">
-                            {changelog.date}
-                            <div>
-                                {changelog.author.avatarUrl ? <Avatar src={changelog.author.avatarUrl} size="xsmall"/> : null}
-                                {' '}{changelog.author.displayName}
+                        <Tooltip content={changelog.author.displayName}>
+                            <div className="flex-row">
+                                <Avatar src={changelog.author.avatarUrl} size="xsmall" appearance="square" borderColor="transparent"/>
+                                <span className="author">
+                                    {changelog.author.displayName}
+                                </span>
                             </div>
+                        </Tooltip>
+                        <div className="date">
+                            {changelog.date}
+                        </div>
+                        <div>
+                            <p>
+                                {changelog.comment}
+                            </p>
                         </div>
                     </div>
                 </div>

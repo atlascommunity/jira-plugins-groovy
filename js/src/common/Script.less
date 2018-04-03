@@ -110,6 +110,7 @@
 
   .changelogContent {
     border-radius: @ak-border-radius;
+    padding-top: 1px;
     padding-left: 3px;
 
     &:hover {
@@ -122,6 +123,21 @@
 
     .changelogSecondary {
       color: @ak-color-N300;
+    }
+
+    .author {
+      margin-left: 2px;
+
+      font-weight: 500;
+      color: @ak-color-N500;
+
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .date {
+      color: @ak-color-N500
     }
 
     strong {
