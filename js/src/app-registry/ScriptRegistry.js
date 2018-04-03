@@ -341,6 +341,9 @@ class ScriptDirectory extends React.Component {
                             onDelete={onDelete}
                             forceOpen={forceOpen}
 
+                            addWatch={this.props.addWatch}
+                            removeWatch={this.props.removeWatch}
+
                             parents={[directory, ...parents]}
                         />
                     ) : null}
