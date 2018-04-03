@@ -1,10 +1,12 @@
 package ru.mail.jira.plugins.groovy.impl;
 
+import com.atlassian.core.user.preferences.Preferences;
 import com.atlassian.jira.config.LocaleManager;
 import com.atlassian.jira.mail.Email;
 import com.atlassian.jira.mail.builder.EmailBuilder;
 import com.atlassian.jira.notification.NotificationRecipient;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.preferences.UserPreferencesManager;
 import com.atlassian.mail.queue.MailQueue;
 import com.atlassian.mail.queue.MailQueueItem;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -21,9 +23,12 @@ import java.util.Map;
 
 @Component
 public class NotificationServiceImpl implements NotificationService {
+    private static final String NOTIFY_OWN_CHANGES_PROPERTY_KEY = "user.notify.own.changes";
+
     private final MailQueue mailQueue;
     private final I18nResolver i18nResolver;
     private final LocaleManager localeManager;
+    private final UserPreferencesManager userPreferencesManager;
     private final PermissionHelper permissionHelper;
 
     @Autowired
@@ -31,11 +36,13 @@ public class NotificationServiceImpl implements NotificationService {
         @ComponentImport MailQueue mailQueue,
         @ComponentImport I18nResolver i18nResolver,
         @ComponentImport LocaleManager localeManager,
+        @ComponentImport UserPreferencesManager userPreferencesManager,
         PermissionHelper permissionHelper
     ) {
         this.mailQueue = mailQueue;
         this.i18nResolver = i18nResolver;
         this.localeManager = localeManager;
+        this.userPreferencesManager = userPreferencesManager;
         this.permissionHelper = permissionHelper;
     }
 
@@ -43,6 +50,11 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendNotifications(NotificationDto notificationDto, List<ApplicationUser> recipients) {
         for (ApplicationUser recipient : recipients) {
             if (!permissionHelper.isAdmin(recipient)) {
+                continue;
+            }
+
+            Preferences usersPrefs = userPreferencesManager.getPreferences(recipient);
+            if (notificationDto.getUser().equals(recipient) && !usersPrefs.getBoolean(NOTIFY_OWN_CHANGES_PROPERTY_KEY)) {
                 continue;
             }
 
