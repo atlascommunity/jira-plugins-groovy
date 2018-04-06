@@ -1,8 +1,7 @@
 matrix:
   include:
     - language: java
-      jdk:
-        - oraclejdk8
+      jdk: oraclejdk8
       cache:
         yarn: true
         directories:
@@ -12,8 +11,7 @@ matrix:
       script:
         - mvn -B package
     - language: node_js
-      node_js:
-        - 8
+      node_js: 8
       cache:
         yarn: true
         directories:
