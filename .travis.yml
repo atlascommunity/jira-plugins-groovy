@@ -1,15 +1,15 @@
 matrix:
   include:
-    - language: java
-      jdk: oraclejdk8
-      cache:
-        yarn: true
-        directories:
-          - $HOME/.m2/repository
-          - js/node_modules
-      install: true
-      script:
-        - mvn -B package
+#    - language: java
+#      jdk: oraclejdk8
+#      cache:
+#        yarn: true
+#        directories:
+#          - $HOME/.m2/repository
+#          - js/node_modules
+#      install: true
+#      script:
+#        - mvn -B package
     - language: node_js
       node_js: 8
       cache:
