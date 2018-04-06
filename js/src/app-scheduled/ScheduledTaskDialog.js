@@ -83,7 +83,7 @@ export class ScheduledTaskDialog extends React.Component {
                 error: null
             });
 
-            scheduledTaskService //todo
+            scheduledTaskService
                 .get(props.id)
                 .then(task => {
                     this.setState({

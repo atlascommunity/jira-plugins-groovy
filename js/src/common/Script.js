@@ -23,7 +23,6 @@ import {executionService} from '../service/services';
 import './Script.less';
 
 
-//todo: maybe display number of failed executions somewhere in title
 //todo: common component for displaying script parameters, maybe add prop for parameters
 export class Script extends React.Component {
     static propTypes = {

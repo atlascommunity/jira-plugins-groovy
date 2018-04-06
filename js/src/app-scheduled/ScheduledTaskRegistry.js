@@ -76,7 +76,6 @@ export class ScheduledTaskRegistry extends React.Component {
             return <div className="aui-icon aui-icon-wait"/>;
         }
 
-        //todo
         return (
             <Page>
                 <PageHeader
@@ -103,9 +102,6 @@ export class ScheduledTaskRegistry extends React.Component {
     }
 }
 
-//todo: not all tasks will have scripts
-//todo: maybe add changelog for all fields
-//todo: i18n
 @connect(null, TaskActionCreators)
 class ScheduledTask extends React.Component {
     static propTypes = {

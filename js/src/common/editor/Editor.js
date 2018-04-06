@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import memoizeOne from 'memoize-one';
+
 import 'codemirror/mode/groovy/groovy';
 import 'codemirror/mode/diff/diff';
 import 'codemirror/mode/velocity/velocity';
@@ -41,6 +43,7 @@ export const MarkerShape = PropTypes.shape({
 
 //todo: remember height for console
 //todo: change to PureComponent
+//todo: move theme state to redux
 export class Editor extends React.Component {
     static propTypes = {
         mode: PropTypes.string.isRequired,
@@ -97,38 +100,15 @@ export class Editor extends React.Component {
         this.setState({height: size.height});
     };
 
-    componentWillUpdate(_props, state) {
-        if (this.state.isLight !== state.isLight) {
-            this.options = null;
-        }
-    }
-
     componentDidUpdate(_prevProps, prevState) {
         if (prevState.height !== this.state.height) {
             this.cm.setSize(null, this.state.height);
         }
     }
 
-    componentWillReceiveProps(props) {
-        const {readOnly, isDisabled, mode, markers} = this.props;
-
-        const invalidateOptions =
-            props.readOnly !== readOnly || props.isDisabled !== isDisabled || props.mode !== mode || props.markers !== markers;
-
-        if (invalidateOptions) {
-            this.options = null;
-            //todo: consider setting options through cm instance
-        }
-    }
-
-    options = null;
-
-    _getOptions = () => {
-        if (!this.options) {
-            const {readOnly, isDisabled, mode} = this.props;
-            const {isLight} = this.state;
-
-            this.options = {
+    _getOptions = memoizeOne(
+        (readOnly, isDisabled, mode, isLight) => {
+            return {
                 theme: isLight ? 'eclipse' : 'lesser-dark',
                 mode: mode,
                 lineNumbers: true,
@@ -142,13 +122,14 @@ export class Editor extends React.Component {
                 //viewportMargin: Infinity
             };
         }
-        return this.options;
-    };
+    );
 
     render() {
-        const {onChange, value, bindings, decorated, resizable, decorator} = this.props;
+        const {onChange, value, bindings, decorated, resizable, decorator, readOnly, isDisabled, mode} = this.props;
+        const {isLight} = this.state;
 
-        const options = this._getOptions();
+        const options = this._getOptions(readOnly, isDisabled, mode, isLight);
+
         let el = <CodeMirror
             options={options}
 

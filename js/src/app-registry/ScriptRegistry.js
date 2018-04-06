@@ -56,7 +56,6 @@ const countErrors = memoize((directory) => {
     return errors;
 });
 
-//todo: anchor to parent
 //todo: collapse/uncollapse all
 @connect(
     memoizeOne(
