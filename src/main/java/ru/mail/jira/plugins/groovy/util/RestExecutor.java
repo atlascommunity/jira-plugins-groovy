@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mail.jira.plugins.commons.RestFieldException;
-import ru.mail.jira.plugins.commons.StreamRestResult;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -42,9 +40,6 @@ public final class RestExecutor<T> {
                 responseBuilder = responseBuilder.type("application/force-download")
                     .header("Content-Transfer-Encoding", "binary")
                     .header("charset", "UTF-8");
-            else if (actionResult instanceof StreamRestResult)
-                responseBuilder = responseBuilder.entity(((StreamRestResult) actionResult).getInputStream())
-                    .type(((StreamRestResult) actionResult).getContentType());
             return responseBuilder.build();
         } catch (SecurityException e) {
             return Response
