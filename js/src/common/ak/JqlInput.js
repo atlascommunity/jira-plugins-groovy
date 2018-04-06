@@ -10,6 +10,7 @@ import {colors} from '@atlaskit/theme';
 import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
 
 import {jiraService} from '../../service/services';
+import {CommonMessages} from '../../i18n/common.i18n';
 
 
 export class JqlInput extends React.Component {
@@ -104,14 +105,13 @@ export class JqlInput extends React.Component {
                 {validating &&
                     <div className="ak-description">
                         <Spinner size="small"/>
-                        {' '}
-                        Validating
+                        {' '}{CommonMessages.validating}
                     </div>
                 }
                 {issues !== null &&
                     <div className="ak-description">
                         <CheckCircleIcon size="small" label="" primaryColor={colors.G500}/>
-                        {' '}{issues} issues found
+                        {' '}{CommonMessages.issuesFound(issues)}
                     </div>
                 }
             </div>

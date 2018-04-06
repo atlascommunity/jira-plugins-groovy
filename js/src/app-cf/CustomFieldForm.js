@@ -13,6 +13,7 @@ import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
+import {ConsoleMessages} from '../i18n/console.i18n';
 
 
 const bindings = [ Bindings.issue ];
@@ -196,12 +197,14 @@ export class CustomFieldForm extends React.Component {
                         onChange={this._setPreviewKey}
                     />
                     <div style={{marginTop: '10px'}}>
-                        <Button appearance="primary" onClick={this._preview}>Preview</Button>
+                        <Button appearance="primary" onClick={this._preview}>
+                            {CommonMessages.preview}
+                        </Button>
                     </div>
 
                     {previewResult &&
                         <div>
-                            Completed in {previewResult.time}:
+                            {ConsoleMessages.executedIn(previewResult.key)}{':'}
 
                             <div dangerouslySetInnerHTML={{__html: previewResult.htmlResult}}/>
                         </div>

@@ -21,7 +21,9 @@ export const FieldMessages = {
     issueJql: i18n.fields.issueJql,
     workflow: i18n.fields.workflow,
     workflowAction: i18n.fields.workflowAction,
-    parentName: i18n.fields.parentName
+    parentName: i18n.fields.parentName,
+    action: i18n.fields.action,
+    order: i18n.fields.order,
 };
 
 export const CommonMessages = {
@@ -47,7 +49,10 @@ export const CommonMessages = {
     condition: i18n.common.condition,
     validator: i18n.common.validator,
     function: i18n.common.function,
-    showAll: i18n.common.showAll
+    showAll: i18n.common.showAll,
+    preview: i18n.common.preview,
+    validating: i18n.common.validating,
+    issuesFound: i18n.common.issuesFound
 };
 
 export const DialogMessages = {

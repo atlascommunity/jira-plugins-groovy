@@ -21,7 +21,6 @@ import Badge from '@atlaskit/badge';
 import Spinner from '@atlaskit/spinner';
 
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
-import TrashIcon from '@atlaskit/icon/glyph/trash';
 import AddIcon from '@atlaskit/icon/glyph/add';
 import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
 import CodeIcon from '@atlaskit/icon/glyph/code';
@@ -40,7 +39,7 @@ import {Script} from '../common/Script';
 
 import {registryService, watcherService} from '../service/services';
 
-import {TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import './ScriptRegistry.less';
@@ -450,7 +449,7 @@ class ScriptDirectory extends React.Component {
                             >
                                 <DropdownItemGroup>
                                     <DropdownItem onClick={onDelete(directory.id, 'directory', directory.name)}>
-                                        Delete
+                                        {CommonMessages.delete}
                                     </DropdownItem>
                                 </DropdownItemGroup>
                             </DropdownMenu>
@@ -491,7 +490,7 @@ class DraggableScript extends React.Component {
         return (
             <div className="DraggableScript">
                 <Draggable draggableId={`${this.props.script.id}`} type="script">
-                    {(provided, snapshot) => (
+                    {(provided) => (
                         <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
@@ -619,10 +618,10 @@ class RegistryScript extends React.Component {
                         >
                             <DropdownItemGroup>
                                 <DropdownItem onClick={this._toggleWorkflows}>
-                                    Find workflows
+                                    {RegistryMessages.findWorkflows}
                                 </DropdownItem>
                                 <DropdownItem onClick={onDelete}>
-                                    Delete
+                                    {CommonMessages.delete}
                                 </DropdownItem>
                             </DropdownItemGroup>
                         </DropdownMenu>

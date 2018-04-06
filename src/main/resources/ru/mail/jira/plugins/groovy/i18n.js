@@ -20,6 +20,8 @@ define('/mailru/groovy/i18n-react', function() {
             workflow: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.workflow'),
             workflowAction: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.workflowAction'),
             parentName: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.parentName'),
+            action: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.action'),
+            order: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.order')
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),
@@ -45,6 +47,11 @@ define('/mailru/groovy/i18n-react', function() {
             validator: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.validator'),
             function: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.function'),
             showAll: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.showAll'),
+            preview: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.preview'),
+            validating: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.validating'),
+            issuesFound: function(...params) {
+                AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.issuesFound', ...params)
+            }
         },
         error: {
             noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue'),
@@ -61,7 +68,8 @@ define('/mailru/groovy/i18n-react', function() {
         registry: {
             addScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.addScript'),
             addDirectory: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.addDirectory'),
-            noScripts: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.noScripts')
+            noScripts: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.noScripts'),
+            findWorkflows: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.findWorkflows')
         },
         listener: {
             addListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.addListener'),

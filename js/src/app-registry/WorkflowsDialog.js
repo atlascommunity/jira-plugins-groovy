@@ -9,7 +9,7 @@ import OpenIcon from '@atlaskit/icon/glyph/open';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import {registryService} from '../service/services';
-import {CommonMessages} from '../i18n/common.i18n';
+import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {getBaseUrl} from '../service/ajaxHelper';
 
 
@@ -62,7 +62,6 @@ export class WorkflowsDialog extends React.Component {
         const {onClose} = this.props;
         const {ready, workflows} = this.state;
 
-        //todo: i18n
         return (
             <Modal
                 heading="Workflows with this script"
@@ -81,16 +80,16 @@ export class WorkflowsDialog extends React.Component {
                         <thead>
                             <tr>
                                 <td>
-                                    Workflow
+                                    {FieldMessages.workflow}
                                 </td>
                                 <td>
-                                    Action
+                                    {FieldMessages.action}
                                 </td>
                                 <td>
-                                    Type
+                                    {FieldMessages.type}
                                 </td>
                                 <td>
-                                    Order
+                                    {FieldMessages.order}
                                 </td>
                                 <td/>
                                 <td/>
