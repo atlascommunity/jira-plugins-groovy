@@ -438,7 +438,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
             return false;
         }
 
-        //todo: maybe add transition inputs
+        //todo: maybe add transition inputs (???)
         IssueService.IssueResult transitionResult = issueService.transition(user, validationResult);
 
         if (!transitionResult.isValid()) {

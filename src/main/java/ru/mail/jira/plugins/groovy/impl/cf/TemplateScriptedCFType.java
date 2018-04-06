@@ -19,8 +19,6 @@ import ru.mail.jira.plugins.groovy.util.Const;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-//todo: preview
-//todo: show template (&changelog) along with script
 @Scanned
 public class TemplateScriptedCFType extends ScriptedCFType<Object, Object> {
     private final Logger logger = LoggerFactory.getLogger(TemplateScriptedCFType.class);
