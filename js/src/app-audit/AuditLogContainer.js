@@ -24,16 +24,16 @@ import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 const tableHead = {
     cells: [
         {
-            content: '',
-            width: '30px'
-        },
-        {
             content: FieldMessages.date,
             width: '120px'
         },
         {
             content: AuditMessages.user,
             width: '200px'
+        },
+        {
+            content: '',
+            width: '30px'
         },
         {
             content: AuditMessages.script,
@@ -104,9 +104,6 @@ export class AuditLogContainer extends React.Component {
                         key: value.id,
                         cells: [
                             {
-                                content: <ActionsIcon action={value.action}/>
-                            },
-                            {
                                 content: value.date
                             },
                             {
@@ -119,6 +116,9 @@ export class AuditLogContainer extends React.Component {
                                         secondaryText={value.user.name}
                                     />
                                 )
+                            },
+                            {
+                                content: <ActionsIcon action={value.action}/>
                             },
                             {
                                 content: (
