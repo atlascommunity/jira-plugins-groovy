@@ -8,7 +8,7 @@ import PageHeader from '@atlaskit/page-header';
 
 import {CustomFieldForm} from './CustomFieldForm';
 
-import {Script} from '../common/Script';
+import {Script, ScriptParameters} from '../common/Script';
 import {fieldConfigService} from '../service/services';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
 import {CommonMessages, ErrorMessages, FieldMessages} from '../i18n/common.i18n';
@@ -84,9 +84,14 @@ export class CustomFieldFormContainer extends React.Component {
 
                         onEdit={this._setEditing(true)}
                     >
-                        <div>
-                            <strong>{FieldMessages.cacheable}{':'}</strong> {config.cacheable ? 'yes' : 'no'}
-                        </div>
+                        <ScriptParameters
+                            params={[
+                                {
+                                    label: FieldMessages.cacheable,
+                                    value: config.cacheable ? 'yes' : 'no'
+                                }
+                            ]}
+                        />
                     </Script>
                 }
                 {(!config.uuid || editing) &&
