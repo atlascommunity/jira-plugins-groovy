@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
+import memoizeOne from 'memoize-one';
+
 import Message from 'aui-react/lib/AUIMessage';
 
 import Button from '@atlaskit/button';
@@ -18,7 +20,7 @@ import {listenerService} from '../service/services';
 import {ListenerMessages, ListenerTypeMessages} from '../i18n/listener.i18n';
 import {FieldMessages, TitleMessages} from '../i18n/common.i18n';
 
-import {Script} from '../common/Script';
+import {Script, ScriptParameters} from '../common/Script';
 
 import './ListenerRegistry.less';
 
@@ -65,7 +67,14 @@ export class ListenerRegistry extends React.Component {
 }
 
 @connect(
-    () => { return {}; },
+    memoizeOne(
+        (state) => {
+            return {
+                projects: state.projects,
+                eventTypes: state.eventTypes
+            };
+        }
+    ),
     ListenerActionCreators
 )
 class Listener extends React.Component {
@@ -84,8 +93,41 @@ class Listener extends React.Component {
         }
     };
 
+    _getParams = memoizeOne(
+        (projects, eventTypes, condition) => {
+            const params = [
+                {
+                    label: FieldMessages.type,
+                    value: ListenerTypeMessages[condition.type]
+                }
+            ];
+
+            if (condition.type === 'CLASS_NAME') {
+                params.push({
+                    label: FieldMessages.name,
+                    value: condition.className
+                });
+            } else if (condition.type === 'ISSUE') {
+                params.push({
+                    label: FieldMessages.eventTypes,
+                    value: condition.typeIds.map(id => eventTypes[id] || id).join(', ')
+                });
+                params.push({
+                    label: FieldMessages.projects,
+                    value: (
+                        <div className="flex-column">
+                            {condition.projectIds.map(id => <div key={id}>{projects[id] || id}</div>)}
+                        </div>
+                    )
+                });
+            }
+
+            return params;
+        }
+    );
+
     render() {
-        const {listener, onEdit} = this.props;
+        const {listener, projects, eventTypes, onEdit} = this.props;
 
         return (
             <Script
@@ -102,68 +144,8 @@ class Listener extends React.Component {
                 onEdit={onEdit}
                 onDelete={this._delete}
             >
-                <Condition condition={listener.condition}/>
+                <ScriptParameters params={this._getParams(projects, eventTypes, listener.condition)}/>
             </Script>
-        );
-    }
-}
-
-
-@connect(
-    state => {
-        return {
-            projects: state.projects,
-            eventTypes: state.eventTypes
-        };
-    }
-)
-class Condition extends React.Component {
-    static propTypes = {
-        condition: ConditionModel.isRequired,
-        projects: PropTypes.object.isRequired,
-        eventTypes: PropTypes.object.isRequired
-    };
-
-    render() {
-        const {condition, projects, eventTypes} = this.props;
-
-        let vertical = true;
-        let conditionBody = null;
-        switch (condition.type) {
-            case 'CLASS_NAME':
-                conditionBody = condition.className;
-                break;
-            case 'ISSUE':
-                conditionBody = (
-                    <div className="flex-row">
-                        <div className="flex-grow">
-                            <strong>{FieldMessages.projects}{':'}</strong>
-                            {condition.projectIds.map(id =>
-                                <div key={id}>{projects[id] || id}</div>
-                            )}
-                        </div>
-                        <div className="flex-grow">
-                            <strong>{FieldMessages.eventTypes}{':'}</strong>
-                            {condition.typeIds.map(id =>
-                                <div key={id}>{eventTypes[id] || id}</div>
-                            )}
-                        </div>
-                    </div>
-                );
-                break;
-            default:
-                conditionBody = 'not implemented'; //todo: ???
-        }
-
-        return (
-            <div className={`${vertical ? 'flex-column' : 'flex-row'}`}>
-                <div className="ConditionName">
-                    <strong>{ListenerTypeMessages[condition.type]}</strong>
-                </div>
-                <div className="ConditionBody">
-                    {conditionBody}
-                </div>
-            </div>
         );
     }
 }
