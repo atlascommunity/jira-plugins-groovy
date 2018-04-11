@@ -240,7 +240,7 @@ export class Script extends React.Component {
                                 </div>
                                 {' '}
                                 <div className="flex-vertical-middle">
-                                    <h3>
+                                    <h3 title={script && script.name}>
                                         {script && script.name}
                                     </h3>
                                 </div>
