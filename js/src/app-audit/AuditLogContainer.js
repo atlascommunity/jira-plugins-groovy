@@ -37,7 +37,7 @@ const tableHead = {
         },
         {
             content: AuditMessages.script,
-            width: '100px'
+            width: '200px'
         },
         {
             content: AuditMessages.description
