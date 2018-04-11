@@ -262,6 +262,12 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         result.setCustomFieldId(customField.getIdAsLong());
         result.setContextName(fieldConfigSchemeManager.getConfigSchemeForFieldConfig(jiraConfig).getName());
         result.setNeedsTemplate(isTemplated);
+        result.setType(customField.getCustomFieldType().getName());
+
+        CustomFieldSearcher searcher = customField.getCustomFieldSearcher();
+        if (searcher != null) {
+            result.setSearcher(searcher.getDescriptor().getName());
+        }
 
         if (fieldConfig == null) {
             result.setCacheable(true);
@@ -275,12 +281,6 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             result.setVelocityParamsEnabled(fieldConfig.isVelocityParamsEnabled());
             result.setScriptBody(fieldConfig.getScriptBody());
             result.setUuid(fieldConfig.getUuid());
-            result.setType(customField.getCustomFieldType().getName());
-
-            CustomFieldSearcher searcher = customField.getCustomFieldSearcher();
-            if (searcher != null) {
-                result.setSearcher(searcher.getDescriptor().getName());
-            }
 
             if (isTemplated) {
                 result.setTemplate(fieldConfig.getTemplate());
