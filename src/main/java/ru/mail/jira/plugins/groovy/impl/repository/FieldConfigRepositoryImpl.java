@@ -5,6 +5,7 @@ import com.atlassian.cache.Cache;
 import com.atlassian.cache.CacheManager;
 import com.atlassian.cache.CacheSettingsBuilder;
 import com.atlassian.jira.issue.CustomFieldManager;
+import com.atlassian.jira.issue.customfields.CustomFieldSearcher;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.config.manager.FieldConfigManager;
 import com.atlassian.jira.issue.fields.config.manager.FieldConfigSchemeManager;
@@ -274,6 +275,12 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             result.setVelocityParamsEnabled(fieldConfig.isVelocityParamsEnabled());
             result.setScriptBody(fieldConfig.getScriptBody());
             result.setUuid(fieldConfig.getUuid());
+            result.setType(customField.getCustomFieldType().getName());
+
+            CustomFieldSearcher searcher = customField.getCustomFieldSearcher();
+            if (searcher != null) {
+                result.setSearcher(searcher.getDescriptor().getName());
+            }
 
             if (isTemplated) {
                 result.setTemplate(fieldConfig.getTemplate());

@@ -87,9 +87,17 @@ export class CustomFieldFormContainer extends React.Component {
                         <ScriptParameters
                             params={[
                                 {
+                                    label: FieldMessages.type,
+                                    value: config.type
+                                },
+                                {
+                                    label: FieldMessages.searcher,
+                                    value: config.searcher || CommonMessages.no
+                                },
+                                {
                                     label: FieldMessages.cacheable,
                                     value: config.cacheable ? 'yes' : 'no'
-                                }
+                                },
                             ]}
                         />
                     </Script>

@@ -21,7 +21,8 @@ define('/mailru/groovy/i18n-react', function() {
             workflowAction: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.workflowAction'),
             parentName: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.parentName'),
             action: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.action'),
-            order: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.order')
+            order: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.order'),
+            searcher: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.searcher'),
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),

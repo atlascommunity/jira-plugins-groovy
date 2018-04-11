@@ -24,6 +24,7 @@ export const FieldMessages = {
     parentName: i18n.fields.parentName,
     action: i18n.fields.action,
     order: i18n.fields.order,
+    searcher: i18n.fields.searcher
 };
 
 export const CommonMessages = {

@@ -35,7 +35,7 @@ export class FieldRegistry extends React.Component {
         const {configs, ready} = this.props;
 
         if (!ready) {
-            return <Spinner size="xlarge" />;
+            return <Spinner size="medium" />;
         }
 
         return <Page>
@@ -104,9 +104,17 @@ class Field extends React.Component {
                 <ScriptParameters
                     params={[
                         {
+                            label: FieldMessages.type,
+                            value: config.type
+                        },
+                        {
+                            label: FieldMessages.searcher,
+                            value: config.searcher || CommonMessages.no
+                        },
+                        {
                             label: FieldMessages.cacheable,
                             value: config.cacheable ? CommonMessages.yes : CommonMessages.no
-                        }
+                        },
                     ]}
                 />
                 {!config.uuid && <div>
