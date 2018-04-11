@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
+import memoizeOne from 'memoize-one';
+
 import Message from 'aui-react/lib/AUIMessage';
 
 import Avatar from '@atlaskit/avatar';
@@ -23,11 +25,10 @@ import {TaskActionCreators} from './scheduled.reducer';
 
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import {FieldMessages, TitleMessages} from '../i18n/common.i18n';
-import {Script} from '../common/Script';
+import {Script, ScriptParameters} from '../common/Script';
 
 import './ScheduledTaskRegistry.less';
 import {scheduledTaskService} from '../service/services';
-import {StaticFieldValue} from '../common/StaticField';
 
 
 function getOutcomeLozengeAppearance(outcome) {
@@ -140,6 +141,58 @@ class ScheduledTask extends React.Component {
             .then(() => updateTask({...task, enabled}));
     };
 
+    _getParams = memoizeOne(
+        (task) => {
+            const params = [
+                {
+                    label: FieldMessages.schedule,
+                    value: task.scheduleExpression
+                }
+            ];
+
+            if (task.user) {
+                params.push({
+                    label: ScheduledTaskMessages.runAs,
+                    value: (
+                        <div className="flex-row">
+                            <Avatar size="xsmall" appearance="square" src={task.user.imgSrc}/>
+                            <div className="flex-vertical-middle">
+                                {' '}{task.user.label}
+                            </div>
+                        </div>
+                    )
+                });
+            }
+
+            if (task.issueJql) {
+                params.push({
+                    label: FieldMessages.issueJql,
+                    value: task.issueJql
+                });
+            }
+
+            if (task.issueWorkflow && task.issueWorkflowAction) {
+                params.push({
+                    label: FieldMessages.workflowAction,
+                    value: `${task.issueWorkflow.label}' - '${task.issueWorkflowAction.label}`
+                });
+            }
+
+            if ((task.type === 'ISSUE_JQL_TRANSITION') && task.transitionOptions) {
+                params.push({
+                    label: ScheduledTaskMessages.transitionOptions,
+                    value: Object
+                        .keys(task.transitionOptions)
+                        .filter(key => task.transitionOptions[key])
+                        .map(key => ScheduledTaskMessages.transitionOption[key])
+                        .join(', ') || 'None'
+                });
+            }
+
+            return params;
+        }
+    );
+
     render() {
         const {task, onEdit} = this.props;
         const {showStatusInfo} = this.state;
@@ -222,53 +275,9 @@ class ScheduledTask extends React.Component {
                 onEdit={onEdit}
                 onDelete={this._delete}
             >
-                <form className="aui">
-                    <div className="field-group">
-                        <label>
-                            {FieldMessages.schedule}{':'}
-                        </label>
-                        <StaticFieldValue>
-                            {task.scheduleExpression}
-                        </StaticFieldValue>
-                    </div>
-                    {task.user && <div className="field-group">
-                        <label>
-                            {ScheduledTaskMessages.runAs}{':'}
-                        </label>
-                        <StaticFieldValue>
-                            <Avatar size="xsmall" src={task.user.imgSrc}/>{' '}{task.user.label}
-                        </StaticFieldValue>
-                    </div>}
-                    {task.issueJql && <div className="field-group">
-                        <label>
-                            {FieldMessages.issueJql}{':'}
-                        </label>
-                        <StaticFieldValue>
-                            {task.issueJql}
-                        </StaticFieldValue>
-                    </div>}
-                    {task.issueWorkflow && task.issueWorkflowAction && <div className="field-group">
-                        <label>
-                            {FieldMessages.workflowAction}{':'}
-                        </label>
-                        <StaticFieldValue>
-                            {task.issueWorkflow.label}{' - '}{task.issueWorkflowAction.label}
-                        </StaticFieldValue>
-                    </div>}
-                    {(task.type === 'ISSUE_JQL_TRANSITION') && task.transitionOptions && <div className="field-group">
-                        <label>
-                            {ScheduledTaskMessages.transitionOptions}{':'}
-                        </label>
-                        <StaticFieldValue>
-                            {Object
-                                .keys(task.transitionOptions)
-                                .filter(key => task.transitionOptions[key])
-                                .map(key => ScheduledTaskMessages.transitionOption[key])
-                                .join(', ')
-                            || 'None'}
-                        </StaticFieldValue>
-                    </div>}
-                </form>
+                <ScriptParameters
+                    params={this._getParams(task)}
+                />
             </Script>
         );
     }

@@ -6,6 +6,7 @@ import Button, {ButtonGroup} from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
 import Badge from '@atlaskit/badge';
 import Tooltip from '@atlaskit/tooltip';
+import {Label} from '@atlaskit/field-base';
 
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
@@ -22,6 +23,34 @@ import {executionService} from '../service/services';
 
 import './Script.less';
 
+
+export class ScriptParameters extends React.PureComponent {
+    static propTypes = {
+        params: PropTypes.arrayOf(PropTypes.shape({
+            label: PropTypes.string.isRequired,
+            value: PropTypes.node.isRequired
+        }).isRequired)
+    };
+
+    render() {
+        const {params} = this.props;
+
+        return (
+            <div className="scriptParams">
+                {params.map((param, i) =>
+                    <div className="item" key={i}>
+                        <div className="label">
+                            <Label label={`${param.label}:`} isFirstChild={true}/>
+                        </div>
+                        <div className="value">
+                            {param.value}
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+}
 
 //todo: common component for displaying script parameters, maybe add prop for parameters
 export class Script extends React.Component {

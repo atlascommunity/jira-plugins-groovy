@@ -13,7 +13,7 @@ import {ScriptActionCreators} from './rest.reducer';
 
 import {restService} from '../service/services';
 import {RestMessages} from '../i18n/rest.i18n';
-import {Script} from '../common/Script';
+import {Script, ScriptParameters} from '../common/Script';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {FieldMessages, TitleMessages} from '../i18n/common.i18n';
 
@@ -98,14 +98,18 @@ class RestScript extends React.Component {
                 onEdit={onEdit}
                 onDelete={this._delete}
             >
-                <div className="flex-column">
-                    <div>
-                        <a href={url}>{url}</a>
-                    </div>
-                    <div>
-                        <strong>{FieldMessages.httpMethods}{':'}</strong> {script.methods.join(', ')}
-                    </div>
-                </div>
+                <ScriptParameters
+                    params={[
+                        {
+                            label: 'URL',
+                            value: <a href={url}>{url}</a>
+                        },
+                        {
+                            label: FieldMessages.httpMethods,
+                            value: script.methods.join(', ')
+                        }
+                    ]}
+                />
             </Script>
         );
     }

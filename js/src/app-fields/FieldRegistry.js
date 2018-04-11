@@ -11,7 +11,7 @@ import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 import SettingsIcon from '@atlaskit/icon/glyph/settings';
 
-import {Script} from '../common/Script';
+import {Script, ScriptParameters} from '../common/Script';
 import {getBaseUrl} from '../service/ajaxHelper';
 import {JiraMessages, FieldMessages, ErrorMessages, CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
@@ -101,10 +101,14 @@ class Field extends React.Component {
                     </div>
                 }
             >
-                <div className="field-group">
-                    <label>{FieldMessages.cacheable}{':'}</label>
-                    {config.cacheable ? CommonMessages.yes : CommonMessages.no}
-                </div>
+                <ScriptParameters
+                    params={[
+                        {
+                            label: FieldMessages.cacheable,
+                            value: config.cacheable ? CommonMessages.yes : CommonMessages.no
+                        }
+                    ]}
+                />
                 {!config.uuid && <div>
                     <strong style={{color: 'red'}}>
                         {ErrorMessages.notConfigured}

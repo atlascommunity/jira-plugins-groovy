@@ -9,8 +9,7 @@ import define from 'extDefine';
 import {FormEditor} from './FormEditor';
 import {RegistryPicker} from './RegistryPicker';
 
-import {Script} from '../common/Script';
-import {StaticFieldValue} from '../common/StaticField';
+import {Script, ScriptParameters} from '../common/Script';
 
 import {ErrorMessages} from '../i18n/common.i18n';
 
@@ -55,18 +54,16 @@ define('mailru/groovy/renderRegistryScript', () => {
                     errorCount
                 }}
             >
-                {params && <form className="aui" style={{margin: 0}}>
-                    {params.map(param =>
-                        <div className="field-group" key={param.name}>
-                            <label>
-                                {param.displayName}{':'}
-                            </label>
-                            <StaticFieldValue>
-                                <ScriptParamValue value={paramValues[param.name]} param={param}/>
-                            </StaticFieldValue>
-                        </div>
-                    )}
-                </form>}
+                {params &&
+                    <ScriptParameters
+                        params={params.map(param => {
+                            return {
+                                label: param.displayName,
+                                value: <ScriptParamValue value={paramValues[param.name]} param={param}/>
+                            };
+                        })}
+                    />
+                }
             </Script>,
             element
         );
