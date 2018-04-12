@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import reactStringReplace from 'react-string-replace';
+
 import Avatar from '@atlaskit/avatar';
 import Button, {ButtonGroup} from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
@@ -22,6 +24,7 @@ import {CommonMessages} from '../i18n/common.i18n';
 import {executionService} from '../service/services';
 
 import './Script.less';
+import {getBaseUrl} from '../service/ajaxHelper';
 
 
 export class ScriptParameters extends React.PureComponent {
@@ -299,6 +302,34 @@ export class Script extends React.Component {
     }
 }
 
+function ChangelogComment({text, issueReferences}) {
+    if (!(issueReferences && issueReferences.length)) {
+        return <p>{text}</p>;
+    }
+
+    return (
+        <p>
+            {reactStringReplace(text, /([A-Z0-9a-z]{1,10}-\d+)/g, (issueKey, i) => {
+                const issueReference = issueReferences.find(ref => ref.key === issueKey);
+
+                if (issueReference) {
+                    return (
+                        <Tooltip
+                            key={`${issueKey}-${i}`}
+                            tag="span"
+                            content={issueReference.summary}
+                        >
+                            <a href={`${getBaseUrl()}/browse/${issueKey}`}>{issueKey}</a>
+                        </Tooltip>
+                    );
+                } else {
+                    return issueKey;
+                }
+            })}
+        </p>
+    );
+}
+
 function Changelog({changelogs, switchToCurrent, switchToChangelog}) {
     return (
         <div className="scriptChangelogs" style={{width: '150px'}}>
@@ -322,9 +353,10 @@ function Changelog({changelogs, switchToCurrent, switchToChangelog}) {
                             {changelog.date}
                         </div>
                         <div>
-                            <p>
-                                {changelog.comment}
-                            </p>
+                            <ChangelogComment
+                                text={changelog.comment}
+                                issueReferences={changelog.issueReferences}
+                            />
                         </div>
                     </div>
                 </div>

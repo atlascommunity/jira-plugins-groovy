@@ -2,6 +2,8 @@ package ru.mail.jira.plugins.groovy.util;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.jira.datetime.DateTimeFormatter;
+import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
@@ -12,26 +14,34 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
+import ru.mail.jira.plugins.groovy.api.dto.JiraIssueReference;
 import ru.mail.jira.plugins.groovy.api.entity.AbstractChangelog;
 import ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog;
 
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
 public final class ChangelogHelper {
+    private static final Pattern ISSUE_KEY_PATTERN = Pattern.compile("((?<!([A-Za-z]{1,10})-?)[A-Z]+-\\d+)");
+
     private final DateTimeFormatter dateTimeFormatter;
+    private final IssueManager issueManager;
     private final ActiveObjects ao;
     private final UserMapper userMapper;
 
     @Autowired
     public ChangelogHelper(
         @ComponentImport DateTimeFormatter dateTimeFormatter,
+        @ComponentImport IssueManager issueManager,
         @ComponentImport ActiveObjects ao,
         UserMapper userMapper
     ) {
         this.dateTimeFormatter = dateTimeFormatter;
+        this.issueManager = issueManager;
         this.ao = ao;
         this.userMapper = userMapper;
     }
@@ -70,6 +80,20 @@ public final class ChangelogHelper {
         if (changelog instanceof FieldConfigChangelog) {
             result.setTemplateDiff(((FieldConfigChangelog) changelog).getTemplateDiff());
         }
+
+        Set<JiraIssueReference> issueReferences = new HashSet<>();
+
+        Matcher issueKeyMatcher = ISSUE_KEY_PATTERN.matcher(changelog.getComment());
+        while (issueKeyMatcher.find()) {
+            String issueKey = issueKeyMatcher.group();
+
+            Issue issue = issueManager.getIssueByCurrentKey(issueKey);
+            if (issue != null) {
+                issueReferences.add(new JiraIssueReference(issue.getKey(), issue.getSummary()));
+            }
+        }
+
+        result.setIssueReferences(issueReferences);
 
         return result;
     }

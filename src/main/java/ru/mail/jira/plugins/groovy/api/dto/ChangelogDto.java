@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Set;
 
 @Getter @Setter
 @XmlRootElement
@@ -21,4 +22,6 @@ public class ChangelogDto {
     private JiraUser author;
     @XmlElement
     private String date;
+    @XmlElement
+    private Set<JiraIssueReference> issueReferences;
 }
