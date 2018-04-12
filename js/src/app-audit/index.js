@@ -4,7 +4,7 @@ import React from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
-import {AuditLogContainer} from './AuditLogContainer';
+import {AuditLog} from './AuditLog';
 
 import {fixStyle} from '../common/fixStyle';
 
@@ -15,7 +15,7 @@ AJS.toInit(() => {
     fixStyle();
 
     ReactDOM.render(
-        <AuditLogContainer/>,
+        <AuditLog/>,
         document.getElementById('react-content')
     );
 });

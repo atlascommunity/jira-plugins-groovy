@@ -21,4 +21,8 @@ export class RestService {
     deleteScript(id) {
         return ajaxDelete(`${getPluginBaseUrl()}/rest/${id}`);
     }
+
+    restoreScript(id) {
+        return ajaxPost(`${getPluginBaseUrl()}/rest/${id}/restore`);
+    }
 }

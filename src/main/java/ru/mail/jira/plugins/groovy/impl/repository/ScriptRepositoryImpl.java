@@ -141,6 +141,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         deleteDirectory(user, ao.get(ScriptDirectory.class, id));
     }
 
+    @Override
+    public void restoreDirectory(ApplicationUser user, int id) {
+        restoreDirectory(user, ao.get(ScriptDirectory.class, id));
+    }
+
     private void deleteDirectory(ApplicationUser user, ScriptDirectory directory) {
         directory.setDeleted(true);
         directory.save();
@@ -154,6 +159,18 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
 
         addAuditLogAndNotify(user, EntityAction.DELETED, directory, directory.getID() + " - " + directory.getName());
+    }
+
+    private void restoreDirectory(ApplicationUser user, ScriptDirectory directory) {
+        directory.setDeleted(false);
+        directory.save();
+
+        ScriptDirectory parent = directory.getParent();
+        if (parent != null && parent.isDeleted()) {
+            restoreDirectory(user, parent);
+        }
+
+        addAuditLogAndNotify(user, EntityAction.RESTORED, directory, directory.getID() + " - " + directory.getName());
     }
 
     @Override
@@ -295,9 +312,30 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
     }
 
+    @Override
+    public void restoreScript(ApplicationUser user, int id) {
+        ClusterLock lock = clusterLockService.getLockForName(getLockKey(id));
+
+        lock.lock();
+        try {
+            restoreScript(user, ao.get(Script.class, id));
+        } finally {
+            lock.unlock();
+        }
+    }
+
     private void deleteScript(ApplicationUser user, Script script) {
         script.setDeleted(true);
         script.save();
+
+        addAuditLogAndNotify(user, EntityAction.DELETED, script, null, script.getID() + " - " + script.getName());
+    }
+
+    private void restoreScript(ApplicationUser user, Script script) {
+        script.setDeleted(false);
+        script.save();
+
+        restoreDirectory(user, script.getDirectory());
 
         addAuditLogAndNotify(user, EntityAction.DELETED, script, null, script.getID() + " - " + script.getName());
     }

@@ -85,6 +85,18 @@ public class ScheduledTaskResource {
         }).getResponse();
     }
 
+    @Path("/{id}/restore")
+    @POST
+    public Response restoreTask(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            scheduledTaskService.restoreTask(authenticationContext.getLoggedInUser(), id);
+
+            return null;
+        }).getResponse();
+    }
+
     @Path("/{id}/enabled/{enabled}")
     @POST
     public Response setEnabled(@PathParam("id") int id, @PathParam("enabled") boolean enabled) {

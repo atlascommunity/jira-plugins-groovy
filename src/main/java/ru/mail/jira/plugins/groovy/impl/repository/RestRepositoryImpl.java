@@ -143,7 +143,25 @@ public class RestRepositoryImpl implements RestRepository {
             new AuditLogEntryForm(
                 EntityType.REST,
                 script.getID(),
-                EntityAction.UPDATED,
+                EntityAction.DELETED,
+                script.getID() + " - " + script.getName()
+            )
+        );
+    }
+
+    @Override
+    public void restoreScript(ApplicationUser user, int id) {
+        RestScript script = ao.get(RestScript.class, id);
+
+        script.setDeleted(false);
+        script.save();
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                EntityType.REST,
+                script.getID(),
+                EntityAction.RESTORED,
                 script.getID() + " - " + script.getName()
             )
         );

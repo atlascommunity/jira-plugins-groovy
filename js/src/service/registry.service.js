@@ -22,6 +22,10 @@ export class RegistryService {
         return ajaxDelete(`${getPluginBaseUrl()}/registry/directory/${id}`);
     }
 
+    restoreDirectory(id) {
+        return ajaxPost(`${getPluginBaseUrl()}/registry/directory/${id}/restore`);
+    }
+
     getAllScripts(type) {
         return ajaxGet(`${getPluginBaseUrl()}/registry/script/${type}/all`);
     }
@@ -40,6 +44,10 @@ export class RegistryService {
 
     deleteScript(id) {
         return ajaxDelete(`${getPluginBaseUrl()}/registry/script/${id}`);
+    }
+
+    restoreScript(id) {
+        return ajaxPost(`${getPluginBaseUrl()}/registry/script/${id}/restore`);
     }
 
     moveScript(id, parentId) {

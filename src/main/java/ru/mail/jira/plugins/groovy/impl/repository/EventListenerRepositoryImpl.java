@@ -191,6 +191,25 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     }
 
     @Override
+    public void restoreEventListener(ApplicationUser user, int id) {
+        Listener listener = ao.get(Listener.class, id);
+        listener.setDeleted(false);
+        listener.save();
+
+        cache.remove(VALUE_KEY);
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                EntityType.LISTENER,
+                listener.getID(),
+                EntityAction.RESTORED,
+                listener.getID() + " - " + listener.getName()
+            )
+        );
+    }
+
+    @Override
     public void invalidate() {
         cache.removeAll();
     }

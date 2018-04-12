@@ -11,5 +11,7 @@ public interface ScheduledTaskService {
 
     void deleteTask(ApplicationUser user, int id);
 
+    void restoreTask(ApplicationUser user, int id);
+
     void setEnabled(ApplicationUser user, int id, boolean enabled);
 }

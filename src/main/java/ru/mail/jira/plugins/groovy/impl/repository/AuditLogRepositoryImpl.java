@@ -85,34 +85,51 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
         if (entityId != null) {
             String name = null;
             String parentName = null;
+            Boolean deleted = null;
             switch (entry.getCategory()) {
-                case REGISTRY_SCRIPT:
+                case REGISTRY_SCRIPT: {
                     Script script = activeObjects.get(Script.class, entityId);
                     name = script.getName();
                     parentName = ScriptUtil.getExpandedName(script.getDirectory());
+                    deleted = script.isDeleted();
                     break;
-                case REGISTRY_DIRECTORY:
+                }
+                case REGISTRY_DIRECTORY: {
                     ScriptDirectory directory = activeObjects.get(ScriptDirectory.class, entityId);
                     name = directory.getName();
+                    deleted = directory.isDeleted();
                     if (directory.getParent() != null) {
                         parentName = ScriptUtil.getExpandedName(directory);
                     }
                     break;
-                case LISTENER:
-                    name = activeObjects.get(Listener.class, entityId).getName();
+                }
+                case LISTENER: {
+                    Listener listener = activeObjects.get(Listener.class, entityId);
+                    name = listener.getName();
+                    deleted = listener.isDeleted();
                     break;
-                case REST:
-                    name = activeObjects.get(RestScript.class, entityId).getName();
+                }
+                case REST: {
+                    RestScript script = activeObjects.get(RestScript.class, entityId);
+                    name = script.getName();
+                    deleted = script.isDeleted();
                     break;
-                case CUSTOM_FIELD:
+                }
+                case CUSTOM_FIELD: {
                     name = customFieldHelper.getFieldName(activeObjects.get(FieldConfig.class, entityId).getFieldConfigId());
+                    deleted = false;
                     break;
-                case SCHEDULED_TASK:
-                    name = activeObjects.get(ScheduledTask.class, entityId).getName();
+                }
+                case SCHEDULED_TASK: {
+                    ScheduledTask task = activeObjects.get(ScheduledTask.class, entityId);
+                    name = task.getName();
+                    deleted = task.isDeleted();
                     break;
+                }
             }
             result.setScriptName(name);
             result.setParentName(parentName);
+            result.setDeleted(deleted);
             result.setScriptId(entityId);
         }
 

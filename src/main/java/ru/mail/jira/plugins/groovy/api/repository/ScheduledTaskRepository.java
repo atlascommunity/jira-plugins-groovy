@@ -30,4 +30,6 @@ public interface ScheduledTaskRepository {
      * All mutations must go through {@link ru.mail.jira.plugins.groovy.api.service.ScheduledTaskService}
      */
     void deleteTask(ApplicationUser user, int id);
+
+    ScheduledTaskDto restoreTask(ApplicationUser user, int id);
 }

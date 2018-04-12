@@ -219,6 +219,26 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         );
     }
 
+    @Override
+    public ScheduledTaskDto restoreTask(ApplicationUser user, int id) {
+        ScheduledTask task = ao.get(ScheduledTask.class, id);
+
+        task.setDeleted(false);
+        task.save();
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                EntityType.SCHEDULED_TASK,
+                task.getID(),
+                EntityAction.RESTORED,
+                task.getID() + " - " + task.getName()
+            )
+        );
+
+        return buildDto(task, true, true);
+    }
+
     private void validateForm(boolean isNew, ScheduledTaskForm form) {
         if (StringUtils.isEmpty(form.getName())) {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");

@@ -22,6 +22,8 @@ public interface ScriptRepository {
 
     void deleteDirectory(ApplicationUser user, int id);
 
+    void restoreDirectory(ApplicationUser user, int id);
+
     void moveDirectory(ApplicationUser user, int id, ParentForm form);
 
     RegistryScriptDto getScript(int id, boolean includeChangelogs, boolean expandName, boolean includeErrorCount);
@@ -33,4 +35,6 @@ public interface ScriptRepository {
     void moveScript(ApplicationUser user, int id, ParentForm form);
 
     void deleteScript(ApplicationUser user, int id);
+
+    void restoreScript(ApplicationUser user, int id);
 }

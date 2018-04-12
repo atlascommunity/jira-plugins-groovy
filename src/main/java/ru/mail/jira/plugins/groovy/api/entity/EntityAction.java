@@ -6,6 +6,7 @@ public enum EntityAction {
     CREATED("ru.mail.jira.plugins.groovy.audit.action.created"),
     UPDATED("ru.mail.jira.plugins.groovy.audit.action.updated"),
     DELETED("ru.mail.jira.plugins.groovy.audit.action.deleted"),
+    RESTORED("ru.mail.jira.plugins.groovy.audit.action.restored"),
     ENABLED("ru.mail.jira.plugins.groovy.audit.action.enabled"),
     DISABLED("ru.mail.jira.plugins.groovy.audit.action.disabled"),
     MOVED("ru.mail.jira.plugins.groovy.audit.action.moved");

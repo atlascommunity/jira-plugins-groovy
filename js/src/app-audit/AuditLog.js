@@ -5,6 +5,7 @@ import PageHeader from '@atlaskit/page-header';
 import Tooltip from '@atlaskit/tooltip';
 import Avatar, {AvatarItem} from '@atlaskit/avatar';
 import Lozenge from '@atlaskit/lozenge';
+import Button from '@atlaskit/button';
 import {DynamicTableStateless} from '@atlaskit/dynamic-table';
 import {PaginationStateless} from '@atlaskit/pagination';
 
@@ -15,8 +16,15 @@ import TrashIcon from '@atlaskit/icon/glyph/trash';
 import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 import ArrowRightCircleIcon from '@atlaskit/icon/glyph/arrow-right-circle';
+import UndoIcon from '@atlaskit/icon/glyph/undo';
 
-import {auditLogService} from '../service/services';
+import {
+    auditLogService,
+    listenerService,
+    registryService,
+    restService,
+    scheduledTaskService
+} from '../service/services';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 
@@ -41,6 +49,10 @@ const tableHead = {
         },
         {
             content: AuditMessages.description
+        },
+        {
+            content: '',
+            width: '35px'
         }
     ]
 };
@@ -66,6 +78,9 @@ function ActionsIcon({action}) {
         case 'MOVED':
             icon = <ArrowRightCircleIcon label={action}/>;
             break;
+        case 'RESTORED':
+            icon = <UndoIcon label={action}/>;
+            break;
         default:
             icon = <QuestionIcon label={action}/>;
             break;
@@ -78,7 +93,7 @@ function ActionsIcon({action}) {
     );
 }
 
-export class AuditLogContainer extends React.Component {
+export class AuditLog extends React.Component {
     state = {
         offset: 0,
         isReady: false,
@@ -87,6 +102,40 @@ export class AuditLogContainer extends React.Component {
             offset: 0,
             limit: 1,
             values: []
+        }
+    };
+
+    _restore = (category, id) => () => {
+        let promise = null;
+        switch (category) {
+            case 'REGISTRY_SCRIPT':
+                promise = registryService.restoreScript(id);
+                break;
+            case 'REGISTRY_DIRECTORY':
+                promise = registryService.restoreDirectory(id);
+                break;
+            case 'LISTENER':
+                promise = listenerService.restoreListener(id);
+                break;
+            case 'REST':
+                promise = restService.restoreScript(id);
+                break;
+            case 'SCHEDULED_TASK':
+                promise = scheduledTaskService.restore(id);
+                break;
+        }
+
+        if (promise) {
+            this.setState({ isReady: false });
+
+            promise
+                .then(
+                    () => this._loadList(this.state.offset),
+                    error => {
+                        this.setState({ isReady: true });
+                        throw error;
+                    }
+                );
         }
     };
 
@@ -133,7 +182,7 @@ export class AuditLogContainer extends React.Component {
                                                 {value.parentName}
                                             </div>
                                         }
-                                        <div>
+                                        <div className={value.deleted ? 'crossed-text' : ''}>
                                             {value.scriptName}
                                         </div>
                                     </div>
@@ -141,6 +190,17 @@ export class AuditLogContainer extends React.Component {
                             },
                             {
                                 content: value.description
+                            },
+                            {
+                                content: value.deleted && (value.action === 'DELETED') && (
+                                    <Tooltip content={AuditMessages.restore}>
+                                        <Button
+                                            iconBefore={<UndoIcon label="Undo"/>}
+
+                                            onClick={this._restore(value.category, value.scriptId)}
+                                        />
+                                    </Tooltip>
+                                )
                             }
                         ]
                     };

@@ -94,4 +94,17 @@ public class ListenerResource {
             return null;
         }).getResponse();
     }
+
+    @POST
+    @Path("/{id}/restore")
+    @WebSudoRequired
+    public Response restoreListener(@PathParam("id") int id) {
+        return new RestExecutor<Void>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            listenerRepository.restoreEventListener(authenticationContext.getLoggedInUser(), id);
+
+            return null;
+        }).getResponse();
+    }
 }

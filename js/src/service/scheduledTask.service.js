@@ -18,6 +18,10 @@ export class ScheduledTaskService {
         return ajaxDelete(`${getPluginBaseUrl()}/scheduled/${id}`);
     }
 
+    restore(id) {
+        return ajaxPost(`${getPluginBaseUrl()}/scheduled/${id}/restore`);
+    }
+
     update(id, data) {
         return ajaxPut(`${getPluginBaseUrl()}/scheduled/${id}`, data);
     }

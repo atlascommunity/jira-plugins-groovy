@@ -260,6 +260,20 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
     }
 
     @Override
+    public void restoreTask(ApplicationUser user, int id) {
+        ClusterLock lock = lockService.getLockForName(LOCK_KEY);
+
+        lock.lock();
+        try {
+            ScheduledTaskDto task = taskRepository.restoreTask(user, id);
+
+            createJob(task);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
     public void setEnabled(ApplicationUser user, int id, boolean enabled) {
         taskRepository.setEnabled(user, id, enabled);
     }

@@ -98,6 +98,19 @@ public class RegistryResource {
         }).getResponse();
     }
 
+    @POST
+    @Path("/directory/{id}/restore")
+    @WebSudoRequired
+    public Response restoreDirectory(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            scriptRepository.restoreDirectory(authenticationContext.getLoggedInUser(), id);
+
+            return null;
+        }).getResponse();
+    }
+
     @PUT
     @Path("/directory/{id}/parent")
     @WebSudoRequired
@@ -166,6 +179,19 @@ public class RegistryResource {
             permissionHelper.checkIfAdmin();
 
             scriptRepository.deleteScript(authenticationContext.getLoggedInUser(), id);
+
+            return null;
+        }).getResponse();
+    }
+
+    @POST
+    @Path("/script/{id}/restore")
+    @WebSudoRequired
+    public Response restoreScript(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            scriptRepository.restoreScript(authenticationContext.getLoggedInUser(), id);
 
             return null;
         }).getResponse();

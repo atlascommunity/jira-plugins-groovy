@@ -7,7 +7,8 @@ export const AuditMessages = {
     category: i18n.audit.category,
     action: i18n.audit.action,
     description: i18n.audit.description,
-    script: i18n.audit.script
+    script: i18n.audit.script,
+    restore: i18n.audit.restore
 };
 
 export const CategoryNameMessages = {

@@ -21,4 +21,8 @@ export class ListenerService {
     deleteListener(id) {
         return ajaxDelete(`${getPluginBaseUrl()}/listener/${id}`);
     }
+
+    restoreListener(id) {
+        return ajaxPost(`${getPluginBaseUrl()}/listener/${id}/restore`);
+    }
 }

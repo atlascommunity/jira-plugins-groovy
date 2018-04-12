@@ -19,5 +19,7 @@ public interface RestRepository {
 
     void deleteScript(ApplicationUser user, int id);
 
+    void restoreScript(ApplicationUser user, int id);
+
     Script getScript(HttpMethod method, String key);
 }

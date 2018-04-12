@@ -20,5 +20,7 @@ public interface EventListenerRepository {
 
     void deleteEventListener(ApplicationUser user, int id);
 
+    void restoreEventListener(ApplicationUser user, int id);
+
     void invalidate();
 }

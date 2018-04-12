@@ -79,6 +79,17 @@ public class RestResource {
         }).getResponse();
     }
 
+    @Path("/{id}/restore")
+    @POST
+    public Response restoreRestScript(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            restRepository.restoreScript(authenticationContext.getLoggedInUser(), id);
+            return null;
+        }).getResponse();
+    }
+
     @Path("/all")
     @GET
     public Response getAllScripts() {

@@ -94,7 +94,8 @@ define('/mailru/groovy/i18n-react', function() {
             listener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.listener'),
             rest: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.rest'),
             cf: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.cf'),
-            scheduledTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.scheduledTask')
+            scheduledTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.scheduledTask'),
+            restore: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.restore')
         },
         rest: {
             nameDescription: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.nameDescription'),
