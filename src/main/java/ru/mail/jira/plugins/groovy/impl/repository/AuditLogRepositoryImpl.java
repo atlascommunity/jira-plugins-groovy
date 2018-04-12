@@ -14,6 +14,7 @@ import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryDto;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.Page;
 import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
+import ru.mail.jira.plugins.groovy.util.ScriptUtil;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
 
 import java.sql.Timestamp;
@@ -83,12 +84,19 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
         Integer entityId = entry.getEntityId();
         if (entityId != null) {
             String name = null;
+            String parentName = null;
             switch (entry.getCategory()) {
                 case REGISTRY_SCRIPT:
-                    name = activeObjects.get(Script.class, entityId).getName();
+                    Script script = activeObjects.get(Script.class, entityId);
+                    name = script.getName();
+                    parentName = ScriptUtil.getExpandedName(script.getDirectory());
                     break;
                 case REGISTRY_DIRECTORY:
-                    name = activeObjects.get(ScriptDirectory.class, entityId).getName();
+                    ScriptDirectory directory = activeObjects.get(ScriptDirectory.class, entityId);
+                    name = directory.getName();
+                    if (directory.getParent() != null) {
+                        parentName = ScriptUtil.getExpandedName(directory);
+                    }
                     break;
                 case LISTENER:
                     name = activeObjects.get(Listener.class, entityId).getName();
@@ -104,6 +112,7 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
                     break;
             }
             result.setScriptName(name);
+            result.setParentName(parentName);
             result.setScriptId(entityId);
         }
 

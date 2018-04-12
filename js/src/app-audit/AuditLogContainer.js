@@ -37,7 +37,7 @@ const tableHead = {
         },
         {
             content: AuditMessages.script,
-            width: '200px'
+            width: '250px'
         },
         {
             content: AuditMessages.description
@@ -128,6 +128,11 @@ export class AuditLogContainer extends React.Component {
                                                 {CategoryNameMessages[value.category]}
                                             </Lozenge>
                                         </div>
+                                        {value.parentName &&
+                                            <div className="muted-text">
+                                                {value.parentName}
+                                            </div>
+                                        }
                                         <div>
                                             {value.scriptName}
                                         </div>

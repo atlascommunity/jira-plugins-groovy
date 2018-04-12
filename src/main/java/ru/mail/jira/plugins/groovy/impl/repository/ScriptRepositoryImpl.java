@@ -7,14 +7,13 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.util.RestFieldException;
+import ru.mail.jira.plugins.groovy.util.*;
 import ru.mail.jira.plugins.groovy.api.dto.notification.NotificationDto;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
@@ -30,9 +29,6 @@ import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.api.service.WatcherService;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
-import ru.mail.jira.plugins.groovy.util.Const;
-import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
-import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -351,10 +347,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         result.setDirectoryId(script.getDirectory().getID());
         result.setScriptBody(script.getScriptBody());
         result.setDeleted(script.isDeleted());
-        result.setParentName(getExpandedName(script.getDirectory()));
+        result.setParentName(ScriptUtil.getExpandedName(script.getDirectory()));
 
         if (expandName) {
-            result.setName(getExpandedName(script));
+            result.setName(ScriptUtil.getExpandedName(script));
         } else {
             result.setName(script.getName());
         }
@@ -387,7 +383,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
         result.setId(directory.getID());
         result.setName(directory.getName());
-        result.setFullName(getExpandedName(directory));
+        result.setFullName(ScriptUtil.getExpandedName(directory));
 
         ScriptDirectory parent = directory.getParent();
         if (parent != null) {
@@ -456,7 +452,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     private ScriptDescription buildScriptDescription(Script script) {
         ScriptDescription result = new ScriptDescription();
         result.setId(script.getID());
-        result.setName(getExpandedName(script));
+        result.setName(ScriptUtil.getExpandedName(script));
         result.setTypes(parseTypes(script.getTypes()));
 
         if (script.getParameters() != null) {
@@ -484,21 +480,6 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
 
         return watchers;
-    }
-
-    private static String getExpandedName(Script script) {
-        return getExpandedName(script.getDirectory()) + "/" + script.getName();
-    }
-
-    private static String getExpandedName(ScriptDirectory directory) {
-        List<String> nameElements = new ArrayList<>();
-        ScriptDirectory dir = directory;
-        while (dir != null) {
-            nameElements.add(dir.getName());
-            dir = dir.getParent();
-        }
-
-        return Lists.reverse(nameElements).stream().collect(Collectors.joining("/"));
     }
 
     private static String getLockKey(int id) {
