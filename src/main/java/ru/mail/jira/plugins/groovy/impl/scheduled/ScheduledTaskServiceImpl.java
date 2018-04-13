@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskForm;
+import ru.mail.jira.plugins.groovy.api.dto.scheduled.TaskResult;
 import ru.mail.jira.plugins.groovy.api.entity.ScheduledTaskType;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ScheduledTaskRepository;
@@ -278,125 +279,13 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
         taskRepository.setEnabled(user, id, enabled);
     }
 
-    private class ScriptJobRunner implements JobRunner {
-        @Nullable
-        @Override
-        @ParametersAreNonnullByDefault
-        public JobRunnerResponse runJob(JobRunnerRequest request) {
-            Integer scriptId = getScriptId(request.getJobConfig());
-            if (scriptId == null) {
-                return JobRunnerResponse.failed("Script id is not present.");
-            }
+    @Override
+    public TaskResult runNow(ApplicationUser user, int id) {
+        logger.info("{} started manually job with id {}", user.getName(), id);
 
-            ScheduledTaskDto task = taskRepository.getTaskInfo(scriptId, false, false);
-            if (task == null) {
-                return JobRunnerResponse.failed("Scheduled task was not found");
-            }
-
-            if (!task.isEnabled()) {
-                return JobRunnerResponse.success("Task is disabled");
-            }
-
-            ApplicationUser runAs = userManager.getUserByKey(task.getUserKey());
-
-            if (runAs == null) {
-                return JobRunnerResponse.failed("Unable to get user with key " + task.getUserKey());
-            }
-
-            ApplicationUser currentUser = authenticationContext.getLoggedInUser();
-
-            ScheduledTaskType type = task.getType();
-            boolean isTransition = type == ScheduledTaskType.ISSUE_JQL_TRANSITION;
-
-            if (isTransition) {
-                if (task.getIssueWorkflowActionId() == null) {
-                    return JobRunnerResponse.failed("Action id is not present for TRANSITION task type");
-                }
-                if (task.getTransitionOptions() == null) {
-                    return JobRunnerResponse.failed("Transition options are not present for TRANSITION task type");
-                }
-            }
-
-            logger.info("running task {}", task.getId());
-
-            TransitionOptions transitionOptions = isTransition? task.getTransitionOptions().toJiraOptions() : null;
-
-            try {
-                authenticationContext.setLoggedInUser(runAs);
-
-                if (
-                    type == ScheduledTaskType.ISSUE_JQL_SCRIPT ||
-                    type == ScheduledTaskType.DOCUMENT_ISSUE_JQL_SCRIPT ||
-                    isTransition
-                ) {
-                    String issueJql = task.getIssueJql();
-                    if (StringUtils.isEmpty(issueJql)) {
-                        return JobRunnerResponse.failed("JQL query is not present for task with JQL type");
-                    }
-
-                    SearchService.ParseResult parseResult = searchService.parseQuery(runAs, issueJql);
-
-                    if (!parseResult.isValid()) {
-                        return JobRunnerResponse.failed(parseResult.getErrors().toString());
-                    }
-
-                    Query query = parseResult.getQuery();
-
-                    try {
-                        boolean isMutableIssue = type == ScheduledTaskType.ISSUE_JQL_SCRIPT;
-                        SearchResults searchResults = searchService.search(runAs, query, new PagerFilter(ISSUE_LIMIT));
-
-                        long total = searchResults.getTotal();
-                        long errors = 0;
-
-                        for (Issue issue : searchResults.getIssues()) {
-                            Issue issueBinding = issue;
-
-                            if (isTransition) {
-                                boolean successful = transitionIssue(runAs, issue, task.getIssueWorkflowActionId(), transitionOptions);
-
-                                if (!successful) {
-                                    errors++;
-                                }
-                            } else {
-                                if (isMutableIssue) {
-                                    issueBinding = issueManager.getIssueObject(issue.getId());
-                                }
-
-                                Exception error = runScript(task, ImmutableMap.of("issue", issueBinding), false);
-
-                                if (error != null) {
-                                    errors++;
-                                    logger.error("Exception occurred in task {} for issue {}", task.getId(), issue.getKey(), error);
-                                }
-                            }
-                        }
-
-                        if (errors > 0) {
-                            if (errors == total) {
-                                return JobRunnerResponse.failed("Task failed for all of " + total + " issues");
-                            } else {
-                                return JobRunnerResponse.failed("Task failed for " + errors + " of " + total + " issues");
-                            }
-                        } else {
-                            return JobRunnerResponse.success("Task ran successfully for all of " + total + " issues");
-                        }
-                    } catch (SearchException e) {
-                        return JobRunnerResponse.failed(e);
-                    }
-                } else {
-                    Exception exception = runScript(task, ImmutableMap.of(), true);
-
-                    if (exception != null) {
-                        return JobRunnerResponse.failed(exception);
-                    }
-                }
-            } finally {
-                authenticationContext.setLoggedInUser(currentUser);
-            }
-
-            return JobRunnerResponse.success();
-        }
+        long t = System.currentTimeMillis();
+        JobRunnerResponse jobRunnerResponse = runJob(id, true);
+        return TaskResult.fromJobRunnerResponse(jobRunnerResponse, System.currentTimeMillis() - t);
     }
 
     private Exception runScript(ScheduledTaskDto taskInfo, Map<String, Object> bindings, boolean trackAll) {
@@ -464,5 +353,129 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
         }
 
         return true;
+    }
+
+    private JobRunnerResponse runJob(Integer scriptId, boolean ignoreDisabled) {
+        if (scriptId == null) {
+            return JobRunnerResponse.failed("Script id is not present.");
+        }
+
+        ScheduledTaskDto task = taskRepository.getTaskInfo(scriptId, false, false);
+        if (task == null) {
+            return JobRunnerResponse.failed("Scheduled task was not found");
+        }
+
+        if (!task.isEnabled() && !ignoreDisabled) {
+            return JobRunnerResponse.success("Task is disabled");
+        }
+
+        ApplicationUser runAs = userManager.getUserByKey(task.getUserKey());
+
+        if (runAs == null) {
+            return JobRunnerResponse.failed("Unable to get user with key " + task.getUserKey());
+        }
+
+        ApplicationUser currentUser = authenticationContext.getLoggedInUser();
+
+        ScheduledTaskType type = task.getType();
+        boolean isTransition = type == ScheduledTaskType.ISSUE_JQL_TRANSITION;
+
+        if (isTransition) {
+            if (task.getIssueWorkflowActionId() == null) {
+                return JobRunnerResponse.failed("Action id is not present for TRANSITION task type");
+            }
+            if (task.getTransitionOptions() == null) {
+                return JobRunnerResponse.failed("Transition options are not present for TRANSITION task type");
+            }
+        }
+
+        logger.info("running task {}", task.getId());
+
+        TransitionOptions transitionOptions = isTransition? task.getTransitionOptions().toJiraOptions() : null;
+
+        try {
+            authenticationContext.setLoggedInUser(runAs);
+
+            if (
+                type == ScheduledTaskType.ISSUE_JQL_SCRIPT ||
+                    type == ScheduledTaskType.DOCUMENT_ISSUE_JQL_SCRIPT ||
+                    isTransition
+                ) {
+                String issueJql = task.getIssueJql();
+                if (StringUtils.isEmpty(issueJql)) {
+                    return JobRunnerResponse.failed("JQL query is not present for task with JQL type");
+                }
+
+                SearchService.ParseResult parseResult = searchService.parseQuery(runAs, issueJql);
+
+                if (!parseResult.isValid()) {
+                    return JobRunnerResponse.failed(parseResult.getErrors().toString());
+                }
+
+                Query query = parseResult.getQuery();
+
+                try {
+                    boolean isMutableIssue = type == ScheduledTaskType.ISSUE_JQL_SCRIPT;
+                    SearchResults searchResults = searchService.search(runAs, query, new PagerFilter(ISSUE_LIMIT));
+
+                    long total = searchResults.getTotal();
+                    long errors = 0;
+
+                    for (Issue issue : searchResults.getIssues()) {
+                        Issue issueBinding = issue;
+
+                        if (isTransition) {
+                            boolean successful = transitionIssue(runAs, issue, task.getIssueWorkflowActionId(), transitionOptions);
+
+                            if (!successful) {
+                                errors++;
+                            }
+                        } else {
+                            if (isMutableIssue) {
+                                issueBinding = issueManager.getIssueObject(issue.getId());
+                            }
+
+                            Exception error = runScript(task, ImmutableMap.of("issue", issueBinding), false);
+
+                            if (error != null) {
+                                errors++;
+                                logger.error("Exception occurred in task {} for issue {}", task.getId(), issue.getKey(), error);
+                            }
+                        }
+                    }
+
+                    if (errors > 0) {
+                        if (errors == total) {
+                            return JobRunnerResponse.failed("Task failed for all of " + total + " issues");
+                        } else {
+                            return JobRunnerResponse.failed("Task failed for " + errors + " of " + total + " issues");
+                        }
+                    } else {
+                        return JobRunnerResponse.success("Task ran successfully for all of " + total + " issues");
+                    }
+                } catch (SearchException e) {
+                    return JobRunnerResponse.failed(e);
+                }
+            } else {
+                Exception exception = runScript(task, ImmutableMap.of(), true);
+
+                if (exception != null) {
+                    return JobRunnerResponse.failed(exception);
+                }
+            }
+        } finally {
+            authenticationContext.setLoggedInUser(currentUser);
+        }
+
+        return JobRunnerResponse.success();
+    }
+
+    private class ScriptJobRunner implements JobRunner {
+        @Nullable
+        @Override
+        @ParametersAreNonnullByDefault
+        public JobRunnerResponse runJob(JobRunnerRequest request) {
+            return ScheduledTaskServiceImpl.this.runJob(getScriptId(request.getJobConfig()), false);
+        }
     }
 }

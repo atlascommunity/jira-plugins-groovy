@@ -118,4 +118,14 @@ public class ScheduledTaskResource {
             return scheduledTaskRepository.getTaskInfo(id, true, true);
         }).getResponse();
     }
+
+    @Path("/{id}/runNow")
+    @POST
+    public Response runNow(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return scheduledTaskService.runNow(authenticationContext.getLoggedInUser(), id);
+        }).getResponse();
+    }
 }
