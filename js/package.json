@@ -115,6 +115,6 @@
   },
   "resolutions": {
     "react": "16.3.1",
-    "@atlaskit/util-shared-styles": "2.10.6"
+    "@atlaskit/util-shared-styles": "2.10.7"
   }
 }

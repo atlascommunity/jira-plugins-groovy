@@ -365,14 +365,7 @@
     create-error "^0.3.1"
     keycode "^2.1.2"
 
-"@atlaskit/util-shared-styles@^2.10.3":
-  version "2.10.6"
-  resolved "https://registry.yarnpkg.com/@atlaskit/util-shared-styles/-/util-shared-styles-2.10.6.tgz#56aa25d59cef0324f653a6e857d512a70be47c65"
-  dependencies:
-    babel-runtime "^6.11.6"
-    styled-components "^1.4.6"
-
-"@atlaskit/util-shared-styles@^2.10.6":
+"@atlaskit/util-shared-styles@2.10.7", "@atlaskit/util-shared-styles@^2.10.3", "@atlaskit/util-shared-styles@^2.10.6":
   version "2.10.7"
   resolved "https://registry.yarnpkg.com/@atlaskit/util-shared-styles/-/util-shared-styles-2.10.7.tgz#d5b4a38f42daa08154e43a3e85f7605182903b41"
   dependencies:
@@ -6487,7 +6480,7 @@ style-loader@0.18.2:
     loader-utils "^1.0.2"
     schema-utils "^0.3.0"
 
-"styled-components@1.4.6 - 3", styled-components@^1.4.6:
+"styled-components@1.4.6 - 3":
   version "1.4.6"
   resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-1.4.6.tgz#58f32e8a6ab510fb1481e901e838e0477f148b06"
   dependencies:
