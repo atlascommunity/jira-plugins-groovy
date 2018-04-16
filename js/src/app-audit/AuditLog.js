@@ -7,7 +7,7 @@ import Avatar, {AvatarItem} from '@atlaskit/avatar';
 import Lozenge from '@atlaskit/lozenge';
 import Button from '@atlaskit/button';
 import {DynamicTableStateless} from '@atlaskit/dynamic-table';
-import {PaginationStateless} from '@atlaskit/pagination';
+import Pagination from '@atlaskit/pagination';
 
 import QuestionIcon from '@atlaskit/icon/glyph/question';
 import AddCircleIcon from '@atlaskit/icon/glyph/add-circle';
@@ -221,10 +221,10 @@ export class AuditLog extends React.Component {
         const {data} = this.state;
 
         return (
-            <PaginationStateless
-                current={(data.offset/data.limit + 1) || 0}
+            <Pagination
+                value={(data.offset/data.limit + 1) || 0}
                 total={Math.ceil(data.total/data.limit) || 0}
-                onSetPage={this._goToPage}
+                onChange={this._goToPage}
 
                 i18n={{
                     prev: CommonMessages.prev,
