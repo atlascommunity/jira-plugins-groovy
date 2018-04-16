@@ -123,6 +123,8 @@ export class AuditLog extends React.Component {
             case 'SCHEDULED_TASK':
                 promise = scheduledTaskService.restore(id);
                 break;
+            default:
+                console.error('unknown category', category);
         }
 
         if (promise) {

@@ -13,7 +13,7 @@ import PageHeader from '@atlaskit/page-header';
 
 import {ListenerActionCreators} from './listeners.reducer';
 
-import {ConditionModel, ListenerModel} from '../model/listener.model';
+import {ListenerModel} from '../model/listener.model';
 
 import {listenerService} from '../service/services';
 
