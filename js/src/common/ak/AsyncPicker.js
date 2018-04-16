@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Select from '@atlaskit/select';
+import SelectWrapper from '@atlaskit/select/dist/esm/SelectWrapper';
 import Avatar from '@atlaskit/avatar';
 import {Label} from '@atlaskit/field-base';
 
@@ -39,6 +40,8 @@ function SingleValueImpl({data, children, ...props}) {
     );
 }
 
+let i = 0;
+
 export class AsyncPicker extends React.Component {
     static propTypes = {
         src: PropTypes.string.isRequired,
@@ -56,6 +59,8 @@ export class AsyncPicker extends React.Component {
         isInvalid: PropTypes.bool,
         invalidMessage: PropTypes.string
     };
+
+    i = i++;
 
     state = {
         filter: '',
@@ -107,31 +112,38 @@ export class AsyncPicker extends React.Component {
     }
 
     render() {
-        const {label, isRequired, isLabelHidden} = this.props;
+        const {label, isRequired, isLabelHidden, isInvalid, invalidMessage} = this.props;
         const {fetching, data, isOpen} = this.state;
 
         //todo: error display
         return (
             <div>
                 <Label label={label} isRequired={isRequired} isHidden={isLabelHidden}/>
-                <Select
-                    {...this.props}
-                    shouldFitContainer={true}
+                <SelectWrapper
+                    id={`async-picker-${this.i}`}
 
-                    hasAutocomplete={true}
-                    onInputChange={this._onFilterChange}
-                    optionRenderer={this._renderOption}
+                    validationState={isInvalid && 'error'}
+                    validationMessage={isInvalid && invalidMessage}
+                >
+                    <Select
+                        {...this.props}
+                        shouldFitContainer={true}
 
-                    isOpen={isOpen}
+                        hasAutocomplete={true}
+                        onInputChange={this._onFilterChange}
+                        optionRenderer={this._renderOption}
 
-                    isLoading={!!fetching}
-                    options={data.options}
+                        isOpen={isOpen}
 
-                    components={{
-                        Option: OptionImpl,
-                        SingleValue: SingleValueImpl
-                    }}
-                />
+                        isLoading={!!fetching}
+                        options={data.options}
+
+                        components={{
+                            Option: OptionImpl,
+                            SingleValue: SingleValueImpl
+                        }}
+                    />
+                </SelectWrapper>
             </div>
         );
     }
