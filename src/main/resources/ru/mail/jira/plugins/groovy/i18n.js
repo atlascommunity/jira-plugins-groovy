@@ -26,8 +26,10 @@ define('/mailru/groovy/i18n-react', function() {
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),
+            completed: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.completed'),
             create: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.create'),
             cancel: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.cancel'),
+            close: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.close'),
             update: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.update'),
             currentVersion: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.currentVersion'),
             edit: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.edit'),
@@ -131,6 +133,10 @@ define('/mailru/groovy/i18n-react', function() {
             noTasks: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.noTasks'),
             addTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.addTask'),
             runAs: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.runAs'),
+            runNow: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.runNow'),
+            runNowConfirm: function(...params) {
+                return AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.runNowConfirm', ...params)
+            },
             lastRun: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.lastRun'),
             nextRun: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.nextRun'),
             jqlLimitDescription: function(...params) {

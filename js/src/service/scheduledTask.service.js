@@ -29,4 +29,8 @@ export class ScheduledTaskService {
     setEnabled(id, enabled) {
         return ajaxPost(`${getPluginBaseUrl()}/scheduled/${id}/enabled/${enabled}`);
     }
+
+    runNow(id) {
+        return ajaxPost(`${getPluginBaseUrl()}/scheduled/${id}/runNow`);
+    }
 }

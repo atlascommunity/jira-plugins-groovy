@@ -14,21 +14,25 @@ import Lozenge from '@atlaskit/lozenge';
 import Button from '@atlaskit/button';
 import InlineDialog from '@atlaskit/inline-dialog';
 import {ToggleStateless} from '@atlaskit/toggle';
+import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
+import {colors} from '@atlaskit/theme';
 
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 import InfoIcon from '@atlaskit/icon/glyph/info';
-import {colors} from '@atlaskit/theme';
+import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
+
 
 import {ScheduledTaskDialog} from './ScheduledTaskDialog';
+import {RunNowDialog} from './RunNowDialog';
 import {types} from './types';
 import {TaskActionCreators} from './scheduled.reducer';
 
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
-import {FieldMessages, TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {Script, ScriptParameters} from '../common/Script';
+import {scheduledTaskService} from '../service/services';
 
 import './ScheduledTaskRegistry.less';
-import {scheduledTaskService} from '../service/services';
 
 
 function getOutcomeLozengeAppearance(outcome) {
@@ -113,7 +117,8 @@ class ScheduledTask extends React.Component {
     };
 
     state = {
-        showStatusInfo: false
+        showStatusInfo: false,
+        showRunDialog: false
     };
 
     _delete = () => {
@@ -140,6 +145,12 @@ class ScheduledTask extends React.Component {
             .setEnabled(task.id, enabled)
             .then(() => updateTask({...task, enabled}));
     };
+
+    _toggleRunNow = () => this.setState(state => {
+        return {
+            showRunDialog: !state.showRunDialog
+        };
+    });
 
     _getParams = memoizeOne(
         (task) => {
@@ -195,7 +206,7 @@ class ScheduledTask extends React.Component {
 
     render() {
         const {task, onEdit} = this.props;
-        const {showStatusInfo} = this.state;
+        const {showStatusInfo, showRunDialog} = this.state;
         const {lastRunInfo} = task;
 
         const outcome = lastRunInfo ? lastRunInfo.outcome : 'NOT_RAN';
@@ -273,11 +284,35 @@ class ScheduledTask extends React.Component {
                 script={script}
                 title={titleEl}
                 onEdit={onEdit}
-                onDelete={this._delete}
+
+                additionalButtons={[
+                    <DropdownMenu
+                        key="etc"
+
+                        position="bottom right"
+
+                        triggerType="button"
+                        triggerButtonProps={{
+                            appearance: 'subtle',
+                            iconBefore: <MoreVerticalIcon label=""/>
+                        }}
+                    >
+                        <DropdownItemGroup>
+                            <DropdownItem onClick={this._toggleRunNow}>
+                                {ScheduledTaskMessages.runNow}
+                            </DropdownItem>
+                            <DropdownItem onClick={this._delete}>
+                                {CommonMessages.delete}
+                            </DropdownItem>
+                        </DropdownItemGroup>
+                    </DropdownMenu>
+
+                ]}
             >
                 <ScriptParameters
                     params={this._getParams(task)}
                 />
+                {showRunDialog && <RunNowDialog task={task} onClose={this._toggleRunNow}/>}
             </Script>
         );
     }

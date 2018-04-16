@@ -29,9 +29,11 @@ export const FieldMessages = {
 
 export const CommonMessages = {
     loading: i18n.common.loading,
+    completed: i18n.common.completed,
     update: i18n.common.update,
     create: i18n.common.create,
     cancel: i18n.common.cancel,
+    close: i18n.common.close,
     currentVersion: i18n.common.currentVersion,
     edit: i18n.common.edit,
     delete: i18n.common.delete,
