@@ -187,7 +187,7 @@ export class ScheduledTaskDialog extends React.Component {
         let errorField = null;
 
         if (error) {
-            errorMessage = error.message;
+            errorMessage = error.message || error.messages;
             errorField = error.field;
         }
 
@@ -346,7 +346,7 @@ export class ScheduledTaskDialog extends React.Component {
             let errorField = null;
 
             if (error) {
-                errorMessage = error.message;
+                errorMessage = error.message || error.messages;
                 errorField = error.field;
             }
 
