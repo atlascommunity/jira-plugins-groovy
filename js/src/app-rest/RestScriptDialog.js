@@ -23,7 +23,7 @@ import {MultiSelect} from '../common/ak/MultiSelect';
 import {EditorField} from '../common/ak/EditorField';
 
 
-const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { content: method, value: method }; });
+const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { label: method, value: method }; });
 const bindings = [ Bindings.method, Bindings.headers, Bindings.uriInfo, Bindings.body, Bindings.currentUser ];
 
 @connect(
@@ -190,6 +190,7 @@ export class RestScriptDialog extends React.Component {
 
                     <MultiSelect
                         label={FieldMessages.httpMethods}
+                        isRequired={true}
 
                         isInvalid={errorField === 'methods'}
                         invalidMessage={errorField === 'methods' ? <div className="error">{errorMessage}</div> : ''}

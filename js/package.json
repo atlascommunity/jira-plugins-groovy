@@ -22,7 +22,6 @@
     "@atlaskit/layer-manager": "^3.0.1",
     "@atlaskit/lozenge": "^4.0.0",
     "@atlaskit/modal-dialog": "^4.0.2",
-    "@atlaskit/multi-select": "^9.0.0",
     "@atlaskit/page": "^6.0.0",
     "@atlaskit/page-header": "^3.0.0",
     "@atlaskit/pagination": "^5.0.0",

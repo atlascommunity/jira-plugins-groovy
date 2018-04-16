@@ -255,21 +255,6 @@
     styled-components "1.4.6 - 3"
     tabbable "^1.1.0"
 
-"@atlaskit/multi-select@^9.0.0":
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/multi-select/-/multi-select-9.0.0.tgz#c819012fc1e334b59320dd4278679c471002f77e"
-  dependencies:
-    "@atlaskit/droplist" "^5.0.0"
-    "@atlaskit/field-base" "^9.0.0"
-    "@atlaskit/icon" "^11.0.0"
-    "@atlaskit/spinner" "^5.0.0"
-    "@atlaskit/tag" "^4.0.0"
-    "@atlaskit/tag-group" "^4.0.0"
-    "@atlaskit/theme" "^3.0.0"
-    classnames "^2.2.5"
-    styled-components "1.4.6 - 3"
-    uuid "^3.1.0"
-
 "@atlaskit/page-header@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@atlaskit/page-header/-/page-header-3.0.0.tgz#d7eece90e86e165f203c63279a63cefdb6baa4bb"
@@ -310,25 +295,6 @@
     "@atlaskit/theme" "^3.0.0"
     babel-runtime "^6.26.0"
     react-transition-group "^2.2.1"
-    styled-components "1.4.6 - 3"
-
-"@atlaskit/tag-group@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/tag-group/-/tag-group-4.0.0.tgz#c3000d99e2deeed59114ddecd8aa860030618707"
-  dependencies:
-    babel-runtime "^6.26.0"
-    styled-components "1.4.6 - 3"
-
-"@atlaskit/tag@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/tag/-/tag-4.0.0.tgz#488c65d3899453d986273416ce71b57a27f27276"
-  dependencies:
-    "@atlaskit/icon" "^11.0.0"
-    "@atlaskit/theme" "^3.0.0"
-    "@atlaskit/util-common" "^1.5.2"
-    babel-runtime "^6.26.0"
-    create-error "^0.3.1"
-    debug "^2.2.0"
     styled-components "1.4.6 - 3"
 
 "@atlaskit/theme@^3.0.0":

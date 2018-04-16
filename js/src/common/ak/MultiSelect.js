@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {MultiSelectStateless} from '@atlaskit/multi-select';
+import Select from '@atlaskit/select';
+import SelectWrapper from '@atlaskit/select/dist/esm/SelectWrapper';
+import {Label} from '@atlaskit/field-base';
 
 
 function getLookupMap(items) {
@@ -18,6 +20,8 @@ const ValueType = PropTypes.oneOfType([
     PropTypes.string.isRequired
 ]);
 
+let i = 0;
+
 export class MultiSelect extends React.Component {
     static propTypes = {
         label: PropTypes.string.isRequired,
@@ -32,11 +36,23 @@ export class MultiSelect extends React.Component {
         items: PropTypes.arrayOf(
             PropTypes.shape({
                 value: ValueType.isRequired,
-                content: PropTypes.string.isRequired
+                label: PropTypes.string.isRequired
             }).isRequired
         ),
 
         onChange: PropTypes.func.isRequired
+    };
+
+    i = i++;
+
+    _onChange = (val) => {
+        let newVal = [];
+
+        if (val) {
+            newVal = val.map(item => item.value);
+        }
+
+        this.props.onChange(newVal);
     };
 
     constructor(props) {
@@ -44,7 +60,6 @@ export class MultiSelect extends React.Component {
 
         this.state = {
             lookupMap: getLookupMap(props.items),
-            filter: '',
             isOpen: false
         };
     }
@@ -55,34 +70,34 @@ export class MultiSelect extends React.Component {
         });
     }
 
-    _onOpenChange = ({isOpen}) => this.setState({ isOpen });
-
-    _onFilterChange = (filter) => this.setState({ filter: filter });
-
-    _onSelected = (sel) => this.props.onChange([...this.props.value, sel.value]);
-
-    _onRemoved = (rem) => this.props.onChange(this.props.value.filter(e => e !== rem.value));
-
     render() {
+        const {isInvalid, invalidMessage} = this.props;
         const {lookupMap} = this.state;
 
-        return <MultiSelectStateless
-            label={this.props.label}
-            isRequired={this.props.isRequired}
-            shouldFitContainer={true}
+        return (
+            <div>
+                <Label
+                    label={this.props.label}
+                    isRequired={this.props.isRequired}
+                />
+                <SelectWrapper
+                    id={`multi-select-${this.i}`}
 
-            filterValue={this.state.filter}
-            onFilterChange={this._onFilterChange}
+                    validationState={isInvalid && 'error'}
+                    validationMessage={isInvalid && invalidMessage}
+                >
+                    <Select
+                        shouldFitContainer={true}
+                        isMulti={true}
 
-            isOpen={this.state.isOpen}
-            onOpenChange={this._onOpenChange}
+                        isLoading={this.props.isLoading}
+                        options={this.props.items}
 
-            isLoading={this.props.isLoading}
-            items={this.props.items}
-
-            selectedItems={this.props.value.map(key => lookupMap.get(key)).filter(e => e)}
-            onSelected={this._onSelected}
-            onRemoved={this._onRemoved}
-        />;
+                        value={this.props.value.map(key => lookupMap.get(key)).filter(e => e)}
+                        onChange={this._onChange}
+                    />
+                </SelectWrapper>
+            </div>
+        );
     }
 }

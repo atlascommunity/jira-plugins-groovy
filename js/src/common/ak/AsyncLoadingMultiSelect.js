@@ -10,7 +10,7 @@ function mapOption(option) {
     }
     return {
         value: option.value,
-        content: option.name
+        label: option.name
     };
 }
 
