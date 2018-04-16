@@ -29,6 +29,7 @@ import ru.mail.jira.plugins.groovy.impl.groovy.*;
 import ru.mail.jira.plugins.groovy.impl.var.GlobalVariable;
 import ru.mail.jira.plugins.groovy.impl.var.HttpClientGlobalVariable;
 import ru.mail.jira.plugins.groovy.impl.var.LoggerGlobalVariable;
+import ru.mail.jira.plugins.groovy.impl.var.TemplateEngineGlobalVariable;
 import ru.mail.jira.plugins.groovy.util.DelegatingClassLoader;
 
 import java.io.IOException;
@@ -242,6 +243,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         globalVariables.put("httpClient", new HttpClientGlobalVariable());
         globalVariables.put("logger", new LoggerGlobalVariable());
         globalVariables.put("log", new LoggerGlobalVariable());
+        globalVariables.put("templateEngine", new TemplateEngineGlobalVariable(gcl));
     }
 
     @Override
@@ -256,7 +258,6 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
         globalFunctions.values().forEach(closure -> InvokerHelper.removeClass(closure.getScriptClass()));
         globalFunctions.clear();
-        globalVariables.clear();
 
         try {
             gcl.close();
@@ -271,5 +272,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
                 logger.error("unable to dispose variable {}", entry.getKey(), e);
             }
         }
+
+        globalVariables.clear();
     }
 }
