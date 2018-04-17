@@ -154,7 +154,11 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
                 additionalParams.put("TEMPLATE_DIFF", StringUtils.isEmpty(templateDiff) ? "no changes" : templateDiff);
             }
 
-            comment = "Created.";
+            comment = form.getComment();
+            if (comment == null) {
+                comment = "Created.";
+            }
+
             changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, comment, additionalParams);
 
             action = EntityAction.CREATED;
@@ -235,7 +239,9 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
+        }
 
+        if (form.getComment() != null) {
             if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
             }

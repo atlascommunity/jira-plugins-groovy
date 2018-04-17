@@ -166,20 +166,17 @@ export class CustomFieldForm extends React.Component {
                         onChange={this._setTemplate}
                     />
                 }
+                <FieldTextAreaStateless
+                    shouldFitContainer={true}
+                    required={!!fieldConfig.uuid}
 
-                {fieldConfig.uuid &&
-                    <FieldTextAreaStateless
-                        shouldFitContainer={true}
-                        required={true}
+                    isInvalid={errorField === 'comment'}
+                    invalidMessage={errorField === 'comment' ? errorMessage : null}
 
-                        isInvalid={errorField === 'comment'}
-                        invalidMessage={errorField === 'comment' ? errorMessage : null}
-
-                        label={FieldMessages.comment}
-                        value={values.get('comment') || ''}
-                        onChange={this._setTextValue('comment')}
-                    />
-                }
+                    label={FieldMessages.comment}
+                    value={values.get('comment') || ''}
+                    onChange={this._setTextValue('comment')}
+                />
                 <div style={{marginTop: '10px'}}>
                     <ButtonGroup>
                         <Button appearance="primary" onClick={this._onSubmit}>{CommonMessages.update}</Button>
