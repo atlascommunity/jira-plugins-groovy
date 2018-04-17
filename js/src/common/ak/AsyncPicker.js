@@ -42,18 +42,23 @@ function SingleValueImpl({data, children, ...props}) {
 
 let i = 0;
 
+const valueShape = PropTypes.shape({
+    value: PropTypes.any.isRequired,
+    label: PropTypes.string.isRequired,
+    imgSrc: PropTypes.string
+});
+
 export class AsyncPicker extends React.Component {
     static propTypes = {
         src: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
         name: PropTypes.string,
         onChange: PropTypes.func,
-        value: PropTypes.shape({
-            value: PropTypes.any.isRequired,
-            label: PropTypes.string.isRequired,
-            imgSrc: PropTypes.string
-        }),
-
+        value: PropTypes.oneOfType([
+            valueShape,
+            PropTypes.arrayOf(valueShape.isRequired)
+        ]),
+        isMulti: PropTypes.bool,
         isLabelHidden: PropTypes.bool,
         isRequired: PropTypes.bool,
         isInvalid: PropTypes.bool,
@@ -113,7 +118,7 @@ export class AsyncPicker extends React.Component {
 
     render() {
         const {label, isRequired, isLabelHidden, isInvalid, invalidMessage} = this.props;
-        const {fetching, data, isOpen} = this.state;
+        const {fetching, data} = this.state;
 
         //todo: error display
         return (
@@ -132,8 +137,6 @@ export class AsyncPicker extends React.Component {
                         hasAutocomplete={true}
                         onInputChange={this._onFilterChange}
                         optionRenderer={this._renderOption}
-
-                        isOpen={isOpen}
 
                         isLoading={!!fetching}
                         options={data.options}

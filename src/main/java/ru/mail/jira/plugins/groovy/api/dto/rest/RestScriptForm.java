@@ -13,4 +13,6 @@ import java.util.Set;
 public class RestScriptForm extends ScriptForm {
     @XmlElement
     private Set<HttpMethod> methods;
+    @XmlElement
+    private Set<String> groups;
 }

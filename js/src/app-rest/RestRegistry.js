@@ -15,7 +15,7 @@ import {restService} from '../service/services';
 import {RestMessages} from '../i18n/rest.i18n';
 import {Script, ScriptParameters} from '../common/Script';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
-import {FieldMessages, TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 
 
 export class RestRegistry extends React.Component {
@@ -107,6 +107,12 @@ class RestScript extends React.Component {
                         {
                             label: FieldMessages.httpMethods,
                             value: script.methods.join(', ')
+                        },
+                        {
+                            label: FieldMessages.groups,
+                            value: script.groups.length ?
+                                script.groups.join(', ') :
+                                <div className="muted-text">{CommonMessages.notSpecified}</div>
                         }
                     ]}
                 />

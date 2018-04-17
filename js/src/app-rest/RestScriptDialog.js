@@ -21,6 +21,8 @@ import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 import {MultiSelect} from '../common/ak/MultiSelect';
 import {EditorField} from '../common/ak/EditorField';
+import {AsyncPicker} from '../common/ak/AsyncPicker';
+import {getPluginBaseUrl} from '../service/ajaxHelper';
 
 
 const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { label: method, value: method }; });
@@ -59,6 +61,7 @@ export class RestScriptDialog extends React.Component {
                 values: new Map({
                     name: '',
                     methods: [],
+                    groups: [],
                     scriptBody: ''
                 }),
                 error: null
@@ -78,6 +81,12 @@ export class RestScriptDialog extends React.Component {
                             name: script.name,
                             methods: script.methods,
                             scriptBody: script.scriptBody,
+                            groups: script.groups.map(group => {
+                                return {
+                                    label: group,
+                                    value: group
+                                };
+                            }),
                             comment: ''
                         }),
                         ready: true
@@ -103,7 +112,8 @@ export class RestScriptDialog extends React.Component {
 
         const {isNew, id, onClose} = this.props;
 
-        const data = this.state.values.toJS();
+        const {groups, ...data} = this.state.values.toJS();
+        data.groups = groups ? groups.map(group => group.value) : [];
 
         if (isNew) {
             restService
@@ -199,6 +209,19 @@ export class RestScriptDialog extends React.Component {
                         value={values.get('methods')}
                         onChange={this._setObjectValue('methods')}
                     />
+                    <AsyncPicker
+                        label={FieldMessages.groups}
+                        isMulti={true}
+
+                        src={`${getPluginBaseUrl()}/jira-api/groupPicker`}
+
+                        value={values.get('groups')}
+                        onChange={this._setObjectValue('groups')}
+
+                        isInvalid={errorField === 'groups'}
+                        invalidMessage={errorField === 'groups' ? errorMessage : ''}
+                    />
+
                     <EditorField
                         label={FieldMessages.scriptCode}
                         isRequired={true}

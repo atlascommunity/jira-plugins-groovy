@@ -1,9 +1,11 @@
 package ru.mail.jira.plugins.groovy.impl.repository;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
+import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.google.common.collect.ImmutableSet;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 public class RestRepositoryImpl implements RestRepository {
     private final ActiveObjects ao;
     private final I18nHelper i18nHelper;
+    private final GroupManager groupManager;
     private final ChangelogHelper changelogHelper;
     private final ScriptService scriptService;
     private final AuditLogRepository auditLogRepository;
@@ -42,6 +45,7 @@ public class RestRepositoryImpl implements RestRepository {
     public RestRepositoryImpl(
         @ComponentImport ActiveObjects ao,
         @ComponentImport I18nHelper i18nHelper,
+        @ComponentImport GroupManager groupManager,
         ChangelogHelper changelogHelper,
         ScriptService scriptService,
         AuditLogRepository auditLogRepository,
@@ -49,6 +53,7 @@ public class RestRepositoryImpl implements RestRepository {
     ) {
         this.ao = ao;
         this.i18nHelper = i18nHelper;
+        this.groupManager = groupManager;
         this.changelogHelper = changelogHelper;
         this.scriptService = scriptService;
         this.auditLogRepository = auditLogRepository;
@@ -70,7 +75,7 @@ public class RestRepositoryImpl implements RestRepository {
 
     @Override
     public RestScriptDto createScript(ApplicationUser user, RestScriptForm form) {
-        validateScriptForm(true, form);
+        validateScriptForm(true, form, null);
 
         RestScript script = ao.create(
             RestScript.class,
@@ -78,6 +83,7 @@ public class RestRepositoryImpl implements RestRepository {
             new DBParam("UUID", UUID.randomUUID().toString()),
             new DBParam("METHODS", joinMethods(form.getMethods())),
             new DBParam("SCRIPT_BODY", form.getScriptBody()),
+            new DBParam("GROUPS", form.getGroups().stream().collect(Collectors.joining(","))),
             new DBParam("DELETED", false)
         );
 
@@ -105,9 +111,9 @@ public class RestRepositoryImpl implements RestRepository {
 
     @Override
     public RestScriptDto updateScript(ApplicationUser user, int id, RestScriptForm form) {
-        validateScriptForm(false, form);
-
         RestScript script = ao.get(RestScript.class, id);
+
+        validateScriptForm(false, form, script.getName());
 
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
@@ -116,6 +122,7 @@ public class RestRepositoryImpl implements RestRepository {
 
         script.setUuid(UUID.randomUUID().toString());
         script.setMethods(joinMethods(form.getMethods()));
+        script.setGroups(form.getGroups().stream().collect(Collectors.joining(",")));
         script.setName(form.getName());
         script.setScriptBody(form.getScriptBody());
         script.save();
@@ -192,11 +199,12 @@ public class RestRepositoryImpl implements RestRepository {
 
         return new Script(
             script.getUuid(),
-            script.getScriptBody()
+            script.getScriptBody(),
+            parseGroups(script.getGroups())
         );
     }
 
-    private void validateScriptForm(boolean isNew, RestScriptForm form) {
+    private void validateScriptForm(boolean isNew, RestScriptForm form, String oldName) {
         scriptService.parseScript(form.getScriptBody());
 
         if (StringUtils.isEmpty(form.getName())) {
@@ -207,7 +215,7 @@ public class RestRepositoryImpl implements RestRepository {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.incorrectRestName"), "name");
         }
 
-        if (!isNameAvailable(form.getName())) {
+        if ((isNew || !form.getName().equals(oldName)) && !isNameAvailable(form.getName())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.restNameTaken"), "name");
         }
 
@@ -217,6 +225,22 @@ public class RestRepositoryImpl implements RestRepository {
 
         if (form.getMethods() == null || form.getMethods().isEmpty()) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "methods");
+        }
+
+        if (form.getGroups() == null) {
+            form.setGroups(ImmutableSet.of());
+        }
+
+        if (!form.getGroups().isEmpty()) {
+            if (form.getGroups().size() > 10) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.tooManyGroups"), "groups");
+            }
+
+            for (String groupName : form.getGroups()) {
+                if (groupManager.getGroup(groupName) == null) {
+                    throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.unknownGroup", groupName), "groups");
+                }
+            }
         }
 
         if (!isNew) {
@@ -243,6 +267,7 @@ public class RestRepositoryImpl implements RestRepository {
         result.setUuid(script.getUuid());
         result.setName(script.getName());
         result.setMethods(parseMethods(script.getMethods()));
+        result.setGroups(parseGroups(script.getGroups()));
         result.setScriptBody(script.getScriptBody());
         result.setDeleted(script.isDeleted());
 
@@ -263,5 +288,15 @@ public class RestRepositoryImpl implements RestRepository {
 
     private Set<HttpMethod> parseMethods(String methods) {
         return Arrays.stream(methods.split(",")).map(HttpMethod::valueOf).collect(Collectors.toSet());
+    }
+
+    private Set<String> parseGroups(String groups) {
+        groups = StringUtils.trimToNull(groups);
+
+        if (groups == null) {
+            return ImmutableSet.of();
+        }
+
+        return Arrays.stream(groups.split(",")).collect(Collectors.toSet());
     }
 }

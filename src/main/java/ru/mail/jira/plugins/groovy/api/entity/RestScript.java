@@ -6,7 +6,6 @@ import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 import net.java.ao.schema.Unique;
 
-//todo: permissions (groups)
 public interface RestScript extends Entity {
     @NotNull
     @Unique
@@ -26,6 +25,10 @@ public interface RestScript extends Entity {
     @StringLength(StringLength.UNLIMITED)
     void setScriptBody(String scriptBody);
     String getScriptBody();
+
+    @StringLength(StringLength.UNLIMITED)
+    void setGroups(String groups);
+    String getGroups();
 
     @OneToMany(reverse = "getScript")
     RestChangelog[] getChangelogs();

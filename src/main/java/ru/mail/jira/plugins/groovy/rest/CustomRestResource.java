@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.rest;
 
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -20,6 +21,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Set;
 
 @Scanned
 @Path("/custom/{scriptKey}")
@@ -29,17 +31,20 @@ public class CustomRestResource {
     private final Logger logger = LoggerFactory.getLogger(CustomRestResource.class);
 
     private final JiraAuthenticationContext authenticationContext;
+    private final GroupManager groupManager;
     private final RestRepository restRepository;
     private final ScriptService scriptService;
     private final ExecutionRepository executionRepository;
 
     public CustomRestResource(
         @ComponentImport JiraAuthenticationContext authenticationContext,
+        @ComponentImport GroupManager groupManager,
         RestRepository restRepository,
         ScriptService scriptService,
         ExecutionRepository executionRepository
     ) {
         this.authenticationContext = authenticationContext;
+        this.groupManager = groupManager;
         this.restRepository = restRepository;
         this.scriptService = scriptService;
         this.executionRepository = executionRepository;
@@ -94,8 +99,16 @@ public class CustomRestResource {
             return Response.status(404).build();
         }
 
-        long t = System.currentTimeMillis();
         ApplicationUser user = authenticationContext.getLoggedInUser();
+
+        Set<String> groups = script.getGroupNames();
+        if (!groups.isEmpty()) {
+            if (user == null || groupManager.getGroupNamesForUser(user).stream().noneMatch(groups::contains)) {
+                return Response.status(403).build();
+            }
+        }
+
+        long t = System.currentTimeMillis();
 
         boolean successful = true;
         String error = null;
