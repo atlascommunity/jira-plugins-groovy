@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 
@@ -13,3 +14,7 @@ export function FieldError({error}) {
         </div>
     );
 }
+
+FieldError.propTypes = {
+    error: PropTypes.node.isRequired
+};

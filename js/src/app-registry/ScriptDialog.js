@@ -23,6 +23,7 @@ import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
 import {StaticField} from '../common/ak/StaticField';
+import {FieldError} from '../common/ak/FieldError';
 
 
 const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
@@ -250,6 +251,7 @@ export class ScriptDialog extends React.Component {
                                     value="FUNCTION"
                                     name="script-type-options"
                                 />
+                                {errorField === 'types' && <FieldError error={errorMessage}/>}
                             </div>
 
                             <EditorField
@@ -267,20 +269,18 @@ export class ScriptDialog extends React.Component {
                                 onChange={this._setScript}
                             />
 
-                            {!!this.state.id &&
-                                <FieldTextAreaStateless
-                                    shouldFitContainer={true}
-                                    required={true}
+                            <FieldTextAreaStateless
+                                shouldFitContainer={true}
+                                required={!!this.state.id}
 
-                                    disabled={waiting}
-                                    isInvalid={errorField === 'comment'}
-                                    invalidMessage={errorField === 'comment' ? errorMessage : null}
+                                disabled={waiting}
+                                isInvalid={errorField === 'comment'}
+                                invalidMessage={errorField === 'comment' ? errorMessage : null}
 
-                                    label={FieldMessages.comment}
-                                    value={values.get('comment') || ''}
-                                    onChange={this._setTextValue('comment')}
-                                />
-                            }
+                                label={FieldMessages.comment}
+                                value={values.get('comment') || ''}
+                                onChange={this._setTextValue('comment')}
+                            />
                         </div>}
                     </ModalDialog>
                     : null}

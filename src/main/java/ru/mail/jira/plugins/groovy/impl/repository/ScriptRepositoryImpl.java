@@ -234,7 +234,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         );
 
         String diff = changelogHelper.generateDiff(script.getID(), "", script.getName(), "", scriptForm.getScriptBody());
-        String comment = "Created.";
+
+        String comment = scriptForm.getComment();
+        if (comment == null) {
+            comment = "Created.";
+        }
 
         changelogHelper.addChangelog(Changelog.class, script.getID(), user.getKey(), diff, comment);
 
@@ -474,7 +478,9 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
+        }
 
+        if (form.getComment() != null) {
             if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
             }
