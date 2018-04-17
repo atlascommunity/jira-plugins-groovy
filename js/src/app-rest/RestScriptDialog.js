@@ -212,19 +212,17 @@ export class RestScriptDialog extends React.Component {
                         value={values.get('scriptBody') || ''}
                         onChange={this._setObjectValue('scriptBody')}
                     />
-                    {!isNew &&
-                        <FieldTextAreaStateless
-                            shouldFitContainer={true}
-                            required={true}
+                    <FieldTextAreaStateless
+                        shouldFitContainer={true}
+                        required={!isNew}
 
-                            isInvalid={errorField === 'comment'}
-                            invalidMessage={errorField === 'comment' ? errorMessage : null}
+                        isInvalid={errorField === 'comment'}
+                        invalidMessage={errorField === 'comment' ? errorMessage : null}
 
-                            label={FieldMessages.comment}
-                            value={values.get('comment') || ''}
-                            onChange={this._setTextValue('comment')}
-                        />
-                    }
+                        label={FieldMessages.comment}
+                        value={values.get('comment') || ''}
+                        onChange={this._setTextValue('comment')}
+                    />
                 </div>;
         }
 

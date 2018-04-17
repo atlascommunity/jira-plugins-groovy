@@ -82,7 +82,11 @@ public class RestRepositoryImpl implements RestRepository {
         );
 
         String diff = changelogHelper.generateDiff(script.getID(), "", script.getName(), "", form.getScriptBody());
-        String comment = "Created.";
+
+        String comment = form.getComment();
+        if (comment == null) {
+            comment = "Created.";
+        }
 
         changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, comment);
 
@@ -203,7 +207,9 @@ public class RestRepositoryImpl implements RestRepository {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.incorrectRestName"), "name");
         }
 
-        //todo: check if name is taken
+        if (!isNameAvailable(form.getName())) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.restNameTaken"), "name");
+        }
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
@@ -217,11 +223,17 @@ public class RestRepositoryImpl implements RestRepository {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
+        }
 
+        if (form.getComment() != null) {
             if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
             }
         }
+    }
+
+    private boolean isNameAvailable(String name) {
+        return ao.count(RestScript.class, Query.select().where("NAME = ?", name)) == 0;
     }
 
     private RestScriptDto buildScriptDto(RestScript script, boolean includeChangelogs, boolean includeErrorCount) {
