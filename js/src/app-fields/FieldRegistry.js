@@ -15,6 +15,7 @@ import {Script, ScriptParameters} from '../common/Script';
 import {getBaseUrl} from '../service/ajaxHelper';
 import {JiraMessages, FieldMessages, ErrorMessages, CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
+import {FieldError} from '../common/ak/FieldError';
 
 
 @connect(
@@ -101,6 +102,7 @@ class Field extends React.Component {
                     </div>
                 }
             >
+                {!config.uuid && <FieldError error={ErrorMessages.notConfigured}/>}
                 <ScriptParameters
                     params={[
                         {
@@ -117,11 +119,6 @@ class Field extends React.Component {
                         },
                     ]}
                 />
-                {!config.uuid && <div>
-                    <strong style={{color: 'red'}}>
-                        {ErrorMessages.notConfigured}
-                    </strong>
-                </div>}
             </Script>
         );
     }
