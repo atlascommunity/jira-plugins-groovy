@@ -5,6 +5,11 @@ export const globalBindings = [
         fullClassName: 'org.apache.http.client.HttpClient'
     },
     {
+        name: 'templateEngine',
+        className: 'TemplateEngine',
+        fullClassName: 'groovy.text.TemplateEngine'
+    },
+    {
         name: 'log',
         className: 'Logger',
         fullClassName: 'org.slf4j.Logger'
