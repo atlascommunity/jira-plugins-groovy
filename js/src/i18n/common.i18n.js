@@ -44,6 +44,7 @@ export const CommonMessages = {
     of: i18n.common.of,
     yes: i18n.common.yes,
     no: i18n.common.no,
+    notSpecified: i18n.common.notSpecified,
     error: i18n.common.error,
     script: i18n.common.script,
     switchTheme: i18n.common.switchTheme,

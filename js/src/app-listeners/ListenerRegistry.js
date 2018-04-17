@@ -18,7 +18,7 @@ import {ListenerModel} from '../model/listener.model';
 import {listenerService} from '../service/services';
 
 import {ListenerMessages, ListenerTypeMessages} from '../i18n/listener.i18n';
-import {FieldMessages, TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 
 import {Script, ScriptParameters} from '../common/Script';
 
@@ -110,13 +110,18 @@ class Listener extends React.Component {
             } else if (condition.type === 'ISSUE') {
                 params.push({
                     label: FieldMessages.eventTypes,
-                    value: condition.typeIds.map(id => eventTypes[id] || id).join(', ')
+                    value: condition.typeIds.length ?
+                        condition.typeIds.map(id => eventTypes[id] || id).join(', ') :
+                        <div className="muted-text">{CommonMessages.notSpecified}</div>
                 });
                 params.push({
                     label: FieldMessages.projects,
                     value: (
                         <div className="flex-column">
-                            {condition.projectIds.map(id => <div key={id}>{projects[id] || id}</div>)}
+                            {condition.projectIds.length ?
+                                condition.projectIds.map(id => <div key={id}>{projects[id] || id}</div>) :
+                                <div className="muted-text">{CommonMessages.notSpecified}</div>
+                            }
                         </div>
                     )
                 });

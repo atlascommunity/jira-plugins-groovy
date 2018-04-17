@@ -41,6 +41,7 @@ define('/mailru/groovy/i18n-react', function() {
             of: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.of'),
             yes: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.yes'),
             no: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.no'),
+            notSpecified: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.notSpecified'),
             error: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.error'),
             script: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.script'),
             switchTheme: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.switchTheme'),
