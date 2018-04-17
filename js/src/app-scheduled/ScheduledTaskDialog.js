@@ -30,6 +30,7 @@ import {Bindings} from '../common/bindings';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {EditorField} from '../common/ak/EditorField';
 import {JqlInput} from '../common/ak/JqlInput';
+import {FieldError} from '../common/ak/FieldError';
 
 
 const issueBindings = [Bindings.issue];
@@ -403,21 +404,20 @@ export class ScheduledTaskDialog extends React.Component {
                         value={values.get('type')}
                         onRadioChange={this._setTextValue('type')}
                     />
+                    {errorField === 'type' && <FieldError error={errorMessage}/>}
 
                     {currentType && types[currentType].fields.map(field => this._renderField(field, error))}
-                    {!isNew &&
-                        <FieldTextAreaStateless
-                            shouldFitContainer={true}
-                            required={true}
+                    <FieldTextAreaStateless
+                        shouldFitContainer={true}
+                        required={!isNew}
 
-                            isInvalid={errorField === 'comment'}
-                            invalidMessage={errorField === 'comment' ? errorMessage : null}
+                        isInvalid={errorField === 'comment'}
+                        invalidMessage={errorField === 'comment' ? errorMessage : null}
 
-                            label={FieldMessages.comment}
-                            value={values.get('comment') || ''}
-                            onChange={this._setTextValue('comment')}
-                        />
-                    }
+                        label={FieldMessages.comment}
+                        value={values.get('comment') || ''}
+                        onChange={this._setTextValue('comment')}
+                    />
                 </div>;
         }
 

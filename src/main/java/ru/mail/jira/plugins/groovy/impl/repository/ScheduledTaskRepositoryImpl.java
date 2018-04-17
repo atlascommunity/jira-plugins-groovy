@@ -130,7 +130,11 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         );
 
         String diff = changelogHelper.generateDiff(task.getID(), "", task.getName(), "", task.getScriptBody());
-        String comment = "Created.";
+
+        String comment = form.getComment();
+        if (comment == null) {
+            comment = "Created.";
+        }
 
         changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, comment);
 
@@ -248,7 +252,9 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
+        }
 
+        if (form.getComment() != null) {
             if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
             }
