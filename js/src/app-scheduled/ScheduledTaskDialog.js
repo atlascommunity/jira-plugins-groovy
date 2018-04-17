@@ -264,7 +264,7 @@ export class ScheduledTaskDialog extends React.Component {
                                 {ScheduledTaskMessages.jqlScriptDescription}
                             </div>
                         }
-                        <Error error={error} thisField={fieldName}/>
+                        {errorField === fieldName && <FieldError error={errorMessage}/>}
                     </div>
                 );
             case 'workflowAction':
