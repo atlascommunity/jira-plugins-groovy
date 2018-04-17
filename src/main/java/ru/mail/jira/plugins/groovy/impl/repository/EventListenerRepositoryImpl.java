@@ -116,7 +116,11 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         );
 
         String diff = changelogHelper.generateDiff(listener.getID(), "", listener.getName(), "", form.getScriptBody());
-        String comment = "Created.";
+
+        String comment = form.getComment();
+        if (comment == null) {
+            comment = "Created.";
+        }
 
         changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, comment);
 
@@ -248,7 +252,9 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             if (StringUtils.isEmpty(form.getComment())) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
+        }
 
+        if (form.getComment() != null) {
             if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
             }
@@ -256,6 +262,10 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         ConditionDescriptor condition = form.getCondition();
         if (condition == null) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "condition.type");
+        }
+
+        if (condition.getType() == null) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "condition.type");
         }
 

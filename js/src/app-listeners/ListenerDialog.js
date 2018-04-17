@@ -239,9 +239,9 @@ export class ListenerDialog extends React.Component {
                         value={values.get('scriptBody') || ''}
                         onChange={this._setObjectValue('scriptBody')}
                     />
-                    {!isNew && <FieldTextAreaStateless
+                    <FieldTextAreaStateless
                         shouldFitContainer={true}
-                        required={true}
+                        required={!isNew}
 
                         isInvalid={errorField === 'comment'}
                         invalidMessage={errorField === 'comment' ? errorMessage : null}
@@ -249,7 +249,7 @@ export class ListenerDialog extends React.Component {
                         label={FieldMessages.comment}
                         value={values.get('comment') || ''}
                         onChange={this._setTextValue('comment')}
-                    />}
+                    />
                 </div>;
         }
 

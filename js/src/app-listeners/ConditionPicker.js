@@ -5,13 +5,16 @@ import {AkFieldRadioGroup} from '@atlaskit/field-radio-group';
 import {FieldTextStateless} from '@atlaskit/field-text';
 
 import {jiraService} from '../service/services';
-import {AsyncLoadingMultiSelect} from '../common/ak/AsyncLoadingMultiSelect';
 
 import {ConditionModel} from '../model/listener.model';
 
-import './ConditionPicker.less';
 import {FieldMessages} from '../i18n/common.i18n';
 import {ListenerTypeMessages} from '../i18n/listener.i18n';
+
+import {AsyncLoadingMultiSelect} from '../common/ak/AsyncLoadingMultiSelect';
+import {FieldError} from '../common/ak/FieldError';
+
+import './ConditionPicker.less';
 
 
 const projectsLoader = () => jiraService
@@ -105,7 +108,6 @@ export class ConditionPicker extends React.Component {
                         <AsyncLoadingMultiSelect
                             key="project"
                             label={FieldMessages.projects}
-                            isRequired={true}
 
                             value={value.projectIds || []}
                             onChange={this._onChange('projectIds')}
@@ -114,7 +116,6 @@ export class ConditionPicker extends React.Component {
                         <AsyncLoadingMultiSelect
                             key="type"
                             label={FieldMessages.eventTypes}
-                            isRequired={true}
 
                             value={value.typeIds || []}
                             onChange={this._onChange('typeIds')}
@@ -148,6 +149,7 @@ export class ConditionPicker extends React.Component {
                     value={value.type}
                     onRadioChange={this._onTypeChange}
                 />
+                {errorField === 'condition.type' && <FieldError error={errorMessage}/>}
                 {paramEl}
             </div>
         );
