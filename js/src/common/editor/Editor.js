@@ -30,7 +30,8 @@ function isLight() {
 export const BindingShape = PropTypes.shape({
     name: PropTypes.string.isRequired,
     className: PropTypes.string.isRequired,
-    fullClassName: PropTypes.string.isRequired
+    fullClassName: PropTypes.string.isRequired,
+    javaDoc: PropTypes.string
 });
 
 export const MarkerShape = PropTypes.shape({
@@ -190,7 +191,10 @@ function Binding({binding}) {
             <div className="flex-none">{binding.name}</div>
             <div className="flex-grow"/>
             <div className="flex-none" style={{marginLeft: '5px'}}>
-                <abbr title={binding.fullClassName}>{binding.className}</abbr>
+                {binding.javaDoc ?
+                    <a href={binding.javaDoc} title={binding.fullClassName} target="_blank">{binding.className}</a> :
+                    <abbr title={binding.fullClassName}>{binding.className}</abbr>
+                }
             </div>
         </div>
     );
