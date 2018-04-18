@@ -55,7 +55,7 @@ public class CustomRestResource {
         @PathParam("scriptKey") String scriptKey,
         @Context HttpHeaders headers,
         @Context UriInfo uriInfo
-    ) throws Exception {
+    ) {
         return runScript(HttpMethod.GET, scriptKey, headers, uriInfo, null);
     }
 
@@ -66,7 +66,7 @@ public class CustomRestResource {
         @Context HttpHeaders headers,
         @Context UriInfo uriInfo,
         String body
-    ) throws Exception {
+    ) {
         return runScript(HttpMethod.POST, scriptKey, headers, uriInfo, body);
     }
 
@@ -77,7 +77,7 @@ public class CustomRestResource {
         @Context HttpHeaders headers,
         @Context UriInfo uriInfo,
         String body
-    ) throws Exception {
+    ) {
         return runScript(HttpMethod.PUT, scriptKey, headers, uriInfo, body);
     }
 
@@ -88,11 +88,11 @@ public class CustomRestResource {
         @Context HttpHeaders headers,
         @Context UriInfo uriInfo,
         String body
-    ) throws Exception {
+    ) {
         return runScript(HttpMethod.DELETE, scriptKey, headers, uriInfo, body);
     }
 
-    private Response runScript(HttpMethod method, String key, HttpHeaders headers, UriInfo uriInfo, String body) throws Exception {
+    private Response runScript(HttpMethod method, String key, HttpHeaders headers, UriInfo uriInfo, String body) {
         Script script = restRepository.getScript(method, key);
 
         if (script == null) {
