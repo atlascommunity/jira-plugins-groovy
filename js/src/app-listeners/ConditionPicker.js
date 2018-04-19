@@ -96,7 +96,7 @@ export class ConditionPicker extends React.Component {
                         required={true}
 
                         isInvalid={errorField === 'condition.className'}
-                        invalidMessage={errorField === 'name' ? errorMessage : null}
+                        invalidMessage={errorField === 'condition.className' ? errorMessage : null}
 
                         label={FieldMessages.name}
                         value={value.className || ''}
