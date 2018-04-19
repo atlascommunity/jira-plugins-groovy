@@ -608,10 +608,6 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
-aui-react@^0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/aui-react/-/aui-react-0.0.8.tgz#340cf562d5f25eb253ee1c51e000e1ed38d5c66c"
-
 autobind-decorator@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/autobind-decorator/-/autobind-decorator-2.1.0.tgz#4451240dbfeff46361c506575a63ed40f0e5bc68"

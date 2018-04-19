@@ -31,7 +31,6 @@
     "@atlaskit/toggle": "^3.0.0",
     "@atlaskit/tooltip": "^9.1.1",
     "@atlaskit/util-shared-styles": "^2.10.6",
-    "aui-react": "^0.0.8",
     "classnames": "^2.2.5",
     "codemirror": "^5.36.0",
     "css-loader": "0.28.4",

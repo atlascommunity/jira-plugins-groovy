@@ -4,10 +4,6 @@ import PropTypes from 'prop-types';
 import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
-import Flag from '@atlaskit/flag';
-import {colors} from '@atlaskit/theme';
-
-import ErrorIcon from '@atlaskit/icon/glyph/error';
 
 import {CustomFieldForm} from './CustomFieldForm';
 
@@ -18,6 +14,7 @@ import {fieldConfigService} from '../service/services';
 
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
 import {CommonMessages, ErrorMessages, FieldMessages} from '../i18n/common.i18n';
+import {ErrorMessage} from '../common/ak/messages';
 
 
 export class CustomFieldFormContainer extends React.Component {
@@ -55,10 +52,7 @@ export class CustomFieldFormContainer extends React.Component {
         if (Number.isNaN(this.props.id)) {
             return (
                 <div style={{ marginTop: '20px' }}>
-                    <Flag
-                        title={ErrorMessages.incorrectConfigId}
-                        icon={<ErrorIcon label="error" color={colors.R300}/>}
-                    />
+                    <ErrorMessage title={ErrorMessages.incorrectConfigId}/>
                 </div>
             );
         }

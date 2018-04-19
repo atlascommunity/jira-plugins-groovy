@@ -3,20 +3,20 @@ import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
-import Message from 'aui-react/lib/AUIMessage';
-
 import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 
 import {ScriptActionCreators} from './rest.reducer';
 
-import {restService} from '../service/services';
-import {RestMessages} from '../i18n/rest.i18n';
 import {Script, ScriptParameters} from '../common/Script';
+import {InfoMessage} from '../common/ak/messages';
+
+import {restService} from '../service/services';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
+
+import {RestMessages} from '../i18n/rest.i18n';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
-import {InfoMessage} from '../common/ak/InfoMessage';
 
 
 export class RestRegistry extends React.Component {

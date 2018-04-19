@@ -27,6 +27,7 @@ import {TaskActionCreators} from './scheduled.reducer';
 
 import {Script, ScriptParameters} from '../common/Script';
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
+import {InfoMessage} from '../common/ak/messages';
 
 import {scheduledTaskService} from '../service/services';
 
@@ -34,7 +35,6 @@ import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 
 import './ScheduledTaskRegistry.less';
-import {InfoMessage} from '../common/ak/InfoMessage';
 
 
 function getOutcomeLozengeAppearance(outcome) {

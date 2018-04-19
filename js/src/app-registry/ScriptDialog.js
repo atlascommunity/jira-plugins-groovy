@@ -9,8 +9,6 @@ import Spinner from '@atlaskit/spinner';
 import {Label} from '@atlaskit/field-base';
 import {CheckboxStateless} from '@atlaskit/checkbox';
 
-import Message from 'aui-react/lib/AUIMessage';
-
 import {Map} from 'immutable';
 
 import {RegistryActionCreators} from './registry.reducer';
@@ -24,6 +22,7 @@ import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
 import {StaticField} from '../common/ak/StaticField';
 import {FieldError} from '../common/ak/FieldError';
+import {ErrorMessage} from '../common/ak/messages';
 
 
 const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
@@ -206,11 +205,7 @@ export class ScriptDialog extends React.Component {
                     >
                         {fetching && <div className="flex-horizontal-middle"><div className="flex-vertical-middle"><Spinner size="medium"/></div></div>}
                         {!fetching && <div className="flex-column">
-                            {error && !errorField ?
-                                <Message type="error">
-                                    {errorMessage}
-                                </Message>
-                                : null}
+                            {error && !errorField && <ErrorMessage title={errorMessage}/>}
                             <StaticField label={FieldMessages.parentName}>
                                 {parentName}
                             </StaticField>

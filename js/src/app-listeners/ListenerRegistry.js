@@ -19,7 +19,7 @@ import {ListenerMessages, ListenerTypeMessages} from '../i18n/listener.i18n';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 
 import {Script, ScriptParameters} from '../common/Script';
-import {InfoMessage} from '../common/ak/InfoMessage';
+import {InfoMessage} from '../common/ak/messages';
 
 import './ListenerRegistry.less';
 

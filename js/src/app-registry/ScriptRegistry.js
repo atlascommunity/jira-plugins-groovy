@@ -16,7 +16,6 @@ import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-
 import {FieldTextStateless} from '@atlaskit/field-text';
 import Lozenge from '@atlaskit/lozenge';
 import Badge from '@atlaskit/badge';
-import Flag from '@atlaskit/flag';
 
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 import AddIcon from '@atlaskit/icon/glyph/add';
@@ -24,7 +23,6 @@ import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import FolderIcon from '@atlaskit/icon/glyph/folder';
 import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
-import InfoIcon from '@atlaskit/icon/glyph/info';
 import ChevronRightIcon from '@atlaskit/icon/glyph/chevron-right';
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
@@ -36,6 +34,7 @@ import {RegistryActionCreators} from './registry.reducer';
 
 import {Script} from '../common/Script';
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
+import {InfoMessage} from '../common/ak/messages';
 
 import {registryService, watcherService} from '../service/services';
 
@@ -43,7 +42,6 @@ import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import './ScriptRegistry.less';
-import {InfoMessage} from '../common/ak/InfoMessage';
 
 
 const countErrors = memoize((directory) => {

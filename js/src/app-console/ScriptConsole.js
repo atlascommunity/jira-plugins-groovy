@@ -1,6 +1,5 @@
 import React from 'react';
 
-import Message from 'aui-react/lib/AUIMessage';
 import Button from '@atlaskit/button';
 
 import {ConsoleMessages} from '../i18n/console.i18n';
@@ -12,6 +11,7 @@ import {Bindings} from '../common/bindings';
 import './ScriptConsole.less';
 import {EditorField} from '../common/ak/EditorField';
 import {CommonMessages} from '../i18n/common.i18n';
+import {ErrorMessage} from '../common/ak/messages';
 
 
 const bindings = [Bindings.currentUser];
@@ -106,7 +106,7 @@ export class ScriptConsole extends React.Component {
                     <Button appearance="primary" isDisabled={waiting} onClick={this._submit}>{ConsoleMessages.execute}</Button>
                 </div>
                 <br/>
-                {!waiting && <div id="console-result">
+                {!waiting && <div className="result">
                     {output ?
                         <div>
                             <strong>{ConsoleMessages.executedIn(output.time)}</strong>
@@ -114,11 +114,11 @@ export class ScriptConsole extends React.Component {
                         </div>
                     : null}
                     {error ?
-                        <Message type="error" title={errorMessage}>
+                        <ErrorMessage title={errorMessage}>
                             <pre style={{overflowX: 'auto'}}>
                                 {error['stack-trace']}
                             </pre>
-                        </Message>
+                        </ErrorMessage>
                     : null}
                 </div>}
                 {waiting && <div className="aui-icon aui-icon-wait"/>}

@@ -12,7 +12,7 @@ import SettingsIcon from '@atlaskit/icon/glyph/settings';
 import {Script, ScriptParameters} from '../common/Script';
 import {FieldError} from '../common/ak/FieldError';
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
-import {InfoMessage} from '../common/ak/InfoMessage';
+import {InfoMessage} from '../common/ak/messages';
 
 import {getBaseUrl} from '../service/ajaxHelper';
 

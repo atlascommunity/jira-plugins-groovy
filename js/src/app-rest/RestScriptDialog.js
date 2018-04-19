@@ -9,8 +9,6 @@ import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 
-import Message from 'aui-react/lib/AUIMessage';
-
 import {ScriptActionCreators} from './rest.reducer';
 
 import {RestMessages} from '../i18n/rest.i18n';
@@ -23,6 +21,7 @@ import {MultiSelect} from '../common/ak/MultiSelect';
 import {EditorField} from '../common/ak/EditorField';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
+import {ErrorMessage} from '../common/ak/messages';
 
 
 const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { label: method, value: method }; });
@@ -179,11 +178,7 @@ export class RestScriptDialog extends React.Component {
 
             body =
                 <div className="flex-column">
-                    {error && !errorField ?
-                        <Message type="error">
-                            {errorMessage}
-                        </Message>
-                    : null}
+                    {error && !errorField && <ErrorMessage title={errorMessage}/>}
 
                     <FieldTextStateless
                         shouldFitContainer={true}

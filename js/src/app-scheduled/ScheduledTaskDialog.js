@@ -22,15 +22,16 @@ import {RestMessages} from '../i18n/rest.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 
-import {scheduledTaskService} from '../service/services';
-import {getMarkers} from '../common/error';
-import {getPluginBaseUrl} from '../service/ajaxHelper';
-import {Error} from '../common/forms/Error';
-import {Bindings} from '../common/bindings';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {EditorField} from '../common/ak/EditorField';
 import {JqlInput} from '../common/ak/JqlInput';
 import {FieldError} from '../common/ak/FieldError';
+import {ErrorMessage} from '../common/ak/messages';
+
+import {scheduledTaskService} from '../service/services';
+import {getMarkers} from '../common/error';
+import {getPluginBaseUrl} from '../service/ajaxHelper';
+import {Bindings} from '../common/bindings';
 
 
 const issueBindings = [Bindings.issue];
@@ -40,10 +41,7 @@ function getValue(option) {
     return option ? option.value : null;
 }
 
-@connect(
-    null,
-    TaskActionCreators
-)
+@connect(null, TaskActionCreators)
 export class ScheduledTaskDialog extends React.Component {
     static propTypes = {
         isNew: PropTypes.bool.isRequired,
@@ -353,7 +351,7 @@ export class ScheduledTaskDialog extends React.Component {
 
             body =
                 <div className="flex-column">
-                    <Error error={error}/>
+                    {error && !errorField && <ErrorMessage title={errorMessage}/>}
 
                     <FieldTextStateless
                         shouldFitContainer={true}

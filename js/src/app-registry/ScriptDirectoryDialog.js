@@ -2,16 +2,16 @@ import React from 'react';
 
 import {connect} from 'react-redux';
 
-import Message from 'aui-react/lib/AUIMessage';
-
 import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 
 import {RegistryActionCreators} from './registry.reducer';
 
-import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
+import {ErrorMessage} from '../common/ak/messages';
 
 import {registryService} from '../service/services';
+
+import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 
 
 @connect(null, RegistryActionCreators, null, {withRef: true})
@@ -126,11 +126,7 @@ export class ScriptDirectoryDialog extends React.Component {
                             }
                         ]}
                     >
-                        {error && !errorField ?
-                            <Message type="error">
-                                {errorMessage}
-                            </Message>
-                        : null}
+                        {error && !errorField && <ErrorMessage title={errorMessage}/>}
                         <div className="flex-column">
                             <FieldTextStateless
                                 shouldFitContainer={true}

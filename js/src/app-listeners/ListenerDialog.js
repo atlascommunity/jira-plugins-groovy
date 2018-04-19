@@ -9,8 +9,6 @@ import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 
-import Message from 'aui-react/lib/AUIMessage';
-
 import {ConditionPicker} from './ConditionPicker';
 import {ListenerActionCreators} from './listeners.reducer';
 
@@ -23,6 +21,7 @@ import {listenerService} from '../service/services';
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
+import {ErrorMessage} from '../common/ak/messages';
 
 
 //AbstractProjectEvent
@@ -208,11 +207,7 @@ export class ListenerDialog extends React.Component {
 
             body =
                 <div className="flex-column">
-                    {error && !errorField ?
-                        <Message type="error">
-                            {errorMessage}
-                        </Message>
-                    : null}
+                    {error && !errorField && <ErrorMessage title={errorMessage}/>}
 
                     <FieldTextStateless
                         shouldFitContainer={true}
