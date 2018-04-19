@@ -16,6 +16,7 @@ import {RestMessages} from '../i18n/rest.i18n';
 import {Script, ScriptParameters} from '../common/Script';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
+import {InfoMessage} from '../common/ak/InfoMessage';
 
 
 export class RestRegistry extends React.Component {
@@ -49,7 +50,7 @@ export class RestRegistry extends React.Component {
                             onEdit={this._triggerDialog(false, script.id)}
                         />
                     )}
-                    {!scripts.length && <Message type="info">{RestMessages.noScripts}</Message>}
+                    {!scripts.length && <InfoMessage title={RestMessages.noScripts}/>}
                 </div>
             </Page>
         );
@@ -57,10 +58,7 @@ export class RestRegistry extends React.Component {
 }
 
 
-@connect(
-    _state => { return {}; },
-    ScriptActionCreators
-)
+@connect(null, ScriptActionCreators)
 class RestScript extends React.Component {
     static propTypes = {
         script: PropTypes.object.isRequired, //todo: shape

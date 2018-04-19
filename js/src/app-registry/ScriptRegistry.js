@@ -6,8 +6,6 @@ import {connect} from 'react-redux';
 import memoize from 'fast-memoize';
 import memoizeOne from 'memoize-one';
 
-import Message from 'aui-react/lib/AUIMessage';
-
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 
 import Page from '@atlaskit/page';
@@ -18,7 +16,7 @@ import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-
 import {FieldTextStateless} from '@atlaskit/field-text';
 import Lozenge from '@atlaskit/lozenge';
 import Badge from '@atlaskit/badge';
-import Spinner from '@atlaskit/spinner';
+import Flag from '@atlaskit/flag';
 
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 import AddIcon from '@atlaskit/icon/glyph/add';
@@ -26,6 +24,7 @@ import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import FolderIcon from '@atlaskit/icon/glyph/folder';
 import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
+import InfoIcon from '@atlaskit/icon/glyph/info';
 import ChevronRightIcon from '@atlaskit/icon/glyph/chevron-right';
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
@@ -36,6 +35,7 @@ import {ScriptDirectoryDialog} from './ScriptDirectoryDialog';
 import {RegistryActionCreators} from './registry.reducer';
 
 import {Script} from '../common/Script';
+import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 
 import {registryService, watcherService} from '../service/services';
 
@@ -43,6 +43,7 @@ import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import './ScriptRegistry.less';
+import {InfoMessage} from '../common/ak/InfoMessage';
 
 
 const countErrors = memoize((directory) => {
@@ -251,8 +252,8 @@ export class ScriptRegistry extends React.Component {
                             />
                         )}
 
-                        {!ready && <div className="flex-horizontal-middle"><Spinner/></div>}
-                        {ready && !directories.length ? <Message type="info" title={RegistryMessages.noScripts}>{RegistryMessages.noScripts}</Message> : null}
+                        {!ready && <LoadingSpinner/>}
+                        {ready && !directories.length ? <InfoMessage title={RegistryMessages.noScripts}/> : null}
                         <ScriptDirectoryDialog ref={this._setRef('directoryDialogRef')}/>
                         <ScriptDialog ref={this._setRef('scriptDialogRef')}/>
 

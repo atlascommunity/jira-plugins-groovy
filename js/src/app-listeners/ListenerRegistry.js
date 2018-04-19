@@ -5,8 +5,6 @@ import {connect} from 'react-redux';
 
 import memoizeOne from 'memoize-one';
 
-import Message from 'aui-react/lib/AUIMessage';
-
 import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
@@ -21,6 +19,7 @@ import {ListenerMessages, ListenerTypeMessages} from '../i18n/listener.i18n';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 
 import {Script, ScriptParameters} from '../common/Script';
+import {InfoMessage} from '../common/ak/InfoMessage';
 
 import './ListenerRegistry.less';
 
@@ -59,7 +58,7 @@ export class ListenerRegistry extends React.Component {
                             onEdit={this._triggerDialog(false, listener.id)}
                         />
                     )}
-                    {!listeners.length && <Message type="info" title={ListenerMessages.noListeners}>{ListenerMessages.noListeners}</Message>}
+                    {!listeners.length && <InfoMessage title={ListenerMessages.noListeners}/>}
                 </div>
             </Page>
         );

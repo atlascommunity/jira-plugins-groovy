@@ -3,19 +3,22 @@ import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
-import Message from 'aui-react/lib/AUIMessage';
-
 import DropdownMenu, {DropdownItem, DropdownItemGroup} from '@atlaskit/dropdown-menu';
-import Spinner from '@atlaskit/spinner';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
+
 import SettingsIcon from '@atlaskit/icon/glyph/settings';
 
 import {Script, ScriptParameters} from '../common/Script';
+import {FieldError} from '../common/ak/FieldError';
+import {LoadingSpinner} from '../common/ak/LoadingSpinner';
+import {InfoMessage} from '../common/ak/InfoMessage';
+
 import {getBaseUrl} from '../service/ajaxHelper';
+
 import {JiraMessages, FieldMessages, ErrorMessages, CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
-import {FieldError} from '../common/ak/FieldError';
+
 
 
 @connect(
@@ -36,7 +39,7 @@ export class FieldRegistry extends React.Component {
         const {configs, ready} = this.props;
 
         if (!ready) {
-            return <Spinner size="medium" />;
+            return <LoadingSpinner/>;
         }
 
         return <Page>
@@ -48,7 +51,7 @@ export class FieldRegistry extends React.Component {
                     <Field key={config.id} config={config}/>
                 )}
 
-                {!configs.length && <Message type="info" title={ScriptFieldMessages.noFields}>{ScriptFieldMessages.noFields}</Message>}
+                {!configs.length && <InfoMessage title={ScriptFieldMessages.noFields}/>}
             </div>
         </Page>;
     }

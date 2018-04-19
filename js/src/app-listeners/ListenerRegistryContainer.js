@@ -9,9 +9,8 @@ import AJS from 'AJS';
 import {ListenerRegistry} from './ListenerRegistry';
 import {ListenerDialog} from './ListenerDialog';
 
-import {CommonMessages} from '../i18n/common.i18n';
-
 import {ListenerModel} from '../model/listener.model';
+import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 
 
 @connect(
@@ -63,7 +62,7 @@ export class ListenerRegistryContainer extends React.Component {
         let content = null;
 
         if (!this._isReady()) {
-            content = <div>{CommonMessages.loading}</div>;
+            content = <LoadingSpinner/>;
         } else {
             content = <ListenerRegistry listeners={listeners} triggerDialog={this._triggerDialog}/>;
         }

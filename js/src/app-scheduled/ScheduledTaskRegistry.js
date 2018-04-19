@@ -5,8 +5,6 @@ import {connect} from 'react-redux';
 
 import memoizeOne from 'memoize-one';
 
-import Message from 'aui-react/lib/AUIMessage';
-
 import Avatar from '@atlaskit/avatar';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
@@ -27,12 +25,16 @@ import {RunNowDialog} from './RunNowDialog';
 import {types} from './types';
 import {TaskActionCreators} from './scheduled.reducer';
 
-import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
-import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {Script, ScriptParameters} from '../common/Script';
+import {LoadingSpinner} from '../common/ak/LoadingSpinner';
+
 import {scheduledTaskService} from '../service/services';
 
+import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
+import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
+
 import './ScheduledTaskRegistry.less';
+import {InfoMessage} from '../common/ak/InfoMessage';
 
 
 function getOutcomeLozengeAppearance(outcome) {
@@ -78,7 +80,7 @@ export class ScheduledTaskRegistry extends React.Component {
         const {dialogProps} = this.state;
 
         if (!ready) {
-            return <div className="aui-icon aui-icon-wait"/>;
+            return <LoadingSpinner/>;
         }
 
         return (
@@ -99,7 +101,7 @@ export class ScheduledTaskRegistry extends React.Component {
                     {!!tasks.length && tasks.map(task =>
                         <ScheduledTask key={task.id} task={task} onEdit={this._triggerDialog(false, task.id)}/>
                     )}
-                    {!tasks.length && <Message type="info">{ScheduledTaskMessages.noTasks}</Message>}
+                    {!tasks.length && <InfoMessage title={ScheduledTaskMessages.noTasks}/>}
                 </div>
                 {dialogProps && <ScheduledTaskDialog {...dialogProps} onClose={this._closeDialog}/>}
             </Page>

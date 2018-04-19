@@ -1,15 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Message from 'aui-react/lib/AUIMessage';
 import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
+import Flag from '@atlaskit/flag';
+import {colors} from '@atlaskit/theme';
+
+import ErrorIcon from '@atlaskit/icon/glyph/error';
 
 import {CustomFieldForm} from './CustomFieldForm';
 
 import {Script, ScriptParameters} from '../common/Script';
+import {LoadingSpinner} from '../common/ak/LoadingSpinner';
+
 import {fieldConfigService} from '../service/services';
+
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
 import {CommonMessages, ErrorMessages, FieldMessages} from '../i18n/common.i18n';
 
@@ -43,11 +49,18 @@ export class CustomFieldFormContainer extends React.Component {
         const {config, ready, editing} = this.state;
 
         if (!ready) {
-            return <div className="aui-icon aui-icon-wait"/>;
+            return <LoadingSpinner/>;
         }
 
         if (Number.isNaN(this.props.id)) {
-            return <Message type="error" title="Error">{ErrorMessages.incorrectConfigId}</Message>;
+            return (
+                <div style={{ marginTop: '20px' }}>
+                    <Flag
+                        title={ErrorMessages.incorrectConfigId}
+                        icon={<ErrorIcon label="error" color={colors.R300}/>}
+                    />
+                </div>
+            );
         }
 
         return <Page>
