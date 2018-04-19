@@ -474,14 +474,17 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
         ParseContext parseContext = scriptService.parseScript(form.getScriptBody());
 
+        String comment = StringUtils.trimToNull(form.getComment());
+        form.setComment(comment);
+
         if (!isNew) {
-            if (StringUtils.isEmpty(form.getComment())) {
+            if (StringUtils.isEmpty(comment)) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
             }
         }
 
-        if (form.getComment() != null) {
-            if (form.getComment().length() > Const.COMMENT_MAX_LENGTH) {
+        if (comment != null) {
+            if (comment.length() > Const.COMMENT_MAX_LENGTH) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
             }
         }
