@@ -136,8 +136,8 @@
     styled-components "1.4.6 - 3"
 
 "@atlaskit/field-radio-group@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/field-radio-group/-/field-radio-group-2.0.0.tgz#733090573ba195d397732c085beac7b2000473d4"
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/field-radio-group/-/field-radio-group-2.0.1.tgz#c577c2c21a046f2c7133441554dec826d01a534b"
   dependencies:
     "@atlaskit/field-base" "^9.0.0"
     "@atlaskit/icon" "^11.0.0"
