@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.util.RestFieldException;
+import ru.mail.jira.plugins.groovy.util.*;
 import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
@@ -32,9 +32,6 @@ import ru.mail.jira.plugins.groovy.api.entity.ListenerChangelog;
 import ru.mail.jira.plugins.groovy.impl.listener.ConditionType;
 import ru.mail.jira.plugins.groovy.impl.listener.ScriptedEventListener;
 import ru.mail.jira.plugins.groovy.impl.listener.ConditionDescriptor;
-import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
-import ru.mail.jira.plugins.groovy.util.Const;
-import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -55,6 +52,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     private final ChangelogHelper changelogHelper;
     private final ScriptService scriptService;
     private final ExecutionRepository executionRepository;
+    private final DelegatingClassLoader classLoader;
 
     @Autowired
     public EventListenerRepositoryImpl(
@@ -65,7 +63,8 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         AuditLogRepository auditLogRepository,
         ChangelogHelper changelogHelper,
         ScriptService scriptService,
-        ExecutionRepository executionRepository
+        ExecutionRepository executionRepository,
+        DelegatingClassLoader classLoader
     ) {
         cache = cacheManager.getCache(EventListenerRepositoryImpl.class.getCanonicalName() + ".cache",
             new EventListenerCacheLoader(),
@@ -82,6 +81,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         this.changelogHelper = changelogHelper;
         this.scriptService = scriptService;
         this.executionRepository = executionRepository;
+        this.classLoader = classLoader;
     }
 
     @Override
@@ -274,7 +274,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         if (condition.getType() == ConditionType.CLASS_NAME) {
             try {
-                Class.forName(condition.getClassName());
+                classLoader.getJiraClassLoader().loadClass(condition.getClassName());
             } catch (ClassNotFoundException e) {
                 throw new RestFieldException("Unable to resolve class: " + e.getMessage(), "condition.className");
             }
@@ -297,7 +297,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     private ScriptedEventListener buildEventListener(Listener listener) throws ClassNotFoundException {
         ConditionDescriptor descriptor = jsonMapper.read(listener.getCondition(), ConditionDescriptor.class);
         if (descriptor.getClassName() != null) {
-            descriptor.setClassInstance(Class.forName(descriptor.getClassName()));
+            descriptor.setClassInstance(classLoader.getJiraClassLoader().loadClass(descriptor.getClassName()));
         }
         return new ScriptedEventListener(
             listener.getID(),

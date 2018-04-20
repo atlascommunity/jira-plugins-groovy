@@ -72,4 +72,8 @@ public class DelegatingClassLoader extends ClassLoader {
             lock.unlock();
         }
     }
+
+    public ClassLoader getJiraClassLoader() {
+        return this.classLoaders.get("__jira").get();
+    }
 }
