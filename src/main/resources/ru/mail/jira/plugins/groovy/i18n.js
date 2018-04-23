@@ -24,6 +24,7 @@ define('/mailru/groovy/i18n-react', function() {
             order: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.order'),
             searcher: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.searcher'),
             groups: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.groups'),
+            issue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.issue'),
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),

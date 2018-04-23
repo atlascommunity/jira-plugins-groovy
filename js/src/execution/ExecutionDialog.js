@@ -17,7 +17,7 @@ export class ExecutionDialog extends React.Component {
     render() {
         const {onClose, execution} = this.props;
 
-        const bindings = execution.extraParams ? JSON.parse(execution.extraParams) : null;
+        const bindings = execution.extraParams;
 
         return <ModalDialog
             width="x-large"

@@ -7,8 +7,11 @@ import EditorSuccessIcon from '@atlaskit/icon/glyph/editor/success';
 import Tooltip from '@atlaskit/tooltip';
 import {colors} from '@atlaskit/theme';
 
-import './ExecutionBar.less';
 import {ExecutionDialog} from './ExecutionDialog';
+
+import {FieldMessages} from '../i18n/common.i18n';
+
+import './ExecutionBar.less';
 
 
 export class ExecutionBar extends React.Component {
@@ -50,13 +53,23 @@ class ExecutionItem extends React.Component {
 
     render() {
         const execution = this.props.execution;
+        const params = execution.extraParams || {};
 
         return (
             <Tooltip
-                content={`${execution.date} - ${execution.time} ms`}
-                onClick={this.props.onClick}
+                content={
+                    <div className="flex-column">
+                        <strong>
+                            {execution.extraParams.type || ''}
+                        </strong>
+                        {params.issue && <span>{FieldMessages.issue}{': '}{params.issue}</span>}
+                        <span>
+                            {execution.date}{' - '}{execution.time}{' ms'}
+                        </span>
+                    </div>
+                }
             >
-                <div className="executionItem">
+                <div className="executionItem" onClick={this.props.onClick}>
                     {execution.success ?
                         <EditorSuccessIcon label="success" size="small" primaryColor={colors.G300}/> :
                         <ErrorIcon label="error" size="small" primaryColor={colors.R300}/>

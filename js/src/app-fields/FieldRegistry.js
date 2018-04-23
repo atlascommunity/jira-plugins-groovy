@@ -76,9 +76,9 @@ class Field extends React.Component {
                     changelogs: config.changelogs,
                     errorCount: config.errorCount
                 }}
-                template={config.needsTemplate && {
+                template={config.needsTemplate ? {
                     body: config.template
-                }}
+                } : null}
 
                 withChangelog={true}
 

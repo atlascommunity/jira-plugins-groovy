@@ -8,5 +8,5 @@ export const ExecutionModel = PropTypes.shape({
     success: PropTypes.bool,
     date: PropTypes.string,
     error: PropTypes.string,
-    extraParams: PropTypes.string
+    extraParams: PropTypes.object
 });
