@@ -4,8 +4,6 @@ import {Provider} from 'react-redux';
 
 import {createStore} from 'redux';
 
-import LayerManager from '@atlaskit/layer-manager';
-
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
@@ -28,11 +26,9 @@ AJS.toInit(() => {
         .then(scripts => store.dispatch(ScriptActionCreators.loadScripts(scripts)));
 
     ReactDOM.render(
-        <LayerManager>
-            <Provider store={store}>
-                <FieldRegistry/>
-            </Provider>
-        </LayerManager>,
+        <Provider store={store}>
+            <FieldRegistry/>
+        </Provider>,
         document.getElementById('react-content')
     );
 });
