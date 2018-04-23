@@ -150,11 +150,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         directory.setDeleted(true);
         directory.save();
 
-        for (ScriptDirectory child : directory.getChildren()) {
+        for (ScriptDirectory child : getChildren(directory)) {
             deleteDirectory(user, child);
         }
 
-        for (Script script : directory.getScripts()) {
+        for (Script script : getScripts(directory)) {
             deleteScript(user, script);
         }
 
@@ -435,14 +435,14 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return result;
     }
 
-    private static ScriptDirectoryTreeDto buildDirectoryTreeDto(ScriptDirectory directory, Multimap<Integer, RegistryScriptDto> scripts) {
+    private ScriptDirectoryTreeDto buildDirectoryTreeDto(ScriptDirectory directory, Multimap<Integer, RegistryScriptDto> scripts) {
         ScriptDirectoryTreeDto result = new ScriptDirectoryTreeDto();
 
         result.setId(directory.getID());
         result.setName(directory.getName());
         result.setChildren(
             Arrays
-                .stream(directory.getChildren())
+                .stream(getChildren(directory))
                 .map(child -> buildDirectoryTreeDto(child, scripts))
                 .sorted(Comparator.comparing(ScriptDirectoryTreeDto::getName))
                 .collect(Collectors.toList())
@@ -527,6 +527,22 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
 
         return watchers;
+    }
+
+    private ScriptDirectory[] getChildren(ScriptDirectory directory) {
+        return ao
+            .find(
+                ScriptDirectory.class,
+                Query.select().where("DELETED = ? AND PARENT_ID = ?", Boolean.FALSE, directory.getID())
+            );
+    }
+
+    private Script[] getScripts(ScriptDirectory directory) {
+        return ao
+            .find(
+                Script.class,
+                Query.select().where("DELETED = ? AND DIRECTORY_ID = ?", Boolean.FALSE, directory.getID())
+            );
     }
 
     private static String getLockKey(int id) {
