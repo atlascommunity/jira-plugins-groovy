@@ -489,35 +489,30 @@ class DraggableScript extends React.Component {
             <div className="DraggableScript">
                 <Draggable draggableId={`${this.props.script.id}`} type="script">
                     {(provided) => (
-                        <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                        >
-                            <RegistryScript
-                                title={
-                                    <div className="flex-grow flex-row" {...provided.dragHandleProps}>
-                                        <div className="flex-vertical-middle">
-                                            <CodeIcon label=""/>
-                                        </div>
-                                        {' '}
-                                        <div className="flex-vertical-middle">
-                                            <h3 title={script.name}>
-                                                {script.name}
-                                            </h3>
-                                        </div>
-                                        {script.errorCount > 0 &&
-                                            <div className="flex-vertical-middle" style={{marginLeft: '5px'}}>
-                                                <div>
-                                                    <Badge max={99} value={script.errorCount} appearance="important"/>
-                                                </div>
-                                            </div>
-                                        }
+                        <RegistryScript
+                            title={
+                                <div className="flex-grow flex-row" {...provided.dragHandleProps}>
+                                    <div className="flex-vertical-middle">
+                                        <CodeIcon label=""/>
                                     </div>
-                                }
-                                {...this.props}
-                            />
-                            {provided.placeholder}
-                        </div>
+                                    {' '}
+                                    <div className="flex-vertical-middle">
+                                        <h3 title={script.name}>
+                                            {script.name}
+                                        </h3>
+                                    </div>
+                                    {script.errorCount > 0 &&
+                                        <div className="flex-vertical-middle" style={{marginLeft: '5px'}}>
+                                            <div>
+                                                <Badge max={99} value={script.errorCount} appearance="important"/>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            wrapperProps={{ ...provided.draggableProps, ref: provided.innerRef }}
+                            {...this.props}
+                        />
                     )}
                 </Draggable>
             </div>
@@ -540,7 +535,8 @@ class RegistryScript extends React.Component {
         onDelete: PropTypes.func.isRequired,
         scriptWatches: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
         addWatch: PropTypes.func.isRequired,
-        removeWatch: PropTypes.func.isRequired
+        removeWatch: PropTypes.func.isRequired,
+        wrapperProps: PropTypes.any
     };
 
     state = {
@@ -580,13 +576,13 @@ class RegistryScript extends React.Component {
     };
 
     render() {
-        const {script, onEdit, onDelete, scriptWatches, ...props} = this.props;
+        const {script, onEdit, onDelete, scriptWatches, wrapperProps, ...props} = this.props;
         const {showWorkflows, waitingWatch} = this.state;
 
         const isWatching = scriptWatches.includes(script.id);
 
         return (
-            <div>
+            <div {...wrapperProps}>
                 {showWorkflows && <WorkflowsDialog id={script.id} onClose={this._toggleWorkflows}/>}
                 <Script
                     script={script}
