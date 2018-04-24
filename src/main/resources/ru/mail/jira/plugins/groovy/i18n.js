@@ -74,6 +74,8 @@ define('/mailru/groovy/i18n-react', function() {
         registry: {
             addScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.addScript'),
             addDirectory: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.addDirectory'),
+            editScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.editScript'),
+            editDirectory: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.editDirectory'),
             noScripts: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.noScripts'),
             findWorkflows: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.findWorkflows')
         },

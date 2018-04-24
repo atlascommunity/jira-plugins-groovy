@@ -23,6 +23,7 @@ import {EditorField} from '../common/ak/EditorField';
 import {StaticField} from '../common/ak/StaticField';
 import {FieldError} from '../common/ak/FieldError';
 import {ErrorMessage} from '../common/ak/messages';
+import {RegistryMessages} from '../i18n/registry.i18n';
 
 
 const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
@@ -76,6 +77,7 @@ export class ScriptDialog extends React.Component {
                     scriptBody: data.scriptBody,
                     directoryId: data.directoryId
                 }),
+                script: data,
                 parentName: data.parentName,
                 error: null,
                 waiting: false
@@ -159,7 +161,7 @@ export class ScriptDialog extends React.Component {
     };
 
     render() {
-        const {values, parentName, error, modified, active, fetching, waiting} = this.state;
+        const {values, script, parentName, error, modified, active, fetching, waiting} = this.state;
         let errorMessage = null;
         let errorField = null;
 
@@ -187,7 +189,10 @@ export class ScriptDialog extends React.Component {
                     <ModalDialog
                         width="x-large"
                         scrollBehavior="outside"
-                        heading={`${this.state.id ? CommonMessages.update : CommonMessages.create} script`}
+
+                        isHeadingMultiline={false}
+                        heading={this.state.id ? `${RegistryMessages.editScript}: ${script.name}` : RegistryMessages.addScript}
+
                         onClose={this._close}
 
                         actions={[

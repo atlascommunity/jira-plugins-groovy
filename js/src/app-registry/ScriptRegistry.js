@@ -492,7 +492,7 @@ class DraggableScript extends React.Component {
                         <RegistryScript
                             title={
                                 <div className="flex-grow flex-row" {...provided.dragHandleProps}>
-                                    <div className="flex-vertical-middle">
+                                    <div className="flex-vertical-middle flex-none">
                                         <CodeIcon label=""/>
                                     </div>
                                     {' '}
@@ -502,7 +502,7 @@ class DraggableScript extends React.Component {
                                         </h3>
                                     </div>
                                     {script.errorCount > 0 &&
-                                        <div className="flex-vertical-middle" style={{marginLeft: '5px'}}>
+                                        <div className="flex-vertical-middle flex-none" style={{marginLeft: '5px', marginRight: '5px'}}>
                                             <div>
                                                 <Badge max={99} value={script.errorCount} appearance="important"/>
                                             </div>

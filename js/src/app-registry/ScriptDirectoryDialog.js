@@ -12,6 +12,7 @@ import {ErrorMessage} from '../common/ak/messages';
 import {registryService} from '../service/services';
 
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
+import {RegistryMessages} from '../i18n/registry.i18n';
 
 
 @connect(null, RegistryActionCreators, null, {withRef: true})
@@ -42,7 +43,8 @@ export class ScriptDirectoryDialog extends React.Component {
                 id: id,
                 parentId: null,
                 name: data.name,
-                error: null
+                error: null,
+                directory: data
             }));
     };
 
@@ -61,11 +63,11 @@ export class ScriptDirectoryDialog extends React.Component {
             e.preventDefault();
         }
 
-        const id = this.state.id;
+        const {id, name, parentId} = this.state;
 
         const data = {
-            name: this.state.name,
-            parentId: this.state.parentId || undefined
+            name: name,
+            parentId: parentId || undefined
         };
 
         if (id) {
@@ -99,7 +101,7 @@ export class ScriptDirectoryDialog extends React.Component {
     _setName = (event) => this.setState({ name: event.target.value });
 
     render() {
-        const {error} = this.state;
+        const {error, directory} = this.state;
 
         let errorMessage = null;
         let errorField = null;
@@ -113,11 +115,11 @@ export class ScriptDirectoryDialog extends React.Component {
                 {this.state.active ?
                     <ModalDialog
                         width="medium"
-                        heading="Create directory"
+                        heading={this.state.id ? `${RegistryMessages.editDirectory}: ${directory.name}` : RegistryMessages.addDirectory}
                         onClose={this._close}
                         actions={[
                             {
-                                text: CommonMessages.create,
+                                text: this.state.id ? CommonMessages.update : CommonMessages.create,
                                 onClick: this._onSubmit
                             },
                             {
