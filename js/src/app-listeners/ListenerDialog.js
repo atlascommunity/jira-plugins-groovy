@@ -60,7 +60,8 @@ export class ListenerDialog extends React.Component {
 
     state = {
         ready: false,
-        values: null
+        values: null,
+        listener: null
     };
 
     componentWillReceiveProps(nextProps) {
@@ -80,7 +81,8 @@ export class ListenerDialog extends React.Component {
                     name: '',
                     comment: '',
                     scriptBody: ''
-                })
+                }),
+                listener: null
             });
         } else {
             this.setState({
@@ -98,6 +100,7 @@ export class ListenerDialog extends React.Component {
                             scriptBody: listener.scriptBody,
                             condition: listener.condition
                         }),
+                        listener,
                         ready: true
                     });
                 });
@@ -159,7 +162,7 @@ export class ListenerDialog extends React.Component {
 
     render() {
         const {onClose, isNew} = this.props;
-        const {ready, values, error} = this.state;
+        const {ready, values, listener, error} = this.state;
 
         let body = null;
 
@@ -251,7 +254,10 @@ export class ListenerDialog extends React.Component {
         return <ModalDialog
             width="x-large"
             scrollBehavior="outside"
-            heading={`${isNew ? ListenerMessages.createListener : ListenerMessages.updateListener}`}
+
+            isHeadingMultiline={false}
+            heading={isNew ? ListenerMessages.addListener : `${ListenerMessages.editListener}: ${listener && listener.name}`}
+
             onClose={onClose}
 
             actions={[

@@ -115,7 +115,10 @@ export class ScriptDirectoryDialog extends React.Component {
                 {this.state.active ?
                     <ModalDialog
                         width="medium"
+
+                        isHeadingMultiline={false}
                         heading={this.state.id ? `${RegistryMessages.editDirectory}: ${directory.name}` : RegistryMessages.addDirectory}
+
                         onClose={this._close}
                         actions={[
                             {

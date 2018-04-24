@@ -22,6 +22,7 @@ import {EditorField} from '../common/ak/EditorField';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {ErrorMessage} from '../common/ak/messages';
+import {RegistryMessages} from '../i18n/registry.i18n';
 
 
 const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { label: method, value: method }; });
@@ -42,7 +43,9 @@ export class RestScriptDialog extends React.Component {
 
     state = {
         ready: false,
-        values: null
+        values: null,
+        error: null,
+        script: null
     };
 
     componentWillReceiveProps(nextProps) {
@@ -63,7 +66,8 @@ export class RestScriptDialog extends React.Component {
                     groups: [],
                     scriptBody: ''
                 }),
-                error: null
+                error: null,
+                script: null
             });
         } else {
             this.setState({
@@ -88,7 +92,8 @@ export class RestScriptDialog extends React.Component {
                             }),
                             comment: ''
                         }),
-                        ready: true
+                        ready: true,
+                        script
                     });
                 });
         }
@@ -151,7 +156,7 @@ export class RestScriptDialog extends React.Component {
 
     render() {
         const {onClose, isNew} = this.props;
-        const {ready, values, error} = this.state;
+        const {ready, values, script, error} = this.state;
 
         let body = null;
 
@@ -247,7 +252,10 @@ export class RestScriptDialog extends React.Component {
         return <ModalDialog
             width="x-large"
             scrollBehavior="outside"
-            heading={`${isNew ? RestMessages.createScript : RestMessages.updateScript}`}
+
+            isHeadingMultiline={false}
+            heading={isNew ? RegistryMessages.addScript : `${RegistryMessages.editScript}: ${script && script.name}`}
+
             onClose={onClose}
             actions={[
                 {

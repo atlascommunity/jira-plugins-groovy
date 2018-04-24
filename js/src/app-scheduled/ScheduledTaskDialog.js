@@ -18,7 +18,6 @@ import WarningIcon from '@atlaskit/icon/glyph/warning';
 import {TaskActionCreators} from './scheduled.reducer';
 import {types, typeList} from './types';
 
-import {RestMessages} from '../i18n/rest.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 
@@ -53,7 +52,9 @@ export class ScheduledTaskDialog extends React.Component {
 
     state = {
         ready: false,
-        values: null
+        values: null,
+        task: null,
+        error: null
     };
 
     componentWillReceiveProps(nextProps) {
@@ -73,7 +74,8 @@ export class ScheduledTaskDialog extends React.Component {
                     transitionOptions: {},
                     scriptBody: ''
                 }),
-                error: null
+                error: null,
+                task: null
             });
         } else {
             this.setState({
@@ -98,7 +100,8 @@ export class ScheduledTaskDialog extends React.Component {
                             transitionOptions: task.transitionOptions || {},
                             comment: ''
                         }),
-                        ready: true
+                        ready: true,
+                        task
                     });
                 });
         }
@@ -332,7 +335,7 @@ export class ScheduledTaskDialog extends React.Component {
 
     render() {
         const {onClose, isNew} = this.props;
-        const {ready, values, error} = this.state;
+        const {ready, values, task, error} = this.state;
 
         let body = null;
 
@@ -422,7 +425,10 @@ export class ScheduledTaskDialog extends React.Component {
         return <ModalDialog
             width="x-large"
             scrollBehavior="outside"
-            heading={`${isNew ? RestMessages.createScript : RestMessages.updateScript}`}
+
+            isHeadingMultiline={false}
+            heading={isNew ? ScheduledTaskMessages.addTask : `${ScheduledTaskMessages.editTask}: ${task && task.name}`}
+
             onClose={onClose}
             actions={[
                 {

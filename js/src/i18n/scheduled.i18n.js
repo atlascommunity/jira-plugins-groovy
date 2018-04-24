@@ -5,6 +5,7 @@ import i18n from 'external-i18n';
 export const ScheduledTaskMessages = {
     noTasks: i18n.scheduled.noTasks,
     addTask: i18n.scheduled.addTask,
+    editTask: i18n.scheduled.editTask,
     runAs: i18n.scheduled.runAs,
     runNow: i18n.scheduled.runNow,
     runNowConfirm: i18n.scheduled.runNowConfirm,

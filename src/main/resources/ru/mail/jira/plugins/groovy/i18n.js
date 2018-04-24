@@ -81,6 +81,7 @@ define('/mailru/groovy/i18n-react', function() {
         },
         listener: {
             addListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.addListener'),
+            editListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.editListener'),
             createListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.createListener'),
             updateListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.updateListener'),
             addCondition: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.addCondition'),
@@ -137,6 +138,7 @@ define('/mailru/groovy/i18n-react', function() {
         scheduled: {
             noTasks: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.noTasks'),
             addTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.addTask'),
+            editTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.editTask'),
             runAs: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.runAs'),
             runNow: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.runNow'),
             runNowConfirm: function(...params) {
