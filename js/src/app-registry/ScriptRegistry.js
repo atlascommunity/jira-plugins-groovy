@@ -373,43 +373,40 @@ class ScriptDirectory extends React.Component {
         return (
             <div className="flex full-width flex-column scriptDirectory">
                 <div className="scriptDirectoryTitle">
-                    <div className="flex-none flex-row">
-                        <div className="flex-vertical-middle">
-                            <Button
-                                appearance="subtle"
-                                spacing="none"
-                                iconBefore={collapsed ? <FolderFilledIcon label=""/> : <FolderIcon label=""/>}
+                    <div className="flex-grow flex-row">
+                        <Button
+                            appearance="subtle"
+                            spacing="none"
+                            iconBefore={collapsed ? <FolderFilledIcon label=""/> : <FolderIcon label=""/>}
 
-                                isDisabled={(directory.children.length + directory.scripts.length) === 0}
+                            isDisabled={(directory.children.length + directory.scripts.length) === 0}
 
-                                onClick={this._toggle}
-                            >
-                                <h3 className="flex-vertical-middle" style={{ margin: 0 }}>
-                                    <span>{' '}{directory.name}</span>
-                                </h3>
-                            </Button>
+                            onClick={this._toggle}
+                        >
+                            <h3 className="flex-vertical-middle" style={{ margin: 0 }}>
+                                <span>{' '}{directory.name}</span>
+                            </h3>
+                        </Button>
+                    </div>
+                    {errorCount > 0 &&
+                        <div className="flex-vertical-middle flex-none" style={{marginLeft: '5px'}}>
+                            <div>
+                                <Badge max={99} value={errorCount} appearance="important"/>
+                            </div>
                         </div>
-                        {errorCount > 0 &&
-                            <div className="flex-vertical-middle" style={{marginLeft: '5px'}}>
-                                <div>
-                                    <Badge max={99} value={errorCount} appearance="important"/>
-                                </div>
-                            </div>
-                        }
-                        <div className="muted-text flex-vertical-middle">
-                            <div className="flex-row">
-                                {parents.map((parent) =>
-                                    <div key={parent.id} className="flex-row">
-                                        <ChevronRightIcon label=""/>
-                                        <div className="flex-vertical-middle">
-                                            {parent.name}
-                                        </div>
+                    }
+                    <div className="muted-text flex-vertical-middle">
+                        <div className="flex-row">
+                            {parents.map((parent) =>
+                                <div key={parent.id} className="flex-row">
+                                    <ChevronRightIcon label=""/>
+                                    <div className="flex-vertical-middle">
+                                        {parent.name}
                                     </div>
-                                )}
-                            </div>
+                                </div>
+                            )}
                         </div>
                     </div>
-                    <div className="flex-grow"/>
                     <div className="flex-none">
                         <ButtonGroup>
                             <Button
