@@ -83,7 +83,7 @@ export class ScriptRegistry extends React.Component {
         this[key] = el;
     };
 
-    _activateCreateDialog = (parentId, type) => () => {
+    _activateCreateDialog = (parentId, type) => {
         if (type === 'directory') {
             this.directoryDialogRef.getWrappedInstance().activateCreate(parentId);
         } else {
@@ -91,7 +91,8 @@ export class ScriptRegistry extends React.Component {
         }
     };
 
-    _activateEditDialog = (id, type) => () => {
+    _activateEditDialog = (id, type) => {
+        console.log(id, type);
         if (type === 'directory') {
             this.directoryDialogRef.getWrappedInstance().activateEdit(id);
         } else {
@@ -99,7 +100,7 @@ export class ScriptRegistry extends React.Component {
         }
     };
 
-    _activateDeleteDialog = (id, type, name) => () => {
+    _activateDeleteDialog = (id, type, name) => {
         // eslint-disable-next-line no-restricted-globals
         if (confirm(`Are you sure you want to delete "${name}"?`)) {
             if (type === 'directory') {
@@ -220,7 +221,7 @@ export class ScriptRegistry extends React.Component {
                         actions={
                             <Button
                                 appearance="primary"
-                                onClick={this._activateCreateDialog(null, 'directory')}
+                                onClick={this._createDirectory}
                             >
                                 {RegistryMessages.addDirectory}
                             </Button>
@@ -321,8 +322,9 @@ class ScriptDirectory extends React.Component {
     };
 
     _onEdit = () => this.props.onEdit(this.props.directory.id, 'directory');
-
     _onDelete = () => this.props.onDelete(this.props.directory.id, 'directory', this.props.directory.name);
+    _onCreateDir = () => this.props.onCreate(this.props.directory.id, 'directory');
+    _onCreateScript = () => this.props.onCreate(this.props.directory.id, 'script');
 
     render() {
         const {collapsed, waitingWatch} = this.state;
@@ -414,7 +416,7 @@ class ScriptDirectory extends React.Component {
                                 appearance="subtle"
                                 iconBefore={<AddIcon label=""/>}
 
-                                onClick={onCreate(directory.id, 'directory')}
+                                onClick={this._onCreateDir}
                             >
                                 {RegistryMessages.addDirectory}
                             </Button>
@@ -422,7 +424,7 @@ class ScriptDirectory extends React.Component {
                                 appearance="subtle"
                                 iconBefore={<AddIcon label=""/>}
 
-                                onClick={onCreate(directory.id, 'script')}
+                                onClick={this._onCreateScript}
                             >
                                 {RegistryMessages.addScript}
                             </Button>
@@ -594,6 +596,8 @@ class RegistryScript extends React.Component {
             <div {...wrapperProps}>
                 {showWorkflows && <WorkflowsDialog id={script.id} onClose={this._toggleWorkflows}/>}
                 <Script
+                    {...props}
+
                     script={script}
 
                     withChangelog={true}
@@ -629,8 +633,6 @@ class RegistryScript extends React.Component {
                             </DropdownItemGroup>
                         </DropdownMenu>
                     ]}
-
-                    {...props}
                 >
                     <div className="flex-row" style={{marginBottom: '5px'}}>
                         {script.types.map(type =>

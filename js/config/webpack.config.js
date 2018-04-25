@@ -188,6 +188,7 @@ module.exports = {
                         loader: require.resolve('babel-loader'),
                         options: {
                             compact: true,
+                            presets: ['react-app'],
                             plugins: [
                                 ['transform-decorators-legacy']
                             ]
