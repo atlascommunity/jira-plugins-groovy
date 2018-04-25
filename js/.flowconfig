@@ -1,0 +1,17 @@
+[ignore]
+#.*/node_modules/styled-components/.*
+
+
+[include]
+
+[libs]
+
+[lints]
+all=warn
+
+[options]
+suppress_comment=\\(.\\|\n\\)*\\$ExpectError
+suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe
+
+
+[strict]

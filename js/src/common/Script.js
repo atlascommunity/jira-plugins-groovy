@@ -1,5 +1,6 @@
+//@flow
+import * as React from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
 
 import reactStringReplace from 'react-string-replace';
 
@@ -23,18 +24,21 @@ import {CommonMessages} from '../i18n/common.i18n';
 
 import {executionService} from '../service/services';
 
-import './Script.less';
 import {getBaseUrl} from '../service/ajaxHelper';
 
+import './Script.less';
 
-export class ScriptParameters extends React.PureComponent {
-    static propTypes = {
-        params: PropTypes.arrayOf(PropTypes.shape({
-            label: PropTypes.string.isRequired,
-            value: PropTypes.node.isRequired
-        }).isRequired)
-    };
 
+type ScriptParam = {
+    label: string,
+    value: React.Node
+}
+
+type ScriptParametersProps = {
+    params: Array<ScriptParam>
+};
+
+export class ScriptParameters extends React.PureComponent<ScriptParametersProps> {
     render() {
         const {params} = this.props;
 
@@ -55,46 +59,58 @@ export class ScriptParameters extends React.PureComponent {
     }
 }
 
+type ChangelogType = any; //todo
+type ExecutionType = any; //todo
+
+type ScriptType = {
+    id: number | string,
+    name: string,
+    scriptBody?: string,
+    inline?: boolean,
+    changelogs?: Array<ChangelogType>,
+    errorCount?: number
+};
+
+type VoidCallback = () => void;
+
+type ScriptProps = {
+    withChangelog: boolean,
+    collapsible: boolean,
+    headerless: boolean,
+
+    script?: ScriptType, //todo: maybe make script non-optional
+    template?: {
+        body: string
+    },
+
+    onEdit?: VoidCallback,
+    onDelete?: VoidCallback,
+
+    title?: React.Node,
+    children?: React.Node,
+    additionalButtons?: React.ChildrenArray<React.Element<any>>
+}
+
+type ScriptState = {
+    showCode: boolean,
+    activeSource: {
+        type: string,
+        id: string,
+        source?: string,
+        templateSource?: string
+    },
+    executions: Array<ExecutionType>,
+    onlyLastExecutions: boolean,
+    executionsReady: boolean
+};
+
+
 //todo: common component for displaying script parameters, maybe add prop for parameters
-export class Script extends React.Component {
-    static propTypes = {
-        withChangelog: PropTypes.bool.isRequired,
-        script: PropTypes.shape({
-            id: PropTypes.oneOfType([
-                PropTypes.number,
-                PropTypes.string
-            ]),
-            name: PropTypes.string,
-            scriptBody: PropTypes.string,
-            inline: PropTypes.bool,
-            changelogs: PropTypes.array,
-            errorCount: PropTypes.number
-        }),
-        template: PropTypes.shape({
-            body: PropTypes.string
-        }),
-        onEdit: PropTypes.func,
-        onDelete: PropTypes.func,
-
-        collapsible: PropTypes.bool,
-        headerless: PropTypes.bool,
-
-        title: PropTypes.oneOfType([
-            PropTypes.string,
-            PropTypes.node
-        ]),
-        children: PropTypes.oneOfType([
-            PropTypes.arrayOf(PropTypes.node),
-            PropTypes.node
-        ]),
-        additionalButtons: PropTypes.oneOfType([
-            PropTypes.arrayOf(PropTypes.node),
-            PropTypes.node
-        ])
-    };
-
+export class Script extends React.Component<ScriptProps, ScriptState> {
     static defaultProps = {
-        collapsible: true
+        collapsible: true,
+        withChangelog: false,
+        headerless: false
     };
 
     state = {
@@ -131,9 +147,11 @@ export class Script extends React.Component {
         const {script} = this.props;
         const {onlyLastExecutions} = this.state;
 
-        executionService
-            .getExecutions(script.inline, script.id, onlyLastExecutions)
-            .then(result => this.setState({executions: result, executionsReady: true}));
+        if (script) {
+            executionService
+                .getExecutions(script.inline, script.id, onlyLastExecutions)
+                .then(result => this.setState({executions: result, executionsReady: true}));
+        }
     };
 
     _switchToCurrent = () => {
@@ -145,7 +163,7 @@ export class Script extends React.Component {
         });
     };
 
-    _switchToChangelog = changelog => () => {
+    _switchToChangelog = (changelog : ChangelogType) => () => {
         this.setState({
             activeSource: {
                 type: 'diff',
@@ -160,11 +178,11 @@ export class Script extends React.Component {
         const {script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons, headerless} = this.props;
         const {activeSource, showCode, executions, executionsReady, onlyLastExecutions} = this.state;
 
-        let codeBlock = null;
-        let templateBlock = null;
-        let executionBar = null;
+        let codeBlock : React.Node = null;
+        let templateBlock : React.Node = null;
+        let executionBar : React.Node = null;
 
-        const isOpen = showCode || !collapsible;
+        const isOpen : boolean = showCode || !collapsible;
 
         if (isOpen) {
             if (template) {
@@ -181,9 +199,9 @@ export class Script extends React.Component {
 
             codeBlock = (
                 <div className="flex-row editor">
-                    {withChangelog &&
+                    {withChangelog && script && script.changelogs &&
                         <Changelog
-                            changelogs={script && script.changelogs}
+                            changelogs={script.changelogs}
                             switchToChangelog={this._switchToChangelog}
                             switchToCurrent={this._switchToCurrent}
                         />
@@ -193,7 +211,7 @@ export class Script extends React.Component {
                             <Editor
                                 readOnly={true}
                                 mode={activeSource.id === 'current' ? 'groovy' : 'diff'}
-                                value={activeSource.id === 'current' ? script.scriptBody : activeSource.source}
+                                value={activeSource.id === 'current' ? script && script.scriptBody : activeSource.source}
                             />
                         </div>
                         {templateBlock}
@@ -247,7 +265,7 @@ export class Script extends React.Component {
                                         {script && script.name}
                                     </h3>
                                 </div>
-                                {!!script.errorCount &&
+                                {script && !!script.errorCount &&
                                     <div className="flex-vertical-middle" style={{marginLeft: '5px'}}>
                                         <div>
                                             <Badge max={99} value={script.errorCount} appearance="important"/>
@@ -330,7 +348,13 @@ function ChangelogComment({text, issueReferences}) {
     );
 }
 
-function Changelog({changelogs, switchToCurrent, switchToChangelog}) {
+type ChangelogProps = {
+    changelogs: Array<ChangelogType>,
+    switchToCurrent: VoidCallback,
+    switchToChangelog: (ChangelogType) => () => void
+};
+
+function Changelog({changelogs, switchToCurrent, switchToChangelog} : ChangelogProps) : React.Node {
     return (
         <div className="scriptChangelogs" style={{width: '150px'}}>
             <div key="current" className="scriptChangelog" onClick={switchToCurrent}>
