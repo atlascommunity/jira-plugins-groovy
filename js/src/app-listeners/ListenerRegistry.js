@@ -18,7 +18,7 @@ import {listenerService} from '../service/services';
 import {ListenerMessages, ListenerTypeMessages} from '../i18n/listener.i18n';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 
-import {Script, ScriptParameters} from '../common/Script';
+import Script, {ScriptParameters} from '../common/script';
 import {InfoMessage} from '../common/ak/messages';
 
 import './ListenerRegistry.less';

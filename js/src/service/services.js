@@ -1,3 +1,5 @@
+//@flow
+
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 

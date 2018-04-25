@@ -1,19 +1,22 @@
+//@flow
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 
-import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
-import {ExecutionModel} from '../model/execution.model';
-import {StaticField} from '../common/ak/StaticField';
+import type {ExecutionType} from './types';
+
+import type {VoidCallback} from '../types';
+
+import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
+import {StaticField} from '../ak/StaticField';
 
 
-export class ExecutionDialog extends React.Component {
-    static propTypes = {
-        onClose: PropTypes.func.isRequired,
-        execution: ExecutionModel.isRequired
-    };
+type ExecutionDialogProps = {
+    onClose: VoidCallback,
+    execution: ExecutionType
+}
 
+export class ExecutionDialog extends React.Component<ExecutionDialogProps> {
     render() {
         const {onClose, execution} = this.props;
 

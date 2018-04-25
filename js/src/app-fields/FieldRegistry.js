@@ -9,7 +9,7 @@ import PageHeader from '@atlaskit/page-header';
 
 import SettingsIcon from '@atlaskit/icon/glyph/settings';
 
-import {Script, ScriptParameters} from '../common/Script';
+import Script, {ScriptParameters} from '../common/script';
 import {FieldError} from '../common/ak/FieldError';
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 import {InfoMessage} from '../common/ak/messages';

@@ -32,7 +32,7 @@ import {WorkflowsDialog} from './WorkflowsDialog';
 import {ScriptDirectoryDialog} from './ScriptDirectoryDialog';
 import {RegistryActionCreators} from './registry.reducer';
 
-import {Script} from '../common/Script';
+import Script from '../common/script';
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 import {InfoMessage} from '../common/ak/messages';
 

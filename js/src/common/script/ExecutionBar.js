@@ -1,6 +1,5 @@
+//@flow
 import React from 'react';
-
-import PropTypes from 'prop-types';
 
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 import EditorSuccessIcon from '@atlaskit/icon/glyph/editor/success';
@@ -8,22 +7,29 @@ import Tooltip from '@atlaskit/tooltip';
 import {colors} from '@atlaskit/theme';
 
 import {ExecutionDialog} from './ExecutionDialog';
+import type {ExecutionType} from './types';
 
-import {FieldMessages} from '../i18n/common.i18n';
+import type {VoidCallback} from '../types';
+
+import {FieldMessages} from '../../i18n/common.i18n';
 
 import './ExecutionBar.less';
 
 
-export class ExecutionBar extends React.Component {
-    static propTypes = {
-        executions: PropTypes.array.isRequired
-    };
+type ExecutionBarProps = {
+    executions: Array<ExecutionType>
+};
 
+type ExecutionBarState = {
+    displayedExecution?: ?ExecutionType
+};
+
+export class ExecutionBar extends React.Component<ExecutionBarProps, ExecutionBarState> {
     state = {
         displayedExecution: null
     };
 
-    _showExecution = (execution) => () => this.setState({ displayedExecution: execution });
+    _showExecution = (execution : ExecutionType) => () => this.setState({ displayedExecution: execution });
 
     _hideExecution = () => this.setState({ displayedExecution: null });
 
@@ -41,16 +47,12 @@ export class ExecutionBar extends React.Component {
     }
 }
 
-class ExecutionItem extends React.Component {
-    static propTypes = {
-        execution: PropTypes.object.isRequired,
-        onClick: PropTypes.func
-    };
+type ExecutionItemProps = {
+    execution: ExecutionType,
+    onClick: VoidCallback
+}
 
-    state = {
-        hovered: false
-    };
-
+class ExecutionItem extends React.Component<ExecutionItemProps> {
     render() {
         const execution = this.props.execution;
         const params = execution.extraParams || {};

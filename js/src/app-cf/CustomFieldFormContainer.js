@@ -7,7 +7,7 @@ import PageHeader from '@atlaskit/page-header';
 
 import {CustomFieldForm} from './CustomFieldForm';
 
-import {Script, ScriptParameters} from '../common/Script';
+import Script, {ScriptParameters} from '../common/script';
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 
 import {fieldConfigService} from '../service/services';

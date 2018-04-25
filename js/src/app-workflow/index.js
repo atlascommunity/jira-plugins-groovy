@@ -9,7 +9,7 @@ import define from 'extDefine';
 import {FormEditor} from './FormEditor';
 import {RegistryPicker} from './RegistryPicker';
 
-import {Script, ScriptParameters} from '../common/Script';
+import Script, {ScriptParameters} from '../common/script';
 
 import {ErrorMessages} from '../i18n/common.i18n';
 

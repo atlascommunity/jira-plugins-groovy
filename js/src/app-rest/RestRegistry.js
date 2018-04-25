@@ -9,7 +9,7 @@ import PageHeader from '@atlaskit/page-header';
 
 import {ScriptActionCreators} from './rest.reducer';
 
-import {Script, ScriptParameters} from '../common/Script';
+import Script, {ScriptParameters} from '../common/script';
 import {InfoMessage} from '../common/ak/messages';
 
 import {restService} from '../service/services';

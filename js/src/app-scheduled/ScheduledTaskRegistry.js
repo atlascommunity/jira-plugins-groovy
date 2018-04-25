@@ -19,13 +19,12 @@ import ErrorIcon from '@atlaskit/icon/glyph/error';
 import InfoIcon from '@atlaskit/icon/glyph/info';
 import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
 
-
 import {ScheduledTaskDialog} from './ScheduledTaskDialog';
 import {RunNowDialog} from './RunNowDialog';
 import {types} from './types';
 import {TaskActionCreators} from './scheduled.reducer';
 
-import {Script, ScriptParameters} from '../common/Script';
+import Script, {ScriptParameters} from '../common/script';
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 import {InfoMessage} from '../common/ak/messages';
 
