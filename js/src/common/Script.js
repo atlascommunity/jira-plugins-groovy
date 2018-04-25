@@ -13,7 +13,6 @@ import {Label} from '@atlaskit/field-base';
 
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
-import TrashIcon from '@atlaskit/icon/glyph/trash';
 import BitbucketSourceIcon from '@atlaskit/icon/glyph/bitbucket/source';
 import RecentIcon from '@atlaskit/icon/glyph/recent';
 
@@ -88,7 +87,7 @@ type ScriptProps = {
 
     title?: React.Node,
     children?: React.Node,
-    additionalButtons?: React.ChildrenArray<React.Element<any>>
+    additionalButtons?: Array<React.Element<any>>
 }
 
 type ScriptState = {
@@ -246,6 +245,38 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             }
         }
 
+        const buttons : Array<React.Element<any>> = [];
+
+        if (collapsible && script) {
+            buttons.push(
+                <Button
+                    key="toggleCode"
+
+                    appearance="subtle"
+                    iconBefore={<BitbucketSourceIcon label=""/>}
+                    onClick={this._showCode}
+                >
+                    {showCode ? CommonMessages.hideCode : CommonMessages.showCode}
+                </Button>
+            );
+        }
+
+        if (onEdit) {
+            buttons.push(
+                <Button
+                    key="edit-button"
+                    appearance="subtle"
+                    iconBefore={<EditIcon label=""/>}
+
+                    onClick={onEdit}
+                />
+            );
+        }
+
+        if (additionalButtons) {
+            buttons.push(...additionalButtons);
+        }
+
         return (
             <div className={`scriptRow ${!isOpen ? 'collapsed' : ''} ${template ? 'withTemplate' : ''}`}>
                 {!headerless &&
@@ -276,34 +307,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                         }
                         <div className="flex-none flex-row">
                             <ButtonGroup>
-                                {collapsible && script &&
-                                    <Button
-                                        appearance="subtle"
-                                        iconBefore={<BitbucketSourceIcon label=""/>}
-                                        onClick={this._showCode}
-                                    >
-                                        {showCode ? CommonMessages.hideCode : CommonMessages.showCode}
-                                    </Button>
-                                }
-                                {onEdit &&
-                                    <Button
-                                        key="edit-button"
-                                        appearance="subtle"
-                                        iconBefore={<EditIcon label=""/>}
-
-                                        onClick={onEdit}
-                                    />
-                                }
-                                {onDelete &&
-                                    <Button
-                                        key="delete-button"
-                                        appearance="subtle"
-                                        iconBefore={<TrashIcon label=""/>}
-
-                                        onClick={onDelete}
-                                    />
-                                }
-                                {additionalButtons}
+                                {buttons}
                             </ButtonGroup>
                         </div>
                     </div>
