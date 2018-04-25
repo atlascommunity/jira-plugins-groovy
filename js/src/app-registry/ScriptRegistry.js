@@ -183,22 +183,24 @@ export class ScriptRegistry extends React.Component {
 
     _onFilterChange = (e) => this.setState({ filter: e.target.value });
 
-    _matchesFilter = (item) => (item.name.toLocaleLowerCase().includes(this.state.filter.toLocaleLowerCase()));
+    _matchesFilter = (item, filter) => (item.name.toLocaleLowerCase().includes(filter));
 
-    _getFilteredDirs = (dirs) => {
+    _getFilteredDirsInternal = (dirs, filter) => {
         return dirs
             .map(dir => {
-                if (this._matchesFilter(dir)) {
+                if (this._matchesFilter(dir, filter)) {
                     return dir;
                 }
                 return {
                     ...dir,
-                    scripts: dir.scripts.filter(this._matchesFilter),
-                    children: this._getFilteredDirs(dir.children)
+                    scripts: dir.scripts.filter(script => this._matchesFilter(script, filter)),
+                    children: this._getFilteredDirsInternal(dir.children)
                 };
             })
             .filter(dir => (dir.scripts.length + dir.children.length) > 0);
     };
+
+    _getFilteredDirs = memoizeOne(this._getFilteredDirsInternal);
 
     render() {
         const {waiting, filter} = this.state;
@@ -206,8 +208,8 @@ export class ScriptRegistry extends React.Component {
 
         let forceOpen = false;
 
-        if (filter && filter.length > 0) {
-            directories = this._getFilteredDirs(directories);
+        if (filter && filter.length >= 2) {
+            directories = this._getFilteredDirs(directories, filter.toLocaleLowerCase());
             forceOpen = true;
         }
 
@@ -318,6 +320,10 @@ class ScriptDirectory extends React.Component {
         );
     };
 
+    _onEdit = () => this.props.onEdit(this.props.directory.id, 'directory');
+
+    _onDelete = () => this.props.onDelete(this.props.directory.id, 'directory', this.props.directory.name);
+
     render() {
         const {collapsed, waitingWatch} = this.state;
         const {directory, directoryWatches, parents, onCreate, onEdit, onDelete, forceOpen} = this.props;
@@ -352,8 +358,8 @@ class ScriptDirectory extends React.Component {
                         key={script.id}
                         script={script}
 
-                        onEdit={onEdit(script.id, 'script')}
-                        onDelete={onDelete(script.id, 'script', script.name)}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
                     />
                 )
             );
@@ -424,7 +430,7 @@ class ScriptDirectory extends React.Component {
                                 appearance="subtle"
                                 iconBefore={<EditFilledIcon label=""/>}
 
-                                onClick={onEdit(directory.id, 'directory')}
+                                onClick={this._onEdit}
                             />
                             <Button
                                 key="watch"
@@ -446,7 +452,7 @@ class ScriptDirectory extends React.Component {
                                 }}
                             >
                                 <DropdownItemGroup>
-                                    <DropdownItem onClick={onDelete(directory.id, 'directory', directory.name)}>
+                                    <DropdownItem onClick={this._onDelete}>
                                         {CommonMessages.delete}
                                     </DropdownItem>
                                 </DropdownItemGroup>
@@ -575,8 +581,11 @@ class RegistryScript extends React.Component {
         );
     };
 
+    _onEdit = () => this.props.onEdit(this.props.script.id, 'script');
+    _onDelete = () => this.props.onDelete(this.props.script.id, 'script', this.props.script.name);
+
     render() {
-        const {script, onEdit, onDelete, scriptWatches, wrapperProps, ...props} = this.props;
+        const {script, scriptWatches, wrapperProps, ...props} = this.props;
         const {showWorkflows, waitingWatch} = this.state;
 
         const isWatching = scriptWatches.includes(script.id);
@@ -589,7 +598,7 @@ class RegistryScript extends React.Component {
 
                     withChangelog={true}
 
-                    onEdit={onEdit}
+                    onEdit={this._onEdit}
                     additionalButtons={[
                         <Button
                             key="watch"
@@ -614,7 +623,7 @@ class RegistryScript extends React.Component {
                                 <DropdownItem onClick={this._toggleWorkflows}>
                                     {RegistryMessages.findWorkflows}
                                 </DropdownItem>
-                                <DropdownItem onClick={onDelete}>
+                                <DropdownItem onClick={this._onDelete}>
                                     {CommonMessages.delete}
                                 </DropdownItem>
                             </DropdownItemGroup>
