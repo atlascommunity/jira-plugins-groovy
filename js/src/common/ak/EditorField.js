@@ -1,38 +1,40 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import Base, {Label} from '@atlaskit/field-base';
 
-import {Editor, MarkerShape, BindingShape} from '../editor/Editor';
+import type {BindingType, MarkerType} from '../editor/types';
+
+import Editor from '../editor';
 
 import './EditorField.less';
 
 
-export class EditorField extends React.Component {
-    static propTypes = {
-        label: PropTypes.string.isRequired,
-        mode: PropTypes.string.isRequired,
-        isLabelHidden: PropTypes.bool,
+type EditorFieldProps = {
+    label: string,
+    mode: string,
+    isLabelHidden?: boolean,
 
-        value: PropTypes.string.isRequired,
-        onChange: PropTypes.func.isRequired,
+    value: string,
+    onChange: (string) => void,
 
-        markers: PropTypes.arrayOf(MarkerShape.isRequired),
-        bindings: PropTypes.arrayOf(BindingShape.isRequired),
-        resizable: PropTypes.bool,
+    markers?: Array<MarkerType>,
+    bindings?: Array<BindingType>,
+    resizable?: boolean,
 
-        isInvalid: PropTypes.bool,
-        invalidMessage: PropTypes.string,
+    isInvalid?: boolean,
+    invalidMessage?: string,
 
-        isRequired: PropTypes.bool,
-        isDisabled: PropTypes.bool
-    };
+    isRequired?: boolean,
+    isDisabled?: boolean
+}
 
+export class EditorField extends React.Component<EditorFieldProps> {
     static defaultProps = {
         mode: 'groovy'
     };
 
-    _decorateEditor = (editor) => {
+    _decorateEditor = (editor : React.Node) : React.Node => {
         const {isInvalid, invalidMessage, isRequired, isDisabled} = this.props;
 
         return (

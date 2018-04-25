@@ -1,3 +1,4 @@
+//@flow
 import React from 'react';
 
 import {Controlled} from 'react-codemirror2';
@@ -31,7 +32,7 @@ import {Controlled} from 'react-codemirror2';
     }
 }*/
 
-export class CodeMirror extends React.PureComponent {
+export class CodeMirror extends React.PureComponent<any> {
     render() {
         return <Controlled {...this.props}/>;
     }

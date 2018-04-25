@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import memoizeOne from 'memoize-one';
 
@@ -13,6 +13,8 @@ import InlineMessage from '@atlaskit/inline-message';
 
 import {Resizable} from 'react-resizable';
 
+import type {BindingType, MarkerType} from './types';
+
 import {CodeMirror} from './CM';
 
 import {globalBindings} from '../bindings';
@@ -23,51 +25,51 @@ import {CommonMessages} from '../../i18n/common.i18n';
 import './Editor.less';
 
 
-function isLight() {
+function isLight() : boolean {
     return !(preferenceService.get('ru.mail.groovy.isLight') === 'false');
 }
 
-export const BindingShape = PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    className: PropTypes.string.isRequired,
-    fullClassName: PropTypes.string.isRequired,
-    javaDoc: PropTypes.string
-});
+type CodeMirrorType = {
+    setSize: (width?: number|string, height: number|string) => void
+};
 
-export const MarkerShape = PropTypes.shape({
-    startRow: PropTypes.number,
-    endRow: PropTypes.number,
-    startCol: PropTypes.number,
-    endCol: PropTypes.number,
-    className: PropTypes.string
-});
+type ResizeCallbackData = {
+    node: HTMLElement,
+    size: {width: number, height: number}
+};
+
+type EditorProps = {
+    mode: string,
+    value?: string,
+    onChange?: (string) => void,
+    isDisabled?: boolean,
+    markers?: Array<MarkerType>,
+    bindings?: Array<BindingType>,
+    readOnly?: boolean,
+    decorated?: boolean,
+    resizable?: boolean,
+    decorator?: (React.Node) => React.Node
+}
+
+type EditorState = {
+    isLight: boolean,
+    height: number
+}
 
 //todo: remember height for console
 //todo: change to PureComponent
 //todo: move theme state to redux
-export class Editor extends React.Component {
-    static propTypes = {
-        mode: PropTypes.string.isRequired,
-        value: PropTypes.string.isRequired,
-        onChange: PropTypes.func,
-        isDisabled: PropTypes.bool,
-        markers: PropTypes.arrayOf(MarkerShape.isRequired),
-        bindings: PropTypes.arrayOf(BindingShape.isRequired),
-        readOnly: PropTypes.bool,
-        decorated: PropTypes.bool,
-        resizable: PropTypes.bool,
-        decorator: PropTypes.func
-    };
+export class Editor extends React.Component<EditorProps, EditorState> {
+    cm: ?CodeMirrorType = null;
 
-    cm = null;
     state = {
         isLight: isLight(),
         height: 300
     };
 
-    _setEditor = (editor) => this.cm = editor;
+    _setEditor = (editor : CodeMirrorType) => this.cm = editor;
 
-    _switchTheme = (e) => {
+    _switchTheme = (e : SyntheticEvent<any>) => {
         if (e) {
             e.preventDefault();
         }
@@ -79,7 +81,11 @@ export class Editor extends React.Component {
         });
     };
 
-    _onChange = (_editor, _data, value) => this.props.onChange(value);
+    _onChange = (_editor:any, _data:any, value:string) => {
+        if (this.props.onChange) {
+            this.props.onChange(value);
+        }
+    };
 
     _getAnnotations = () => {
         const markers = this.props.markers;
@@ -96,19 +102,21 @@ export class Editor extends React.Component {
         return [];
     };
 
-    _resize = (_e, {size}) => {
+    _resize = (_e: any, {size}: ResizeCallbackData) => {
         console.log(size);
         this.setState({height: size.height});
     };
 
-    componentDidUpdate(_prevProps, prevState) {
+    componentDidUpdate(_prevProps : EditorProps, prevState : EditorState) {
         if (prevState.height !== this.state.height) {
-            this.cm.setSize(null, this.state.height);
+            if (this.cm) {
+                this.cm.setSize(undefined, this.state.height);
+            }
         }
     }
 
     _getOptions = memoizeOne(
-        (readOnly, isDisabled, mode, isLight) => {
+        (readOnly?: boolean, isDisabled?: boolean, mode?: string, isLight: boolean) => {
             return {
                 theme: isLight ? 'eclipse' : 'lesser-dark',
                 mode: mode,
@@ -135,7 +143,7 @@ export class Editor extends React.Component {
             options={options}
 
             onBeforeChange={onChange && this._onChange}
-            value={value}
+            value={value || ''}
             editorDidMount={this._setEditor}
         />;
 
@@ -185,7 +193,11 @@ export class Editor extends React.Component {
     }
 }
 
-function Binding({binding}) {
+type BindingProps = {
+    binding: BindingType
+}
+
+function Binding({binding} : BindingProps) : React.Node {
     return (
         <div className="flex-row">
             <div className="flex-none">{binding.name}</div>
@@ -199,7 +211,3 @@ function Binding({binding}) {
         </div>
     );
 }
-
-Binding.propTypes = {
-    binding: BindingShape.isRequired
-};
