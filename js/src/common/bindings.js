@@ -1,4 +1,9 @@
-export const globalBindings = [
+//@flow
+
+import type {BindingType} from './editor/types';
+
+
+export const globalBindings : Array<BindingType> = [
     {
         name: 'httpClient',
         className: 'HttpClient',
@@ -27,7 +32,7 @@ export const globalBindings = [
 
 const jiraVersion = '7.6.1';
 
-export const Bindings = {
+export const Bindings : {[string]: BindingType} = {
     currentUser: {
         name: 'currentUser',
         className: 'ApplicationUser',

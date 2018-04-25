@@ -1,3 +1,5 @@
+
+
 export function getMarkers(errors) {
     return errors.map(error => {
         return {
