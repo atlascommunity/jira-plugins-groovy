@@ -4,19 +4,15 @@ import * as React from 'react';
 import Base, {Label} from '@atlaskit/field-base';
 
 import type {BindingType, MarkerType} from '../editor/types';
-import type {FieldProps} from '../types';
+import type {FieldProps, MutableFieldProps} from '../types';
 
 import Editor from '../editor';
 
 import './EditorField.less';
 
 
-type EditorFieldProps = FieldProps & {
+type EditorFieldProps = FieldProps & MutableFieldProps<string> & {
     mode: string,
-
-    value: string,
-    onChange: (string) => void,
-
     markers?: Array<MarkerType>,
     bindings?: Array<BindingType>,
     resizable?: boolean,
