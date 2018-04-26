@@ -1,8 +1,11 @@
+//@flow
 // eslint-disable-next-line import/no-extraneous-dependencies
 import i18n from 'external-i18n';
 
+import type {I18nMessages} from '../common/types';
 
-export const AuditMessages = {
+
+export const AuditMessages: I18nMessages = {
     user: i18n.audit.user,
     category: i18n.audit.category,
     action: i18n.audit.action,
@@ -11,7 +14,7 @@ export const AuditMessages = {
     restore: i18n.audit.restore
 };
 
-export const CategoryNameMessages = {
+export const CategoryNameMessages: I18nMessages = {
     REGISTRY_SCRIPT: i18n.audit.registryScript,
     REGISTRY_DIRECTORY: i18n.audit.registryDirectory,
     LISTENER: i18n.audit.listener,

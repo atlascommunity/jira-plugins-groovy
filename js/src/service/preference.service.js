@@ -1,9 +1,11 @@
+//@flow
+
 export class PreferenceService {
-    get(key) {
+    get(key: string): ?string {
         return localStorage.getItem(key);
     }
 
-    put(key, value) {
+    put(key: string, value: string) {
         try {
             localStorage.setItem(key, value);
         } catch (e) {
@@ -11,7 +13,7 @@ export class PreferenceService {
         }
     }
 
-    remove(key) {
+    remove(key: string) {
         localStorage.removeItem(key);
     }
 }

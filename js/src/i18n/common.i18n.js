@@ -1,8 +1,11 @@
+//@flow
 // eslint-disable-next-line import/no-extraneous-dependencies
 import i18n from 'external-i18n';
 
+import type {I18nMessages} from '../common/types';
 
-export const FieldMessages = {
+
+export const FieldMessages: I18nMessages = {
     name: i18n.fields.name,
     scriptCode: i18n.fields.scriptCode,
     comment: i18n.fields.comment,
@@ -29,7 +32,7 @@ export const FieldMessages = {
     issue: i18n.fields.issue
 };
 
-export const CommonMessages = {
+export const CommonMessages: I18nMessages = {
     loading: i18n.common.loading,
     completed: i18n.common.completed,
     update: i18n.common.update,
@@ -61,23 +64,23 @@ export const CommonMessages = {
     issuesFound: i18n.common.issuesFound
 };
 
-export const DialogMessages = {
+export const DialogMessages: I18nMessages = {
     notReady: i18n.dialog.notReady
 };
 
-export const ErrorMessages = {
+export const ErrorMessages: I18nMessages = {
     noValue: i18n.error.noValue,
     notConfigured: i18n.error.notConfigured,
     errorOccurred: i18n.error.errorOccurred,
     incorrectConfigId: i18n.error.incorrectConfigId
 };
 
-export const JiraMessages = {
+export const JiraMessages: I18nMessages = {
     configure: i18n.jira.configure,
     edit: i18n.jira.edit
 };
 
-export const TitleMessages = {
+export const TitleMessages: I18nMessages = {
     console: i18n.titles.console,
     registry: i18n.titles.registry,
     listeners: i18n.titles.listeners,

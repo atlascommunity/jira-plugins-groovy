@@ -8,3 +8,7 @@ declare module 'ajs' {
         $: JQuery
     };
 }
+
+declare module 'external-i18n' {
+    declare module.exports: any;
+}

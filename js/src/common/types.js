@@ -14,3 +14,5 @@ export type ErrorType = {
 };
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
+export type I18nMessages = {[string]: string};

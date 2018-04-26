@@ -89,7 +89,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         }
 
         const value = !this.state.isLight;
-        preferenceService.put('ru.mail.groovy.isLight', value);
+        preferenceService.put('ru.mail.groovy.isLight', value.toString());
         this.setState({
             isLight: value
         });

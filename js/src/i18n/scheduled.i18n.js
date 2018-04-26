@@ -1,8 +1,11 @@
+//@flow
 // eslint-disable-next-line import/no-extraneous-dependencies
 import i18n from 'external-i18n';
 
+import type {I18nMessages} from '../common/types';
 
-export const ScheduledTaskMessages = {
+
+export const ScheduledTaskMessages: I18nMessages = {
     noTasks: i18n.scheduled.noTasks,
     addTask: i18n.scheduled.addTask,
     editTask: i18n.scheduled.editTask,
