@@ -1,12 +1,16 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 
 import './FieldError.less';
 
 
-export function FieldError({error}) {
+type FieldErrorProps = {
+    error: React.Node
+};
+
+export function FieldError({error}: FieldErrorProps): React.Node {
     return (
         <div className="FieldError">
             <ErrorIcon label="error icon" role="presentation" />
@@ -14,7 +18,3 @@ export function FieldError({error}) {
         </div>
     );
 }
-
-FieldError.propTypes = {
-    error: PropTypes.node.isRequired
-};

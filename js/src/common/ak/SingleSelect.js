@@ -1,25 +1,20 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import {Label} from '@atlaskit/field-base';
-
 import Select from '@atlaskit/select';
 
+import type {OldSelectItem} from './types';
 
-export class SingleSelect extends React.Component {
-    static propTypes = {
-        label: PropTypes.string.isRequired,
-        isRequired: PropTypes.bool,
-        isLabelHidden: PropTypes.bool,
-        value: PropTypes.any,
-        onChange: PropTypes.func,
-        options: PropTypes.arrayOf(PropTypes.shape({
-            value: PropTypes.any.isRequired,
-            label: PropTypes.string.isRequired
-        })).isRequired
-    };
+import type {FieldProps, MutableFieldProps} from '../types';
 
-    render() {
+
+type SingleSelectProps = FieldProps & MutableFieldProps<OldSelectItem> & {
+    options: Array<OldSelectItem>
+}
+
+export class SingleSelect extends React.Component<SingleSelectProps> {
+    render(): React.Node {
         const {label, isRequired, isLabelHidden, options, value, onChange, ...props} = this.props;
 
         return (

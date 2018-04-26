@@ -1,12 +1,18 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import Select from '@atlaskit/select';
 import SelectWrapper from '@atlaskit/select/dist/esm/SelectWrapper';
 import {Label} from '@atlaskit/field-base';
 
+import type {OldSelectItem, OldSelectValue} from './types';
 
-function getLookupMap(items) {
+import type {FieldProps, LoadableFieldProps, MutableFieldProps} from '../types';
+
+
+type LookupMapType = Map<OldSelectValue, OldSelectItem>;
+
+function getLookupMap(items: Array<OldSelectItem>): LookupMapType {
     const lookupMap = new Map();
     for (const item of items) {
         lookupMap.set(item.value, item);
@@ -15,38 +21,21 @@ function getLookupMap(items) {
     return lookupMap;
 }
 
-const ValueType = PropTypes.oneOfType([
-    PropTypes.number.isRequired,
-    PropTypes.string.isRequired
-]);
+let i: number = 0;
 
-let i = 0;
+type MultiSelectProps = FieldProps & LoadableFieldProps & MutableFieldProps<Array<OldSelectValue>> & {
+    items: Array<OldSelectItem>,
+};
 
-export class MultiSelect extends React.Component {
-    static propTypes = {
-        label: PropTypes.string.isRequired,
+type MultiSelectState = {
+    lookupMap: LookupMapType
+}
 
-        isRequired: PropTypes.bool,
-        isLoading: PropTypes.bool,
-
-        isInvalid: PropTypes.bool,
-        invalidMessage: PropTypes.string,
-
-        value: PropTypes.arrayOf(ValueType.isRequired).isRequired,
-        items: PropTypes.arrayOf(
-            PropTypes.shape({
-                value: ValueType.isRequired,
-                label: PropTypes.string.isRequired
-            }).isRequired
-        ),
-
-        onChange: PropTypes.func.isRequired
-    };
-
+export class MultiSelect extends React.Component<MultiSelectProps, MultiSelectState> {
     i = i++;
 
-    _onChange = (val) => {
-        let newVal = [];
+    _onChange = (val: Array<OldSelectItem>) => {
+        let newVal: Array<OldSelectValue> = [];
 
         if (val) {
             newVal = val.map(item => item.value);
@@ -55,22 +44,21 @@ export class MultiSelect extends React.Component {
         this.props.onChange(newVal);
     };
 
-    constructor(props) {
+    constructor(props: MultiSelectProps) {
         super(props);
 
         this.state = {
-            lookupMap: getLookupMap(props.items),
-            isOpen: false
+            lookupMap: getLookupMap(props.items)
         };
     }
 
-    componentWillReceiveProps(props) {
+    componentWillReceiveProps(props: MultiSelectProps) {
         this.setState({
             lookupMap: getLookupMap(props.items)
         });
     }
 
-    render() {
+    render(): React.Node {
         const {isInvalid, invalidMessage} = this.props;
         const {lookupMap} = this.state;
 
@@ -83,8 +71,8 @@ export class MultiSelect extends React.Component {
                 <SelectWrapper
                     id={`multi-select-${this.i}`}
 
-                    validationState={isInvalid && 'error'}
-                    validationMessage={isInvalid && invalidMessage}
+                    validationState={isInvalid ? 'error' : 'default'}
+                    validationMessage={isInvalid ? invalidMessage : undefined}
                 >
                     <Select
                         shouldFitContainer={true}

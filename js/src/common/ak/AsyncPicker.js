@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import Select from '@atlaskit/select';
 import SelectWrapper from '@atlaskit/select/dist/esm/SelectWrapper';
@@ -9,9 +9,10 @@ import {Label} from '@atlaskit/field-base';
 import {components} from 'react-select';
 
 import {ajaxGet} from '../../service/ajaxHelper';
+import type {OptMutableFieldProps, FieldProps, FormFieldProps} from '../types';
 
 
-function ValueImpl({data, children}) {
+function ValueImpl({data, children}: any): React.Node {
     return (
         <div className="flex-row">
             {data.imgSrc && <Avatar size="xsmall" src={data.imgSrc}/>}
@@ -22,7 +23,7 @@ function ValueImpl({data, children}) {
     );
 }
 
-function OptionImpl({data, children, ...props}) {
+function OptionImpl({data, children, ...props}: any): React.Node {
     return (
         <components.Option
             {...props}
@@ -32,7 +33,7 @@ function OptionImpl({data, children, ...props}) {
     );
 }
 
-function SingleValueImpl({data, children, ...props}) {
+function SingleValueImpl({data, children, ...props}: any): React.Node {
     return (
         <components.SingleValue {...props}>
             {props.in && <ValueImpl data={data}>{children}</ValueImpl>}
@@ -40,31 +41,33 @@ function SingleValueImpl({data, children, ...props}) {
     );
 }
 
-let i = 0;
+let i: number = 0;
 
-const valueShape = PropTypes.shape({
-    value: PropTypes.any.isRequired,
-    label: PropTypes.string.isRequired,
-    imgSrc: PropTypes.string
-});
+type SingleValueType = {
+    value: any,
+    label: string,
+    imgSrc?: string
+}
 
-export class AsyncPicker extends React.Component {
-    static propTypes = {
-        src: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
-        name: PropTypes.string,
-        onChange: PropTypes.func,
-        value: PropTypes.oneOfType([
-            valueShape,
-            PropTypes.arrayOf(valueShape.isRequired)
-        ]),
-        isMulti: PropTypes.bool,
-        isLabelHidden: PropTypes.bool,
-        isRequired: PropTypes.bool,
-        isInvalid: PropTypes.bool,
-        invalidMessage: PropTypes.string
-    };
+type ValueType = SingleValueType | Array<SingleValueType>;
 
+type AsyncPickerProps = FieldProps & OptMutableFieldProps<ValueType> & FormFieldProps & {
+    src: string,
+    isMulti?: boolean
+};
+
+type DataType = {
+    complete: boolean,
+    options: Array<ValueType>
+};
+
+type AsyncPickerState = {
+    filter: string,
+    data: DataType,
+    fetching: ?boolean
+};
+
+export class AsyncPicker extends React.Component<AsyncPickerProps, AsyncPickerState> {
     i = i++;
 
     state = {
@@ -78,16 +81,16 @@ export class AsyncPicker extends React.Component {
 
     reqId = 0;
 
-    _getOptions = (filter) => {
+    _getOptions = (filter: string) => {
         const reqId = ++this.reqId;
 
-        let needsFetching = !this.state.data.complete;
-        this.setState({ fetching: needsFetching && this.reqId, filter });
+        let needsFetching: boolean = !this.state.data.complete;
+        this.setState({ fetching: needsFetching && !!this.reqId, filter });
 
         if (needsFetching) {
-            return ajaxGet(this.props.src + (filter ? `?q=${filter}` : ''))
-                .then(data => {
-                    this.setState(state => {
+            ajaxGet(this.props.src + (filter ? `?q=${filter}` : ''))
+                .then((data: DataType) => {
+                    this.setState((state: AsyncPickerState): any => {
                         if (reqId === state.fetching) {
                             return {
                                 data,
@@ -100,23 +103,28 @@ export class AsyncPicker extends React.Component {
         }
     };
 
-    _onFilterChange = (filter) => {
+    _onFilterChange = (filter: string) => {
         this._getOptions(filter);
     };
 
     componentDidMount() {
         const {value} = this.props;
 
-        this._getOptions(value ? value.label : '');
-    }
-
-    componentWillReceiveProps(props) {
-        if (this.props.value !== props.value) {
-            this._getOptions(props.value ? props.value.label : '');
+        if (!Array.isArray(value)) {
+            this._getOptions(value ? value.label : '');
         }
     }
 
-    render() {
+    componentWillReceiveProps(props: AsyncPickerProps) {
+        const value = props.value;
+        if (this.props.value !== value) {
+            if (!Array.isArray(value)) {
+                this._getOptions(value ? value.label : '');
+            }
+        }
+    }
+
+    render(): React.Node {
         const {label, isRequired, isLabelHidden, isInvalid, invalidMessage} = this.props;
         const {fetching, data} = this.state;
 
@@ -127,8 +135,8 @@ export class AsyncPicker extends React.Component {
                 <SelectWrapper
                     id={`async-picker-${this.i}`}
 
-                    validationState={isInvalid && 'error'}
-                    validationMessage={isInvalid && invalidMessage}
+                    validationState={isInvalid ? 'error' : 'default'}
+                    validationMessage={isInvalid ? invalidMessage : undefined}
                 >
                     <Select
                         {...this.props}
@@ -136,7 +144,6 @@ export class AsyncPicker extends React.Component {
 
                         hasAutocomplete={true}
                         onInputChange={this._onFilterChange}
-                        optionRenderer={this._renderOption}
 
                         isLoading={!!fetching}
                         options={data.options}

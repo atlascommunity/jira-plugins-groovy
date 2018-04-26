@@ -1,12 +1,21 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import {MultiSelect} from './MultiSelect';
 
+import type {OldSelectItem, OldSelectValue} from './types';
 
-function mapOption(option) {
-    if (option.content && option.value) {
-        return option;
+import type {FieldProps, MutableFieldProps} from '../types';
+
+
+type LoaderOptionType = {
+    value: string,
+    name: string
+}
+
+function mapOption(option: any): OldSelectItem {
+    if (option.label && option.value) {
+        return (option: OldSelectItem);
     }
     return {
         value: option.value,
@@ -14,17 +23,16 @@ function mapOption(option) {
     };
 }
 
-export class AsyncLoadingMultiSelect extends React.Component {
-    static propTypes = {
-        label: PropTypes.string.isRequired,
+type AsyncLoadingMultiSelectProps = FieldProps & MutableFieldProps<Array<OldSelectValue>> & {
+    loader: () => Promise<Array<LoaderOptionType>>
+}
 
-        isRequired: PropTypes.bool,
+type AsyncLoadingMultiSelectState = {
+    ready: boolean,
+    options: Array<OldSelectItem>
+}
 
-        value: PropTypes.arrayOf(PropTypes.number).isRequired,
-        onChange: PropTypes.func.isRequired,
-        loader: PropTypes.func.isRequired
-    };
-
+export class AsyncLoadingMultiSelect extends React.Component<AsyncLoadingMultiSelectProps, AsyncLoadingMultiSelectState> {
     state = {
         options: [],
         ready: false
@@ -35,7 +43,7 @@ export class AsyncLoadingMultiSelect extends React.Component {
 
         this.props
             .loader()
-            .then(options => {
+            .then((options: Array<LoaderOptionType>) => {
                 this.setState({
                     ready: true,
                     options: options.map(mapOption)
@@ -43,7 +51,7 @@ export class AsyncLoadingMultiSelect extends React.Component {
             });
     }
 
-    render() {
+    render(): React.Node {
         return <MultiSelect
             label={this.props.label}
             isRequired={this.props.isRequired}
