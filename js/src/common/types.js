@@ -1,5 +1,16 @@
 //@flow
 
+export type ScriptError = {
+    message: string
+};
+
+export type SyntaxError = ScriptError & {
+    startLine: number,
+    endLine: number,
+    startColumn: number,
+    endColumn: number
+};
+
 export type VoidCallback = () => void;
 
 export type ErrorDataType = {
