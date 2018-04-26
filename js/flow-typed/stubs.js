@@ -12,3 +12,7 @@ declare module 'ajs' {
 declare module 'external-i18n' {
     declare module.exports: any;
 }
+
+declare module 'extDefine' {
+    declare module.exports: any; //todo
+}

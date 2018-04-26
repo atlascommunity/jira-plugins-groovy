@@ -1,4 +1,5 @@
-import React from 'react';
+//@flow
+import * as React from 'react';
 import ReactDOM from 'react-dom';
 
 import Avatar from '@atlaskit/avatar';
@@ -8,8 +9,10 @@ import define from 'extDefine';
 
 import {FormEditor} from './FormEditor';
 import {RegistryPicker} from './RegistryPicker';
+import type {ParamType, ScriptType} from './types';
 
 import Script, {ScriptParameters} from '../common/script';
+import type {ScriptParam} from '../common/script/ScriptParameters';
 
 import {ErrorMessages} from '../i18n/common.i18n';
 
@@ -17,7 +20,12 @@ import '../flex.less';
 import './workflow.less';
 
 
-function ScriptParamValue({value, param}) {
+export type ScriptParamValueProps = {
+    value: any,
+    param: ParamType
+};
+
+function ScriptParamValue({value, param}: ScriptParamValueProps): React.Node {
     if (value === null || value === undefined) {
         return <strong style={{color: 'red'}}>{ErrorMessages.noValue}</strong>;
     }
@@ -41,8 +49,8 @@ function ScriptParamValue({value, param}) {
     }
 }
 
-define('mailru/groovy/renderRegistryScript', () => {
-    return (element, id, name, source, errorCount, params, paramValues) => {
+define('mailru/groovy/renderRegistryScript', (): any => {
+    return (element: Element, id: number, name: string, source: string, errorCount?: number, params: Array<ParamType>, paramValues: {[string]: any}) => {
         ReactDOM.render(
             <Script
                 withChangelog={false}
@@ -56,7 +64,7 @@ define('mailru/groovy/renderRegistryScript', () => {
             >
                 {params &&
                     <ScriptParameters
-                        params={params.map(param => {
+                        params={params.map((param: ParamType): ScriptParam => {
                             return {
                                 label: param.displayName,
                                 value: <ScriptParamValue value={paramValues[param.name]} param={param}/>
@@ -70,8 +78,8 @@ define('mailru/groovy/renderRegistryScript', () => {
     };
 });
 
-define('mailru/groovy/renderInlineScript', () => {
-    return (element, id, name, source, errorCount) => {
+define('mailru/groovy/renderInlineScript', (): any => {
+    return (element: Element, id: string, name: string, source: string, errorCount?: number) => {
         ReactDOM.render(
             <Script
                 withChangelog={false}
@@ -91,8 +99,8 @@ define('mailru/groovy/renderInlineScript', () => {
     };
 });
 
-define('mailru/groovy/renderEditor', () => {
-    return (element, fieldName, initialValue) => {
+define('mailru/groovy/renderEditor', (): any => {
+    return (element: Element, fieldName: string, initialValue: ?string) => {
         ReactDOM.render(
             <FormEditor fieldName={fieldName} initialValue={initialValue}/>,
             element
@@ -100,8 +108,8 @@ define('mailru/groovy/renderEditor', () => {
     };
 });
 
-define('mailru/groovy/renderRegistryPicker', () => {
-    return (element, fieldName, type, scriptId, values) => {
+define('mailru/groovy/renderRegistryPicker', (): any => {
+    return (element: Element, fieldName: string, type: ScriptType, scriptId: ?number, values: {[string]: any}) => {
         ReactDOM.render(
             <RegistryPicker type={type} scriptId={scriptId} values={values} fieldName={fieldName}/>,
             element

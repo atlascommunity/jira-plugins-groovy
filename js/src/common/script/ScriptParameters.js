@@ -4,7 +4,7 @@ import * as React from 'react';
 import {Label} from '@atlaskit/field-base';
 
 
-type ScriptParam = {
+export type ScriptParam = {
     label: string,
     value: React.Node
 }

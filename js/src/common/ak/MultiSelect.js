@@ -59,7 +59,7 @@ export class MultiSelect extends React.Component<MultiSelectProps, MultiSelectSt
     }
 
     render(): React.Node {
-        const {isInvalid, invalidMessage} = this.props;
+        const {isInvalid, invalidMessage, value} = this.props;
         const {lookupMap} = this.state;
 
         return (
@@ -81,7 +81,7 @@ export class MultiSelect extends React.Component<MultiSelectProps, MultiSelectSt
                         isLoading={this.props.isLoading}
                         options={this.props.items}
 
-                        value={this.props.value.map(key => lookupMap.get(key)).filter(e => e)}
+                        value={value ? value.map(key => lookupMap.get(key)).filter(e => e) : []}
                         onChange={this._onChange}
                     />
                 </SelectWrapper>

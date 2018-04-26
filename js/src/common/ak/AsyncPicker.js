@@ -8,6 +8,8 @@ import {Label} from '@atlaskit/field-base';
 
 import {components} from 'react-select';
 
+import type {SingleValueType} from './types';
+
 import {ajaxGet} from '../../service/ajaxHelper';
 import type {OptMutableFieldProps, FieldProps, FormFieldProps} from '../types';
 
@@ -42,12 +44,6 @@ function SingleValueImpl({data, children, ...props}: any): React.Node {
 }
 
 let i: number = 0;
-
-type SingleValueType = {
-    value: any,
-    label: string,
-    imgSrc?: string
-}
 
 type ValueType = SingleValueType | Array<SingleValueType>;
 

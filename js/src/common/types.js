@@ -16,13 +16,13 @@ export type LoadableFieldProps = {
 }
 
 export type MutableFieldProps<T> = {
-    value: T,
-    onChange: (T) => void
+    value: ?T,
+    onChange: (?T) => void
 }
 
 export type OptMutableFieldProps<T> = {
-    value?: T,
-    onChange?: (T) => void
+    value?: ?T,
+    onChange?: (?T) => void
 }
 
 export type FormFieldProps = {

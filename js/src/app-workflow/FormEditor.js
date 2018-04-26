@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
@@ -8,19 +8,23 @@ import {CommonMessages} from '../i18n/common.i18n';
 
 const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
 
-export class FormEditor extends React.Component {
-    static propTypes = {
-        initialValue: PropTypes.string,
-        fieldName: PropTypes.string.isRequired
-    };
+type FormEditorProps = {
+    initialValue: ?string,
+    fieldName: string
+};
 
+type FormEditorState = {
+    value: string
+}
+
+export class FormEditor extends React.Component<FormEditorProps, FormEditorState> {
     state = {
-        value: this.props.initialValue
+        value: this.props.initialValue || ''
     };
 
-    _setValue = (value) => this.setState({ value });
+    _setValue = (value: ?string) => this.setState({ value: value || '' });
 
-    render() {
+    render(): React.Node {
         return <div>
             <EditorField
                 label={CommonMessages.script}

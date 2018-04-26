@@ -1,31 +1,54 @@
-import React from 'react';
+//@flow
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import {Map} from 'immutable';
+import type {Map as MapType} from 'immutable';
 
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import {ToggleStateless} from '@atlaskit/toggle';
 import {Label} from '@atlaskit/field-base';
 
+import type {ScriptType, ParamType, ScriptDescriptionType} from './types';
+
 import {registryService} from '../service/services';
 import {SingleSelect} from '../common/ak/SingleSelect';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {CommonMessages} from '../i18n/common.i18n';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
+import type {OldSelectItem} from '../common/ak/types';
 
 
-function mapScriptToOption(script) {
-    if (!script) {
-        return null;
-    }
+function mapScriptToOption(script: ScriptDescriptionType): OldSelectItem {
     return {
         value: script.id,
         label: script.name
     };
 }
 
-export class RegistryPicker extends React.Component {
+function mapScriptToOptionNullable(script: ?ScriptDescriptionType): ?OldSelectItem {
+    if (!script) {
+        return null;
+    }
+    return mapScriptToOption(script);
+}
+
+type RegistryPickerProps = {
+    type: ScriptType,
+    fieldName: string,
+    values: ?{[string]: any},
+    scriptId: ?number
+};
+
+type RegistryPickerState = {
+    scripts: Array<ScriptDescriptionType>,
+    script: ?ScriptDescriptionType,
+    values: MapType<string, any>,
+    ready: boolean
+};
+
+export class RegistryPicker extends React.Component<RegistryPickerProps, RegistryPickerState> {
     static propTypes = {
         type: PropTypes.string.isRequired,
         values: PropTypes.object,
@@ -33,26 +56,38 @@ export class RegistryPicker extends React.Component {
         fieldName: PropTypes.string
     };
 
-    _onChange = (value) => {
-        this.setState({
-            script: value ? this.state.scripts.find(el => el.id === value.value) : null
-        });
+    _onChange = (value: ?OldSelectItem) => {
+        if (value) {
+            this.setState({
+                //$FlowFixMe
+                script: this.state.scripts.find(el => el.id === value.value)
+            });
+        } else {
+            this.setState({ script: null });
+        }
     };
 
-    _setInputValue = (field) => (e) => this._mutateValue(field, e.target.value);
+    _setInputValue = (field: string) => (e: SyntheticEvent<any>) => {
+        //$FlowFixMe
+        this._mutateValue(field, e.target.value);
+    };
 
-    _setValue = (field) => (value) => this._mutateValue(field, value);
+    _setValue = (field: string) => (value: any) => this._mutateValue(field, value);
 
-    _setToggleValue = (field) => (event) => this._mutateValue(field, event.target.checked);
+    _setToggleValue = (field: string) => (e: Event) => {
+        //$FlowFixMe
+        this._mutateValue(field, e.target.checked);
+    };
 
-    _mutateValue = (field, value) => this.setState((state) => {
+    _mutateValue = (field: string, value: any) => this.setState((state: RegistryPickerState): any => {
         return {
             values: state.values.set(field, value)
         };
     });
 
-    _renderParam(param, label) {
+    _renderParam(param: ParamType, label: string): React.Node {
         const {values} = this.state;
+
         const {fieldName} = this.props;
         const paramName = param.name;
         const inputName = `${fieldName}-${paramName}`;
@@ -153,7 +188,9 @@ export class RegistryPicker extends React.Component {
 
     state = {
         ready: false,
-        scripts: []
+        script: null,
+        scripts: [],
+        values: new Map()
     };
 
     componentDidMount() {
@@ -163,15 +200,16 @@ export class RegistryPicker extends React.Component {
                 this.setState({
                     scripts,
                     ready: true,
+                    //$FlowFixMe
                     values: new Map(this.props.values),
                     script: this.props.scriptId ? scripts.find(el => el.id === this.props.scriptId) : null
                 }));
     }
 
-    render() {
+    render(): React.Node {
         const {ready, scripts, script} = this.state;
 
-        if (!ready) {
+        if (!ready && !scripts) {
             return <span className="aui-icon aui-icon-wait"/>;
         }
 
@@ -179,7 +217,7 @@ export class RegistryPicker extends React.Component {
             <SingleSelect
                 options={scripts.map(mapScriptToOption)}
                 onChange={this._onChange}
-                value={mapScriptToOption(script)}
+                value={mapScriptToOptionNullable(script)}
 
                 name={this.props.fieldName}
 
