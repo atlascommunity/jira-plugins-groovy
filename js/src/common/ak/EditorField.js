@@ -4,16 +4,15 @@ import * as React from 'react';
 import Base, {Label} from '@atlaskit/field-base';
 
 import type {BindingType, MarkerType} from '../editor/types';
+import type {FieldProps} from '../types';
 
 import Editor from '../editor';
 
 import './EditorField.less';
 
 
-type EditorFieldProps = {
-    label: string,
+type EditorFieldProps = FieldProps & {
     mode: string,
-    isLabelHidden?: boolean,
 
     value: string,
     onChange: (string) => void,
@@ -21,12 +20,6 @@ type EditorFieldProps = {
     markers?: Array<MarkerType>,
     bindings?: Array<BindingType>,
     resizable?: boolean,
-
-    isInvalid?: boolean,
-    invalidMessage?: string,
-
-    isRequired?: boolean,
-    isDisabled?: boolean
 }
 
 export class EditorField extends React.Component<EditorFieldProps> {

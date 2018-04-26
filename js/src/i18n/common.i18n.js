@@ -2,7 +2,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import i18n from 'external-i18n';
 
-import type {I18nMessages} from '../common/types';
+import type {I18nMessages, I18nFunction} from '../common/types';
 
 
 export const FieldMessages: I18nMessages = {
@@ -32,7 +32,7 @@ export const FieldMessages: I18nMessages = {
     issue: i18n.fields.issue
 };
 
-export const CommonMessages: I18nMessages = {
+export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction }) = {
     loading: i18n.common.loading,
     completed: i18n.common.completed,
     update: i18n.common.update,

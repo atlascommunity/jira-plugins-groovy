@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import debounce from 'lodash.debounce';
 
@@ -12,23 +12,20 @@ import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
 import {jiraService} from '../../service/services';
 import {CommonMessages} from '../../i18n/common.i18n';
 
+import type {FieldProps, ErrorType, MutableTextFieldProps} from '../types';
+import type {ValidationResult} from '../../service/jira.service';
 
-export class JqlInput extends React.Component {
-    static propTypes = {
-        label: PropTypes.string.isRequired,
-        value: PropTypes.string.isRequired,
-        onChange: PropTypes.func.isRequired,
-        isRequired: PropTypes.bool,
-        isInvalid: PropTypes.bool,
-        invalidMessage: PropTypes.string
-    };
 
-    componentDidMount() {
-        jiraService
-            .getAutoCompleteData()
-            .then(this._initAutoComplete);
-    }
+type JqlInputProps = FieldProps & MutableTextFieldProps<string, HTMLTextAreaElement>;
 
+type JqlInputState = {
+    validating: boolean,
+    isInvalid: ?boolean,
+    invalidMessage: ?React.Node,
+    issues: ?number
+};
+
+export class JqlInput extends React.Component<JqlInputProps, JqlInputState> {
     state = {
         validating: false,
         isInvalid: null,
@@ -36,7 +33,7 @@ export class JqlInput extends React.Component {
         issues: null
     };
 
-    _validate = (query) => {
+    _validate = (query: string) => {
         //todo: track requestId
 
         this.setState({
@@ -45,7 +42,7 @@ export class JqlInput extends React.Component {
 
         jiraService
             .validateQuery(query)
-            .then(data => {
+            .then((data: ValidationResult) => {
                 this.setState({
                     validating: false,
                     isInvalid: false,
@@ -53,40 +50,46 @@ export class JqlInput extends React.Component {
                     issues: data.total
                 });
             })
-            .catch(({response}) => {
-                this.setState({
-                    validating: false,
-                    isInvalid: true,
-                    invalidMessage: <div className="flex flex-column">
-                        {response.data.errorMessages.map((message, i) => <div key={i}>{message}</div>)}
-                    </div>,
-                    issues: null
-                });
+            .catch(({response}: ErrorType) => {
+                if (response.data) {
+                    this.setState({
+                        validating: false,
+                        isInvalid: true,
+                        invalidMessage: (
+                            <div className="flex flex-column">
+                                {response.data.errorMessages.map((message, i) =>
+                                    <div key={i}>{message}</div>)
+                                }
+                            </div>
+                        ),
+                        issues: null
+                    });
+                }
             });
     };
 
     _debouncedValidate = debounce(this._validate, 500, { maxWait: 5000 });
 
-    constructor(props) {
+    constructor(props: JqlInputProps) {
         super(props);
 
         this._debouncedValidate(props.value);
     }
 
-    componentWillReceiveProps(props) {
+    componentWillReceiveProps(props: JqlInputProps) {
         if (props.value !== this.props.value) {
             this._debouncedValidate(props.value);
         }
     }
 
-    render() {
+    render(): React.Node {
         const {value, onChange, isInvalid, invalidMessage, ...props} = this.props;
         const {issues, validating} = this.state;
 
-        let invalid = isInvalid;
-        let invalidMsg = invalidMessage;
+        let invalid: boolean = isInvalid || false;
+        let invalidMsg: ?React.Node = invalidMessage;
 
-        if (this.state.isInvalid !== null) {
+        if (this.state.isInvalid !== null && this.state.isInvalid !== undefined) {
             invalid = this.state.isInvalid;
             invalidMsg = this.state.invalidMessage;
         }
@@ -108,10 +111,10 @@ export class JqlInput extends React.Component {
                         {' '}{CommonMessages.validating}
                     </div>
                 }
-                {issues !== null &&
+                {!!issues &&
                     <div className="ak-description">
                         <CheckCircleIcon size="small" label="" primaryColor={colors.G500}/>
-                        {' '}{CommonMessages.issuesFound(issues)}
+                        {' '}{CommonMessages.issuesFound(issues.toString())}
                     </div>
                 }
             </div>

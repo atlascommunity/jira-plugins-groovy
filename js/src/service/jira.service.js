@@ -1,20 +1,21 @@
+//@flow
 import {ajaxGet, ajaxPost, getBaseUrl, getPluginBaseUrl} from './ajaxHelper';
 
 
+export type ValidationResult = {
+    total: number
+}
+
 export class JiraService {
-    getAllProjects() {
+    getAllProjects(): any { //todo
         return ajaxGet(`${getBaseUrl()}/rest/api/2/project`);
     }
 
-    getEventTypes() {
+    getEventTypes(): any { //todo
         return ajaxGet(`${getPluginBaseUrl()}/jira-api/eventType`);
     }
 
-    getAutoCompleteData() {
-        return ajaxGet(`${getBaseUrl()}/rest/api/2/jql/autocompletedata`);
-    }
-
-    validateQuery(query) {
+    validateQuery(query: string): Promise<ValidationResult> {
         return ajaxPost(
             `${getBaseUrl()}/rest/api/2/search`,
             {
