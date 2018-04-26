@@ -1,5 +1,5 @@
 //@flow
-import React from 'react';
+import * as React from 'react';
 
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 import EditorSuccessIcon from '@atlaskit/icon/glyph/editor/success';
@@ -29,11 +29,11 @@ export class ExecutionBar extends React.Component<ExecutionBarProps, ExecutionBa
         displayedExecution: null
     };
 
-    _showExecution = (execution : ExecutionType) => () => this.setState({ displayedExecution: execution });
+    _showExecution = (execution: ExecutionType) => () => this.setState({ displayedExecution: execution });
 
     _hideExecution = () => this.setState({ displayedExecution: null });
 
-    render() {
+    render(): React.Node {
         const {displayedExecution} = this.state;
 
         return (
@@ -53,7 +53,7 @@ type ExecutionItemProps = {
 }
 
 class ExecutionItem extends React.Component<ExecutionItemProps> {
-    render() {
+    render(): React.Node {
         const execution = this.props.execution;
         const params = execution.extraParams || {};
 

@@ -34,7 +34,7 @@ export class EditorField extends React.Component<EditorFieldProps> {
         mode: 'groovy'
     };
 
-    _decorateEditor = (editor : React.Node) : React.Node => {
+    _decorateEditor = (editor: Editor): React.Node => {
         const {isInvalid, invalidMessage, isRequired, isDisabled} = this.props;
 
         return (
@@ -51,7 +51,7 @@ export class EditorField extends React.Component<EditorFieldProps> {
         );
     };
 
-    render() {
+    render(): React.Node {
         const {label, isRequired, isLabelHidden, ...props} = this.props;
 
         return (

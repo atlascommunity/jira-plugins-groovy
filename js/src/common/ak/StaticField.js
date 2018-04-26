@@ -1,12 +1,18 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+
+import * as React from 'react';
 
 import {Label} from '@atlaskit/field-base';
 
 import {StaticFieldValue} from '../StaticField';
 
 
-export function StaticField({label, children}) {
+type StaticFieldProps = {
+    label: string,
+    children: React.Node
+};
+
+export function StaticField({label, children}: StaticFieldProps): React.Node {
     return (
         <div>
             <Label label={label}/>
@@ -16,8 +22,3 @@ export function StaticField({label, children}) {
         </div>
     );
 }
-
-StaticField.propTypes = {
-    label: PropTypes.string.isRequired,
-    children: PropTypes.any.isRequired
-};

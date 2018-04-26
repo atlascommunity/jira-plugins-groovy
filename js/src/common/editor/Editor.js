@@ -25,7 +25,7 @@ import {CommonMessages} from '../../i18n/common.i18n';
 import './Editor.less';
 
 
-function isLight() : boolean {
+function isLight(): boolean {
     return !(preferenceService.get('ru.mail.groovy.isLight') === 'false');
 }
 
@@ -36,6 +36,20 @@ type CodeMirrorType = {
 type ResizeCallbackData = {
     node: HTMLElement,
     size: {width: number, height: number}
+};
+
+type CodeMirrorOptions = any;
+
+type EditorPosition = {
+    line: number,
+    ch: number
+};
+
+type AnnotationType = {
+    message: string,
+    severity: string,
+    from: EditorPosition,
+    to: EditorPosition
 };
 
 type EditorProps = {
@@ -67,9 +81,9 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         height: 300
     };
 
-    _setEditor = (editor : CodeMirrorType) => this.cm = editor;
+    _setEditor = (editor: CodeMirrorType) => this.cm = editor;
 
-    _switchTheme = (e : SyntheticEvent<any>) => {
+    _switchTheme = (e: SyntheticEvent<any>) => {
         if (e) {
             e.preventDefault();
         }
@@ -81,23 +95,25 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         });
     };
 
-    _onChange = (_editor:any, _data:any, value:string) => {
+    _onChange = (_editor: CodeMirrorType, _data: any, value: string) => {
         if (this.props.onChange) {
             this.props.onChange(value);
         }
     };
 
-    _getAnnotations = () => {
+    _getAnnotations = (): Array<AnnotationType> => {
         const markers = this.props.markers;
         if (markers) {
-            return markers.map(marker => {
-                return {
-                    message: marker.message,
-                    severity: 'error',
-                    from: {line: marker.startRow, ch: marker.startCol},
-                    to: {line: marker.endRow, ch: marker.endCol}
-                };
-            });
+            return markers.map(
+                (marker: MarkerType): AnnotationType => {
+                    return {
+                        message: marker.message,
+                        severity: 'error',
+                        from: {line: marker.startRow, ch: marker.startCol},
+                        to: {line: marker.endRow, ch: marker.endCol}
+                    };
+                }
+            );
         }
         return [];
     };
@@ -107,7 +123,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         this.setState({height: size.height});
     };
 
-    componentDidUpdate(_prevProps : EditorProps, prevState : EditorState) {
+    componentDidUpdate(_prevProps: EditorProps, prevState: EditorState) {
         if (prevState.height !== this.state.height) {
             if (this.cm) {
                 this.cm.setSize(undefined, this.state.height);
@@ -116,7 +132,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
     }
 
     _getOptions = memoizeOne(
-        (readOnly?: boolean, isDisabled?: boolean, mode?: string, isLight: boolean) => {
+        (readOnly?: boolean, isDisabled?: boolean, mode?: string, isLight: boolean): CodeMirrorOptions => {
             return {
                 theme: isLight ? 'eclipse' : 'lesser-dark',
                 mode: mode,
@@ -133,13 +149,13 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         }
     );
 
-    render() {
+    render(): React.Node {
         const {onChange, value, bindings, decorated, resizable, decorator, readOnly, isDisabled, mode} = this.props;
         const {isLight} = this.state;
 
         const options = this._getOptions(readOnly, isDisabled, mode, isLight);
 
-        let el = <CodeMirror
+        let el: React.Node = <CodeMirror
             options={options}
 
             onBeforeChange={onChange && this._onChange}
@@ -197,7 +213,7 @@ type BindingProps = {
     binding: BindingType
 }
 
-function Binding({binding} : BindingProps) : React.Node {
+function Binding({binding}: BindingProps): React.Node {
     return (
         <div className="flex-row">
             <div className="flex-none">{binding.name}</div>

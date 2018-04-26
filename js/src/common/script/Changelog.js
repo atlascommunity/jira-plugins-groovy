@@ -21,7 +21,7 @@ type ChangelogProps = {
     switchToChangelog: (ChangelogType) => () => void
 };
 
-export function Changelog({changelogs, switchToCurrent, switchToChangelog} : ChangelogProps) : React.Node {
+export function Changelog({changelogs, switchToCurrent, switchToChangelog}: ChangelogProps): React.Node {
     return (
         <div className="scriptChangelogs" style={{width: '150px'}}>
             <div key="current" className="scriptChangelog" onClick={switchToCurrent}>
@@ -61,30 +61,33 @@ type ChangelogCommentProps = {
     issueReferences: Array<IssueReference>
 }
 
-function ChangelogComment({text, issueReferences} : ChangelogCommentProps) : React.Node {
+function ChangelogComment({text, issueReferences}: ChangelogCommentProps): React.Node {
     if (!(issueReferences && issueReferences.length)) {
         return <p>{text}</p>;
     }
 
     return (
         <p>
-            {reactStringReplace(text, /([A-Z0-9a-z]{1,10}-\d+)/g, (issueKey, i) => {
-                const issueReference = issueReferences.find(ref => ref.key === issueKey);
+            {reactStringReplace(
+                text, /([A-Z0-9a-z]{1,10}-\d+)/g,
+                (issueKey: string, i: number): React.Node => {
+                    const issueReference = issueReferences.find(ref => ref.key === issueKey);
 
-                if (issueReference) {
-                    return (
-                        <Tooltip
-                            key={`${issueKey}-${i}`}
-                            tag="span"
-                            content={issueReference.summary}
-                        >
-                            <a href={`${getBaseUrl()}/browse/${issueKey}`}>{issueKey}</a>
-                        </Tooltip>
-                    );
-                } else {
-                    return issueKey;
+                    if (issueReference) {
+                        return (
+                            <Tooltip
+                                key={`${issueKey}-${i}`}
+                                tag="span"
+                                content={issueReference.summary}
+                            >
+                                <a href={`${getBaseUrl()}/browse/${issueKey}`}>{issueKey}</a>
+                            </Tooltip>
+                        );
+                    } else {
+                        return issueKey;
+                    }
                 }
-            })}
+            )}
         </p>
     );
 }

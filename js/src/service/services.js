@@ -33,7 +33,7 @@ export const scheduledTaskService = new ScheduledTaskService();
 export const watcherService = new WatcherService();
 
 
-window.addEventListener('unhandledrejection', function(err) {
+window.addEventListener('unhandledrejection', function(err: PromiseRejectionEvent) {
     console.error('uncaught error', err);
     AJS.flag({
         title: ErrorMessages.errorOccurred,

@@ -1,5 +1,5 @@
 //@flow
-import React from 'react';
+import * as React from 'react';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 
@@ -17,7 +17,7 @@ type ExecutionDialogProps = {
 }
 
 export class ExecutionDialog extends React.Component<ExecutionDialogProps> {
-    render() {
+    render(): React.Node {
         const {onClose, execution} = this.props;
 
         const bindings = execution.extraParams;

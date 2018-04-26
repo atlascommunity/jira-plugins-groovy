@@ -12,5 +12,6 @@ export type MarkerType = {
     endRow: number,
     startCol: number,
     endCol: number,
-    message: string
+    message: string,
+    severity?: string
 };

@@ -3,5 +3,8 @@ declare module 'less' {
 }
 
 declare module 'ajs' {
-    declare module.exports: any;
+    declare module.exports: {
+        contextPath: () => string;
+        $: JQuery
+    };
 }

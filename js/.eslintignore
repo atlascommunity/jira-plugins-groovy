@@ -1,2 +1,3 @@
 src/vendor/*
 config/*
+flow-typed/*

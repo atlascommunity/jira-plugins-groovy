@@ -27,7 +27,7 @@ export type ExecutionType = {
     time: number,
     success: boolean,
     date: string,
-    extraParams: any,
+    extraParams: {[string]: string},
     error?: string
 };
 

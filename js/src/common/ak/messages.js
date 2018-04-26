@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import Flag from '@atlaskit/flag';
 import {colors} from '@atlaskit/theme';
@@ -8,13 +8,14 @@ import InfoIcon from '@atlaskit/icon/glyph/info';
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 
 
-const propTypes = {
-    title: PropTypes.string.isRequired,
-    children: PropTypes.node
+type MessageProps = {
+    title: string,
+    children?: React.Node
 };
 
-export function InfoMessage({title, children}) {
+export function InfoMessage({title, children}: MessageProps): React.Node {
     return (
+        //$FlowFixMe
         <Flag
             icon={<InfoIcon label="info" primaryColor={colors.P300}/>}
             title={title}
@@ -23,10 +24,9 @@ export function InfoMessage({title, children}) {
     );
 }
 
-InfoMessage.propTypes = propTypes;
-
-export function ErrorMessage({title, children}) {
+export function ErrorMessage({title, children}: MessageProps): React.Node {
     return (
+        //$FlowFixMe
         <Flag
             icon={<ErrorIcon label="info" primaryColor={colors.R300}/>}
             title={title}
@@ -34,5 +34,3 @@ export function ErrorMessage({title, children}) {
         />
     );
 }
-
-InfoMessage.propTypes = propTypes;

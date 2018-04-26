@@ -112,7 +112,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         });
     };
 
-    _switchToChangelog = (changelog : ChangelogType) => () => {
+    _switchToChangelog = (changelog: ChangelogType) => () => {
         this.setState({
             activeSource: {
                 type: 'diff',
@@ -123,7 +123,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         });
     };
 
-    render() {
+    render(): React.Node {
         const {script, template, title, children, collapsible, withChangelog, onEdit, additionalButtons, headerless} = this.props;
         const {activeSource, showCode, executions, executionsReady, onlyLastExecutions} = this.state;
 

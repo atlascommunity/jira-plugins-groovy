@@ -14,7 +14,7 @@ type ScriptParametersProps = {
 };
 
 export class ScriptParameters extends React.PureComponent<ScriptParametersProps> {
-    render() {
+    render(): React.Node {
         const {params} = this.props;
 
         return (
