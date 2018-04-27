@@ -137,21 +137,23 @@ public class WorkflowHelper {
             t = System.currentTimeMillis() - t;
         }
 
-        ImmutableMap<String, String> params = ImmutableMap.of(
-            "issue", Objects.toString(issue, ""),
-            "currentUser", Objects.toString(user, ""),
-            "transientVars", Objects.toString(transientVars, ""),
-            "type", type.name(),
-            "params", script.getParams().toString()
-        );
-        if (script.isFromRegistry()) {
-            Integer parsedId = Ints.tryParse(id);
+        if (!success || type != ScriptType.WORKFLOW_CONDITION) {
+            ImmutableMap<String, String> params = ImmutableMap.of(
+                "issue", Objects.toString(issue, ""),
+                "currentUser", Objects.toString(user, ""),
+                "transientVars", Objects.toString(transientVars, ""),
+                "type", type.name(),
+                "params", script.getParams().toString()
+            );
+            if (script.isFromRegistry()) {
+                Integer parsedId = Ints.tryParse(id);
 
-            if (parsedId != null) {
-                executionRepository.trackFromRegistry(parsedId, t, success, error, params);
+                if (parsedId != null) {
+                    executionRepository.trackFromRegistry(parsedId, t, success, error, params);
+                }
+            } else {
+                executionRepository.trackInline(id, t, success, error, params);
             }
-        } else {
-            executionRepository.trackInline(id, t, success, error, params);
         }
 
         if (rethrow != null) {
