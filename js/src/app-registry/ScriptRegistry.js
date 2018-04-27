@@ -206,11 +206,8 @@ export class ScriptRegistry extends React.Component {
         const {waiting, filter} = this.state;
         let {directories, ready} = this.props;
 
-        let forceOpen = false;
-
         if (filter && filter.length >= 2) {
             directories = this._getFilteredDirs(directories, filter.toLocaleLowerCase());
-            forceOpen = true;
         }
 
         return (
@@ -247,8 +244,6 @@ export class ScriptRegistry extends React.Component {
                                 onCreate={this._activateCreateDialog}
                                 onEdit={this._activateEditDialog}
                                 onDelete={this._activateDeleteDialog}
-
-                                forceOpen={forceOpen}
                             />
                         )}
 
@@ -280,7 +275,6 @@ class ScriptDirectory extends React.Component {
         onCreate: PropTypes.func.isRequired,
         onEdit: PropTypes.func.isRequired,
         onDelete: PropTypes.func.isRequired,
-        forceOpen: PropTypes.bool.isRequired,
         addWatch: PropTypes.func.isRequired,
         removeWatch: PropTypes.func.isRequired
     };
@@ -322,12 +316,12 @@ class ScriptDirectory extends React.Component {
 
     render() {
         const {collapsed, waitingWatch} = this.state;
-        const {directory, directoryWatches, onCreate, onEdit, onDelete, forceOpen} = this.props;
+        const {directory, directoryWatches, onCreate, onEdit, onDelete} = this.props;
 
         let directories = null;
         let scripts = null;
 
-        if (!collapsed || forceOpen) {
+        if (!collapsed) {
             directories = (
                 <div>
                     {directory.children ? directory.children.map(child =>
@@ -338,7 +332,6 @@ class ScriptDirectory extends React.Component {
                             onCreate={onCreate}
                             onEdit={onEdit}
                             onDelete={onDelete}
-                            forceOpen={forceOpen}
 
                             addWatch={this.props.addWatch}
                             removeWatch={this.props.removeWatch}
@@ -439,7 +432,7 @@ class ScriptDirectory extends React.Component {
                         </ButtonGroup>
                     </div>
                 </div>
-                <div className={`scriptDirectoryChildren ${(!collapsed || forceOpen) ? 'open' : ''}`}>
+                <div className={`scriptDirectoryChildren ${!collapsed ? 'open' : ''}`}>
                     <Droppable droppableId={`${directory.id}`}>
                         {(provided, snapshot) => (
                             <div
