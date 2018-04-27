@@ -218,6 +218,7 @@ export class ScriptDialog extends React.Component {
                             <FieldTextStateless
                                 shouldFitContainer={true}
                                 required={true}
+                                maxLength={64}
 
                                 disabled={waiting}
                                 isInvalid={errorField === 'name'}

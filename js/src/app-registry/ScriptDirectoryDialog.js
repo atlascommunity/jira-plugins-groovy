@@ -136,6 +136,7 @@ export class ScriptDirectoryDialog extends React.Component {
                             <FieldTextStateless
                                 shouldFitContainer={true}
                                 required={true}
+                                maxLength={32}
 
                                 isInvalid={errorField === 'name'}
                                 invalidMessage={errorMessage}

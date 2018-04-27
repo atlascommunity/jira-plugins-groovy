@@ -126,6 +126,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     @Override
     public ScriptDirectoryDto updateDirectory(ApplicationUser user, int id, ScriptDirectoryForm form) {
+        validateDirectoryForm(form);
+
         ScriptDirectory directory = ao.get(ScriptDirectory.class, id);
         directory.setName(form.getName());
         directory.setParent(getParentDirectory(form.getParentId()));
@@ -462,11 +464,19 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         if (StringUtils.isEmpty(form.getName())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
         }
+
+        if (form.getName().length() > 32) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "name");
+        }
     }
 
     private ParseContext validateScriptForm(boolean isNew, RegistryScriptForm form) {
         if (StringUtils.isEmpty(form.getName())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
+        }
+
+        if (form.getName().length() > 64) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "name");
         }
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
