@@ -10,6 +10,10 @@ public interface Script extends Entity {
     void setName(String name);
     String getName();
 
+    @StringLength(StringLength.UNLIMITED)
+    void setDescription(String description);
+    String getDescription();
+
     @NotNull
     @StringLength(StringLength.UNLIMITED)
     void setScriptBody(String scriptBody);

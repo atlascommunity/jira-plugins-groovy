@@ -36,8 +36,9 @@ export type ScriptId = number | string;
 export type ScriptType = {
     id: ScriptId,
     name: string,
+    description?: ?string,
     scriptBody?: string,
     inline?: boolean,
     changelogs?: Array<ChangelogType>,
-    errorCount?: number
+    errorCount?: number,
 };

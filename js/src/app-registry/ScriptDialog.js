@@ -73,6 +73,7 @@ export class ScriptDialog extends React.Component {
                 id: id,
                 values: new Map({
                     name: data.name,
+                    description: data.description,
                     types: data.types,
                     scriptBody: data.scriptBody,
                     directoryId: data.directoryId
@@ -227,6 +228,18 @@ export class ScriptDialog extends React.Component {
                                 label={FieldMessages.name}
                                 value={values.get('name') || ''}
                                 onChange={this._setTextValue('name')}
+                            />
+
+                            <FieldTextAreaStateless
+                                shouldFitContainer={true}
+
+                                disabled={waiting}
+                                isInvalid={errorField === 'description'}
+                                invalidMessage={errorField === 'description' ? errorMessage : null}
+
+                                label={FieldMessages.description}
+                                value={values.get('description') || ''}
+                                onChange={this._setTextValue('description')}
                             />
 
                             <div>

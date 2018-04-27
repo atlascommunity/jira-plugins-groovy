@@ -141,7 +141,7 @@ class ScriptDirectoryInternal extends React.Component<ScriptDirectoryProps, Scri
         return (
             <div className="flex full-width flex-column scriptDirectory">
                 <div className="scriptDirectoryTitle">
-                    <div className="flex-grow flex-row">
+                    <div className="flex-row">
                         <Button
                             appearance="subtle"
                             spacing="none"
@@ -157,12 +157,13 @@ class ScriptDirectoryInternal extends React.Component<ScriptDirectoryProps, Scri
                         </Button>
                     </div>
                     {errorCount > 0 &&
-                    <div className="flex-vertical-middle flex-none errorCount">
-                        <div>
-                            <Badge max={99} value={errorCount} appearance="important"/>
+                        <div className="flex-vertical-middle flex-none errorCount">
+                            <div>
+                                <Badge max={99} value={errorCount} appearance="important"/>
+                            </div>
                         </div>
-                    </div>
                     }
+                    <div className="flex-grow"/>
                     <div className="flex-none">
                         <ButtonGroup>
                             <Button

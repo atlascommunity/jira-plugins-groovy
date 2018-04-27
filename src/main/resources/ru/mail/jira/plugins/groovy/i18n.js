@@ -2,6 +2,7 @@ define('/mailru/groovy/i18n-react', function() {
     return {
         fields: {
             name: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.name'),
+            description: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.description'),
             scriptCode: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.scriptCode'),
             comment: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.comment'),
             condition: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.condition'),

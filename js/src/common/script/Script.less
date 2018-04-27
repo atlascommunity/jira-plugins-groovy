@@ -1,6 +1,7 @@
 @import (reference) "../../flex";
 @import (reference) "../../const";
 @import (reference) "~@atlaskit/util-shared-styles/src/borders";
+@import (reference) "~@atlaskit/util-shared-styles/src/grid";
 @import (reference) "~@atlaskit/util-shared-styles/src/colors";
 
 .ScriptList {
@@ -27,6 +28,19 @@
     margin-left: 5px;
     margin-right: 5px;
   }
+}
+
+.scriptDescription {
+  color: @ak-color-N300;
+  background-color: white;
+
+  padding: @ak-grid-size;
+  margin: 15px 15px 0;
+
+  border: 1px solid @border-color;
+  border-radius: @ak-border-radius;
+
+  white-space: pre-line;
 }
 
 .scriptRow {

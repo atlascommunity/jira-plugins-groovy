@@ -228,6 +228,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         Script script = ao.create(
             Script.class,
             new DBParam("NAME", scriptForm.getName()),
+            new DBParam("DESCRIPTION", scriptForm.getDescription()),
             new DBParam("SCRIPT_BODY", scriptForm.getScriptBody()),
             new DBParam("DIRECTORY_ID", scriptForm.getDirectoryId()),
             new DBParam("DELETED", false),
@@ -296,6 +297,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         String parameters = parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null;
 
         script.setName(form.getName());
+        script.setDescription(form.getDescription());
         script.setScriptBody(form.getScriptBody());
         script.setParameters(parameters);
         script.setTypes(form.getTypes().stream().map(WorkflowScriptType::name).collect(Collectors.joining(",")));
@@ -388,6 +390,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         RegistryScriptDto result = new RegistryScriptDto();
 
         result.setId(script.getID());
+        result.setDescription(script.getDescription());
         result.setDirectoryId(script.getDirectory().getID());
         result.setScriptBody(script.getScriptBody());
         result.setDeleted(script.isDeleted());
@@ -473,6 +476,14 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     private ParseContext validateScriptForm(boolean isNew, RegistryScriptForm form) {
         if (StringUtils.isEmpty(form.getName())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
+        }
+
+        String description = StringUtils.trimToNull(form.getDescription());
+        form.setDescription(description);
+        if (description != null) {
+            if (form.getDescription().length() > 10000) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "description");
+            }
         }
 
         if (form.getName().length() > 64) {

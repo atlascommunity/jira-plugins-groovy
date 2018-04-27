@@ -14,12 +14,14 @@ import type {ScriptType, ExecutionType, ChangelogType} from './types';
 
 import {Changelog} from './Changelog';
 import {ExecutionBar} from './ExecutionBar';
+import {ScriptParameters} from './ScriptParameters';
+import type {ScriptParam} from './ScriptParameters';
 
 import type {VoidCallback} from '../types';
 
 import {Editor} from '../editor/Editor';
 
-import {CommonMessages} from '../../i18n/common.i18n';
+import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
 
 import {executionService} from '../../service/services';
 
@@ -39,7 +41,8 @@ type ScriptProps = {
 
     title?: React.Node,
     children?: React.Node,
-    additionalButtons?: Array<React.Element<any>>
+    additionalButtons?: Array<React.Element<any>>,
+    additionalParameters?: Array<ScriptParam>
 }
 
 type ScriptState = {
@@ -124,7 +127,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
     };
 
     render(): React.Node {
-        const {script, template, title, children, collapsible, withChangelog, onEdit, additionalButtons, headerless} = this.props;
+        const {script, template, title, children, collapsible, withChangelog, onEdit, additionalButtons, additionalParameters, headerless} = this.props;
         const {activeSource, showCode, executions, executionsReady, onlyLastExecutions} = this.state;
 
         let codeBlock : React.Node = null;
@@ -241,18 +244,19 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                                 <CodeIcon label=""/>
                             </div>
                             {' '}
-                            <div className="flex-vertical-middle flex-grow">
+                            <div className="flex-vertical-middle">
                                 <h3 title={script && script.name}>
                                     {script && script.name}
                                 </h3>
                             </div>
                             {script && !!script.errorCount &&
-                            <div className="flex-vertical-middle flex-none errorCount">
-                                <div>
-                                    <Badge max={99} value={script.errorCount} appearance="important"/>
+                                <div className="flex-vertical-middle flex-none errorCount">
+                                    <div>
+                                        <Badge max={99} value={script.errorCount} appearance="important"/>
+                                    </div>
                                 </div>
-                            </div>
                             }
+                            <div className="flex-grow"/>
                         </div>
                     }
                     <div className="flex-none flex-row">
@@ -266,6 +270,8 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                     {children}
                 </div>
                 {isOpen && <div className="ScriptBody">
+                    {script.description && <div className="scriptDescription">{script.description}</div>}
+                    {additionalParameters && <ScriptParameters params={additionalParameters}/>}
                     {codeBlock}
                     {executionBar}
                 </div>}

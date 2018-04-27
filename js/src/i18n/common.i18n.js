@@ -7,6 +7,7 @@ import type {I18nMessages, I18nFunction} from '../common/types';
 
 export const FieldMessages: I18nMessages = {
     name: i18n.fields.name,
+    description: i18n.fields.description,
     scriptCode: i18n.fields.scriptCode,
     comment: i18n.fields.comment,
     condition: i18n.fields.condition,

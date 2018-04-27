@@ -12,6 +12,8 @@ public class ScriptForm {
     @XmlElement
     private String name;
     @XmlElement
+    private String description;
+    @XmlElement
     private String scriptBody;
     @XmlElement
     private String comment;
