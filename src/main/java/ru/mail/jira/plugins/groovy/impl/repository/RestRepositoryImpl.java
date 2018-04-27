@@ -80,6 +80,7 @@ public class RestRepositoryImpl implements RestRepository {
         RestScript script = ao.create(
             RestScript.class,
             new DBParam("NAME", form.getName()),
+            new DBParam("DESCRIPTION", form.getDescription()),
             new DBParam("UUID", UUID.randomUUID().toString()),
             new DBParam("METHODS", joinMethods(form.getMethods())),
             new DBParam("SCRIPT_BODY", form.getScriptBody()),
@@ -124,6 +125,7 @@ public class RestRepositoryImpl implements RestRepository {
         script.setMethods(joinMethods(form.getMethods()));
         script.setGroups(form.getGroups().stream().collect(Collectors.joining(",")));
         script.setName(form.getName());
+        script.setDescription(form.getDescription());
         script.setScriptBody(form.getScriptBody());
         script.save();
 
@@ -205,11 +207,9 @@ public class RestRepositoryImpl implements RestRepository {
     }
 
     private void validateScriptForm(boolean isNew, RestScriptForm form, String oldName) {
-        scriptService.parseScript(form.getScriptBody());
+        ValidationUtils.validateForm(i18nHelper, isNew, form);
 
-        if (StringUtils.isEmpty(form.getName())) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
-        }
+        scriptService.parseScript(form.getScriptBody());
 
         if (!Const.REST_NAME_PATTERN.matcher(form.getName()).matches()) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.incorrectRestName"), "name");
@@ -240,21 +240,6 @@ public class RestRepositoryImpl implements RestRepository {
                 if (groupManager.getGroup(groupName) == null) {
                     throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.unknownGroup", groupName), "groups");
                 }
-            }
-        }
-
-        String comment = StringUtils.trimToNull(form.getComment());
-        form.setComment(comment);
-
-        if (!isNew) {
-            if (StringUtils.isEmpty(comment)) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
-            }
-        }
-
-        if (comment != null) {
-            if (comment.length() > Const.COMMENT_MAX_LENGTH) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
             }
         }
     }

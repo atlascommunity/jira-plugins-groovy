@@ -117,6 +117,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             ScheduledTask.class,
             new DBParam("UUID", UUID.randomUUID().toString()),
             new DBParam("NAME", form.getName()),
+            new DBParam("DESCRIPTION", form.getDescription()),
             new DBParam("SCHEDULE_EXPRESSION", form.getScheduleExpression()),
             new DBParam("USER_KEY", form.getUserKey()),
             new DBParam("TYPE", form.getType()),
@@ -164,6 +165,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
 
         task.setUuid(UUID.randomUUID().toString());
         task.setName(form.getName());
+        task.setDescription(form.getDescription());
         task.setScheduleExpression(form.getScheduleExpression());
         task.setUserKey(form.getUserKey());
         task.setType(form.getType());
@@ -244,24 +246,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
     }
 
     private void validateForm(boolean isNew, ScheduledTaskForm form) {
-        if (StringUtils.isEmpty(form.getName())) {
-            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
-        }
-
-        String comment = StringUtils.trimToNull(form.getComment());
-        form.setComment(comment);
-
-        if (!isNew) {
-            if (StringUtils.isEmpty(comment)) {
-                throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
-            }
-        }
-
-        if (comment != null) {
-            if (comment.length() > Const.COMMENT_MAX_LENGTH) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
-            }
-        }
+        ValidationUtils.validateForm(i18nHelper, isNew, form);
 
         String scheduleExpression = StringUtils.trimToNull(form.getScheduleExpression());
         form.setScheduleExpression(scheduleExpression);

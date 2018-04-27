@@ -12,6 +12,10 @@ public interface RestScript extends Entity {
     void setName(String name);
     String getName();
 
+    @StringLength(StringLength.UNLIMITED)
+    void setDescription(String description);
+    String getDescription();
+
     @NotNull
     void setUuid(String uuid);
     String getUuid();

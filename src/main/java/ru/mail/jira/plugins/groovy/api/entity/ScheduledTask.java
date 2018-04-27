@@ -14,6 +14,10 @@ public interface ScheduledTask extends Entity {
     String getName();
     void setName(String name);
 
+    @StringLength(StringLength.UNLIMITED)
+    void setDescription(String description);
+    String getDescription();
+
     @NotNull
     String getScheduleExpression();
     void setScheduleExpression(String scheduleExpression);

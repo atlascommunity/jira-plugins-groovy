@@ -474,41 +474,12 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     private ParseContext validateScriptForm(boolean isNew, RegistryScriptForm form) {
-        if (StringUtils.isEmpty(form.getName())) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
-        }
-
-        String description = StringUtils.trimToNull(form.getDescription());
-        form.setDescription(description);
-        if (description != null) {
-            if (form.getDescription().length() > 10000) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "description");
-            }
-        }
-
-        if (form.getName().length() > 64) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "name");
-        }
+        ValidationUtils.validateForm(i18nHelper, isNew, form);
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
         ParseContext parseContext = scriptService.parseScript(form.getScriptBody());
-
-        String comment = StringUtils.trimToNull(form.getComment());
-        form.setComment(comment);
-
-        if (!isNew) {
-            if (StringUtils.isEmpty(comment)) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
-            }
-        }
-
-        if (comment != null) {
-            if (comment.length() > Const.COMMENT_MAX_LENGTH) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
-            }
-        }
 
         if (form.getTypes() == null || form.getTypes().size() == 0) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "types");

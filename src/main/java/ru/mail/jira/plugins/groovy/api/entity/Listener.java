@@ -10,6 +10,10 @@ public interface Listener extends Entity {
     String getName();
     void setName(String name);
 
+    @StringLength(StringLength.UNLIMITED)
+    void setDescription(String description);
+    String getDescription();
+
     @NotNull
     String getUuid();
     void setUuid(String uuid);

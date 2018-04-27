@@ -110,6 +110,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             Listener.class,
             new DBParam("UUID", UUID.randomUUID().toString()),
             new DBParam("NAME", form.getName()),
+            new DBParam("DESCRIPTION", form.getDescription()),
             new DBParam("SCRIPT_BODY", form.getScriptBody()),
             new DBParam("DELETED", false),
             new DBParam("CONDITION", jsonMapper.write(form.getCondition()))
@@ -155,6 +156,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, comment);
 
         listener.setName(form.getName());
+        listener.setDescription(form.getDescription());
         listener.setUuid(UUID.randomUUID().toString());
         listener.setScriptBody(form.getScriptBody());
         listener.setCondition(jsonMapper.write(form.getCondition()));
@@ -222,6 +224,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         EventListenerDto result = new EventListenerDto();
         result.setId(listener.getID());
         result.setName(listener.getName());
+        result.setDescription(listener.getDescription());
         result.setScriptBody(listener.getScriptBody());
         result.setUuid(listener.getUuid());
         result.setCondition(jsonMapper.read(listener.getCondition(), ConditionDescriptor.class));
@@ -238,29 +241,12 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     }
 
     private void validateListener(boolean isNew, EventListenerForm form) {
-        scriptService.parseScript(form.getScriptBody());
+        ValidationUtils.validateForm(i18nHelper, isNew, form);
 
-        if (StringUtils.isEmpty(form.getName())) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
-        }
+        scriptService.parseScript(form.getScriptBody());
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
-        }
-
-        String comment = StringUtils.trimToNull(form.getComment());
-        form.setComment(comment);
-
-        if (!isNew) {
-            if (StringUtils.isEmpty(comment)) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "comment");
-            }
-        }
-
-        if (comment != null) {
-            if (comment.length() > Const.COMMENT_MAX_LENGTH) {
-                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "comment");
-            }
         }
 
         ConditionDescriptor condition = form.getCondition();
