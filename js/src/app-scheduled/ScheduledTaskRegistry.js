@@ -276,7 +276,8 @@ class ScheduledTask extends React.Component {
             name: task.name,
             scriptBody: task.scriptBody,
             inline: true,
-            changelogs: task.changelogs
+            changelogs: task.changelogs,
+            description: task.description
         } : null;
 
         return (

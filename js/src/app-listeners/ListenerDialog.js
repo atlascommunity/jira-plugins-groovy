@@ -79,6 +79,7 @@ export class ListenerDialog extends React.Component {
                 values: new Map({
                     condition: {},
                     name: '',
+                    description: '',
                     comment: '',
                     scriptBody: ''
                 }),
@@ -97,6 +98,7 @@ export class ListenerDialog extends React.Component {
                     this.setState({
                         values: new Map({
                             name: listener.name,
+                            description: listener.description,
                             scriptBody: listener.scriptBody,
                             condition: listener.condition
                         }),
@@ -223,6 +225,19 @@ export class ListenerDialog extends React.Component {
                         value={values.get('name') || ''}
                         onChange={this._setTextValue('name')}
                     />
+
+                    <FieldTextAreaStateless
+                        shouldFitContainer={true}
+                        minimumRows={5}
+
+                        isInvalid={errorField === 'description'}
+                        invalidMessage={errorField === 'description' ? errorMessage : null}
+
+                        label={FieldMessages.description}
+                        value={values.get('description') || ''}
+                        onChange={this._setTextValue('description')}
+                    />
+
                     <ConditionPicker value={condition} onChange={this._setObjectValue('condition')} error={error}/>
                     <EditorField
                         label={FieldMessages.scriptCode}

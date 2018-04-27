@@ -346,6 +346,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         result.setId(task.getID());
         result.setUuid(task.getUuid());
         result.setName(task.getName());
+        result.setDescription(task.getDescription());
         result.setScheduleExpression(task.getScheduleExpression());
         result.setType(task.getType());
         result.setScriptBody(task.getScriptBody());

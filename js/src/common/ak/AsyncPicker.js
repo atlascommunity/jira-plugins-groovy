@@ -60,7 +60,7 @@ type DataType = {
 type AsyncPickerState = {
     filter: string,
     data: DataType,
-    fetching: ?boolean
+    fetching: ?number
 };
 
 export class AsyncPicker extends React.Component<AsyncPickerProps, AsyncPickerState> {
@@ -81,7 +81,7 @@ export class AsyncPicker extends React.Component<AsyncPickerProps, AsyncPickerSt
         const reqId = ++this.reqId;
 
         let needsFetching: boolean = !this.state.data.complete;
-        this.setState({ fetching: needsFetching && !!this.reqId, filter });
+        this.setState({ fetching: needsFetching ? this.reqId : null, filter });
 
         if (needsFetching) {
             ajaxGet(this.props.src + (filter ? `?q=${filter}` : ''))
@@ -92,6 +92,8 @@ export class AsyncPicker extends React.Component<AsyncPickerProps, AsyncPickerSt
                                 data,
                                 fetching: null
                             };
+                        } else {
+                            return {};
                         }
                     });
                 }

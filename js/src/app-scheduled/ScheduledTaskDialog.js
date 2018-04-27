@@ -71,6 +71,7 @@ export class ScheduledTaskDialog extends React.Component {
                 ready: true,
                 values: new Map({
                     name: '',
+                    description: '',
                     transitionOptions: {},
                     scriptBody: ''
                 }),
@@ -90,6 +91,7 @@ export class ScheduledTaskDialog extends React.Component {
                     this.setState({
                         values: new Map({
                             name: task.name,
+                            description: task.description,
                             scriptBody: task.scriptBody,
                             scheduleExpression: task.scheduleExpression,
                             userKey: task.user,
@@ -367,6 +369,19 @@ export class ScheduledTaskDialog extends React.Component {
                         value={values.get('name') || ''}
                         onChange={this._setTextValue('name')}
                     />
+
+                    <FieldTextAreaStateless
+                        shouldFitContainer={true}
+                        minimumRows={5}
+
+                        isInvalid={errorField === 'description'}
+                        invalidMessage={errorField === 'description' ? errorMessage : null}
+
+                        label={FieldMessages.description}
+                        value={values.get('description') || ''}
+                        onChange={this._setTextValue('description')}
+                    />
+
                     <FieldTextStateless
                         shouldFitContainer={true}
                         required={true}

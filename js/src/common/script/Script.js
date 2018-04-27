@@ -9,6 +9,7 @@ import CodeIcon from '@atlaskit/icon/glyph/code';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
 import BitbucketSourceIcon from '@atlaskit/icon/glyph/bitbucket/source';
 import RecentIcon from '@atlaskit/icon/glyph/recent';
+import TrashIcon from '@atlaskit/icon/glyph/trash';
 
 import type {ScriptType, ExecutionType, ChangelogType} from './types';
 
@@ -21,7 +22,7 @@ import type {VoidCallback} from '../types';
 
 import {Editor} from '../editor/Editor';
 
-import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
+import {CommonMessages} from '../../i18n/common.i18n';
 
 import {executionService} from '../../service/services';
 
@@ -127,7 +128,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
     };
 
     render(): React.Node {
-        const {script, template, title, children, collapsible, withChangelog, onEdit, additionalButtons, additionalParameters, headerless} = this.props;
+        const {script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons, additionalParameters, headerless} = this.props;
         const {activeSource, showCode, executions, executionsReady, onlyLastExecutions} = this.state;
 
         let codeBlock : React.Node = null;
@@ -222,6 +223,18 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                     iconBefore={<EditIcon label=""/>}
 
                     onClick={onEdit}
+                />
+            );
+        }
+
+        if (onDelete) {
+            buttons.push(
+                <Button
+                    key="edit-button"
+                    appearance="subtle"
+                    iconBefore={<TrashIcon label=""/>}
+
+                    onClick={onDelete}
                 />
             );
         }

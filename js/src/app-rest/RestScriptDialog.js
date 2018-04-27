@@ -198,6 +198,18 @@ export class RestScriptDialog extends React.Component {
                     />
                     <div className="ak-description">{RestMessages.nameDescription}</div>
 
+                    <FieldTextAreaStateless
+                        shouldFitContainer={true}
+                        minimumRows={5}
+
+                        isInvalid={errorField === 'description'}
+                        invalidMessage={errorField === 'description' ? errorMessage : null}
+
+                        label={FieldMessages.description}
+                        value={values.get('description') || ''}
+                        onChange={this._setTextValue('description')}
+                    />
+
                     <MultiSelect
                         label={FieldMessages.httpMethods}
                         isRequired={true}

@@ -138,6 +138,7 @@ class Listener extends React.Component {
                 script={{
                     id: listener.uuid,
                     name: listener.name,
+                    description: listener.description,
                     inline: true,
                     scriptBody: listener.scriptBody,
                     changelogs: listener.changelogs,
