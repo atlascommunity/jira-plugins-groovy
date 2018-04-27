@@ -232,6 +232,7 @@ export class ScriptDialog extends React.Component {
 
                             <FieldTextAreaStateless
                                 shouldFitContainer={true}
+                                minimumRows={5}
 
                                 disabled={waiting}
                                 isInvalid={errorField === 'description'}
