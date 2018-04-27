@@ -15,6 +15,20 @@
   }
 }
 
+.scriptTitle() {
+  h3 {
+    margin-top: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .errorCount {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+}
+
 .scriptRow {
   .flex-column;
 
@@ -39,12 +53,7 @@
     margin-right: 3px;
     padding-bottom: 3px;
 
-    h3 {
-      margin-top: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .scriptTitle();
   }
 
   >.children {

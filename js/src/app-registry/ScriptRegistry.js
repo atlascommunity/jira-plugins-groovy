@@ -23,7 +23,6 @@ import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import FolderIcon from '@atlaskit/icon/glyph/folder';
 import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
-import ChevronRightIcon from '@atlaskit/icon/glyph/chevron-right';
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
 
@@ -281,14 +280,9 @@ class ScriptDirectory extends React.Component {
         onCreate: PropTypes.func.isRequired,
         onEdit: PropTypes.func.isRequired,
         onDelete: PropTypes.func.isRequired,
-        parents: PropTypes.array.isRequired,
         forceOpen: PropTypes.bool.isRequired,
         addWatch: PropTypes.func.isRequired,
         removeWatch: PropTypes.func.isRequired
-    };
-
-    static defaultProps = {
-        parents: []
     };
 
     state = {
@@ -328,7 +322,7 @@ class ScriptDirectory extends React.Component {
 
     render() {
         const {collapsed, waitingWatch} = this.state;
-        const {directory, directoryWatches, parents, onCreate, onEdit, onDelete, forceOpen} = this.props;
+        const {directory, directoryWatches, onCreate, onEdit, onDelete, forceOpen} = this.props;
 
         let directories = null;
         let scripts = null;
@@ -348,8 +342,6 @@ class ScriptDirectory extends React.Component {
 
                             addWatch={this.props.addWatch}
                             removeWatch={this.props.removeWatch}
-
-                            parents={[directory, ...parents]}
                         />
                     ) : null}
                 </div>
@@ -384,29 +376,17 @@ class ScriptDirectory extends React.Component {
                             onClick={this._toggle}
                         >
                             <h3 className="flex-vertical-middle" style={{ margin: 0 }}>
-                                <span>{' '}{directory.name}</span>
+                                {' '}{directory.name}
                             </h3>
                         </Button>
                     </div>
                     {errorCount > 0 &&
-                        <div className="flex-vertical-middle flex-none" style={{marginLeft: '5px'}}>
+                        <div className="flex-vertical-middle flex-none errorCount">
                             <div>
                                 <Badge max={99} value={errorCount} appearance="important"/>
                             </div>
                         </div>
                     }
-                    <div className="muted-text flex-vertical-middle">
-                        <div className="flex-row">
-                            {parents.map((parent) =>
-                                <div key={parent.id} className="flex-row">
-                                    <ChevronRightIcon label=""/>
-                                    <div className="flex-vertical-middle">
-                                        {parent.name}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
                     <div className="flex-none">
                         <ButtonGroup>
                             <Button
@@ -507,7 +487,7 @@ class DraggableScript extends React.Component {
                                         </h3>
                                     </div>
                                     {script.errorCount > 0 &&
-                                        <div className="flex-vertical-middle flex-none" style={{marginLeft: '5px', marginRight: '5px'}}>
+                                        <div className="flex-vertical-middle flex-none errorCount">
                                             <div>
                                                 <Badge max={99} value={script.errorCount} appearance="important"/>
                                             </div>

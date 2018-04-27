@@ -237,17 +237,17 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                         </div>
                         :
                         <div className="flex-grow flex-row">
-                            <div className="flex-vertical-middle">
+                            <div className="flex-vertical-middle flex-none">
                                 <CodeIcon label=""/>
                             </div>
                             {' '}
-                            <div className="flex-vertical-middle">
+                            <div className="flex-vertical-middle flex-grow">
                                 <h3 title={script && script.name}>
                                     {script && script.name}
                                 </h3>
                             </div>
                             {script && !!script.errorCount &&
-                            <div className="flex-vertical-middle" style={{marginLeft: '5px'}}>
+                            <div className="flex-vertical-middle flex-none errorCount">
                                 <div>
                                     <Badge max={99} value={script.errorCount} appearance="important"/>
                                 </div>
