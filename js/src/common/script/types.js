@@ -31,8 +31,10 @@ export type ExecutionType = {
     error?: string
 };
 
+export type ScriptId = number | string;
+
 export type ScriptType = {
-    id: number | string,
+    id: ScriptId,
     name: string,
     scriptBody?: string,
     inline?: boolean,

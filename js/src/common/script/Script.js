@@ -29,7 +29,7 @@ type ScriptProps = {
     collapsible: boolean,
     headerless: boolean,
 
-    script?: ScriptType, //todo: maybe make script non-optional
+    script: ScriptType,
     template?: {
         body: string
     },
@@ -148,7 +148,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
 
             codeBlock = (
                 <div className="flex-row editor">
-                    {withChangelog && script && script.changelogs &&
+                    {withChangelog && script.changelogs &&
                     <Changelog
                         changelogs={script.changelogs}
                         switchToChangelog={this._switchToChangelog}

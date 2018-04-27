@@ -8,7 +8,15 @@
     "quotes": ["error", "single"],
     "key-spacing": ["warn", { "beforeColon": false, "afterColon": true }],
     "semi": ["warn", "always", { "omitLastInOneLineBlock" : false }],
-    "no-unused-vars": ["warn", { "vars": "all", "args": "all", "argsIgnorePattern": "^_" }],
+    "no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "args": "all",
+        "argsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ],
     "eol-last": ["error", "always"],
 
     "react/jsx-no-literals": [1, {"noStrings": false}],

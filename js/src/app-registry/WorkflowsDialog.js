@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import Button, {ButtonGroup} from '@atlaskit/button';
 import Modal from '@atlaskit/modal-dialog';
@@ -8,12 +8,15 @@ import Spinner from '@atlaskit/spinner';
 import OpenIcon from '@atlaskit/icon/glyph/open';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
 
+import type {WorkflowActionItemType, WorkflowActionType, WorkflowScriptType, WorkflowType, WorkflowMode} from './types';
+
 import {registryService} from '../service/services';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {getBaseUrl} from '../service/ajaxHelper';
+import type {VoidCallback} from '../common/types';
 
 
-function getTabForType(type) {
+function getTabForType(type: WorkflowScriptType): ?string {
     switch (type) {
         case 'CONDITION':
             return 'conditions';
@@ -26,23 +29,28 @@ function getTabForType(type) {
     }
 }
 
-function getWorkflowActionLink(workflow, action, item, mode='live') {
-    return `${getBaseUrl()}/secure/admin/workflows/ViewWorkflowTransition.jspa?workflowMode=${mode}&workflowName=${encodeURIComponent(workflow.name)}&descriptorTab=${getTabForType(item.type)}&workflowStep=1&workflowTransition=${action.id}`;
+function getWorkflowActionLink(workflow: WorkflowType, action: WorkflowActionType, item: WorkflowActionItemType, mode: WorkflowMode='live'): string {
+    return `${getBaseUrl()}/secure/admin/workflows/ViewWorkflowTransition.jspa?workflowMode=${mode}&workflowName=${encodeURIComponent(workflow.name)}&descriptorTab=${getTabForType(item.type) || ''}&workflowStep=1&workflowTransition=${action.id}`;
 }
 
-function getWorkflowLink(workflow, mode='live') {
+function getWorkflowLink(workflow: WorkflowType, mode: WorkflowMode='live'): string {
     return `${getBaseUrl()}/secure/admin/workflows/ViewWorkflowSteps.jspa?workflowMode=${mode}&workflowName=${encodeURIComponent(workflow.name)}`;
 }
 
-export class WorkflowsDialog extends React.Component {
-    static propTypes = {
-        id: PropTypes.number.isRequired,
-        onClose: PropTypes.func.isRequired
-    };
+type WorkflowsDialogProps = {
+    id: number|string,
+    onClose: VoidCallback
+};
 
+type WorkflowsDialogState = {
+    ready: boolean,
+    workflows: Array<WorkflowType>
+};
+
+export class WorkflowsDialog extends React.Component<WorkflowsDialogProps, WorkflowsDialogState> {
     state = {
         ready: false,
-        workflows: null
+        workflows: []
     };
 
     componentDidMount() {
@@ -58,7 +66,7 @@ export class WorkflowsDialog extends React.Component {
             }));
     }
 
-    render() {
+    render(): React.Node {
         const {onClose} = this.props;
         const {ready, workflows} = this.state;
 
@@ -108,11 +116,14 @@ export class WorkflowsDialog extends React.Component {
                                                 >
                                                     {workflow.name}
                                                 </Button>
-                                                {workflow.hasDraft && <Button
-                                                    appearance="subtle"
-                                                    iconBefore={<EditIcon label=""/>}
-                                                    href={getWorkflowLink(workflow, 'draft')}
-                                                />}
+                                                {//$FlowFixMe
+                                                    workflow.hasDraft &&
+                                                    <Button
+                                                        appearance="subtle"
+                                                        iconBefore={<EditIcon label=""/>}
+                                                        href={getWorkflowLink(workflow, 'draft')}
+                                                    />
+                                                }
                                             </ButtonGroup>
                                         </td>
                                         <td>
