@@ -30,12 +30,12 @@ export class DraggableRegistryScript extends React.Component<PublicRegistryScrip
                                             {script.name}
                                         </h3>
                                     </div>
-                                    {script.errorCount && script.errorCount > 0 &&
-                                    <div className="flex-vertical-middle flex-none errorCount">
-                                        <div>
-                                            <Badge max={99} value={script.errorCount} appearance="important"/>
+                                    {!!script.errorCount &&
+                                        <div className="flex-vertical-middle flex-none errorCount">
+                                            <div>
+                                                <Badge max={99} value={script.errorCount} appearance="important"/>
+                                            </div>
                                         </div>
-                                    </div>
                                     }
                                 </div>
                             }
