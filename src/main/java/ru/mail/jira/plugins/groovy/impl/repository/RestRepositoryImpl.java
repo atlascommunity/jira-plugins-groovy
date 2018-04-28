@@ -11,20 +11,16 @@ import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.entity.*;
+import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.RestFieldException;
-import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.RestRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.api.entity.EntityType;
-import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.rest.HttpMethod;
 import ru.mail.jira.plugins.groovy.api.dto.rest.RestScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.rest.RestScriptForm;
 import ru.mail.jira.plugins.groovy.api.dto.rest.Script;
-import ru.mail.jira.plugins.groovy.api.entity.EntityAction;
-import ru.mail.jira.plugins.groovy.api.entity.RestChangelog;
-import ru.mail.jira.plugins.groovy.api.entity.RestScript;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.Const;
 
@@ -38,7 +34,7 @@ public class RestRepositoryImpl implements RestRepository {
     private final GroupManager groupManager;
     private final ChangelogHelper changelogHelper;
     private final ScriptService scriptService;
-    private final AuditLogRepository auditLogRepository;
+    private final AuditService auditService;
     private final ExecutionRepository executionRepository;
 
     @Autowired
@@ -48,7 +44,7 @@ public class RestRepositoryImpl implements RestRepository {
         @ComponentImport GroupManager groupManager,
         ChangelogHelper changelogHelper,
         ScriptService scriptService,
-        AuditLogRepository auditLogRepository,
+        AuditService auditService,
         ExecutionRepository executionRepository
     ) {
         this.ao = ao;
@@ -56,7 +52,7 @@ public class RestRepositoryImpl implements RestRepository {
         this.groupManager = groupManager;
         this.changelogHelper = changelogHelper;
         this.scriptService = scriptService;
-        this.auditLogRepository = auditLogRepository;
+        this.auditService = auditService;
         this.executionRepository = executionRepository;
     }
 
@@ -97,15 +93,7 @@ public class RestRepositoryImpl implements RestRepository {
 
         changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, comment);
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.REST,
-                script.getID(),
-                EntityAction.CREATED,
-                comment
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
         return buildScriptDto(script, true, true);
     }
@@ -129,15 +117,7 @@ public class RestRepositoryImpl implements RestRepository {
         script.setScriptBody(form.getScriptBody());
         script.save();
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.REST,
-                script.getID(),
-                EntityAction.UPDATED,
-                comment
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.UPDATED, script, diff, comment);
 
         return buildScriptDto(script, true, true);
     }
@@ -151,15 +131,7 @@ public class RestRepositoryImpl implements RestRepository {
 
         //todo: free name after deletion
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.REST,
-                script.getID(),
-                EntityAction.DELETED,
-                script.getID() + " - " + script.getName()
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.DELETED, script, null, script.getID() + " - " + script.getName());
     }
 
     @Override
@@ -169,15 +141,7 @@ public class RestRepositoryImpl implements RestRepository {
         script.setDeleted(false);
         script.save();
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.REST,
-                script.getID(),
-                EntityAction.RESTORED,
-                script.getID() + " - " + script.getName()
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.RESTORED, script, null, script.getID() + " - " + script.getName());
     }
 
     @Override
@@ -204,6 +168,10 @@ public class RestRepositoryImpl implements RestRepository {
             script.getScriptBody(),
             parseGroups(script.getGroups())
         );
+    }
+
+    private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, RestScript script, String diff, String description) {
+        auditService.addAuditLogAndNotify(user, action, EntityType.REST, script, diff, description);
     }
 
     private void validateScriptForm(boolean isNew, RestScriptForm form, String oldName) {

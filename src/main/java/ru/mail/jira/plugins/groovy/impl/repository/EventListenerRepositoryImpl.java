@@ -17,18 +17,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.entity.*;
+import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.*;
-import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.api.entity.EntityType;
-import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerDto;
 import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerForm;
-import ru.mail.jira.plugins.groovy.api.entity.EntityAction;
-import ru.mail.jira.plugins.groovy.api.entity.Listener;
-import ru.mail.jira.plugins.groovy.api.entity.ListenerChangelog;
 import ru.mail.jira.plugins.groovy.impl.listener.ConditionType;
 import ru.mail.jira.plugins.groovy.impl.listener.ScriptedEventListener;
 import ru.mail.jira.plugins.groovy.impl.listener.ConditionDescriptor;
@@ -48,10 +44,10 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     private final ActiveObjects ao;
     private final I18nHelper i18nHelper;
     private final JsonMapper jsonMapper;
-    private final AuditLogRepository auditLogRepository;
     private final ChangelogHelper changelogHelper;
     private final ScriptService scriptService;
     private final ExecutionRepository executionRepository;
+    private final AuditService auditService;
     private final DelegatingClassLoader classLoader;
 
     @Autowired
@@ -60,10 +56,10 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         @ComponentImport ActiveObjects ao,
         @ComponentImport I18nHelper i18nHelper,
         JsonMapper jsonMapper,
-        AuditLogRepository auditLogRepository,
         ChangelogHelper changelogHelper,
         ScriptService scriptService,
         ExecutionRepository executionRepository,
+        AuditService auditService,
         DelegatingClassLoader classLoader
     ) {
         cache = cacheManager.getCache(EventListenerRepositoryImpl.class.getCanonicalName() + ".cache",
@@ -77,10 +73,10 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         this.ao = ao;
         this.i18nHelper = i18nHelper;
         this.jsonMapper = jsonMapper;
-        this.auditLogRepository = auditLogRepository;
         this.changelogHelper = changelogHelper;
         this.scriptService = scriptService;
         this.executionRepository = executionRepository;
+        this.auditService = auditService;
         this.classLoader = classLoader;
     }
 
@@ -127,15 +123,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         cache.remove(VALUE_KEY);
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.LISTENER,
-                listener.getID(),
-                EntityAction.CREATED,
-                comment
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.CREATED, listener, diff, comment);
 
         return buildDto(listener, true, true);
     }
@@ -164,15 +152,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         cache.remove(VALUE_KEY);
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.LISTENER,
-                listener.getID(),
-                EntityAction.UPDATED,
-                comment
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.UPDATED, listener, diff, comment);
 
         return buildDto(listener, true, true);
     }
@@ -185,15 +165,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         cache.remove(VALUE_KEY);
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.LISTENER,
-                listener.getID(),
-                EntityAction.DELETED,
-                listener.getID() + " - " + listener.getName()
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.DELETED, listener, null, listener.getID() + " - " + listener.getName());
     }
 
     @Override
@@ -204,20 +176,16 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         cache.remove(VALUE_KEY);
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.LISTENER,
-                listener.getID(),
-                EntityAction.RESTORED,
-                listener.getID() + " - " + listener.getName()
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.RESTORED, listener, null, listener.getID() + " - " + listener.getName());
     }
 
     @Override
     public void invalidate() {
         cache.removeAll();
+    }
+
+    private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, Listener listener, String diff, String description) {
+        auditService.addAuditLogAndNotify(user, action, EntityType.LISTENER, listener, diff, description);
     }
 
     private EventListenerDto buildDto(Listener listener, boolean includeChangelogs, boolean includeErrorCount) {

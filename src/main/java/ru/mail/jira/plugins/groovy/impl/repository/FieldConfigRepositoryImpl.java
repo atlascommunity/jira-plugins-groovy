@@ -16,21 +16,19 @@ import com.google.common.collect.ImmutableList;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.entity.*;
+import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.RestFieldException;
-import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.api.entity.EntityType;
-import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigDto;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigForm;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScript;
-import ru.mail.jira.plugins.groovy.api.entity.EntityAction;
-import ru.mail.jira.plugins.groovy.api.entity.FieldConfig;
-import ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.cf.ScriptedCFType;
 import ru.mail.jira.plugins.groovy.impl.cf.TemplateScriptedCFType;
@@ -47,6 +45,8 @@ import java.util.stream.Stream;
 
 @Component
 public class FieldConfigRepositoryImpl implements FieldConfigRepository {
+    private final Logger logger = LoggerFactory.getLogger(FieldConfigRepositoryImpl.class);
+
     private final ActiveObjects ao;
     private final I18nHelper i18nHelper;
     private final FieldConfigManager fieldConfigManager;
@@ -54,7 +54,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
     private final CustomFieldManager customFieldManager;
     private final ScriptService scriptService;
     private final ChangelogHelper changelogHelper;
-    private final AuditLogRepository auditLogRepository;
+    private final AuditService auditService;
     private final Cache<Long, FieldScript> scriptCache;
     private final ScriptInvalidationService invalidationService;
     private final ExecutionRepository executionRepository;
@@ -67,9 +67,9 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         @ComponentImport FieldConfigSchemeManager fieldConfigSchemeManager,
         @ComponentImport CustomFieldManager customFieldManager,
         @ComponentImport CacheManager cacheManager,
+        AuditService auditService,
         ScriptService scriptService,
         ChangelogHelper changelogHelper,
-        AuditLogRepository auditLogRepository,
         ScriptInvalidationService invalidationService,
         ExecutionRepository executionRepository
     ) {
@@ -78,8 +78,12 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         this.fieldConfigManager = fieldConfigManager;
         this.fieldConfigSchemeManager = fieldConfigSchemeManager;
         this.customFieldManager = customFieldManager;
+        this.auditService = auditService;
         this.scriptService = scriptService;
         this.changelogHelper = changelogHelper;
+        this.invalidationService = invalidationService;
+        this.executionRepository = executionRepository;
+
         this.scriptCache = cacheManager
             .getCache(
                 FieldConfigRepositoryImpl.class.getCanonicalName() + ".cache",
@@ -89,9 +93,6 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
                     .replicateViaInvalidation()
                     .build()
             );
-        this.auditLogRepository = auditLogRepository;
-        this.invalidationService = invalidationService;
-        this.executionRepository = executionRepository;
     }
 
     @Override
@@ -132,6 +133,8 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
 
         EntityAction action;
         String comment;
+        String diff;
+        String templateDiff = null;
 
         if (fieldConfig == null) {
             validate(true, isTemplated, form);
@@ -146,11 +149,11 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
                 new DBParam("VELOCITY_PARAMS_ENABLED", form.isVelocityParamsEnabled())
             );
 
-            String diff = changelogHelper.generateDiff(configId, "", "field", "", form.getScriptBody());
+            diff = changelogHelper.generateDiff(configId, "", "field", "", form.getScriptBody());
 
             Map<String, Object> additionalParams = new HashMap<>();
             if (isTemplated) {
-                String templateDiff = changelogHelper.generateDiff(configId, "", "field", "", form.getTemplate());
+                templateDiff = changelogHelper.generateDiff(configId, "", "field", "", form.getTemplate());
                 additionalParams.put("TEMPLATE_DIFF", StringUtils.isEmpty(templateDiff) ? "no changes" : templateDiff);
             }
 
@@ -165,11 +168,11 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         } else {
             validate(false, isTemplated, form);
 
-            String diff = changelogHelper.generateDiff(configId, "field", "field", fieldConfig.getScriptBody(), form.getScriptBody());
+            diff = changelogHelper.generateDiff(configId, "field", "field", fieldConfig.getScriptBody(), form.getScriptBody());
 
             Map<String, Object> additionalParams = new HashMap<>();
             if (isTemplated) {
-                String templateDiff = changelogHelper.generateDiff(configId, "field", "field", fieldConfig.getTemplate(), form.getTemplate());
+                templateDiff = changelogHelper.generateDiff(configId, "field", "field", fieldConfig.getTemplate(), form.getTemplate());
                 additionalParams.put("TEMPLATE_DIFF", StringUtils.isEmpty(templateDiff) ? "no changes" : templateDiff);
             }
 
@@ -186,18 +189,16 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             action = EntityAction.UPDATED;
         }
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.CUSTOM_FIELD,
-                fieldConfig.getID(),
-                action,
-                comment
-            )
-        );
+        CustomField cf = jiraFieldConfig.getCustomField();
+
+        addAuditLogAndNotify(user, action, fieldConfig, cf != null ? cf.getName() : "undefined", diff, templateDiff, comment);
 
         scriptCache.remove(configId);
-        invalidationService.invalidateField(jiraFieldConfig.getCustomField().getIdAsLong());
+        if (cf != null) {
+            invalidationService.invalidateField(cf.getIdAsLong());
+        } else {
+            logger.error("CustomField is null for field config {}", jiraFieldConfig.getId());
+        }
         return buildDto(jiraFieldConfig, fieldConfig, true, true);
     }
 
@@ -225,6 +226,16 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             fieldConfig.getTemplate(),
             fieldConfig.getCacheable(),
             fieldConfig.isVelocityParamsEnabled()
+        );
+    }
+
+    private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, FieldConfig fieldConfig, String fieldName, String diff, String templateDiff, String description) {
+        auditService.addAuditLogAndNotify(
+            user, action,
+            EntityType.CUSTOM_FIELD,
+            fieldConfig.getID(), fieldName,
+            diff, templateDiff,
+            description
         );
     }
 

@@ -27,20 +27,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.util.RestFieldException;
-import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.RunInfo;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskForm;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskDto;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.TransitionOptionsDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
-import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ScheduledTaskRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
 import ru.mail.jira.plugins.groovy.impl.scheduled.JobUtil;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
-import ru.mail.jira.plugins.groovy.util.Const;
+import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 
@@ -63,7 +60,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
     private final SchedulerService schedulerService;
     private final SearchService searchService;
     private final ChangelogHelper changelogHelper;
-    private final AuditLogRepository auditLogRepository;
+    private final AuditService auditService;
     private final UserMapper userMapper;
     private final ScriptService scriptService;
 
@@ -78,8 +75,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         @ComponentImport SchedulerService schedulerService,
         @ComponentImport SearchService searchService,
         ChangelogHelper changelogHelper,
-        AuditLogRepository auditLogRepository,
-        UserMapper userMapper,
+        AuditService auditService, UserMapper userMapper,
         ScriptService scriptService
     ) {
         this.ao = ao;
@@ -91,7 +87,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         this.schedulerService = schedulerService;
         this.searchService = searchService;
         this.changelogHelper = changelogHelper;
-        this.auditLogRepository = auditLogRepository;
+        this.auditService = auditService;
         this.userMapper = userMapper;
         this.scriptService = scriptService;
     }
@@ -139,15 +135,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
 
         changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, comment);
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.SCHEDULED_TASK,
-                task.getID(),
-                EntityAction.CREATED,
-                comment
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.CREATED, task, diff, comment);
 
         return buildDto(task, true, true);
     }
@@ -176,15 +164,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         task.setTransitionOptions(form.getTransitionOptions() != null ? form.getTransitionOptions().toInt() : null);
         task.save();
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.SCHEDULED_TASK,
-                task.getID(),
-                EntityAction.UPDATED,
-                comment
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.UPDATED, task, diff, comment);
 
         return buildDto(task, true, true);
     }
@@ -196,15 +176,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         task.setEnabled(enabled);
         task.save();
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.SCHEDULED_TASK,
-                task.getID(),
-                enabled ? EntityAction.ENABLED : EntityAction.DISABLED,
-                task.getID() + " - " + task.getName()
-            )
-        );
+        addAuditLogAndNotify(user, enabled ? EntityAction.ENABLED : EntityAction.DISABLED, task, null, task.getID() + " - " + task.getName());
     }
 
     @Override
@@ -214,15 +186,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         task.setDeleted(true);
         task.save();
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.SCHEDULED_TASK,
-                task.getID(),
-                EntityAction.DELETED,
-                task.getID() + " - " + task.getName()
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.DELETED, task, null, task.getID() + " - " + task.getName());
     }
 
     @Override
@@ -232,17 +196,13 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         task.setDeleted(false);
         task.save();
 
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.SCHEDULED_TASK,
-                task.getID(),
-                EntityAction.RESTORED,
-                task.getID() + " - " + task.getName()
-            )
-        );
+        addAuditLogAndNotify(user, EntityAction.RESTORED, task, null, task.getID() + " - " + task.getName());
 
         return buildDto(task, true, true);
+    }
+
+    private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, ScheduledTask task, String diff, String description) {
+        auditService.addAuditLogAndNotify(user, action, EntityType.SCHEDULED_TASK, task, diff, description);
     }
 
     private void validateForm(boolean isNew, ScheduledTaskForm form) {

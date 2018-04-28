@@ -1,19 +1,10 @@
 package ru.mail.jira.plugins.groovy.api.entity;
 
-import net.java.ao.Entity;
 import net.java.ao.OneToMany;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 
-public interface Listener extends Entity {
-    @NotNull
-    String getName();
-    void setName(String name);
-
-    @StringLength(StringLength.UNLIMITED)
-    void setDescription(String description);
-    String getDescription();
-
+public interface Listener extends AbstractScript {
     @NotNull
     String getUuid();
     void setUuid(String uuid);
@@ -30,8 +21,4 @@ public interface Listener extends Entity {
 
     @OneToMany(reverse = "getListener")
     ListenerChangelog[] getChangelogs();
-
-    @NotNull
-    boolean isDeleted();
-    void setDeleted(boolean deleted);
 }

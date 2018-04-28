@@ -1,19 +1,10 @@
 package ru.mail.jira.plugins.groovy.api.entity;
 
-import net.java.ao.Entity;
 import net.java.ao.OneToMany;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 
-public interface Script extends Entity {
-    @NotNull
-    void setName(String name);
-    String getName();
-
-    @StringLength(StringLength.UNLIMITED)
-    void setDescription(String description);
-    String getDescription();
-
+public interface Script extends AbstractScript {
     @NotNull
     @StringLength(StringLength.UNLIMITED)
     void setScriptBody(String scriptBody);
@@ -32,8 +23,4 @@ public interface Script extends Entity {
 
     void setTypes(String types);
     String getTypes();
-
-    @NotNull
-    void setDeleted(boolean deleted);
-    boolean isDeleted();
 }

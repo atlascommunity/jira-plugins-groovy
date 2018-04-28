@@ -1,20 +1,15 @@
 package ru.mail.jira.plugins.groovy.api.entity;
 
-import net.java.ao.Entity;
 import net.java.ao.OneToMany;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 import net.java.ao.schema.Unique;
 
-public interface RestScript extends Entity {
+public interface RestScript extends AbstractScript {
     @NotNull
     @Unique
     void setName(String name);
     String getName();
-
-    @StringLength(StringLength.UNLIMITED)
-    void setDescription(String description);
-    String getDescription();
 
     @NotNull
     void setUuid(String uuid);
@@ -36,8 +31,4 @@ public interface RestScript extends Entity {
 
     @OneToMany(reverse = "getScript")
     RestChangelog[] getChangelogs();
-
-    @NotNull
-    void setDeleted(boolean deleted);
-    boolean isDeleted();
 }

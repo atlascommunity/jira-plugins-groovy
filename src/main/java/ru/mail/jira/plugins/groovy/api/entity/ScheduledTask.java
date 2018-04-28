@@ -1,22 +1,13 @@
 package ru.mail.jira.plugins.groovy.api.entity;
 
-import net.java.ao.Entity;
 import net.java.ao.OneToMany;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 
-public interface ScheduledTask extends Entity {
+public interface ScheduledTask extends AbstractScript {
     @NotNull
     String getUuid();
     void setUuid(String uuid);
-
-    @NotNull
-    String getName();
-    void setName(String name);
-
-    @StringLength(StringLength.UNLIMITED)
-    void setDescription(String description);
-    String getDescription();
 
     @NotNull
     String getScheduleExpression();
@@ -50,10 +41,6 @@ public interface ScheduledTask extends Entity {
     @NotNull
     boolean isEnabled();
     void setEnabled(boolean enabled);
-
-    @NotNull
-    boolean isDeleted();
-    void setDeleted(boolean deleted);
 
     @OneToMany(reverse = "getTask")
     ScheduledTaskChangelog[] getChangelogs();

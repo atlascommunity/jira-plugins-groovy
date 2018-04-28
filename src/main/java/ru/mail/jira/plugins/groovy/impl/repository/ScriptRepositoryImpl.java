@@ -13,17 +13,14 @@ import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.*;
-import ru.mail.jira.plugins.groovy.api.dto.notification.NotificationDto;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
-import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
-import ru.mail.jira.plugins.groovy.api.service.NotificationService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.*;
 import ru.mail.jira.plugins.groovy.api.entity.EntityType;
-import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.directory.*;
 import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.api.service.WatcherService;
@@ -41,11 +38,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     private final ScriptInvalidationService scriptInvalidationService;
     private final ScriptService scriptService;
     private final JsonMapper jsonMapper;
-    private final AuditLogRepository auditLogRepository;
     private final ExecutionRepository executionRepository;
     private final ChangelogHelper changelogHelper;
-    private final NotificationService notificationService;
     private final WatcherService watcherService;
+    private final AuditService auditService;
 
     @Autowired
     public ScriptRepositoryImpl(
@@ -55,11 +51,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         ScriptInvalidationService scriptInvalidationService,
         ScriptService scriptService,
         JsonMapper jsonMapper,
-        AuditLogRepository auditLogRepository,
         ExecutionRepository executionRepository,
         ChangelogHelper changelogHelper,
-        NotificationService notificationService,
-        WatcherService watcherService
+        WatcherService watcherService,
+        AuditService auditService
     ) {
         this.i18nHelper = i18nHelper;
         this.clusterLockService = clusterLockService;
@@ -67,11 +62,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         this.scriptInvalidationService = scriptInvalidationService;
         this.scriptService = scriptService;
         this.jsonMapper = jsonMapper;
-        this.auditLogRepository = auditLogRepository;
         this.executionRepository = executionRepository;
         this.changelogHelper = changelogHelper;
-        this.notificationService = notificationService;
         this.watcherService = watcherService;
+        this.auditService = auditService;
     }
 
     private ScriptDirectory getParentDirectory(Integer parentId) {
@@ -189,6 +183,14 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         directory.save();
 
         addAuditLogAndNotify(user, EntityAction.MOVED, directory, getName(oldParent) + " -> " + getName(newParent));
+    }
+
+    private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, ScriptDirectory directory, String description) {
+        auditService.addAuditLogAndNotify(
+            user, action,
+            EntityType.REGISTRY_DIRECTORY, directory.getID(), directory.getName(),
+            null, null, description, getWatchers(directory)
+        );
     }
 
     @Override
@@ -345,45 +347,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
         restoreDirectory(user, script.getDirectory());
 
-        addAuditLogAndNotify(user, EntityAction.DELETED, script, null, script.getID() + " - " + script.getName());
-    }
-
-    private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, ScriptDirectory directory, String description) {
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.REGISTRY_DIRECTORY,
-                directory.getID(),
-                action,
-                description
-            )
-        );
-
-        notificationService.sendNotifications(
-            new NotificationDto(
-                user, action, EntityType.REGISTRY_DIRECTORY, directory.getName(), directory.getID(), null, null, description
-            ),
-            getWatchers(directory)
-        );
+        addAuditLogAndNotify(user, EntityAction.RESTORED, script, null, script.getID() + " - " + script.getName());
     }
 
     private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, Script script, String diff, String description) {
-        auditLogRepository.create(
-            user,
-            new AuditLogEntryForm(
-                EntityType.REGISTRY_SCRIPT,
-                script.getID(),
-                action,
-                description
-            )
-        );
-
-        notificationService.sendNotifications(
-            new NotificationDto(
-                user, action, EntityType.REGISTRY_SCRIPT, script.getName(), script.getID(), diff, null, description
-            ),
-            getWatchers(script)
-        );
+        auditService.addAuditLogAndNotify(user, action, EntityType.REGISTRY_SCRIPT, script, diff, description, getWatchers(script));
     }
 
     private RegistryScriptDto buildScriptDto(Script script, boolean includeChangelogs, boolean expandName, boolean includeErrorCount) {
