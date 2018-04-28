@@ -85,6 +85,8 @@ export class ScriptRegistry extends React.Component {
         }
     };
 
+    _createDirectory = () => this._activateCreateDialog(null, 'directory');
+
     _onDragStart = () => {
         this.setState({isDragging: true});
     };

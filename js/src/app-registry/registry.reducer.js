@@ -217,6 +217,14 @@ function watchesReducer(kind) {
             return state.filter(id => id !== action.id);
         }
 
+        if (action.type === ADD_SCRIPT && kind === 'script') {
+            return [...state, action.script.id];
+        }
+
+        if (action.type === ADD_DIRECTORY && kind === 'directory') {
+            return [...state, action.directory.id];
+        }
+
         return state;
     };
 }
