@@ -91,7 +91,8 @@
           "const": true
         }
       }
-    ]
+    ],
+    "flowtype/no-flow-fix-me-comments": [1]
   },
   "settings": {
     "flowtype": {
