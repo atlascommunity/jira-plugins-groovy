@@ -1,11 +1,12 @@
 //@flow
 import * as React from 'react';
 
-import Flag from '@atlaskit/flag';
 import {colors} from '@atlaskit/theme';
 
 import InfoIcon from '@atlaskit/icon/glyph/info';
 import ErrorIcon from '@atlaskit/icon/glyph/error';
+
+import './messages.less';
 
 
 type MessageProps = {
@@ -15,22 +16,32 @@ type MessageProps = {
 
 export function InfoMessage({title, children}: MessageProps): React.Node {
     return (
-        //$FlowFixMe
-        <Flag
-            icon={<InfoIcon label="info" primaryColor={colors.P300}/>}
-            title={title}
-            description={children}
-        />
+        <div className="InfoMessage">
+            <div className="Icon">
+                <InfoIcon label="info" primaryColor={colors.P300} size="medium"/>
+            </div>
+            <div className="Body">
+                <div className="Title">
+                    {title}
+                </div>
+                {children}
+            </div>
+        </div>
     );
 }
 
 export function ErrorMessage({title, children}: MessageProps): React.Node {
     return (
-        //$FlowFixMe
-        <Flag
-            icon={<ErrorIcon label="info" primaryColor={colors.R300}/>}
-            title={title}
-            description={children}
-        />
+        <div className="ErrorMessage">
+            <div className="Icon">
+                <ErrorIcon label="error" primaryColor={colors.R300} size="medium"/>
+            </div>
+            <div className="Body">
+                <div className="Title">
+                    {title}
+                </div>
+                {children}
+            </div>
+        </div>
     );
 }
