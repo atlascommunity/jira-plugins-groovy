@@ -4,12 +4,14 @@ import * as React from 'react';
 import Button, {ButtonGroup} from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
 import Badge from '@atlaskit/badge';
+import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
 
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
 import BitbucketSourceIcon from '@atlaskit/icon/glyph/bitbucket/source';
 import RecentIcon from '@atlaskit/icon/glyph/recent';
 import TrashIcon from '@atlaskit/icon/glyph/trash';
+import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
 
 import type {ScriptType, ExecutionType, ChangelogType} from './types';
 
@@ -27,7 +29,12 @@ import {CommonMessages} from '../../i18n/common.i18n';
 import {executionService} from '../../service/services';
 
 
-type ScriptProps = {
+type DropdownItemType = {
+    label: string,
+    onClick: VoidCallback
+}
+
+export type ScriptProps = {
     withChangelog: boolean,
     collapsible: boolean,
     headerless: boolean,
@@ -43,6 +50,7 @@ type ScriptProps = {
     title?: React.Node,
     children?: React.Node,
     additionalButtons?: Array<React.Element<any>>,
+    dropdownItems?: Array<DropdownItemType>,
     additionalParameters?: Array<ScriptParam>
 }
 
@@ -128,7 +136,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
     };
 
     render(): React.Node {
-        const {script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons, additionalParameters, headerless} = this.props;
+        const {script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons, additionalParameters, dropdownItems, headerless} = this.props;
         const {activeSource, showCode, executions, executionsReady, onlyLastExecutions} = this.state;
 
         let codeBlock : React.Node = null;
@@ -241,6 +249,30 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
 
         if (additionalButtons) {
             buttons.push(...additionalButtons);
+        }
+
+        if (dropdownItems) {
+            buttons.push(
+                <DropdownMenu
+                    key="etc"
+
+                    position="bottom right"
+
+                    triggerType="button"
+                    triggerButtonProps={{
+                        appearance: 'subtle',
+                        iconBefore: <MoreVerticalIcon label=""/>
+                    }}
+                >
+                    <DropdownItemGroup>
+                        {dropdownItems.map((item: *, i: number): * =>
+                            <DropdownItem onClick={item.onClick} key={i}>
+                                {item.label}
+                            </DropdownItem>
+                        )}
+                    </DropdownItemGroup>
+                </DropdownMenu>
+            );
         }
 
         return (

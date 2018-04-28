@@ -2,6 +2,8 @@
 import type {ChangelogType} from './script/types';
 
 
+export type EntityType = 'REGISTRY_SCRIPT' | 'REGISTRY_DIRECTORY' | 'LISTENER' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK';
+
 export type IssueEventType = {
     id: number,
     name: string

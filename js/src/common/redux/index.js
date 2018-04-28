@@ -70,7 +70,7 @@ export type RemoveWatchAction = WatcherAction<typeof REMOVE_WATCH>;
 
 type WatcherActionType = LoadAction | DeleteItemAction | ItemAction<typeof ADD_ITEM> | AddWatchAction | RemoveWatchAction;
 
-export function watchersReducer(state: WatchesListType, action: WatcherActionType): WatchesListType {
+export function watchesReducer(state: WatchesListType, action: WatcherActionType): WatchesListType {
     if (state === undefined) {
         return [];
     }
@@ -143,6 +143,19 @@ export const ItemActionCreators = {
     deleteItem: (id: number): DeleteItemAction => {
         return {
             type: DELETE_ITEM, id: id
+        };
+    }
+};
+
+export const WatchActionCreators = {
+    addWatch: (id: number): AddWatchAction => {
+        return {
+            type: ADD_WATCH, id
+        };
+    },
+    removeWatch: (id: number): RemoveWatchAction => {
+        return {
+            type: REMOVE_WATCH, id
         };
     }
 };

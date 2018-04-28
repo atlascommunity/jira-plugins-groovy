@@ -12,18 +12,30 @@ import {ListenerModel} from '../model/listener.model';
 
 import {listenerService} from '../service/services';
 
-import {ItemActionCreators} from '../common/redux';
+import {ItemActionCreators, WatchActionCreators} from '../common/redux';
 
 import {ListenerTypeMessages} from '../i18n/listener.i18n';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 
-import Script, {ScriptParameters} from '../common/script';
+import {ScriptParameters} from '../common/script';
 
 import type {ObjectMap} from '../common/types';
 import type {ScriptParam} from '../common/script/ScriptParameters';
 
 import './ListenerRegistry.less';
+import {WatchableScript} from '../common/script/WatchableScript';
 
+
+const ConnectedWatchableScript = connect(
+    memoizeOne(
+        (state: *): * => {
+            return {
+                watches: state.watches
+            };
+        }
+    ),
+    WatchActionCreators
+)(WatchableScript);
 
 type Props = {
     listener: ListenerType,
@@ -91,7 +103,10 @@ class ListenerInternal extends React.PureComponent<Props> {
         const {listener, projects, eventTypes, onEdit} = this.props;
 
         return (
-            <Script
+            <ConnectedWatchableScript
+                entityId={listener.id}
+                entityType={'LISTENER'}
+
                 script={{
                     id: listener.uuid,
                     name: listener.name,
@@ -107,7 +122,7 @@ class ListenerInternal extends React.PureComponent<Props> {
                 onDelete={this._delete}
             >
                 <ScriptParameters params={this._getParams(projects, eventTypes, listener.condition)}/>
-            </Script>
+            </ConnectedWatchableScript>
         );
     }
 }
