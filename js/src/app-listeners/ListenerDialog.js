@@ -10,18 +10,16 @@ import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 
 import {ConditionPicker} from './ConditionPicker';
-import {ListenerActionCreators} from './listeners.reducer';
 
 import {ListenerMessages} from '../i18n/listener.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
-
-import {fillListenerKeys} from '../model/listener.model';
 
 import {listenerService} from '../service/services';
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
 import {ErrorMessage} from '../common/ak/messages';
+import {ItemActionCreators} from '../common/redux';
 
 
 //AbstractProjectEvent
@@ -46,16 +44,16 @@ function extractShortClassName(className) {
 }
 
 @connect(
-    () => { return{}; },
-    ListenerActionCreators
+    null,
+    ItemActionCreators
 )
 export class ListenerDialog extends React.Component {
     static propTypes = {
         isNew: PropTypes.bool.isRequired,
         onClose: PropTypes.func.isRequired,
         id: PropTypes.number,
-        updateListener: PropTypes.func.isRequired,
-        addListener: PropTypes.func.isRequired
+        updateItem: PropTypes.func.isRequired,
+        addItem: PropTypes.func.isRequired
     };
 
     state = {
@@ -93,8 +91,7 @@ export class ListenerDialog extends React.Component {
 
             listenerService
                 .getListener(props.id)
-                .then(rawListener => {
-                    const listener = fillListenerKeys(rawListener);
+                .then(listener => {
                     this.setState({
                         values: new Map({
                             name: listener.name,
@@ -133,7 +130,7 @@ export class ListenerDialog extends React.Component {
                 .then(
                     listener => {
                         onClose();
-                        this.props.addListener(fillListenerKeys(listener));
+                        this.props.addItem(listener);
                     },
                     this._handleError
                 );
@@ -143,7 +140,7 @@ export class ListenerDialog extends React.Component {
                 .then(
                     listener => {
                         onClose();
-                        this.props.updateListener(fillListenerKeys(listener));
+                        this.props.updateItem(listener);
                     },
                     this._handleError
                 );

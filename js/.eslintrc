@@ -3,6 +3,7 @@
     "no-cond-assign": ["error", "always"],
     "no-constant-condition": ["warn"],
     "no-duplicate-case": ["error"],
+    "no-case-declarations": ["error"],
     "curly": [2, "all"],
     "block-spacing": [2, "always"],
     "quotes": ["error", "single"],

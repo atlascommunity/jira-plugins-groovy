@@ -1,4 +1,22 @@
 //@flow
+import type {ChangelogType} from './script/types';
+
+
+export type IssueEventType = {
+    id: number,
+    name: string
+};
+
+export type ProjectType = any; //todo
+
+export type ScriptEntity = {
+    id: number,
+    name: string,
+    description: ?string,
+    errorCount: number,
+    scriptBody: string,
+    changelogs: Array<ChangelogType>,
+};
 
 export type FieldProps = {
     label: string,
@@ -44,6 +62,8 @@ export type SyntaxError = ScriptError & {
     startColumn: number,
     endColumn: number
 };
+
+export type ObjectMap = {[string]: string};
 
 export type VoidCallback = () => void;
 

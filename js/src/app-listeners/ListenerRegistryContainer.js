@@ -1,67 +1,45 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+//@flow
+import * as React from 'react';
 
 import {connect} from 'react-redux';
-
-// eslint-disable-next-line import/no-extraneous-dependencies
-import AJS from 'AJS';
+import memoizeOne from 'memoize-one';
 
 import {ListenerRegistry} from './ListenerRegistry';
 import {ListenerDialog} from './ListenerDialog';
 
-import {ListenerModel} from '../model/listener.model';
+import type {ListenerType} from './types';
+
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 
 
-@connect(
-    state => {
-        return {
-            listeners: state.listeners,
-            ready: state.ready
-        };
-    }
-)
-export class ListenerRegistryContainer extends React.Component {
-    static propTypes ={
-        listeners: PropTypes.arrayOf(ListenerModel).isRequired,
-        ready: PropTypes.shape({
-            listeners: PropTypes.bool.isRequired,
-            projects: PropTypes.bool.isRequired,
-            events: PropTypes.bool.isRequired
-        }).isRequired
-    };
+type Props = {
+    listeners: Array<ListenerType>,
+    ready: boolean
+}
 
+type State = {
+    dialogProps: ?{
+        isNew: boolean,
+        id: ?number
+    }
+}
+
+class ListenerRegistryContainerInternal extends React.PureComponent<Props, State> {
     state = {
         dialogProps: null
     };
-
-    _isReady(props=this.props) {
-        const ready = props.ready;
-        return ready.listeners && ready.projects && ready.events;
-    }
 
     _triggerDialog = (isNew, id) => this.setState({ dialogProps: {isNew, id} });
 
     _closeDialog = () => this.setState({ dialogProps: null });
 
-    componentDidUpdate(prevProps) {
-        const readyNow = this._isReady();
-        if (readyNow !== this._isReady(prevProps)) {
-            if (readyNow) {
-                AJS.undim();
-            } else {
-                AJS.dim();
-            }
-        }
-    }
-
-    render() {
+    render(): React.Node {
         const {dialogProps} = this.state;
-        const {listeners} = this.props;
+        const {listeners, ready} = this.props;
 
-        let content = null;
+        let content: React.Node = null;
 
-        if (!this._isReady()) {
+        if (!ready) {
             content = <LoadingSpinner/>;
         } else {
             content = <ListenerRegistry listeners={listeners} triggerDialog={this._triggerDialog}/>;
@@ -75,3 +53,14 @@ export class ListenerRegistryContainer extends React.Component {
         );
     }
 }
+
+export const ListenerRegistryContainer = connect(
+    memoizeOne(
+        (state: *): * => {
+            return {
+                listeners: state.items,
+                ready: state.ready
+            };
+        }
+    )
+)(ListenerRegistryContainerInternal);
