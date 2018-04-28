@@ -9,8 +9,6 @@ import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 
-import {ScriptActionCreators} from './rest.reducer';
-
 import {RestMessages} from '../i18n/rest.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 
@@ -23,6 +21,7 @@ import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {ErrorMessage} from '../common/ak/messages';
 import {RegistryMessages} from '../i18n/registry.i18n';
+import {ItemActionCreators} from '../common/redux';
 
 
 const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { label: method, value: method }; });
@@ -30,15 +29,15 @@ const bindings = [ Bindings.method, Bindings.headers, Bindings.uriInfo, Bindings
 
 @connect(
     () => { return{}; },
-    ScriptActionCreators
+    ItemActionCreators
 )
 export class RestScriptDialog extends React.Component {
     static propTypes = {
         isNew: PropTypes.bool.isRequired,
         onClose: PropTypes.func.isRequired,
         id: PropTypes.number,
-        updateScript: PropTypes.func.isRequired,
-        addScript: PropTypes.func.isRequired
+        updateItem: PropTypes.func.isRequired,
+        addItem: PropTypes.func.isRequired
     };
 
     state = {
@@ -125,7 +124,7 @@ export class RestScriptDialog extends React.Component {
                 .then(
                     script => {
                         onClose();
-                        this.props.addScript(script);
+                        this.props.addItem(script);
                     },
                     this._handleError
                 );
@@ -135,7 +134,7 @@ export class RestScriptDialog extends React.Component {
                 .then(
                     script => {
                         onClose();
-                        this.props.updateScript(script);
+                        this.props.updateItem(script);
                     },
                     this._handleError
                 );

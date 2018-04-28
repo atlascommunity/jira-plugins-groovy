@@ -124,7 +124,7 @@ export function wholeObjectReducerFactory<T, Field>(field: Field, defaultValue: 
 }
 
 export const ItemActionCreators = {
-    loadItems: (items: ItemListType, watches: WatchesListType, extraFields: {[string]: any}): LoadAction => {
+    loadItems: (items: ItemListType, watches: WatchesListType, extraFields?: {[string]: any}): LoadAction => {
         return {
             ...extraFields,
             type: LOAD_ITEMS, items, watches

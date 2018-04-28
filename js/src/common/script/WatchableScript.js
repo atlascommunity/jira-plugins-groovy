@@ -31,7 +31,9 @@ type State = {
     waitingWatch: boolean
 }
 
-export class WatchableScript extends React.Component<Props, State> {
+export class WatchableScript extends React.PureComponent<Props, State> {
+    static defaultProps = Script.defaultProps;
+
     state = {
         waitingWatch: false
     };

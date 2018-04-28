@@ -215,8 +215,8 @@
     uuid "^3.1.0"
 
 "@atlaskit/layer-manager@^3.0.0", "@atlaskit/layer-manager@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@atlaskit/layer-manager/-/layer-manager-3.0.1.tgz#2e29e4d1f041c44a414cdb449a709c4384600407"
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@atlaskit/layer-manager/-/layer-manager-3.0.3.tgz#a46dd575f3a7635ac6a46f2d629a15a2ac354d44"
   dependencies:
     focusin "^2.0.0"
     prop-types "^15.5.10"

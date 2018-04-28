@@ -190,7 +190,7 @@ module.exports = {
                             compact: true,
                             presets: ['react-app'],
                             plugins: [
-                                ['transform-decorators-legacy']
+                                ['transform-decorators-legacy', 'react-flow-props-to-prop-types']
                             ]
                         },
                     },

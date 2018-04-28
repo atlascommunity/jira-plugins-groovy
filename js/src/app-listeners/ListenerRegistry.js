@@ -53,6 +53,7 @@ export class ListenerRegistry extends React.PureComponent<Props> {
 
                 <div className="page-content ScriptList">
                     {listeners.map(listener =>
+                        //$FlowFixMe wtf
                         <Listener
                             key={listener.id}
                             listener={listener}
