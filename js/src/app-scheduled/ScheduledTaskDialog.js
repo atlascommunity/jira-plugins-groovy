@@ -15,7 +15,6 @@ import {Label} from '@atlaskit/field-base';
 
 import WarningIcon from '@atlaskit/icon/glyph/warning';
 
-import {TaskActionCreators} from './scheduled.reducer';
 import {types, typeList} from './types';
 
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
@@ -31,6 +30,7 @@ import {scheduledTaskService} from '../service/services';
 import {getMarkers} from '../common/error';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {Bindings} from '../common/bindings';
+import {ItemActionCreators} from '../common/redux';
 
 
 const issueBindings = [Bindings.issue];
@@ -40,14 +40,14 @@ function getValue(option) {
     return option ? option.value : null;
 }
 
-@connect(null, TaskActionCreators)
+@connect(null, ItemActionCreators)
 export class ScheduledTaskDialog extends React.Component {
     static propTypes = {
         isNew: PropTypes.bool.isRequired,
         onClose: PropTypes.func.isRequired,
         id: PropTypes.number,
-        updateTask: PropTypes.func.isRequired,
-        addTask: PropTypes.func.isRequired
+        updateItem: PropTypes.func.isRequired,
+        addItem: PropTypes.func.isRequired
     };
 
     state = {
@@ -140,7 +140,7 @@ export class ScheduledTaskDialog extends React.Component {
                 .then(
                     script => {
                         onClose();
-                        this.props.addTask(script);
+                        this.props.addItem(script);
                     },
                     this._handleError
                 );
@@ -150,7 +150,7 @@ export class ScheduledTaskDialog extends React.Component {
                 .then(
                     script => {
                         onClose();
-                        this.props.updateTask(script);
+                        this.props.updateItem(script);
                     },
                     this._handleError
                 );

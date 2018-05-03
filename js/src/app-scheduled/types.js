@@ -1,3 +1,8 @@
+//@flow
+import type {ScriptEntity} from '../common/types';
+import type {SingleValueType} from '../common/ak/types';
+
+//todo: move somewhere else
 export const types = {
     BASIC_SCRIPT: {
         name: 'Basic script',
@@ -19,9 +24,40 @@ export const types = {
 
 export const typeList = Object
     .keys(types)
-    .map(key => {
+    .map((key: string): * => {
         return {
             ...(types[key]),
             key
         };
     });
+
+export type ScheduledTaskTypeEnum = 'BASIC_SCRIPT' | 'ISSUE_JQL_SCRIPT' | 'ISSUE_JQL_TRANSITION' | 'DOCUMENT_ISSUE_JQL_SCRIPT';
+
+export type TransitionOptionsType = {
+    skipConditions: boolean,
+    skipValidators: boolean,
+    skipPermissions: boolean
+}
+
+export type RunOutcomeType = 'SUCCESS' | 'UNAVAILABLE' | 'ABORTED' | 'FAILED' | 'NOT_RAN';
+
+export type RunInfoType = {
+    startDate: string,
+    duration: number,
+    outcome: RunOutcomeType,
+    message: ?string
+}
+
+export type ScheduledTaskType = ScriptEntity & {
+    uuid: string,
+    type: ScheduledTaskTypeEnum,
+    enabled: boolean,
+    scheduleExpression: string,
+    user: ?SingleValueType,
+    issueJql: ?string,
+    issueWorkflow: ?SingleValueType,
+    issueWorkflowAction: ?SingleValueType,
+    transitionOptions: TransitionOptionsType,
+    lastRunInfo: ?RunInfoType,
+    nextRunDate: ?string
+}

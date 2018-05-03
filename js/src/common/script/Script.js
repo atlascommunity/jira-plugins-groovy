@@ -39,7 +39,7 @@ export type ScriptProps = {
     collapsible: boolean,
     headerless: boolean,
 
-    script: ScriptType,
+    script: ?ScriptType,
     template?: {
         body: string
     },
@@ -145,7 +145,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
 
         const isOpen : boolean = showCode || !collapsible;
 
-        if (isOpen) {
+        if (isOpen && script) {
             if (template) {
                 templateBlock = (
                     <div style={{overflow: 'hidden'}}>
@@ -160,7 +160,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
 
             codeBlock = (
                 <div className="flex-row editor">
-                    {withChangelog && script.changelogs &&
+                    {withChangelog && script && script.changelogs &&
                     <Changelog
                         changelogs={script.changelogs}
                         switchToChangelog={this._switchToChangelog}
@@ -315,7 +315,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                     {children}
                 </div>
                 {isOpen && <div className="ScriptBody">
-                    {script.description && <div className="scriptDescription">{script.description}</div>}
+                    {script && script.description && <div className="scriptDescription">{script.description}</div>}
                     {additionalParameters && <ScriptParameters params={additionalParameters}/>}
                     {codeBlock}
                     {executionBar}
