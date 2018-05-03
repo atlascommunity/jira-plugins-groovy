@@ -62,6 +62,7 @@ class RestScriptInternal extends React.PureComponent<Props> {
                 script={{
                     id: script.uuid,
                     name: script.name,
+                    description: script.description,
                     inline: true,
                     scriptBody: script.scriptBody,
                     changelogs: script.changelogs,

@@ -89,6 +89,7 @@ export class RestScriptDialog extends React.Component {
                                     value: group
                                 };
                             }),
+                            description: script.description,
                             comment: ''
                         }),
                         ready: true,
