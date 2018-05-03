@@ -24,7 +24,7 @@ type State = {
     editProps: ?DialogComponentProps
 }
 
-export class ScriptPage<T> extends React.Component<Props<T&ItemType>, State> {
+export class ScriptPage<T> extends React.PureComponent<Props<T&ItemType>, State> {
     state = {
         editProps: null,
         deleteProps: null

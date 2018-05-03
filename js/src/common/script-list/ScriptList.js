@@ -17,11 +17,9 @@ type Props<T> = {
     ScriptComponent: React.ComponentType<ScriptComponentProps<T>>
 }
 
-export class ScriptList<T> extends React.Component<Props<T&ItemType>> {
+export class ScriptList<T> extends React.PureComponent<Props<T&ItemType>> {
     render(): React.Node {
         const {isReady, items, i18n, onEdit, ScriptComponent} = this.props;
-
-        console.log(items, isReady);
 
         if (!isReady) {
             return <LoadingSpinner/>;
