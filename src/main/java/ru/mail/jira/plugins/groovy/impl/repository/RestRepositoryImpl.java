@@ -222,6 +222,7 @@ public class RestRepositoryImpl implements RestRepository {
         result.setId(script.getID());
         result.setUuid(script.getUuid());
         result.setName(script.getName());
+        result.setDescription(script.getDescription());
         result.setMethods(parseMethods(script.getMethods()));
         result.setGroups(parseGroups(script.getGroups()));
         result.setScriptBody(script.getScriptBody());

@@ -9,13 +9,17 @@ import type {RestScriptType} from './types';
 
 import {ScriptParameters} from '../common/script';
 
-import {restService} from '../service/services';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
+
 import {ItemActionCreators, WatchActionCreators} from '../common/redux';
-import type {VoidCallback} from '../common/types';
+
+import {restService} from '../service/services';
+
 import {WatchableScript} from '../common/script/WatchableScript';
+
+import type {ScriptComponentProps} from '../common/script-list/types';
 
 
 const ConnectedWatchableScript = connect(
@@ -29,13 +33,13 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
-type Props = {
-    script: RestScriptType,
-    onEdit: VoidCallback,
+type Props = ScriptComponentProps<RestScriptType> & {
     deleteItem: typeof ItemActionCreators.deleteItem
 }
 
 class RestScriptInternal extends React.PureComponent<Props> {
+    _onEdit = () => this.props.onEdit(this.props.script.id);
+
     _delete = () => {
         const script = this.props.script;
 
@@ -46,7 +50,7 @@ class RestScriptInternal extends React.PureComponent<Props> {
     };
 
     render(): React.Node {
-        const {script, onEdit} = this.props;
+        const {script} = this.props;
 
         const url = `${getPluginBaseUrl()}/custom/${script.name}`;
 
@@ -66,7 +70,7 @@ class RestScriptInternal extends React.PureComponent<Props> {
 
                 withChangelog={true}
 
-                onEdit={onEdit}
+                onEdit={this._onEdit}
                 onDelete={this._delete}
             >
                 <ScriptParameters

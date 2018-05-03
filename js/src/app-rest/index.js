@@ -9,13 +9,18 @@ import {createStore} from 'redux';
 import AJS from 'AJS';
 
 import {scriptsReducer} from './rest.reducer';
-import {RestRegistryContainer} from './RestRegistryContainer';
+import {RestRegistry} from './RestRegistry';
+import {RestScript} from './RestScript';
+import {RestScriptDialog} from './RestScriptDialog';
 
 import {restService, watcherService} from '../service/services';
 import {fixStyle} from '../common/fixStyle';
+import {ItemActionCreators} from '../common/redux';
+
+import {TitleMessages} from '../i18n/common.i18n';
+import {RestMessages} from '../i18n/rest.i18n';
 
 import '../flex.less';
-import {ItemActionCreators} from '../common/redux';
 
 
 const store = createStore(scriptsReducer, {scripts: [], ready: false});
@@ -36,7 +41,15 @@ AJS.toInit(() => {
 
     ReactDOM.render(
         <Provider store={store}>
-            <RestRegistryContainer/>
+            <RestRegistry
+                DialogComponent={RestScriptDialog}
+                ScriptComponent={RestScript}
+                i18n={{
+                    title: TitleMessages.rest,
+                    addItem: RestMessages.addScript,
+                    noItems: RestMessages.noScripts
+                }}
+            />
         </Provider>,
         element
     );
