@@ -82,28 +82,20 @@ class Field extends React.Component {
 
                 withChangelog={true}
 
-                additionalButtons={
-                    <div style={{marginLeft: '5px'}}>
-                        <DropdownMenu
-                            triggerType="button"
-                            triggerButtonProps={{appearance: 'subtle', iconBefore: <SettingsIcon label=""/>}}
-
-                            position="bottom right"
-                        >
-                            <DropdownItemGroup>
-                                <DropdownItem href={`${getBaseUrl()}/plugins/servlet/my-groovy/custom-field?fieldConfigId=${config.id}`}>
-                                    {JiraMessages.edit}{' '}{CommonMessages.script}
-                                </DropdownItem>
-                                <DropdownItem href={`${getBaseUrl()}/secure/admin/EditCustomField!default.jspa?id=${config.customFieldId}`}>
-                                    {JiraMessages.edit}{' '}{FieldMessages.customField}
-                                </DropdownItem>
-                                <DropdownItem href={`${getBaseUrl()}/secure/admin/ConfigureCustomField!default.jspa?customFieldId=${config.customFieldId}`}>
-                                    {JiraMessages.configure}{' '}{FieldMessages.customField}
-                                </DropdownItem>
-                            </DropdownItemGroup>
-                        </DropdownMenu>
-                    </div>
-                }
+                dropdownItems={[
+                    {
+                        label: `${JiraMessages.edit} ${CommonMessages.script}`,
+                        href: `${getBaseUrl()}/plugins/servlet/my-groovy/custom-field?fieldConfigId=${config.id}`
+                    },
+                    {
+                        label: `${JiraMessages.edit} ${FieldMessages.customField}`,
+                        href: `${getBaseUrl()}/secure/admin/EditCustomField!default.jspa?id=${config.customFieldId}`
+                    },
+                    {
+                        label: `${JiraMessages.configure} ${FieldMessages.customField}`,
+                        href: `${getBaseUrl()}/secure/admin/ConfigureCustomField!default.jspa?customFieldId=${config.customFieldId}`
+                    }
+                ]}
             >
                 {!config.uuid && <FieldError error={ErrorMessages.notConfigured}/>}
                 <ScriptParameters

@@ -31,7 +31,8 @@ import {executionService} from '../../service/services';
 
 type DropdownItemType = {
     label: string,
-    onClick: VoidCallback
+    onClick?: VoidCallback,
+    href?: string
 }
 
 export type ScriptProps = {
@@ -251,7 +252,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             buttons.push(...additionalButtons);
         }
 
-        if (dropdownItems) {
+        if (dropdownItems && dropdownItems.length) {
             buttons.push(
                 <DropdownMenu
                     key="etc"
@@ -266,7 +267,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                 >
                     <DropdownItemGroup>
                         {dropdownItems.map((item: *, i: number): * =>
-                            <DropdownItem onClick={item.onClick} key={i}>
+                            <DropdownItem onClick={item.onClick} key={i} href={item.href}>
                                 {item.label}
                             </DropdownItem>
                         )}
