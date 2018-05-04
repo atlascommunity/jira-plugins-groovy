@@ -20,8 +20,10 @@
     ],
     "eol-last": ["error", "always"],
 
+    "react/prefer-stateless-function": [1, { "ignorePureComponents": true }],
     "react/jsx-no-literals": [1, {"noStrings": false}],
     "react/jsx-no-target-blank": 2,
+
     "jsx-quotes": ["error", "prefer-double"],
 
     "import/order": [
@@ -92,7 +94,8 @@
         }
       }
     ],
-    "flowtype/no-flow-fix-me-comments": [1]
+    "flowtype/no-flow-fix-me-comments": [1],
+    "flowtype/semi": [2, "always"]
   },
   "settings": {
     "flowtype": {
