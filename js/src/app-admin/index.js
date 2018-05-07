@@ -49,7 +49,6 @@ const store = createStore(
 AJS.toInit(() => {
     fixStyle();
 
-    //todo: built-in scripts
     Promise
         //$FlowFixMe
         .all([adminScriptService.getAllScripts(), watcherService.getAllWatches('ADMIN_SCRIPT')])

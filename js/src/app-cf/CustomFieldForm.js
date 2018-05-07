@@ -22,7 +22,7 @@ const bindingsWithVelocity = [ Bindings.issue, Bindings.velocityParams ];
 export class CustomFieldForm extends React.Component {
     static propTypes = {
         id: PropTypes.number.isRequired,
-        fieldConfig: PropTypes.object.isRequired, //todo: shape
+        fieldConfig: PropTypes.object.isRequired,
         onChange: PropTypes.func.isRequired,
         onCancel: PropTypes.func.isRequired
     };

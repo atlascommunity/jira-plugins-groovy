@@ -63,7 +63,8 @@ export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction }) =
     preview: i18n.common.preview,
     validating: i18n.common.validating,
     issuesFound: i18n.common.issuesFound,
-    run: i18n.common.run
+    run: i18n.common.run,
+    back: i18n.common.back
 };
 
 export const DialogMessages: I18nMessages = {

@@ -1,17 +1,19 @@
 //@flow
 import {ajaxGet, ajaxPost, getBaseUrl, getPluginBaseUrl} from './ajaxHelper';
 
+import type {ProjectType, IssueEventType} from '../common/types';
+
 
 export type ValidationResult = {
     total: number
 };
 
 export class JiraService {
-    getAllProjects(): any { //todo
+    getAllProjects(): Promise<Array<ProjectType>> {
         return ajaxGet(`${getBaseUrl()}/rest/api/2/project`);
     }
 
-    getEventTypes(): any { //todo
+    getEventTypes(): Promise<Array<IssueEventType>> {
         return ajaxGet(`${getPluginBaseUrl()}/jira-api/eventType`);
     }
 

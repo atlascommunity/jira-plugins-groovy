@@ -9,11 +9,11 @@ export class WatcherService {
         return ajaxGet(`${getPluginBaseUrl()}/watch/${type}/all`);
     }
 
-    startWatching(type: EntityType, id: number): Promise<void> {
+    startWatching(type: EntityType, id: number|string): Promise<void> {
         return ajaxPost(`${getPluginBaseUrl()}/watch/${type}/${id}`);
     }
 
-    stopWatching(type: EntityType, id: number): Promise<void> {
+    stopWatching(type: EntityType, id: number|string): Promise<void> {
         return ajaxDelete(`${getPluginBaseUrl()}/watch/${type}/${id}`);
     }
 }

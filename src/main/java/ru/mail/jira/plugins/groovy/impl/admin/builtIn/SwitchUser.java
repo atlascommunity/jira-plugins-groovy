@@ -1,5 +1,8 @@
 package ru.mail.jira.plugins.groovy.impl.admin.builtIn;
 
+import com.atlassian.jira.auditing.AuditingCategory;
+import com.atlassian.jira.auditing.AuditingManager;
+import com.atlassian.jira.auditing.RecordRequest;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.web.context.HttpContext;
@@ -20,10 +23,15 @@ import java.util.Map;
 @Component
 public class SwitchUser implements BuiltInScript {
     private final HttpContext httpContext;
+    private final AuditingManager auditingManager;
 
     @Autowired
-    public SwitchUser(@ComponentImport HttpContext httpContext) {
+    public SwitchUser(
+        @ComponentImport HttpContext httpContext,
+        @ComponentImport AuditingManager auditingManager
+    ) {
         this.httpContext = httpContext;
+        this.auditingManager = auditingManager;
     }
 
     @Override
@@ -41,9 +49,15 @@ public class SwitchUser implements BuiltInScript {
                 throw new ValidationException("Session is null");
             }
 
+            auditingManager.store(new RecordRequest(
+                AuditingCategory.USER_MANAGEMENT,
+                "Switched user to \"" + user.getDisplayName() + "\" (" + user.getName() + ")",
+                "",
+                currentUser,
+                request.getRemoteAddr()
+            ));
             session.setAttribute(DefaultAuthenticator.LOGGED_IN_KEY, user);
-            //todo: audit log
-            return "Switched to user \"" + user.getDisplayName() + "\""; //todo: i18n
+            return "Switched to user \"" + user.getDisplayName() + "\"";
         }
 
         throw new ValidationException("User not specified");

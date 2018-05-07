@@ -13,7 +13,7 @@ export type WorkflowScriptType = 'CONDITION' | 'VALIDATOR' | 'FUNCTION';
 
 export type RegistryScriptType = ScriptType & {
     types: Array<WorkflowScriptType>
-}
+};
 
 export type RegistryDirectoryType = {
     id: number,
@@ -25,7 +25,7 @@ export type RegistryDirectoryType = {
 export type WorkflowActionItemType = {
     type: WorkflowScriptType,
     order: number
-}
+};
 
 export type WorkflowActionType = {
     id: number,

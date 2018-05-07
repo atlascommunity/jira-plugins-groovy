@@ -54,7 +54,6 @@ export class RunNowDialog extends React.PureComponent {
 
         if (result) {
             return (
-                //todo: i18n
                 <ModalDialog
                     width="small"
                     scrollBehavior="outside"

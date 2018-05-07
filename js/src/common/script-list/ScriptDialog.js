@@ -88,7 +88,7 @@ export class ScriptDialog extends React.PureComponent<Props, State> {
         });
     };
 
-    _setTextValue = (field: string) => (event: any) => this.mutateValue(field, event.target.value); //todo: event type
+    _setTextValue = (field: string) => (event: SyntheticEvent<HTMLInputElement|HTMLTextAreaElement>) => this.mutateValue(field, event.currentTarget.value);
 
     _setObjectValue = (field: string) => (value: any) => this.mutateValue(field, value);
 

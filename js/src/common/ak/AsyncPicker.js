@@ -126,7 +126,6 @@ export class AsyncPicker extends React.Component<AsyncPickerProps, AsyncPickerSt
         const {label, isRequired, isLabelHidden, isInvalid, invalidMessage} = this.props;
         const {fetching, data} = this.state;
 
-        //todo: error display
         return (
             <div>
                 <Label label={label} isRequired={isRequired} isHidden={isLabelHidden}/>

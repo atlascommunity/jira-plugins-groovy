@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.impl.admin;
 
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.util.I18nHelper;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,7 @@ import java.util.Objects;
 
 @Component
 public class AdminScriptServiceImpl implements AdminScriptService {
+    private final I18nHelper i18nHelper;
     private final ScriptService scriptService;
     private final BuiltInScriptManager builtInScriptManager;
     private final AdminScriptRepository adminScriptRepository;
@@ -31,11 +33,13 @@ public class AdminScriptServiceImpl implements AdminScriptService {
 
     @Autowired
     public AdminScriptServiceImpl(
+        I18nHelper i18nHelper,
         ScriptService scriptService,
         BuiltInScriptManager builtInScriptManager,
         AdminScriptRepository adminScriptRepository,
         ScriptParamFactory scriptParamFactory
     ) {
+        this.i18nHelper = i18nHelper;
         this.scriptService = scriptService;
         this.builtInScriptManager = builtInScriptManager;
         this.adminScriptRepository = adminScriptRepository;
@@ -47,7 +51,7 @@ public class AdminScriptServiceImpl implements AdminScriptService {
         BuiltInScript script = builtInScriptManager.getScript(key);
 
         if (script == null) {
-            throw new ValidationException("Script not found"); //todo: i18n
+            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.notFound"));
         }
 
         try {
@@ -62,17 +66,18 @@ public class AdminScriptServiceImpl implements AdminScriptService {
         AdminScriptDto script = adminScriptRepository.getScript(id, false, false);
 
         if (script == null || script.isDeleted()) {
-            throw new ValidationException("Script not found"); //todo: i18n
+            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.notFound"));
         }
 
-        //todo: current user binding
         try {
+            Map<String, Object> params = getParams(script.getParams(), rawParams);
+            params.put("currentUser", user);
             return new AdminScriptOutcome(
                 true,
                 Objects.toString(
                     scriptService.executeScript(
                         null, script.getScriptBody(), ScriptType.ADMIN_SCRIPT,
-                        getParams(script.getParams(), rawParams)
+                        params
                     )
                 )
             );

@@ -71,18 +71,16 @@ class RegistryScriptInternal extends React.Component<RegistryScriptProps, Regist
         this.setState({ waitingWatch: true });
 
         const promise = isWatching ?
-            //$FlowFixMe todo
             watcherService.stopWatching('REGISTRY_SCRIPT', script.id) :
-            //$FlowFixMe todo
             watcherService.startWatching('REGISTRY_SCRIPT', script.id);
 
         promise.then(
             () => {
                 (isWatching ? removeWatch : addWatch)('script', script.id);
-                this.setState({ waitingWatch: false });
+                this.setState({waitingWatch: false});
             },
             (error: any) => {
-                this.setState({ waitingWatch: false });
+                this.setState({waitingWatch: false});
                 throw error;
             }
         );

@@ -46,7 +46,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-//todo: run now
 @Component
 public class ScheduledTaskServiceImpl implements ScheduledTaskService {
     private static final JobRunnerKey JOB_RUNNER_KEY = JobRunnerKey.of("ru.mail.jira.groovy.scriptJobRunner");
@@ -341,7 +340,6 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
             return false;
         }
 
-        //todo: maybe add transition inputs (???)
         IssueService.IssueResult transitionResult = issueService.transition(user, validationResult);
 
         if (!transitionResult.isValid()) {

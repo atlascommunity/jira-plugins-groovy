@@ -237,7 +237,6 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
             changelogs: task.changelogs,
             description: task.description
         } : null;
-        //todo: description display for ISSUE_JQL_TRANSITION
 
         return (
             <ConnectedWatchableScript

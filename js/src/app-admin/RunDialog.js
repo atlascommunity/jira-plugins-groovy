@@ -118,7 +118,7 @@ export class RunDialog extends React.PureComponent<Props, State> {
             case 'params':
                 return [
                     {
-                        text: 'Run', //todo: i18n
+                        text: CommonMessages.run,
                         onClick: this._run,
                     },
                     {
@@ -137,7 +137,7 @@ export class RunDialog extends React.PureComponent<Props, State> {
                 } else {
                     return [
                         {
-                            text: 'Back', //todo: i18n,
+                            text: CommonMessages.back,
                             onClick: () => this.setState({ stage: 'params' })
                         },
                         {

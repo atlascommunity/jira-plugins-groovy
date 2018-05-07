@@ -29,7 +29,7 @@ import './ScheduledTaskRegistry.less';
 )
 export class ScheduledTaskRegistry extends React.Component {
     static propTypes = {
-        tasks: PropTypes.arrayOf(PropTypes.object.isRequired), //todo: shape
+        tasks: PropTypes.arrayOf(PropTypes.object.isRequired),
         ready: PropTypes.bool.isRequired
     };
 
