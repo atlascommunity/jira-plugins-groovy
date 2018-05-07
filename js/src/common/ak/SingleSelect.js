@@ -11,9 +11,9 @@ import type {FieldProps, MutableFieldProps} from '../types';
 
 type SingleSelectProps = FieldProps & MutableFieldProps<OldSelectItem> & {
     options: Array<OldSelectItem>
-}
+};
 
-export class SingleSelect extends React.Component<SingleSelectProps> {
+export class SingleSelect extends React.PureComponent<SingleSelectProps> {
     render(): React.Node {
         const {label, isRequired, isLabelHidden, options, value, onChange, ...props} = this.props;
 

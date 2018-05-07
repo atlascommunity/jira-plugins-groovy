@@ -15,14 +15,14 @@ import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 type Props = {
     listeners: Array<ListenerType>,
     ready: boolean
-}
+};
 
 type State = {
     dialogProps: ?{
         isNew: boolean,
         id: ?number
     }
-}
+};
 
 class ListenerRegistryContainerInternal extends React.PureComponent<Props, State> {
     state = {

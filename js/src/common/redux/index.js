@@ -25,12 +25,12 @@ export type LoadAction = {
 export type DeleteItemAction = {
     type: typeof DELETE_ITEM,
     id: number
-}
+};
 
 type ItemAction<T> = {
     type: T,
     item: ItemType
-}
+};
 
 export type AddItemAction = ItemAction<typeof ADD_ITEM>;
 export type UpdateItemAction = ItemAction<typeof UPDATE_ITEM>;
@@ -63,7 +63,7 @@ export function itemsReducer(state: ItemListType, action: Action): ItemListType 
 type WatcherAction<T> = {
     type: T,
     id: number
-}
+};
 
 export type AddWatchAction = WatcherAction<typeof ADD_WATCH>;
 export type RemoveWatchAction = WatcherAction<typeof REMOVE_WATCH>;

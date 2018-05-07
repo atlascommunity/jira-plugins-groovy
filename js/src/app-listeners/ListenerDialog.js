@@ -45,7 +45,10 @@ function extractShortClassName(className) {
 
 @connect(
     null,
-    ItemActionCreators
+    {
+        deleteItem: ItemActionCreators.deleteItem,
+        addItem: ItemActionCreators.addItem
+    }
 )
 export class ListenerDialog extends React.Component {
     static propTypes = {

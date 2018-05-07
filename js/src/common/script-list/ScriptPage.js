@@ -18,11 +18,11 @@ type Props<T> = {
     items: Array<T>,
     ScriptComponent: React.ComponentType<ScriptComponentProps<T>>,
     DialogComponent: React.ComponentType<FullDialogComponentProps>
-}
+};
 
 type State = {
     editProps: ?DialogComponentProps
-}
+};
 
 export class ScriptPage<T> extends React.PureComponent<Props<T&ItemType>, State> {
     state = {

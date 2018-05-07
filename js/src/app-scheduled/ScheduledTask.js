@@ -67,12 +67,12 @@ type Props = {
     onEdit: VoidCallback,
     updateItem: typeof ItemActionCreators.updateItem,
     deleteItem: typeof ItemActionCreators.deleteItem,
-}
+};
 
 type State = {
     showStatusInfo: boolean,
     showRunDialog: boolean
-}
+};
 
 export class ScheduledTaskInternal extends React.Component<Props, State> {
     static propTypes = {
@@ -279,4 +279,10 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
     }
 }
 
-export const ScheduledTask = connect(null, ItemActionCreators)(ScheduledTaskInternal);
+export const ScheduledTask = connect(
+    null,
+    {
+        updateItem: ItemActionCreators.updateItem,
+        deleteItem: ItemActionCreators.deleteItem
+    }
+)(ScheduledTaskInternal);

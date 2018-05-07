@@ -37,7 +37,7 @@ export type TransitionOptionsType = {
     skipConditions: boolean,
     skipValidators: boolean,
     skipPermissions: boolean
-}
+};
 
 export type RunOutcomeType = 'SUCCESS' | 'UNAVAILABLE' | 'ABORTED' | 'FAILED' | 'NOT_RAN';
 
@@ -46,7 +46,7 @@ export type RunInfoType = {
     duration: number,
     outcome: RunOutcomeType,
     message: ?string
-}
+};
 
 export type ScheduledTaskType = ScriptEntity & {
     uuid: string,
@@ -60,4 +60,4 @@ export type ScheduledTaskType = ScriptEntity & {
     transitionOptions: TransitionOptionsType,
     lastRunInfo: ?RunInfoType,
     nextRunDate: ?string
-}
+};

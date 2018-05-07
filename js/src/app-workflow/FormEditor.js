@@ -15,7 +15,7 @@ type FormEditorProps = {
 
 type FormEditorState = {
     value: string
-}
+};
 
 export class FormEditor extends React.Component<FormEditorProps, FormEditorState> {
     state = {

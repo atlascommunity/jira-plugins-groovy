@@ -63,12 +63,12 @@ type EditorProps = {
     decorated?: boolean,
     resizable?: boolean,
     decorator?: (React.Node) => React.Node
-}
+};
 
 type EditorState = {
     isLight: boolean,
     height: number
-}
+};
 
 //todo: remember height for console
 //todo: change to PureComponent
@@ -211,7 +211,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
 
 type BindingProps = {
     binding: BindingType
-}
+};
 
 function Binding({binding}: BindingProps): React.Node {
     return (

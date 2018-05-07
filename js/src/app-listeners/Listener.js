@@ -136,5 +136,7 @@ export const Listener = connect(
             };
         }
     ),
-    ItemActionCreators
+    {
+        deleteItem: ItemActionCreators.deleteItem
+    }
 )(ListenerInternal);

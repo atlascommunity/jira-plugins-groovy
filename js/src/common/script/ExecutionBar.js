@@ -24,7 +24,7 @@ type ExecutionBarState = {
     displayedExecution?: ?ExecutionType
 };
 
-export class ExecutionBar extends React.Component<ExecutionBarProps, ExecutionBarState> {
+export class ExecutionBar extends React.PureComponent<ExecutionBarProps, ExecutionBarState> {
     state = {
         displayedExecution: null
     };
@@ -50,9 +50,9 @@ export class ExecutionBar extends React.Component<ExecutionBarProps, ExecutionBa
 type ExecutionItemProps = {
     execution: ExecutionType,
     onClick: VoidCallback
-}
+};
 
-class ExecutionItem extends React.Component<ExecutionItemProps> {
+class ExecutionItem extends React.PureComponent<ExecutionItemProps> {
     render(): React.Node {
         const execution = this.props.execution;
         const params = execution.extraParams || {};

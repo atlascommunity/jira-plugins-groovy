@@ -22,6 +22,8 @@ import {adminScriptService} from '../service/services';
 import {WatchableScript} from '../common/script/WatchableScript';
 
 import type {ScriptComponentProps} from '../common/script-list/types';
+import {AdminScriptMessages} from '../i18n/admin.i18n';
+import {CommonMessages} from '../i18n/common.i18n';
 
 
 const ConnectedWatchableScript = connect(
@@ -94,7 +96,9 @@ class AdminScriptInternal extends React.PureComponent<Props, State> {
                             <CodeIcon label=""/>
                         </div>
                         <div className="flex-vertical-middle flex-none">
-                            <Lozenge appearance="inprogress">Built-in</Lozenge>
+                            <Lozenge appearance="inprogress">
+                                {AdminScriptMessages.builtIn}
+                            </Lozenge>
                         </div>
                         <div className="flex-vertical-middle">
                             <h3 title={script.name}>
@@ -115,7 +119,7 @@ class AdminScriptInternal extends React.PureComponent<Props, State> {
 
                 additionalPrimaryButtons={[
                     <Button appearance="subtle" iconBefore={<VidPlayIcon label="run"/>} onClick={this._toggleDialog}>
-                        Run {/*todo*/}
+                        {CommonMessages.run}
                     </Button>
                 ]}
             >

@@ -38,7 +38,7 @@ export type PublicRegistryScriptProps = {
     title?: React.Node,
     children?: React.Node,
     wrapperProps?: any
-}
+};
 
 export type RegistryScriptProps = PublicRegistryScriptProps & RegistryScriptConnectProps;
 

@@ -59,7 +59,7 @@ export function Changelog({changelogs, switchToCurrent, switchToChangelog}: Chan
 type ChangelogCommentProps = {
     text: string,
     issueReferences: Array<IssueReference>
-}
+};
 
 function ChangelogComment({text, issueReferences}: ChangelogCommentProps): React.Node {
     if (!(issueReferences && issueReferences.length)) {

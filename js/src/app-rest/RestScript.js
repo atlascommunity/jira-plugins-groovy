@@ -35,7 +35,7 @@ const ConnectedWatchableScript = connect(
 
 type Props = ScriptComponentProps<RestScriptType> & {
     deleteItem: typeof ItemActionCreators.deleteItem
-}
+};
 
 class RestScriptInternal extends React.PureComponent<Props> {
     _onEdit = () => this.props.onEdit(this.props.script.id);
@@ -97,4 +97,4 @@ class RestScriptInternal extends React.PureComponent<Props> {
     }
 }
 
-export const RestScript = connect(null, ItemActionCreators)(RestScriptInternal);
+export const RestScript = connect(null, { deleteItem: ItemActionCreators.deleteItem })(RestScriptInternal);

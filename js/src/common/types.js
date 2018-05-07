@@ -31,30 +31,30 @@ export type FieldProps = {
 
     isRequired?: boolean,
     isDisabled?: boolean
-}
+};
 
 export type LoadableFieldProps = {
     isLoading?: boolean
-}
+};
 
 export type MutableFieldProps<T> = {
     value: ?T,
     onChange: (?T) => void
-}
+};
 
 export type OptMutableFieldProps<T> = {
     value?: ?T,
     onChange?: (?T) => void
-}
+};
 
 export type FormFieldProps = {
     name?: string
-}
+};
 
 export type MutableTextFieldProps<T, FieldType> = {
     value: T,
     onChange: (SyntheticEvent<FieldType>) => void
-}
+};
 
 export type ScriptError = {
     message: string

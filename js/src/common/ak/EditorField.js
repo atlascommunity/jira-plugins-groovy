@@ -16,7 +16,7 @@ type EditorFieldProps = FieldProps & MutableFieldProps<string> & {
     markers?: ?Array<MarkerType>,
     bindings?: Array<BindingType>,
     resizable?: boolean,
-}
+};
 
 export class EditorField extends React.Component<EditorFieldProps> {
     static defaultProps = {

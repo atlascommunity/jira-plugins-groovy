@@ -10,7 +10,7 @@ import CodeIcon from '@atlaskit/icon/glyph/code';
 import {RegistryScript, type PublicRegistryScriptProps} from './RegistryScript';
 
 
-export class DraggableRegistryScript extends React.Component<PublicRegistryScriptProps> {
+export class DraggableRegistryScript extends React.PureComponent<PublicRegistryScriptProps> {
     render(): React.Node {
         const {script} = this.props;
 

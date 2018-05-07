@@ -33,7 +33,7 @@ type DropdownItemType = {
     label: string,
     onClick?: VoidCallback,
     href?: string
-}
+};
 
 export type ScriptProps = {
     withChangelog: boolean,
@@ -54,7 +54,7 @@ export type ScriptProps = {
     additionalPrimaryButtons?: Array<React.Element<any>>,
     dropdownItems?: Array<DropdownItemType>,
     additionalParameters?: Array<ScriptParam>
-}
+};
 
 type ScriptState = {
     showCode: boolean,

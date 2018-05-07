@@ -3,11 +3,8 @@ import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
-import DropdownMenu, {DropdownItem, DropdownItemGroup} from '@atlaskit/dropdown-menu';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
-
-import SettingsIcon from '@atlaskit/icon/glyph/settings';
 
 import Script, {ScriptParameters} from '../common/script';
 import {FieldError} from '../common/ak/FieldError';
@@ -20,7 +17,6 @@ import {JiraMessages, FieldMessages, ErrorMessages, CommonMessages, TitleMessage
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
 
 
-
 @connect(
     state => {
         return {
@@ -29,7 +25,7 @@ import {ScriptFieldMessages} from '../i18n/cf.i18n';
         };
     }
 )
-export class FieldRegistry extends React.Component {
+export class FieldRegistry extends React.PureComponent {
     static propTypes = {
         configs: PropTypes.arrayOf(PropTypes.object.isRequired).isRequired,
         ready: PropTypes.bool.isRequired
@@ -58,7 +54,7 @@ export class FieldRegistry extends React.Component {
 }
 
 //todo: velocity vars, searcher
-class Field extends React.Component {
+class Field extends React.PureComponent {
     static propTypes = {
         config: PropTypes.object.isRequired
     };

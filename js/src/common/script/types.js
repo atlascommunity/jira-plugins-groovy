@@ -3,13 +3,13 @@
 export type IssueReference = {
     key: string,
     summary: string
-}
+};
 
 export type JiraUser = {
     name: string,
     displayName: string,
     avatarUrl?: string
-}
+};
 
 export type ChangelogType = {
     id: number,

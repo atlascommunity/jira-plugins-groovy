@@ -196,7 +196,7 @@ export class ScheduledTaskDialog extends React.Component {
         }
 
         switch (fieldName) {
-            case 'scriptBody':
+            case 'scriptBody': {
                 let markers = null;
 
                 if (error && error.field === fieldName) {
@@ -240,7 +240,8 @@ export class ScheduledTaskDialog extends React.Component {
                         onChange={this._setObjectValue(fieldName)}
                     />
                 );
-            case 'issueJql':
+            }
+            case 'issueJql': {
                 return (
                     <div key={fieldName}>
                         <JqlInput
@@ -261,16 +262,17 @@ export class ScheduledTaskDialog extends React.Component {
                             {ScheduledTaskMessages.jqlLimitDescription(1000) /*todo: insert value from config when its configurable*/}
                         </div>
                         {['ISSUE_JQL_SCRIPT', 'DOCUMENT_ISSUE_JQL_SCRIPT'].includes(values.get('type')) &&
-                            <div className="ak-description">
-                                <WarningIcon size="small" label="" primaryColor={colors.Y500}/>
-                                {' '}
-                                {ScheduledTaskMessages.jqlScriptDescription}
-                            </div>
+                        <div className="ak-description">
+                            <WarningIcon size="small" label="" primaryColor={colors.Y500}/>
+                            {' '}
+                            {ScheduledTaskMessages.jqlScriptDescription}
+                        </div>
                         }
                         {errorField === fieldName && <FieldError error={errorMessage}/>}
                     </div>
                 );
-            case 'workflowAction':
+            }
+            case 'workflowAction': {
                 const workflow = values.get('issueWorkflowName');
                 return (
                     <div key={fieldName}>
@@ -286,21 +288,22 @@ export class ScheduledTaskDialog extends React.Component {
                             invalidMessage={errorField === fieldName ? errorMessage : ''}
                         />
                         {workflow &&
-                            <AsyncPicker
-                                label={FieldMessages.workflowAction}
-                                isRequired={true}
+                        <AsyncPicker
+                            label={FieldMessages.workflowAction}
+                            isRequired={true}
 
-                                src={`${getPluginBaseUrl()}/jira-api/workflowActionPicker/${workflow.value}`}
-                                value={values.get('issueWorkflowActionId')}
-                                onChange={this._setObjectValue('issueWorkflowActionId')}
+                            src={`${getPluginBaseUrl()}/jira-api/workflowActionPicker/${workflow.value}`}
+                            value={values.get('issueWorkflowActionId')}
+                            onChange={this._setObjectValue('issueWorkflowActionId')}
 
-                                isInvalid={errorField === fieldName}
-                                invalidMessage={errorField === fieldName ? errorMessage : ''}
-                            />
+                            isInvalid={errorField === fieldName}
+                            invalidMessage={errorField === fieldName ? errorMessage : ''}
+                        />
                         }
                     </div>
                 );
-            case 'transitionOptions':
+            }
+            case 'transitionOptions': {
                 const value = values.get(fieldName);
                 return (
                     <div key={fieldName}>
@@ -330,6 +333,7 @@ export class ScheduledTaskDialog extends React.Component {
                         </CheckboxGroup>
                     </div>
                 );
+            }
             default:
                 return <div key={fieldName}>{'NOT IMPLEMENTED'}</div>;
         }

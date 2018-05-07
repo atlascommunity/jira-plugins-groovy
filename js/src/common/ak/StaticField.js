@@ -8,7 +8,7 @@ import './StaticField.less';
 
 type StaticFieldValueProps = {
     children: React.Node
-}
+};
 
 function StaticFieldValue({children}: StaticFieldValueProps): React.Node {
     return <div className="static-field">{children}</div>;

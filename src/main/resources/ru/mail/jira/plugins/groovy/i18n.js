@@ -58,7 +58,8 @@ define('/mailru/groovy/i18n-react', function() {
             validating: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.validating'),
             issuesFound: function(...params) {
                 AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.issuesFound', ...params)
-            }
+            },
+            run: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.run')
         },
         error: {
             noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue'),
@@ -160,7 +161,8 @@ define('/mailru/groovy/i18n-react', function() {
             }
         },
         adminScript: {
-            noParams: AJS.I18n.getText('ru.mail.jira.plugins.groovy.adminScripts.noParams')
+            noParams: AJS.I18n.getText('ru.mail.jira.plugins.groovy.adminScripts.noParams'),
+            builtIn: AJS.I18n.getText('ru.mail.jira.plugins.groovy.adminScripts.builtIn')
         }
     };
 });

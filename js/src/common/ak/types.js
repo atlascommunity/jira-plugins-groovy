@@ -11,4 +11,4 @@ export type SingleValueType = {
     value: any,
     label: string,
     imgSrc?: string
-}
+};

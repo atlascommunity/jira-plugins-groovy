@@ -4,7 +4,7 @@ import {ajaxGet, ajaxPost, getBaseUrl, getPluginBaseUrl} from './ajaxHelper';
 
 export type ValidationResult = {
     total: number
-}
+};
 
 export class JiraService {
     getAllProjects(): any { //todo

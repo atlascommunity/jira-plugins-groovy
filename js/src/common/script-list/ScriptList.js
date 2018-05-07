@@ -15,7 +15,7 @@ type Props<T> = {
     items: Array<T>,
     onEdit: ScriptCallbackType,
     ScriptComponent: React.ComponentType<ScriptComponentProps<T>>
-}
+};
 
 export class ScriptList<T> extends React.PureComponent<Props<T&ItemType>> {
     render(): React.Node {

@@ -7,7 +7,7 @@ import {Label} from '@atlaskit/field-base';
 export type ScriptParam = {
     label: string,
     value: React.Node
-}
+};
 
 type ScriptParametersProps = {
     params: Array<ScriptParam>

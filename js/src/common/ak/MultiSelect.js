@@ -29,7 +29,7 @@ type MultiSelectProps = FieldProps & LoadableFieldProps & MutableFieldProps<Arra
 
 type MultiSelectState = {
     lookupMap: LookupMapType
-}
+};
 
 export class MultiSelect extends React.Component<MultiSelectProps, MultiSelectState> {
     i = i++;
