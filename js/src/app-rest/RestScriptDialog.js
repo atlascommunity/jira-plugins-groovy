@@ -28,7 +28,7 @@ const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { la
 const bindings = [ Bindings.method, Bindings.headers, Bindings.uriInfo, Bindings.body, Bindings.currentUser ];
 
 @connect(
-    () => { return{}; },
+    null,
     ItemActionCreators
 )
 export class RestScriptDialog extends React.Component {

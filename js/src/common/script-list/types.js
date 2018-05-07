@@ -12,11 +12,11 @@ export type ScriptComponentProps<T> = {
 export type DialogComponentProps = {
     isNew: boolean,
     id: ?number
-}
+};
 
 export type FullDialogComponentProps = DialogComponentProps & {
     onClose: VoidCallback
-}
+};
 
 export type I18nType = {
     title: string,

@@ -1,6 +1,5 @@
 //@flow
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
@@ -75,13 +74,6 @@ type State = {
 };
 
 export class ScheduledTaskInternal extends React.Component<Props, State> {
-    static propTypes = {
-        task: PropTypes.object.isRequired, //todo: shape
-        onEdit: PropTypes.func.isRequired,
-        updateItem: PropTypes.func.isRequired,
-        deleteItem: PropTypes.func.isRequired
-    };
-
     state = {
         showStatusInfo: false,
         showRunDialog: false
