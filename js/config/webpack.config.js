@@ -96,6 +96,7 @@ module.exports = {
         fields: [require.resolve('./polyfills'), paths.resolveApp('src/app-fields/index.js')],
         extras: [require.resolve('./polyfills'), paths.resolveApp('src/app-extras/index.js')],
         scheduled: [require.resolve('./polyfills'), paths.resolveApp('src/app-scheduled/index.js')],
+        admin: [require.resolve('./polyfills'), paths.resolveApp('src/app-admin/index.js')],
     },
     output: {
         // The build folder.
@@ -190,7 +191,10 @@ module.exports = {
                             compact: true,
                             presets: ['react-app'],
                             plugins: [
-                                ['transform-decorators-legacy', 'react-flow-props-to-prop-types']
+                                [
+                                    'transform-decorators-legacy',
+                                    'flow-react-proptypes',
+                                ]
                             ]
                         },
                     },

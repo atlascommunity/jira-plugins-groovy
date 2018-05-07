@@ -24,12 +24,13 @@ type Props = ScriptProps & {
     entityType: EntityType,
     addWatch: typeof WatchActionCreators.addWatch,
     removeWatch: typeof WatchActionCreators.removeWatch,
-    watches: Array<number>
-}
+    watches: Array<number>,
+    isUnwatchable?: boolean
+};
 
 type State = {
     waitingWatch: boolean
-}
+};
 
 export class WatchableScript extends React.PureComponent<Props, State> {
     static defaultProps = Script.defaultProps;
@@ -62,8 +63,12 @@ export class WatchableScript extends React.PureComponent<Props, State> {
     };
 
     render(): React.Node {
-        const {watches, entityId, entityType, dropdownItems, additionalButtons, onDelete, ...props} = this.props;
+        const {watches, entityId, entityType, dropdownItems, additionalButtons, onDelete, isUnwatchable, ...props} = this.props;
         const {waitingWatch} = this.state;
+
+        if (isUnwatchable) {
+            return <Script {...this.props}/>;
+        }
 
         const dropdown = dropdownItems ? [...dropdownItems] : [];
         const buttons = additionalButtons ? [...additionalButtons] : [];

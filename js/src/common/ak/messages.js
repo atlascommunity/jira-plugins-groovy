@@ -5,20 +5,26 @@ import {colors} from '@atlaskit/theme';
 
 import InfoIcon from '@atlaskit/icon/glyph/info';
 import ErrorIcon from '@atlaskit/icon/glyph/error';
+import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
 
 import './messages.less';
 
 
 type MessageProps = {
-    title: string,
+    title: React.Node,
     children?: React.Node
 };
 
-export function InfoMessage({title, children}: MessageProps): React.Node {
+type BaseMessageProps = MessageProps & {
+    icon: React.Node,
+    className: string
+};
+
+function Message({title, children, icon, className}: BaseMessageProps): React.Node {
     return (
-        <div className="InfoMessage">
+        <div className={className}>
             <div className="Icon">
-                <InfoIcon label="info" primaryColor={colors.P300} size="medium"/>
+                {icon}
             </div>
             <div className="Body">
                 <div className="Title">
@@ -30,18 +36,32 @@ export function InfoMessage({title, children}: MessageProps): React.Node {
     );
 }
 
-export function ErrorMessage({title, children}: MessageProps): React.Node {
+export function InfoMessage(props: MessageProps): React.Node {
     return (
-        <div className="ErrorMessage">
-            <div className="Icon">
-                <ErrorIcon label="error" primaryColor={colors.R300} size="medium"/>
-            </div>
-            <div className="Body">
-                <div className="Title">
-                    {title}
-                </div>
-                {children}
-            </div>
-        </div>
+        <Message
+            className="InfoMessage"
+            icon={<InfoIcon label="info" primaryColor={colors.P300} size="medium"/>}
+            {...props}
+        />
+    );
+}
+
+export function ErrorMessage(props: MessageProps): React.Node {
+    return (
+        <Message
+            className="ErrorMessage"
+            icon={<ErrorIcon label="error" primaryColor={colors.R300} size="medium"/>}
+            {...props}
+        />
+    );
+}
+
+export function SuccessMessage(props: MessageProps): React.Node {
+    return (
+        <Message
+            className="SuccessMessage"
+            icon={<CheckCircleIcon label="error" primaryColor={colors.G300} size="medium"/>}
+            {...props}
+        />
     );
 }

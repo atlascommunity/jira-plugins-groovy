@@ -51,6 +51,7 @@ export type ScriptProps = {
     title?: React.Node,
     children?: React.Node,
     additionalButtons?: Array<React.Element<any>>,
+    additionalPrimaryButtons?: Array<React.Element<any>>,
     dropdownItems?: Array<DropdownItemType>,
     additionalParameters?: Array<ScriptParam>
 }
@@ -137,7 +138,10 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
     };
 
     render(): React.Node {
-        const {script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons, additionalParameters, dropdownItems, headerless} = this.props;
+        const {
+            script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons,
+            additionalPrimaryButtons, additionalParameters, dropdownItems, headerless
+        } = this.props;
         const {activeSource, showCode, executions, executionsReady, onlyLastExecutions} = this.state;
 
         let codeBlock : React.Node = null;
@@ -222,6 +226,10 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                     {showCode ? CommonMessages.hideCode : CommonMessages.showCode}
                 </Button>
             );
+        }
+
+        if (additionalPrimaryButtons) {
+            buttons.push(...additionalPrimaryButtons);
         }
 
         if (onEdit) {

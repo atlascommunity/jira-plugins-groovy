@@ -1,9 +1,11 @@
 //@flow
 
+export type ParamTypeEnum = 'BOOLEAN' | 'STRING' | 'TEXT' | 'LONG' | 'DOUBLE' | 'CUSTOM_FIELD' | 'USER' | 'GROUP' | 'RESOLUTION';
+
 export type ParamType = {
     name: string,
     displayName: string,
-    paramType: 'BOOLEAN' | 'STRING' | 'TEXT' | 'LONG' | 'DOUBLE' | 'CUSTOM_FIELD' | 'USER' | 'GROUP'
+    paramType: ParamTypeEnum
 };
 
 export type ScriptType = 'CONDITION' | 'VALIDATOR' | 'FUNCTION';

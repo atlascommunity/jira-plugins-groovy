@@ -1,7 +1,9 @@
 package ru.mail.jira.plugins.groovy.impl;
 
+import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.fields.CustomField;
+import com.atlassian.jira.issue.resolution.Resolution;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -19,6 +21,7 @@ public class ScriptParamFactory {
     private final UserManager userManager;
     private final CustomFieldManager customFieldManager;
     private final GroupManager groupManager;
+    private final ConstantsManager constantsManager;
     private final UserMapper userMapper;
 
     @Autowired
@@ -26,8 +29,10 @@ public class ScriptParamFactory {
         @ComponentImport UserManager userManager,
         @ComponentImport CustomFieldManager customFieldManager,
         @ComponentImport GroupManager groupManager,
+        @ComponentImport ConstantsManager constantsManager,
         UserMapper userMapper
     ) {
+        this.constantsManager = constantsManager;
         this.userMapper = userMapper;
         this.userManager = userManager;
         this.customFieldManager = customFieldManager;
@@ -55,6 +60,8 @@ public class ScriptParamFactory {
                 return userManager.getUserByKey(value);
             case GROUP:
                 return groupManager.getGroup(value);
+            case RESOLUTION:
+                return constantsManager.getResolution(value);
         }
 
         return null;
@@ -94,6 +101,12 @@ public class ScriptParamFactory {
             case GROUP:
                 return ImmutableMap.of(
                     "label", value,
+                    "value", value
+                );
+            case RESOLUTION:
+                Resolution resolution = constantsManager.getResolution(value);
+                return ImmutableMap.of(
+                    "label", resolution != null ? resolution.getName() : value,
                     "value", value
                 );
         }

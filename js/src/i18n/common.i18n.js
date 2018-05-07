@@ -83,6 +83,7 @@ export const JiraMessages: I18nMessages = {
 
 export const TitleMessages: I18nMessages = {
     console: i18n.titles.console,
+    adminScripts: i18n.titles.adminScripts,
     registry: i18n.titles.registry,
     listeners: i18n.titles.listeners,
     audit: i18n.titles.audit,

@@ -128,6 +128,7 @@ define('/mailru/groovy/i18n-react', function() {
         },
         titles: {
             console: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.console'),
+            adminScripts: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.adminScripts'),
             registry: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.registry'),
             listeners: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.listeners'),
             audit: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.audit'),
@@ -157,6 +158,9 @@ define('/mailru/groovy/i18n-react', function() {
                 skipValidators: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOption.skipValidators'),
                 skipPermissions: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOption.skipPermissions')
             }
+        },
+        adminScript: {
+            noParams: AJS.I18n.getText('ru.mail.jira.plugins.groovy.adminScripts.noParams')
         }
     };
 });

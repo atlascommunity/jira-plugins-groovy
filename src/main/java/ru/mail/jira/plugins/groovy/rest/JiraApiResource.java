@@ -6,6 +6,7 @@ import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.bc.group.search.GroupPickerSearchService;
 import com.atlassian.jira.bc.user.search.UserSearchParams;
 import com.atlassian.jira.bc.user.search.UserSearchService;
+import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.event.type.EventType;
 import com.atlassian.jira.event.type.EventTypeManager;
 import com.atlassian.jira.issue.CustomFieldManager;
@@ -35,6 +36,7 @@ public class JiraApiResource {
     private final GroupPickerSearchService groupPickerSearchService;
     private final CustomFieldManager customFieldManager;
     private final AvatarService avatarService;
+    private final ConstantsManager constantsManager;
     private final WorkflowManager workflowManager;
     private final PermissionHelper permissionHelper;
 
@@ -45,6 +47,7 @@ public class JiraApiResource {
         @ComponentImport GroupPickerSearchService groupPickerSearchService,
         @ComponentImport CustomFieldManager customFieldManager,
         @ComponentImport AvatarService avatarService,
+        @ComponentImport ConstantsManager constantsManager,
         @ComponentImport WorkflowManager workflowManager,
         PermissionHelper permissionHelper
     ) {
@@ -54,6 +57,7 @@ public class JiraApiResource {
         this.groupPickerSearchService = groupPickerSearchService;
         this.customFieldManager = customFieldManager;
         this.avatarService = avatarService;
+        this.constantsManager = constantsManager;
         this.workflowManager = workflowManager;
         this.permissionHelper = permissionHelper;
     }
@@ -123,6 +127,26 @@ public class JiraApiResource {
                 null
             ))
             .collect(Collectors.toList());
+
+        return new PickerResultSet<>(options, true);
+    }
+
+    @GET
+    @Path("/resolutionPicker")
+    public PickerResultSet<PickerOption> resolutionPicker() {
+        permissionHelper.checkIfAdmin();
+
+        List<PickerOption> options = constantsManager
+            .getResolutions()
+            .stream()
+            .map(resolution -> new PickerOption(
+                resolution.getName(),
+                resolution.getId(),
+                null
+            ))
+            .collect(Collectors.toList());
+
+        options.add(0, new PickerOption("None", null, null));
 
         return new PickerResultSet<>(options, true);
     }

@@ -1,8 +1,10 @@
 //@flow
+import * as React from 'react';
+
 import type {ChangelogType} from './script/types';
 
 
-export type EntityType = 'REGISTRY_SCRIPT' | 'REGISTRY_DIRECTORY' | 'LISTENER' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK';
+export type EntityType = 'REGISTRY_SCRIPT' | 'REGISTRY_DIRECTORY' | 'LISTENER' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK' | 'ADMIN_SCRIPT';
 
 export type IssueEventType = {
     id: number,
@@ -25,7 +27,7 @@ export type FieldProps = {
     isLabelHidden?: boolean,
 
     isInvalid?: boolean,
-    invalidMessage?: string,
+    invalidMessage?: React.Node,
 
     isRequired?: boolean,
     isDisabled?: boolean

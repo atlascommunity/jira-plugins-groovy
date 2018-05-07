@@ -55,6 +55,18 @@
         <context>ru.mail.jira.plugins.groovy.console</context>
     </web-resource>
 
+    <web-resource key="admin-scripts-resources" name="groovy console Web Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="admin.css" location="/ru/mail/jira/plugins/groovy/css/admin.css"/>
+        <resource type="download" name="admin.css.map" location="/ru/mail/jira/plugins/groovy/css/admin.css.map"/>
+
+        <resource type="download" name="admin.js" location="/ru/mail/jira/plugins/groovy/js/admin.js"/>
+        <resource type="download" name="admin.js.map" location="/ru/mail/jira/plugins/groovy/js/admin.js.map"/>
+
+        <context>ru.mail.jira.plugins.groovy.admin-scripts</context>
+    </web-resource>
+
     <web-resource key="registry-resources" name="groovy script registry Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
@@ -176,6 +188,8 @@
         <entity>ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.ScheduledTask</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.ScheduledTaskChangelog</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.AdminScript</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.AdminScriptChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.Watcher</entity>
     </ao>
 
@@ -347,6 +361,16 @@
         <description>Link to groovy console page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.console" />
         <link linkId="mailru-groovy-console-link">/plugins/servlet/my-groovy/console</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
+    <web-item key="groovy-admin-scripts-menu-item" name="Groovy admin scripts menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy admin scripts.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.adminScripts" />
+        <link linkId="mailru-groovy-console-link">/plugins/servlet/my-groovy/admin-scripts</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>

@@ -8,5 +8,6 @@ public enum ScriptType {
     CONSOLE,
     REST,
     CUSTOM_FIELD,
-    SCHEDULED_TASK
+    SCHEDULED_TASK,
+    ADMIN_SCRIPT
 }

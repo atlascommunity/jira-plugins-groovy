@@ -123,6 +123,16 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                     onChange={this._setValue(paramName)}
                     value={value}
                 />;
+            case 'RESOLUTION':
+                return <AsyncPicker
+                    label={label}
+                    isRequired={true}
+
+                    src={`${getPluginBaseUrl()}/jira-api/resolutionPicker`}
+                    name={inputName}
+                    onChange={this._setValue(paramName)}
+                    value={value}
+                />;
             case 'STRING':
                 return <FieldTextStateless
                     label={label}

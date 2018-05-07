@@ -134,6 +134,7 @@ export class AsyncPicker extends React.Component<AsyncPickerProps, AsyncPickerSt
                     id={`async-picker-${this.i}`}
 
                     validationState={isInvalid ? 'error' : 'default'}
+                    //$FlowFixMe
                     validationMessage={isInvalid ? invalidMessage : undefined}
                 >
                     <Select

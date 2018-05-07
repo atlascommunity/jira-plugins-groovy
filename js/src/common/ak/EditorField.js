@@ -13,7 +13,7 @@ import './EditorField.less';
 
 type EditorFieldProps = FieldProps & MutableFieldProps<string> & {
     mode: string,
-    markers?: Array<MarkerType>,
+    markers?: ?Array<MarkerType>,
     bindings?: Array<BindingType>,
     resizable?: boolean,
 }

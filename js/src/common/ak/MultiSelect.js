@@ -72,6 +72,7 @@ export class MultiSelect extends React.Component<MultiSelectProps, MultiSelectSt
                     id={`multi-select-${this.i}`}
 
                     validationState={isInvalid ? 'error' : 'default'}
+                    //$FlowFixMe
                     validationMessage={isInvalid ? invalidMessage : undefined}
                 >
                     <Select
