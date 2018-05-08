@@ -1,13 +1,17 @@
-import React from 'react';
+//@flow
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
 import {Map} from 'immutable';
+import type {Map as MapType} from 'immutable';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
+
+import type {RestScriptType} from './types';
 
 import {RestMessages} from '../i18n/rest.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
@@ -22,16 +26,36 @@ import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {ErrorMessage} from '../common/ak/messages';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {ItemActionCreators} from '../common/redux';
+import type {FullDialogComponentProps} from '../common/script-list/types';
+import type {HttpMethod} from '../common/types';
+import type {OldSelectItem} from '../common/ak/types';
+import type {InputEvent} from '../common/EventTypes';
 
 
-const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(method => { return { label: method, value: method }; });
+const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(
+    (method: HttpMethod): OldSelectItem<string> => {
+        return {
+            label: method,
+            value: method
+        };
+    }
+);
+
 const bindings = [ Bindings.method, Bindings.headers, Bindings.uriInfo, Bindings.body, Bindings.currentUser ];
 
-@connect(
-    null,
-    ItemActionCreators
-)
-export class RestScriptDialog extends React.Component {
+type Props = FullDialogComponentProps & {
+    updateItem: typeof ItemActionCreators.updateItem,
+    addItem: typeof ItemActionCreators.addItem
+};
+
+type State = {
+    ready: boolean,
+    values: MapType<string, any>,
+    error: *,
+    script: ?RestScriptType
+};
+
+export class RestScriptDialogInternal extends React.Component<Props, State> {
     static propTypes = {
         isNew: PropTypes.bool.isRequired,
         onClose: PropTypes.func.isRequired,
@@ -42,12 +66,12 @@ export class RestScriptDialog extends React.Component {
 
     state = {
         ready: false,
-        values: null,
+        values: Map(),
         error: null,
         script: null
     };
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: Props) {
         this._init(nextProps);
     }
 
@@ -55,11 +79,11 @@ export class RestScriptDialog extends React.Component {
         this._init(this.props);
     }
 
-    _init = props => {
+    _init = (props: Props) => {
         if (props.isNew) {
             this.setState({
                 ready: true,
-                values: new Map({
+                values: Map({
                     name: '',
                     methods: [],
                     groups: [],
@@ -71,19 +95,19 @@ export class RestScriptDialog extends React.Component {
         } else {
             this.setState({
                 ready: false,
-                values: null,
+                values: Map(),
                 error: null
             });
 
             restService
                 .getScript(props.id)
-                .then(script => {
+                .then((script: RestScriptType) => {
                     this.setState({
-                        values: new Map({
+                        values: Map({
                             name: script.name,
                             methods: script.methods,
                             scriptBody: script.scriptBody,
-                            groups: script.groups.map(group => {
+                            groups: script.groups.map((group: string): OldSelectItem<string> => {
                                 return {
                                     label: group,
                                     value: group
@@ -99,7 +123,7 @@ export class RestScriptDialog extends React.Component {
         }
     };
 
-    _handleError = (error) => {
+    _handleError = (error: *) => {
         const {response} = error;
 
         if (response.status === 400) {
@@ -109,21 +133,17 @@ export class RestScriptDialog extends React.Component {
         }
     };
 
-    _onSubmit = (e) => {
-        if (e) {
-            e.preventDefault();
-        }
-
+    _onSubmit = () => {
         const {isNew, id, onClose} = this.props;
 
-        const {groups, ...data} = this.state.values.toJS();
+        const {groups, ...data}: any = this.state.values.toJS();
         data.groups = groups ? groups.map(group => group.value) : [];
 
         if (isNew) {
             restService
                 .createScript(data)
                 .then(
-                    script => {
+                    (script: RestScriptType) => {
                         onClose();
                         this.props.addItem(script);
                     },
@@ -133,7 +153,7 @@ export class RestScriptDialog extends React.Component {
             restService
                 .updateScript(id, data)
                 .then(
-                    script => {
+                    (script: RestScriptType) => {
                         onClose();
                         this.props.updateItem(script);
                     },
@@ -142,31 +162,31 @@ export class RestScriptDialog extends React.Component {
         }
     };
 
-    mutateValue = (field, value) => {
-        this.setState(state => {
+    mutateValue = (field: string, value: any) => {
+        this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
             };
         });
     };
 
-    _setTextValue = (field) => (event) => this.mutateValue(field, event.target.value);
+    _setTextValue = (field: string) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
 
-    _setObjectValue = (field) => (value) => this.mutateValue(field, value);
+    _setObjectValue = (field: string) => (value: any) => this.mutateValue(field, value);
 
-    render() {
+    render(): React.Node {
         const {onClose, isNew} = this.props;
         const {ready, values, script, error} = this.state;
 
-        let body = null;
+        let body: ?React.Node = null;
 
         if (!ready) {
             body = <div>{DialogMessages.notReady}</div>;
         } else {
-            let errorMessage = null;
-            let errorField = null;
+            let errorMessage: * = null;
+            let errorField: ?string = null;
 
-            let markers = null;
+            let markers: * = null;
 
             if (error) {
                 if (error.field === 'scriptBody' && Array.isArray(error.error)) {
@@ -266,7 +286,7 @@ export class RestScriptDialog extends React.Component {
             scrollBehavior="outside"
 
             isHeadingMultiline={false}
-            heading={isNew ? RegistryMessages.addScript : `${RegistryMessages.editScript}: ${script && script.name}`}
+            heading={isNew ? RegistryMessages.addScript : `${RegistryMessages.editScript}: ${script ? script.name : ''}`}
 
             onClose={onClose}
             actions={[
@@ -284,3 +304,8 @@ export class RestScriptDialog extends React.Component {
         </ModalDialog>;
     }
 }
+
+export const RestScriptDialog = connect(
+    null,
+    ItemActionCreators
+)(RestScriptDialogInternal);

@@ -77,7 +77,9 @@ AJS.toInit(() => {
     ReactDOM.render(
         <Provider store={store}>
             <ConnectedScriptPage
+                //$FlowFixMe
                 ScriptComponent={Listener}
+                //$FlowFixMe
                 DialogComponent={ListenerDialog}
                 i18n={{
                     addItem: ListenerMessages.addListener,
