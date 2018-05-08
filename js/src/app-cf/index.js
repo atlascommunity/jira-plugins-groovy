@@ -1,3 +1,4 @@
+//@flow
 import ReactDOM from 'react-dom';
 import React from 'react';
 
@@ -16,8 +17,15 @@ AJS.toInit(() => {
 
     const params = new URLSearchParams(window.location.search);
 
+    const element = document.getElementById('react-content');
+
+    if (element === null) {
+        alert('no element');
+        return;
+    }
+
     ReactDOM.render(
         <CustomFieldFormContainer id={parseInt(params.get('fieldConfigId'), 10)}/>,
-        document.getElementById('react-content')
+        element
     );
 });

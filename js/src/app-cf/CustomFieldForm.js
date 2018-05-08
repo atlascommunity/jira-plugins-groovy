@@ -1,12 +1,16 @@
-import React from 'react';
+//@flow
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import {Map} from 'immutable';
+import type {Map as MapType} from 'immutable';
 
 import Button, {ButtonGroup} from '@atlaskit/button';
 import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import {FieldTextStateless} from '@atlaskit/field-text';
+
+import type {FieldConfig} from './types';
 
 import {fieldConfigService} from '../service/services';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
@@ -14,12 +18,31 @@ import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
 import {ConsoleMessages} from '../i18n/console.i18n';
+import type {VoidCallback} from '../common/types';
+import type {InputEvent} from '../common/EventTypes';
 
 
 const bindings = [ Bindings.issue ];
 const bindingsWithVelocity = [ Bindings.issue, Bindings.velocityParams ];
 
-export class CustomFieldForm extends React.Component {
+type Props = {
+    id: number,
+    fieldConfig: FieldConfig,
+    onChange: (FieldConfig) => void,
+    onCancel: VoidCallback
+};
+
+type State = {
+    values: MapType<string, any>,
+    previewKey: ?string,
+    previewResult: ?{
+        time: number,
+        htmlResult: string
+    },
+    error: *
+};
+
+export class CustomFieldForm extends React.Component<Props, State> {
     static propTypes = {
         id: PropTypes.number.isRequired,
         fieldConfig: PropTypes.object.isRequired,
@@ -27,18 +50,18 @@ export class CustomFieldForm extends React.Component {
         onCancel: PropTypes.func.isRequired
     };
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
         const {fieldConfig} = props;
 
         this.state = {
-            values: new Map({
+            values: Map({
                 scriptBody: fieldConfig.scriptBody,
                 cacheable: fieldConfig.cacheable,
                 template: fieldConfig.template,
                 velocityParamsEnabled: fieldConfig.velocityParamsEnabled,
-                comment: fieldConfig.comment
+                comment: ''
             }),
             previewKey: '',
             previewResult: null,
@@ -46,7 +69,7 @@ export class CustomFieldForm extends React.Component {
         };
     }
 
-    _onSubmit = (e) => {
+    _onSubmit = (e: Event) => {
         if (e) {
             e.preventDefault();
         }
@@ -55,11 +78,11 @@ export class CustomFieldForm extends React.Component {
             .updateFieldConfig(this.props.id, this.state.values.toJS())
             .then(
                 (data) => this.props.onChange(data),
-                (error) => {
+                (error: *) => {
                     const {response} = error;
 
                     if (response.status === 400) {
-                        this.setState({error: response.data});
+                        this.setState({ error: response.data });
                     } else {
                         throw error;
                     }
@@ -67,24 +90,27 @@ export class CustomFieldForm extends React.Component {
             );
     };
 
-    _mutateValue = (field, value) => {
-        this.setState(state => {
+    _mutateValue = (field: string, value: any) => {
+        this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
             };
         });
     };
 
-    _setObjectValue = (field) => (value) => this._mutateValue(field, value);
+    _setObjectValue = (field: string) => (value: any) => this._mutateValue(field, value);
 
-    _setTextValue = (field) => (event) => this._mutateValue(field, event.target.value);
+    _setTextValue = (field: string) => (event: InputEvent) => this._mutateValue(field, event.currentTarget.value);
 
-    _setToggleValue = field => e => this._mutateValue(field, e.currentTarget.checked);
+    _setToggleValue = (field: string) => (e: Event) => {
+        //$FlowFixMe
+        this._mutateValue(field, e.currentTarget.checked);
+    };
 
     _setTemplate = this._setObjectValue('template');
     _setScript = this._setObjectValue('scriptBody');
 
-    _setPreviewKey = (e) => this.setState({previewKey: e.target.value});
+    _setPreviewKey = (e: InputEvent) => this.setState({ previewKey: e.currentTarget.value });
 
     _preview = () => {
         fieldConfigService
@@ -100,14 +126,14 @@ export class CustomFieldForm extends React.Component {
             );
     };
 
-    render() {
+    render(): React.Node {
         const {fieldConfig} = this.props;
         const {values, error, previewKey, previewResult} = this.state;
 
-        let errorMessage = null;
-        let errorField = null;
+        let errorMessage: * = null;
+        let errorField: ?string = null;
 
-        let markers = null;
+        let markers: * = null;
 
         if (error) {
             if (error.field === 'scriptBody' && Array.isArray(error.error)) {
@@ -180,8 +206,9 @@ export class CustomFieldForm extends React.Component {
                 <div style={{marginTop: '10px'}}>
                     <ButtonGroup>
                         <Button appearance="primary" onClick={this._onSubmit}>{CommonMessages.update}</Button>
-                        {fieldConfig.uuid &&
+                        {fieldConfig.uuid ?
                             <Button appearance="link" onClick={this.props.onCancel}>{CommonMessages.cancel}</Button>
+                            : undefined
                         }
                     </ButtonGroup>
                 </div>
@@ -190,7 +217,7 @@ export class CustomFieldForm extends React.Component {
                     <FieldTextStateless
                         label="Issue key"
 
-                        value={previewKey}
+                        value={previewKey || ''}
                         onChange={this._setPreviewKey}
                     />
                     <div style={{marginTop: '10px'}}>
@@ -201,7 +228,7 @@ export class CustomFieldForm extends React.Component {
 
                     {previewResult &&
                         <div>
-                            {ConsoleMessages.executedIn(previewResult.key)}{':'}
+                            {ConsoleMessages.executedIn(previewResult.time.toString())}{':'}
 
                             <div dangerouslySetInnerHTML={{__html: previewResult.htmlResult}}/>
                         </div>

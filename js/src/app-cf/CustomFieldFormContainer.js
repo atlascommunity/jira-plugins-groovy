@@ -1,4 +1,5 @@
-import React from 'react';
+//@flow
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import Button from '@atlaskit/button';
@@ -6,6 +7,7 @@ import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 
 import {CustomFieldForm} from './CustomFieldForm';
+import type {FieldConfig} from './types';
 
 import Script, {ScriptParameters} from '../common/script';
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
@@ -17,7 +19,17 @@ import {CommonMessages, ErrorMessages, FieldMessages} from '../i18n/common.i18n'
 import {ErrorMessage} from '../common/ak/messages';
 
 
-export class CustomFieldFormContainer extends React.Component {
+type Props = {
+    id: number
+};
+
+type State = {
+    ready: boolean,
+    editing: boolean,
+    config: ?FieldConfig
+};
+
+export class CustomFieldFormContainer extends React.Component<Props, State> {
     static propTypes = {
         id: PropTypes.number.isRequired
     };
@@ -28,9 +40,9 @@ export class CustomFieldFormContainer extends React.Component {
         config: null
     };
 
-    _setEditing = (value) => () => this.setState({ editing: value });
+    _setEditing = (value: boolean) => () => this.setState({ editing: value });
 
-    _onChange = (value) => this.setState({ config: value, editing: false });
+    _onChange = (value: FieldConfig) => this.setState({ config: value, editing: false });
 
     componentDidMount() {
         if (Number.isNaN(this.props.id)) {
@@ -42,10 +54,10 @@ export class CustomFieldFormContainer extends React.Component {
         }
     }
 
-    render() {
+    render(): React.Node {
         const {config, ready, editing} = this.state;
 
-        if (!ready) {
+        if (!ready || !config) {
             return <LoadingSpinner/>;
         }
 
@@ -57,17 +69,21 @@ export class CustomFieldFormContainer extends React.Component {
             );
         }
 
+        let actions: ?React.Element<any> = null;
+
+        if (config.uuid && !editing) {
+            actions = (
+                <Button
+                    appearance="primary"
+                    onClick={this._setEditing(true)}
+                >
+                    {CommonMessages.edit}
+                </Button>
+            );
+        }
+
         return <Page>
-            <PageHeader
-                actions = {config.uuid && !editing &&
-                    <Button
-                        appearance="primary"
-                        onClick={this._setEditing(true)}
-                    >
-                        {CommonMessages.edit}
-                    </Button>
-                }
-            >
+            <PageHeader actions={actions || undefined}>
                 {ScriptFieldMessages.scriptFor(`${config.customFieldName} - ${config.contextName}`)}
             </PageHeader>
 
@@ -81,9 +97,7 @@ export class CustomFieldFormContainer extends React.Component {
                             scriptBody: config.scriptBody,
                             changelogs: config.changelogs,
                         }}
-                        template={config.needsTemplate && {
-                            body: config.template
-                        }}
+                        template={config.needsTemplate ? { body: (config.template || '') }: undefined}
 
                         withChangelog={true}
                         collapsible={false}
