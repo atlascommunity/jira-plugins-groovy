@@ -38,7 +38,7 @@ function getWorkflowLink(workflow: WorkflowType, mode: WorkflowMode='live'): str
 }
 
 type WorkflowsDialogProps = {
-    id: number|string,
+    id: number,
     onClose: VoidCallback
 };
 

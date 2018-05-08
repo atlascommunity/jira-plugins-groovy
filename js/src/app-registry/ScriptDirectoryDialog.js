@@ -1,4 +1,5 @@
-import React from 'react';
+//@flow
+import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
 
@@ -6,6 +7,7 @@ import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 
 import {RegistryActionCreators} from './registry.reducer';
+import type {BasicRegistryDirectoryType} from './types';
 
 import {ErrorMessage} from '../common/ak/messages';
 
@@ -15,17 +17,32 @@ import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 
-@connect(null, RegistryActionCreators, null, {withRef: true})
-export class ScriptDirectoryDialog extends React.Component {
+type Props = {
+    addDirectory: typeof RegistryActionCreators.addDirectory,
+    updateDirectory: typeof RegistryActionCreators.updateDirectory
+};
+
+type State = {
+    active: boolean,
+    name: string,
+    parentId: ?number,
+    id: ?number,
+    directory: ?BasicRegistryDirectoryType,
+    error: *
+};
+
+//todo: declarative activation
+export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, State> {
     state = {
         active: false,
         name: '',
         parentId: null,
         id: null,
+        directory: null,
         error: null
     };
 
-    activateCreate = (parentId) => {
+    activateCreate = (parentId: number) => {
         this.setState({
             active: true,
             name: '',
@@ -35,7 +52,7 @@ export class ScriptDirectoryDialog extends React.Component {
         });
     };
 
-    activateEdit = (id) => {
+    activateEdit = (id: number) => {
         registryService
             .getDirectory(id)
             .then(data => this.setState({
@@ -48,7 +65,7 @@ export class ScriptDirectoryDialog extends React.Component {
             }));
     };
 
-    _handleError = (error) => {
+    _handleError = (error: *) => {
         const {response} = error;
 
         if (response.status === 400) {
@@ -58,11 +75,7 @@ export class ScriptDirectoryDialog extends React.Component {
         }
     };
 
-    _onSubmit = (e) => {
-        if (e) {
-            e.preventDefault();
-        }
-
+    _onSubmit = () => {
         const {id, name, parentId} = this.state;
 
         const data = {
@@ -74,7 +87,7 @@ export class ScriptDirectoryDialog extends React.Component {
             registryService
                 .updateDirectory(id, data)
                 .then(
-                    result => {
+                    (result: BasicRegistryDirectoryType) => {
                         this.props.updateDirectory(result);
                         this.setState({active: false});
                     },
@@ -83,7 +96,7 @@ export class ScriptDirectoryDialog extends React.Component {
             registryService
                 .createDirectory(data)
                 .then(
-                    result => {
+                    (result: BasicRegistryDirectoryType) => {
                         this.props.addDirectory({
                             ...result,
                             children: [],
@@ -98,13 +111,13 @@ export class ScriptDirectoryDialog extends React.Component {
 
     _close = () => this.setState({active: false});
 
-    _setName = (event) => this.setState({ name: event.target.value });
+    _setName = (event: SyntheticEvent<HTMLInputElement>) => this.setState({ name: event.currentTarget.value });
 
-    render() {
+    render(): Node {
         const {error, directory} = this.state;
 
-        let errorMessage = null;
-        let errorField = null;
+        let errorMessage: * = null;
+        let errorField: ?string = null;
 
         if (error) {
             ({field: errorField, message: errorMessage} = error);
@@ -117,7 +130,7 @@ export class ScriptDirectoryDialog extends React.Component {
                         width="medium"
 
                         isHeadingMultiline={false}
-                        heading={this.state.id ? `${RegistryMessages.editDirectory}: ${directory.name}` : RegistryMessages.addDirectory}
+                        heading={this.state.id ? `${RegistryMessages.editDirectory}: ${directory ? directory.name : ''}` : RegistryMessages.addDirectory}
 
                         onClose={this._close}
                         actions={[
@@ -152,3 +165,5 @@ export class ScriptDirectoryDialog extends React.Component {
         );
     }
 }
+
+export const ScriptDirectoryDialog = connect(null, RegistryActionCreators, null, {withRef: true})(ScriptDirectoryDialogInternal);

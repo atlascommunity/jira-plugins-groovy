@@ -1,4 +1,5 @@
-import React from 'react';
+//@flow
+import React, {type Node} from 'react';
 import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
@@ -18,6 +19,8 @@ import {ScriptDirectory} from './ScriptDirectory';
 import {ScriptDirectoryDialog} from './ScriptDirectoryDialog';
 import {RegistryActionCreators} from './registry.reducer';
 
+import type {RegistryDirectoryType, RegistryScriptType} from './types';
+
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 import {InfoMessage} from '../common/ak/messages';
 
@@ -29,19 +32,22 @@ import {RegistryMessages} from '../i18n/registry.i18n';
 import './ScriptRegistry.less';
 
 
+type Props = {
+    ready: boolean,
+    directories: $ReadOnlyArray<RegistryDirectoryType>,
+    deleteDirectory: typeof RegistryActionCreators.deleteDirectory,
+    deleteScript: typeof RegistryActionCreators.deleteScript,
+    moveScript: typeof RegistryActionCreators.moveScript
+};
+
+type State = {
+    waiting: boolean,
+    isDragging: boolean,
+    filter: string
+};
+
 //todo: collapse/uncollapse all
-@connect(
-    memoizeOne(
-        state => {
-            return {
-                ready: state.ready,
-                directories: state.directories
-            };
-        }
-    ),
-    RegistryActionCreators
-)
-export class ScriptRegistry extends React.Component {
+export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
     static propTypes = {
         ready: PropTypes.bool.isRequired,
         directories: PropTypes.arrayOf(PropTypes.object.isRequired)
@@ -53,11 +59,11 @@ export class ScriptRegistry extends React.Component {
         filter: ''
     };
 
-    _setRef = (key) => (el) => {
+    _setRef = (key: string) => (el: any) => {
         this[key] = el;
     };
 
-    _activateCreateDialog = (parentId, type) => {
+    _activateCreateDialog = (parentId: ?number, type: 'script'|'directory') => {
         if (type === 'directory') {
             this.directoryDialogRef.getWrappedInstance().activateCreate(parentId);
         } else {
@@ -65,7 +71,7 @@ export class ScriptRegistry extends React.Component {
         }
     };
 
-    _activateEditDialog = (id, type) => {
+    _activateEditDialog = (id: number, type: 'script'|'directory') => {
         console.log(id, type);
         if (type === 'directory') {
             this.directoryDialogRef.getWrappedInstance().activateEdit(id);
@@ -74,7 +80,7 @@ export class ScriptRegistry extends React.Component {
         }
     };
 
-    _activateDeleteDialog = (id, type, name) => {
+    _activateDeleteDialog = (id: number, type: 'script'|'directory', name: string) => {
         // eslint-disable-next-line no-restricted-globals
         if (confirm(`Are you sure you want to delete "${name}"?`)) {
             if (type === 'directory') {
@@ -91,7 +97,7 @@ export class ScriptRegistry extends React.Component {
         this.setState({isDragging: true});
     };
 
-    _onDragEnd = (result) => {
+    _onDragEnd = (result: *) => {
         const {source, destination, draggableId} = result;
 
         this.setState({isDragging: false});
@@ -133,7 +139,7 @@ export class ScriptRegistry extends React.Component {
             );
     };
 
-    _findScript(id) {
+    _findScript(id: number): ?RegistryScriptType {
         for (const dir of this.props.directories) {
             const found = this._findScriptInDirectory(dir, id);
             if (found) {
@@ -143,7 +149,7 @@ export class ScriptRegistry extends React.Component {
         return null;
     }
 
-    _findScriptInDirectory(dir, id) {
+    _findScriptInDirectory(dir: RegistryDirectoryType, id: number): ?RegistryScriptType {
         if (dir.children) {
             for (const child of dir.children) {
                 const foundInDir = this._findScriptInDirectory(child, id);
@@ -158,20 +164,22 @@ export class ScriptRegistry extends React.Component {
         return null;
     }
 
-    _onFilterChange = (e) => this.setState({ filter: e.target.value });
+    _onFilterChange = (e: SyntheticEvent<HTMLInputElement>) => this.setState({ filter: e.currentTarget.value });
 
-    _matchesFilter = (item, filter) => (item.name.toLocaleLowerCase().includes(filter));
+    _matchesFilter = (item: RegistryDirectoryType|RegistryScriptType, filter: string): boolean => {
+        return item.name.toLocaleLowerCase().includes(filter);
+    };
 
-    _getFilteredDirsInternal = (dirs, filter) => {
+    _getFilteredDirsInternal = (dirs: $ReadOnlyArray<RegistryDirectoryType>, filter: string): $ReadOnlyArray<RegistryDirectoryType> => {
         return dirs
-            .map(dir => {
+            .map((dir: RegistryDirectoryType): RegistryDirectoryType => {
                 if (this._matchesFilter(dir, filter)) {
                     return dir;
                 }
                 return {
                     ...dir,
                     scripts: dir.scripts.filter(script => this._matchesFilter(script, filter)),
-                    children: this._getFilteredDirsInternal(dir.children)
+                    children: this._getFilteredDirsInternal(dir.children, filter)
                 };
             })
             .filter(dir => (dir.scripts.length + dir.children.length) > 0);
@@ -179,9 +187,11 @@ export class ScriptRegistry extends React.Component {
 
     _getFilteredDirs = memoizeOne(this._getFilteredDirsInternal);
 
-    render() {
+    render(): Node {
         const {waiting, filter} = this.state;
-        let {directories, ready} = this.props;
+        const {ready} = this.props;
+
+        let directories: * = this.props.directories;
 
         if (filter && filter.length >= 2) {
             directories = this._getFilteredDirs(directories, filter.toLocaleLowerCase());
@@ -236,3 +246,15 @@ export class ScriptRegistry extends React.Component {
         );
     }
 }
+
+export const ScriptRegistry = connect(
+    memoizeOne(
+        (state: *): * => {
+            return {
+                ready: state.ready,
+                directories: state.directories
+            };
+        }
+    ),
+    RegistryActionCreators
+)(ScriptRegistryInternal);

@@ -1,3 +1,4 @@
+//@flow
 import ReactDOM from 'react-dom';
 import React from 'react';
 import {Provider} from 'react-redux';
@@ -28,15 +29,22 @@ AJS.toInit(() => {
             watcherService.getAllWatches('REGISTRY_DIRECTORY')
         ])
         .then(
-            ([tree, scriptWatches, directoryWatches]) => {
+            ([tree, scriptWatches, directoryWatches]: *) => {
                 store.dispatch(RegistryActionCreators.loadState(tree, scriptWatches, directoryWatches));
             }
         );
+
+    const element = document.getElementById('react-content');
+
+    if (element === null) {
+        alert('no element');
+        return;
+    }
 
     ReactDOM.render(
         <Provider store={store}>
             <ScriptRegistry/>
         </Provider>,
-        document.getElementById('react-content')
+        element
     );
 });

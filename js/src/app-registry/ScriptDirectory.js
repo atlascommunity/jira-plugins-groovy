@@ -24,7 +24,7 @@ import {RegistryActionCreators} from './registry.reducer';
 
 import {DraggableRegistryScript} from './DraggableRegistryScript';
 
-import type {DeleteCallback, CreateCallback, EditCallback, RegistryDirectoryType, WatcherCallback} from './types';
+import type {DeleteCallback, CreateCallback, EditCallback, RegistryDirectoryType} from './types';
 
 import {watcherService} from '../service/services';
 
@@ -52,8 +52,8 @@ type ScriptDirectoryProps = ScriptDirectoryConnectProps & {
     onCreate: CreateCallback,
     onEdit: EditCallback,
     onDelete: DeleteCallback,
-    addWatch: WatcherCallback,
-    removeWatch: WatcherCallback
+    addWatch: typeof RegistryActionCreators.addWatch,
+    removeWatch: typeof RegistryActionCreators.removeWatch
 };
 
 type ScriptDirectoryState = {
@@ -238,10 +238,13 @@ class ScriptDirectoryInternal extends React.Component<ScriptDirectoryProps, Scri
 }
 
 export const ScriptDirectory = connect(
-    memoizeOne((state: *): ScriptDirectoryConnectProps => {
+    memoizeOne((state: *): * => {
         return {
             directoryWatches: state.directoryWatches
         };
     }),
-    RegistryActionCreators
+    {
+        addWatch: RegistryActionCreators.addWatch,
+        removeWatch: RegistryActionCreators.removeWatch
+    }
 )(ScriptDirectoryInternal);

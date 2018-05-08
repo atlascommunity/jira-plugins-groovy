@@ -1,4 +1,5 @@
-import React from 'react';
+//@flow
+import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
 
@@ -9,9 +10,11 @@ import Spinner from '@atlaskit/spinner';
 import {Label} from '@atlaskit/field-base';
 import {CheckboxStateless} from '@atlaskit/checkbox';
 
-import {Map} from 'immutable';
+import {Map, type Map as MapType} from 'immutable';
 
 import {RegistryActionCreators} from './registry.reducer';
+
+import type {RegistryScriptType} from './types';
 
 import {FieldMessages, CommonMessages} from '../i18n/common.i18n';
 
@@ -24,12 +27,30 @@ import {StaticField} from '../common/ak/StaticField';
 import {FieldError} from '../common/ak/FieldError';
 import {ErrorMessage} from '../common/ak/messages';
 import {RegistryMessages} from '../i18n/registry.i18n';
+import type {InputEvent} from '../common/EventTypes';
 
 
 const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
 
-@connect(null, RegistryActionCreators, null, {withRef: true})
-export class ScriptDialog extends React.Component {
+type Props = {
+    addScript: typeof RegistryActionCreators.addScript,
+    updateScript: typeof RegistryActionCreators.updateScript
+};
+
+type State = {
+    active: boolean,
+    fetching: boolean,
+    id: ?number,
+    values: MapType<string, any>,
+    parentName: string,
+    error: *,
+    modified: boolean,
+    waiting: boolean,
+    script: ?RegistryScriptType
+};
+
+//todo: use declarative activation
+export class ScriptDialogInternal extends React.PureComponent<Props, State> {
     state = {
         active: false,
         fetching: false,
@@ -38,10 +59,11 @@ export class ScriptDialog extends React.Component {
         parentName: '',
         error: null,
         modified: false,
-        waiting: false
+        waiting: false,
+        script: null
     };
 
-    activateCreate = (directoryId) => {
+    activateCreate = (directoryId: number) => {
         this.setState({ active: true, fetching: true });
 
         registryService
@@ -51,7 +73,7 @@ export class ScriptDialog extends React.Component {
                     fetching: false,
                     active: true,
                     id: null,
-                    values: new Map({
+                    values: Map({
                         directoryId: directoryId,
                         types: []
                     }),
@@ -62,7 +84,7 @@ export class ScriptDialog extends React.Component {
             );
     };
 
-    activateEdit = (id) => {
+    activateEdit = (id: number) => {
         this.setState({ active: true, fetching: true });
 
         registryService
@@ -71,7 +93,7 @@ export class ScriptDialog extends React.Component {
                 fetching: false,
                 active: true,
                 id: id,
-                values: new Map({
+                values: Map({
                     name: data.name,
                     description: data.description,
                     types: data.types,
@@ -85,7 +107,7 @@ export class ScriptDialog extends React.Component {
             }));
     };
 
-    _handleError = (error) => {
+    _handleError = (error: *) => {
         const {response} = error;
 
         this.setState({ waiting: false });
@@ -99,11 +121,7 @@ export class ScriptDialog extends React.Component {
         }
     };
 
-    _onSubmit = (e) => {
-        if (e) {
-            e.preventDefault();
-        }
-
+    _onSubmit = () => {
         this.setState({ waiting: true });
 
         const id = this.state.id;
@@ -111,7 +129,7 @@ export class ScriptDialog extends React.Component {
             registryService
                 .updateScript(id, this.state.values.toJS())
                 .then(
-                    data => {
+                    (data: RegistryScriptType) => {
                         this.props.updateScript(data);
                         this.setState({ active: false, waiting: false });
                     },
@@ -121,7 +139,7 @@ export class ScriptDialog extends React.Component {
             registryService
                 .createScript(this.state.values.toJS())
                 .then(
-                    data => {
+                    (data: RegistryScriptType) => {
                         this.props.addScript(data);
                         this.setState({ active: false, waiting: false });
                     },
@@ -132,8 +150,8 @@ export class ScriptDialog extends React.Component {
 
     _close = () => this.setState({ active: false, waiting: false, values: Map() });
 
-    mutateValue = (field, value) => {
-        this.setState(state => {
+    mutateValue = (field: string, value: any) => {
+        this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value),
                 modified: true
@@ -141,17 +159,17 @@ export class ScriptDialog extends React.Component {
         });
     };
 
-    _setTextValue = (field) => (event) => this.mutateValue(field, event.target.value);
+    _setTextValue = (field: string) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
 
-    _setObjectValue = (field) => (value) => this.mutateValue(field, value);
+    _setObjectValue = (field: string) => (value: any) => this.mutateValue(field, value);
 
     _setScript = this._setObjectValue('scriptBody');
 
-    _toggleType = (e) => {
+    _toggleType = (e: SyntheticEvent<HTMLInputElement>) => {
         const option = e.currentTarget.value;
 
-        this.setState(state => {
-            const types = state.values.get('types');
+        this.setState((state: State): * => {
+            const types = state.values.get('types') || [];
 
             const isRemove = types.includes(option);
 
@@ -161,12 +179,12 @@ export class ScriptDialog extends React.Component {
         });
     };
 
-    render() {
+    render(): Node {
         const {values, script, parentName, error, modified, active, fetching, waiting} = this.state;
-        let errorMessage = null;
-        let errorField = null;
+        let errorMessage: * = null;
+        let errorField: ?string = null;
 
-        let markers = null;
+        let markers: * = null;
         if (error) {
             if (error.field === 'scriptBody' && Array.isArray(error.error)) {
                 const errors = error.error.filter(e => e);
@@ -182,7 +200,7 @@ export class ScriptDialog extends React.Component {
             errorField = error.field;
         }
 
-        const types = values.get('types');
+        const types = values.get('types') || [];
 
         return (
             <div>
@@ -192,7 +210,7 @@ export class ScriptDialog extends React.Component {
                         scrollBehavior="outside"
 
                         isHeadingMultiline={false}
-                        heading={this.state.id ? `${RegistryMessages.editScript}: ${script.name}` : RegistryMessages.addScript}
+                        heading={this.state.id ? `${RegistryMessages.editScript}: ${script ? script.name : ''}` : RegistryMessages.addScript}
 
                         onClose={this._close}
 
@@ -303,3 +321,5 @@ export class ScriptDialog extends React.Component {
         );
     }
 }
+
+export const ScriptDialog = connect(null, RegistryActionCreators, null, {withRef: true})(ScriptDialogInternal);

@@ -1,5 +1,6 @@
 //@flow
-import type {ScriptType, ScriptId} from '../common/script/types';
+import type {ScriptId} from '../common/script/types';
+import type {ScriptEntity} from '../common/types';
 
 
 export type EntityType = 'script' | 'directory';
@@ -11,15 +12,21 @@ export type DeleteCallback = (id: ScriptId, type: EntityType, name: string) => v
 
 export type WorkflowScriptType = 'CONDITION' | 'VALIDATOR' | 'FUNCTION';
 
-export type RegistryScriptType = ScriptType & {
-    types: Array<WorkflowScriptType>
+//todo: change base entity to ScriptEntity
+export type RegistryScriptType = ScriptEntity & {
+    types: Array<WorkflowScriptType>,
+    parentName: string,
+    directoryId: number
 };
 
-export type RegistryDirectoryType = {
+export type BasicRegistryDirectoryType = {
     id: number,
-    name: string,
-    scripts: Array<RegistryScriptType>,
-    children: Array<RegistryDirectoryType>
+    name: string
+};
+
+export type RegistryDirectoryType = BasicRegistryDirectoryType & {
+    scripts: $ReadOnlyArray<RegistryScriptType>,
+    children: $ReadOnlyArray<RegistryDirectoryType>
 };
 
 export type WorkflowActionItemType = {
