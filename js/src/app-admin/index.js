@@ -1,11 +1,9 @@
 //@flow
 import ReactDOM from 'react-dom';
-import React from 'react';
+import * as React from 'react';
 
-import {Provider, connect} from 'react-redux';
+import {Provider} from 'react-redux';
 import {combineReducers, createStore} from 'redux';
-
-import memoizeOne from 'memoize-one';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
@@ -18,23 +16,14 @@ import {fixStyle} from '../common/fixStyle';
 
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 
-import {ScriptPage} from '../common/script-list/ScriptPage';
+import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 
 import {TitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
+import type {FullDialogComponentProps} from '../common/script-list/types';
+
 import '../flex.less';
-
-
-const ConnectedPage = connect(
-    memoizeOne(
-        ({items, watches, isReady}: *): * => {
-            return {
-                items, watches, isReady
-            };
-        }
-    )
-)(ScriptPage);
 
 
 const store = createStore(
@@ -62,8 +51,8 @@ AJS.toInit(() => {
 
     ReactDOM.render(
         <Provider store={store}>
-            <ConnectedPage
-                DialogComponent={AdminDialog}
+            <ConnectedScriptPage
+                DialogComponent={(AdminDialog: React.ComponentType<FullDialogComponentProps>)}
                 ScriptComponent={AdminScript}
                 i18n={{
                     title: TitleMessages.adminScripts,

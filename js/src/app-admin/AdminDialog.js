@@ -71,19 +71,21 @@ const onSubmit = (id: ?number, data: {[string]: any}): Promise<SubmitResult> => 
         );
 };
 
-function AdminDialogInternal(props: Props): React.Node {
-    return (
-        <ScriptDialog
-            defaultLoader={defaultLoader}
-            editLoader={editLoader}
-            onSubmit={onSubmit}
-            i18n={{
-                editTitle: RegistryMessages.editScript,
-                createTitle: RegistryMessages.addScript
-            }}
-            {...props}
-        />
-    );
+class AdminDialogInternal extends React.PureComponent<Props> {
+    render(): React.Node {
+        return (
+            <ScriptDialog
+                defaultLoader={defaultLoader}
+                editLoader={editLoader}
+                onSubmit={onSubmit}
+                i18n={{
+                    editTitle: RegistryMessages.editScript,
+                    createTitle: RegistryMessages.addScript
+                }}
+                {...this.props}
+            />
+        );
+    }
 }
 
 export const AdminDialog = connect(

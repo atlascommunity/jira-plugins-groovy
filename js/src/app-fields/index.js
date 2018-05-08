@@ -10,15 +10,17 @@ import {combineReducers, createStore} from 'redux';
 import AJS from 'AJS';
 
 import {FieldScript} from './FieldScript';
-import {FieldRegistry} from './FieldRegistry';
+
+import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 
 import {fieldConfigService, watcherService} from '../service/services';
 import {fixStyle} from '../common/fixStyle';
 
-import '../flex.less';
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {TitleMessages} from '../i18n/common.i18n';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
+
+import '../flex.less';
 
 
 const store = createStore(
@@ -46,7 +48,7 @@ AJS.toInit(() => {
 
     ReactDOM.render(
         <Provider store={store}>
-            <FieldRegistry
+            <ConnectedScriptPage
                 ScriptComponent={FieldScript}
                 i18n={{
                     title: TitleMessages.fields,

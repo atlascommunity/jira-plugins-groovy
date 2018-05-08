@@ -3,19 +3,18 @@ import ReactDOM from 'react-dom';
 import React from 'react';
 import {Provider} from 'react-redux';
 
-import {createStore} from 'redux';
+import {combineReducers, createStore} from 'redux';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
-import {scriptsReducer} from './rest.reducer';
-import {RestRegistry} from './RestRegistry';
 import {RestScript} from './RestScript';
 import {RestScriptDialog} from './RestScriptDialog';
 
 import {restService, watcherService} from '../service/services';
 import {fixStyle} from '../common/fixStyle';
-import {ItemActionCreators} from '../common/redux';
+import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
+import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 
 import {TitleMessages} from '../i18n/common.i18n';
 import {RestMessages} from '../i18n/rest.i18n';
@@ -23,7 +22,14 @@ import {RestMessages} from '../i18n/rest.i18n';
 import '../flex.less';
 
 
-const store = createStore(scriptsReducer, {scripts: [], ready: false});
+const store = createStore(
+    combineReducers({
+        items: itemsReducer,
+        watches: watchesReducer,
+        isReady: readinessReducer
+    }),
+    {items: [], isReady: false}
+);
 
 AJS.toInit(() => {
     fixStyle();
@@ -41,7 +47,7 @@ AJS.toInit(() => {
 
     ReactDOM.render(
         <Provider store={store}>
-            <RestRegistry
+            <ConnectedScriptPage
                 DialogComponent={RestScriptDialog}
                 ScriptComponent={RestScript}
                 i18n={{

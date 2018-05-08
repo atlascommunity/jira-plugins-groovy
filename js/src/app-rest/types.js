@@ -6,4 +6,4 @@ export type RestScriptType = ScriptEntity & {
     uuid: string,
     methods: Array<string>,
     groups: Array<string>
-}
+};
