@@ -10,7 +10,7 @@ import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import {FieldTextStateless} from '@atlaskit/field-text';
 
-import type {FieldConfig} from './types';
+import type {FieldConfig, FieldConfigPreviewResult} from './types';
 
 import {fieldConfigService} from '../service/services';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
@@ -35,10 +35,7 @@ type Props = {
 type State = {
     values: MapType<string, any>,
     previewKey: ?string,
-    previewResult: ?{
-        time: number,
-        htmlResult: string
-    },
+    previewResult: ?FieldConfigPreviewResult,
     error: *
 };
 

@@ -15,3 +15,8 @@ export type FieldConfig = {
     searcher: ?string,
     template: ?string
 };
+
+export type FieldConfigPreviewResult = {
+    time: number,
+    htmlResult: string
+};

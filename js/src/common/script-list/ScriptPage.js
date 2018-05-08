@@ -17,7 +17,9 @@ type Props<T> = {
     isReady: boolean,
     items: Array<T>,
     ScriptComponent: React.ComponentType<ScriptComponentProps<T>>,
-    DialogComponent: React.ComponentType<FullDialogComponentProps>
+    DialogComponent?: React.ComponentType<FullDialogComponentProps>,
+
+    isCreateDisabled: boolean
 };
 
 type State = {
@@ -25,6 +27,10 @@ type State = {
 };
 
 export class ScriptPage<T> extends React.PureComponent<Props<T&ItemType>, State> {
+    static defaultProps = {
+        isCreateDisabled: false
+    };
+
     state = {
         editProps: null,
         deleteProps: null
@@ -37,16 +43,16 @@ export class ScriptPage<T> extends React.PureComponent<Props<T&ItemType>, State>
     _closeEdit = () => this.setState({ editProps: null });
 
     render(): React.Node {
-        const {isReady, items, i18n, DialogComponent, ScriptComponent} = this.props;
+        const {isReady, items, i18n, DialogComponent, ScriptComponent, isCreateDisabled} = this.props;
         const {editProps} = this.state;
 
         return (
             <Page>
                 <PageHeader
                     actions={
-                        <Button appearance="primary" onClick={this._triggerCreate} isDisabled={!isReady}>
+                        !isCreateDisabled ? <Button appearance="primary" onClick={this._triggerCreate} isDisabled={!isReady}>
                             {i18n.addItem}
-                        </Button>
+                        </Button> : undefined
                     }
                 >
                     {i18n.title}
@@ -63,7 +69,7 @@ export class ScriptPage<T> extends React.PureComponent<Props<T&ItemType>, State>
                     />
                 </div>
 
-                {editProps ? <DialogComponent {...editProps} onClose={this._closeEdit}/> : null}
+                {editProps && DialogComponent ? <DialogComponent {...editProps} onClose={this._closeEdit}/> : null}
             </Page>
         );
     }

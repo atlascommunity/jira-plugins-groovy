@@ -21,9 +21,9 @@ import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from
 import {ScriptPage} from '../common/script-list/ScriptPage';
 
 import {TitleMessages} from '../i18n/common.i18n';
+import {RegistryMessages} from '../i18n/registry.i18n';
 
 import '../flex.less';
-import {RegistryMessages} from '../i18n/registry.i18n';
 
 
 const ConnectedPage = connect(
