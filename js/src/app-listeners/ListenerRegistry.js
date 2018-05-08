@@ -53,7 +53,7 @@ export class ListenerRegistry extends React.PureComponent<Props> {
 
                 <div className="page-content ScriptList">
                     {listeners.map(listener =>
-                        //$FlowFixMe wtf
+                        //$FlowFixMe: todo: should be fixed in later flow version
                         <Listener
                             key={listener.id}
                             listener={listener}

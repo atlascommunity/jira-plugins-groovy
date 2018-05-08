@@ -8,7 +8,7 @@ import type {OldSelectItem, OldSelectValue} from './types';
 import type {FieldProps, MutableFieldProps} from '../types';
 
 
-type LoaderOptionType = {
+export type LoaderOptionType = {
     value: string,
     name: string
 };
@@ -23,13 +23,13 @@ function mapOption(option: any): OldSelectItem {
     };
 }
 
-type AsyncLoadingMultiSelectProps = FieldProps & MutableFieldProps<Array<OldSelectValue>> & {
+type AsyncLoadingMultiSelectProps = FieldProps & MutableFieldProps<$ReadOnlyArray<OldSelectValue>> & {
     loader: () => Promise<Array<LoaderOptionType>>
 };
 
 type AsyncLoadingMultiSelectState = {
     ready: boolean,
-    options: Array<OldSelectItem>
+    options: $ReadOnlyArray<OldSelectItem>
 };
 
 export class AsyncLoadingMultiSelect extends React.Component<AsyncLoadingMultiSelectProps, AsyncLoadingMultiSelectState> {

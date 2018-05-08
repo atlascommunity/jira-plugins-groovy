@@ -18,6 +18,7 @@ import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {CommonMessages} from '../i18n/common.i18n';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import type {OldSelectItem} from '../common/ak/types';
+import type {InputEvent} from '../common/EventTypes';
 
 
 function mapScriptToOption(script: ScriptDescriptionType): OldSelectItem {
@@ -59,7 +60,6 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
     _onChange = (value: ?OldSelectItem) => {
         if (value) {
             this.setState({
-                //$FlowFixMe
                 script: this.state.scripts.find(el => el.id === value.value)
             });
         } else {
@@ -67,9 +67,8 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
         }
     };
 
-    _setInputValue = (field: string) => (e: SyntheticEvent<any>) => {
-        //$FlowFixMe
-        this._mutateValue(field, e.target.value);
+    _setInputValue = (field: string) => (e: InputEvent) => {
+        this._mutateValue(field, e.currentTarget.value);
     };
 
     _setValue = (field: string) => (value: any) => this._mutateValue(field, value);
@@ -200,20 +199,22 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
         ready: false,
         script: null,
         scripts: [],
-        values: new Map()
+        values: Map()
     };
 
     componentDidMount() {
         registryService
             .getAllScripts(this.props.type)
-            .then(scripts =>
+            .then((scripts: Array<ScriptDescriptionType>) => {
+                const {values} = this.props;
+
                 this.setState({
                     scripts,
                     ready: true,
-                    //$FlowFixMe
-                    values: new Map(this.props.values),
+                    values: values ? Map(values) : Map(),
                     script: this.props.scriptId ? scripts.find(el => el.id === this.props.scriptId) : null
-                }));
+                });
+            });
     }
 
     render(): React.Node {

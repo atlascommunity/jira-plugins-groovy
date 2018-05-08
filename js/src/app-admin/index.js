@@ -50,7 +50,6 @@ AJS.toInit(() => {
     fixStyle();
 
     Promise
-        //$FlowFixMe
         .all([adminScriptService.getAllScripts(), watcherService.getAllWatches('ADMIN_SCRIPT')])
         .then(([scripts, watches]) => store.dispatch(ItemActionCreators.loadItems(scripts, watches)));
 

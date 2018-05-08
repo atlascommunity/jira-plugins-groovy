@@ -1,8 +1,11 @@
-import React from 'react';
+//@flow
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import {AkFieldRadioGroup} from '@atlaskit/field-radio-group';
 import {FieldTextStateless} from '@atlaskit/field-text';
+
+import type {ConditionType} from './types';
 
 import {jiraService} from '../service/services';
 
@@ -14,36 +17,46 @@ import {ListenerTypeMessages} from '../i18n/listener.i18n';
 import {AsyncLoadingMultiSelect} from '../common/ak/AsyncLoadingMultiSelect';
 import {FieldError} from '../common/ak/FieldError';
 
+import type {LoaderOptionType} from '../common/ak/AsyncLoadingMultiSelect';
+
+import type {IssueEventType, ProjectType} from '../common/types';
+
 import './ConditionPicker.less';
 
 
 const projectsLoader = () => jiraService
     .getAllProjects()
-    .then(projects => projects.map(project => {
+    .then(projects => projects.map((project: ProjectType): LoaderOptionType => {
         return {
-            value: parseInt(project.id, 10),
+            value: project.id,
             name: `${project.key} - ${project.name}`
         };
     }));
 
 const eventTypeLoader = () => jiraService
     .getEventTypes()
-    .then(types => types.map(type => {
+    .then(types => types.map((type: IssueEventType): LoaderOptionType => {
         return {
-            value: type.id,
+            value: type.id.toString(10),
             name: type.name
         };
     }));
 
-export class ConditionPicker extends React.Component {
+type Props = {
+    value: ConditionType,
+    onChange: (value: ConditionType) => void,
+    error: any
+};
+
+export class ConditionPicker extends React.Component<Props> {
     static propTypes = {
         value: ConditionModel.isRequired,
         onChange: PropTypes.func.isRequired,
         error: PropTypes.object
     };
 
-    _onChange = property => {
-        return val => {
+    _onChange = (property: string): * => {
+        return (val: any) => {
             const {value, onChange} = this.props;
 
             onChange({
@@ -53,38 +66,39 @@ export class ConditionPicker extends React.Component {
         };
     };
 
-    _onTypeChange = (e) => {
+    _onTypeChange = (e: SyntheticEvent<HTMLInputElement>) => {
         const {value, onChange} = this.props;
 
-        onChange({
-            ...value,
-            type: e.target.value
-        });
+        const type = e.currentTarget.value;
+
+        if (type === 'CLASS_NAME' || type === 'ISSUE') {
+            onChange({...value, type});
+        }
     };
 
-    _onInputChange = property => {
-        return e => {
+    _onInputChange = (property: string): * => {
+        return (e: SyntheticEvent<HTMLInputElement>) => {
             const {value, onChange} = this.props;
 
             onChange({
                 ...value,
-                [property]: e.target.value
+                [property]: e.currentTarget.value
             });
         };
     };
 
-    render() {
+    render(): React.Node {
         const {value, error} = this.props;
 
-        let errorField = null;
-        let errorMessage = null;
+        let errorField: * = null;
+        let errorMessage: * = null;
 
         if (error) {
             errorField = error.field;
             errorMessage = error.message;
         }
 
-        let paramEl = null;
+        let paramEl: ?React.Node = null;
 
         if (value.type) {
             switch (value.type) {

@@ -13,8 +13,8 @@ export type ItemType = {
     id: number
 };
 
-export type ItemListType = Array<ItemType>;
-export type WatchesListType = Array<number>;
+export type ItemListType = $ReadOnlyArray<ItemType>;
+export type WatchesListType = $ReadOnlyArray<number>;
 
 export type LoadAction = {
     type: typeof LOAD_ITEMS,

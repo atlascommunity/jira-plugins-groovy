@@ -152,10 +152,13 @@ class RegistryScriptInternal extends React.Component<RegistryScriptProps, Regist
 
 export const RegistryScript =
     connect(
-        memoizeOne((state: any): * => {
+        memoizeOne((state: any): {scriptWatches: Array<number>} => {
             return {
                 scriptWatches: state.scriptWatches
             };
         }),
-        RegistryActionCreators
+        {
+            addWatch: RegistryActionCreators.addWatch,
+            removeWatch: RegistryActionCreators.removeWatch
+        }
     )(RegistryScriptInternal);

@@ -116,13 +116,14 @@ export class WorkflowsDialog extends React.Component<WorkflowsDialogProps, Workf
                                                 >
                                                     {workflow.name}
                                                 </Button>
-                                                {//$FlowFixMe
-                                                    workflow.hasDraft &&
-                                                    <Button
-                                                        appearance="subtle"
-                                                        iconBefore={<EditIcon label=""/>}
-                                                        href={getWorkflowLink(workflow, 'draft')}
-                                                    />
+                                                {
+                                                    workflow.hasDraft ?
+                                                        <Button
+                                                            appearance="subtle"
+                                                            iconBefore={<EditIcon label=""/>}
+                                                            href={getWorkflowLink(workflow, 'draft')}
+                                                        />
+                                                    : undefined
                                                 }
                                             </ButtonGroup>
                                         </td>

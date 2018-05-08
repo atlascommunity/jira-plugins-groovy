@@ -12,7 +12,7 @@ import type {FieldProps, LoadableFieldProps, MutableFieldProps} from '../types';
 
 type LookupMapType = Map<OldSelectValue, OldSelectItem>;
 
-function getLookupMap(items: Array<OldSelectItem>): LookupMapType {
+function getLookupMap(items: $ReadOnlyArray<OldSelectItem>): LookupMapType {
     const lookupMap = new Map();
     for (const item of items) {
         lookupMap.set(item.value, item);
@@ -23,8 +23,8 @@ function getLookupMap(items: Array<OldSelectItem>): LookupMapType {
 
 let i: number = 0;
 
-type MultiSelectProps = FieldProps & LoadableFieldProps & MutableFieldProps<Array<OldSelectValue>> & {
-    items: Array<OldSelectItem>,
+type MultiSelectProps = FieldProps & LoadableFieldProps & MutableFieldProps<$ReadOnlyArray<OldSelectValue>> & {
+    items: $ReadOnlyArray<OldSelectItem>,
 };
 
 type MultiSelectState = {
