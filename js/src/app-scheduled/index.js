@@ -3,22 +3,37 @@ import ReactDOM from 'react-dom';
 import React from 'react';
 import {Provider} from 'react-redux';
 
-import {createStore} from 'redux';
+import {combineReducers, createStore} from 'redux';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
-import {tasksReducer} from './scheduled.reducer';
-import {ScheduledTaskRegistry} from './ScheduledTaskRegistry';
+import {ScheduledTaskDialog} from './ScheduledTaskDialog';
+import {ScheduledTask} from './ScheduledTask';
 
 import {scheduledTaskService, watcherService} from '../service/services';
 import {fixStyle} from '../common/fixStyle';
 
 import '../flex.less';
-import {ItemActionCreators} from '../common/redux';
+import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
+import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
+
+import './ScheduledTaskRegistry.less';
+import {TitleMessages} from '../i18n/common.i18n';
+import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 
 
-const store = createStore(tasksReducer, {tasks: [], ready: false});
+const store = createStore(
+    combineReducers({
+        items: itemsReducer,
+        isReady: readinessReducer,
+        watches: watchesReducer
+    }),
+    {
+        items: [],
+        isReady: false
+    }
+);
 
 AJS.toInit(() => {
     fixStyle();
@@ -36,7 +51,15 @@ AJS.toInit(() => {
 
     ReactDOM.render(
         <Provider store={store}>
-            <ScheduledTaskRegistry/>
+            <ConnectedScriptPage
+                DialogComponent={ScheduledTaskDialog}
+                ScriptComponent={ScheduledTask}
+                i18n={{
+                    title: TitleMessages.rest,
+                    addItem: ScheduledTaskMessages.addTask,
+                    noItems: ScheduledTaskMessages.noTasks
+                }}
+            />
         </Provider>,
         element
     );

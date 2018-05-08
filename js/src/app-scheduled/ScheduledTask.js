@@ -32,6 +32,7 @@ import {ItemActionCreators, WatchActionCreators} from '../common/redux';
 import type {VoidCallback} from '../common/types';
 import type {ScriptParam} from '../common/script/ScriptParameters';
 import {WatchableScript} from '../common/script/WatchableScript';
+import type {ScriptComponentProps} from '../common/script-list/types';
 
 
 function getOutcomeLozengeAppearance(outcome: RunOutcomeType): Appearances {
@@ -61,9 +62,7 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
-type Props = {
-    task: ScheduledTaskType,
-    onEdit: VoidCallback,
+type Props = ScriptComponentProps<ScheduledTaskType> & {
     updateItem: typeof ItemActionCreators.updateItem,
     deleteItem: typeof ItemActionCreators.deleteItem,
 };
@@ -79,14 +78,16 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
         showRunDialog: false
     };
 
+    _edit = () => this.props.onEdit(this.props.script.id);
+
     _delete = () => {
-        const {task} = this.props;
+        const {script} = this.props;
 
         // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${task.name}"?`)) {
+        if (confirm(`Are you sure you want to delete "${script.name}"?`)) {
             scheduledTaskService
-                .doDelete(task.id)
-                .then(() => this.props.deleteItem(task.id));
+                .doDelete(script.id)
+                .then(() => this.props.deleteItem(script.id));
         }
     };
 
@@ -95,13 +96,13 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
     _hideStatusInfo = () => this.setState({ showStatusInfo: false });
 
     _toggleEnabled = () => {
-        const {task, updateItem} = this.props;
+        const {script, updateItem} = this.props;
 
-        const enabled = !task.enabled;
+        const enabled = !script.enabled;
 
         scheduledTaskService
-            .setEnabled(task.id, enabled)
-            .then(() => updateItem({...task, enabled}));
+            .setEnabled(script.id, enabled)
+            .then(() => updateItem({...script, enabled}));
     };
 
     _toggleRunNow = () => this.setState((state: State): * => {
@@ -164,9 +165,9 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
     );
 
     render(): React.Node {
-        const {task, onEdit} = this.props;
+        const {script} = this.props;
         const {showStatusInfo, showRunDialog} = this.state;
-        const {lastRunInfo} = task;
+        const {lastRunInfo} = script;
 
         const outcome = lastRunInfo ? lastRunInfo.outcome : 'NOT_RAN';
 
@@ -190,7 +191,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
         const popup = <div className="flex-column">
             <div>
                 <strong>{ScheduledTaskMessages.nextRun}{':'}</strong>
-                <div>{task.nextRunDate || 'unavailable'}</div>
+                <div>{script.nextRunDate || 'unavailable'}</div>
             </div>
             {lastRun}
         </div>;
@@ -198,14 +199,14 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
             <div className="flex-row space-between">
                 <div className="flex-vertical-middle">
                     <ToggleStateless
-                        isChecked={task.enabled}
+                        isChecked={script.enabled}
                         onChange={this._toggleEnabled}
                     />
                 </div>
                 <div className="flex-vertical-middle">
                     <span style={{marginTop: '2px', marginLeft: '2px'}}>
-                        {types[task.type].name}{': '}
-                        <strong>{task.name}</strong>
+                        {types[script.type].name}{': '}
+                        <strong>{script.name}</strong>
                     </span>
                 </div>
                 <div className="flex-vertical-middle">
@@ -229,24 +230,24 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
             </div>
         );
 
-        const script = (task.type !== 'ISSUE_JQL_TRANSITION') ? {
-            id: task.uuid,
-            name: task.name,
-            scriptBody: task.scriptBody,
+        const scriptObject = (script.type !== 'ISSUE_JQL_TRANSITION') ? {
+            id: script.uuid,
+            name: script.name,
+            scriptBody: script.scriptBody,
             inline: true,
-            changelogs: task.changelogs,
-            description: task.description
+            changelogs: script.changelogs,
+            description: script.description
         } : null;
 
         return (
             <ConnectedWatchableScript
-                entityId={task.id}
+                entityId={script.id}
                 entityType="SCHEDULED_TASK"
 
                 withChangelog={true}
-                script={script}
+                script={scriptObject}
                 title={titleEl}
-                onEdit={onEdit}
+                onEdit={this._edit}
                 onDelete={this._delete}
 
                 dropdownItems={[
@@ -256,15 +257,15 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                     }
                 ]}
             >
-                {task.type === 'ISSUE_JQL_TRANSITION' && task.description &&
+                {script.type === 'ISSUE_JQL_TRANSITION' && script.description &&
                     <div className="scriptDescription">
-                        {task.description}
+                        {script.description}
                     </div>
                 }
                 <ScriptParameters
-                    params={this._getParams(task)}
+                    params={this._getParams(script)}
                 />
-                {showRunDialog && <RunNowDialog task={task} onClose={this._toggleRunNow}/>}
+                {showRunDialog && <RunNowDialog task={script} onClose={this._toggleRunNow}/>}
             </ConnectedWatchableScript>
         );
     }

@@ -26,7 +26,7 @@ type State = {
     editProps: ?DialogComponentProps
 };
 
-export class ScriptPage<T> extends React.PureComponent<Props<T&ItemType>, State> {
+export class ScriptPage<T: ItemType> extends React.PureComponent<Props<T>, State> {
     static defaultProps = {
         isCreateDisabled: false
     };

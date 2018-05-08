@@ -3,6 +3,8 @@ import * as React from 'react';
 
 import Button from '@atlaskit/button';
 
+import type {ConsoleResult} from './types';
+
 import {ConsoleMessages} from '../i18n/console.i18n';
 
 import {consoleService} from '../service/services';
@@ -23,10 +25,7 @@ type Props = {
 
 type State = {
     script: ?string,
-    output: ?{
-        result: string,
-        time: number
-    },
+    output: ?ConsoleResult,
     error: ?*,
     waiting: boolean,
     modified: boolean
@@ -50,7 +49,7 @@ export class ScriptConsole extends React.Component<Props, State> {
         this.setState({ waiting: true });
 
         consoleService
-            .executeScript(this.state.script)
+            .executeScript(this.state.script || '')
             .then(
                 output => this.setState({
                     output,

@@ -1,8 +1,9 @@
+//@flow
 import {getPluginBaseUrl, ajaxPost} from './ajaxHelper';
 
 
 export class ExtrasService {
-    clearCache() {
+    clearCache(): Promise<void> {
         return ajaxPost(`${getPluginBaseUrl()}/extras/clearCache`);
     }
 }

@@ -1,16 +1,36 @@
-import React from 'react';
+//@flow
+import React, {type Node} from 'react';
 import PropTypes from 'prop-types';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 import Spinner from '@atlaskit/spinner';
+
+import type {RunOutcomeType, ScheduledTaskType} from './types';
 
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import {CommonMessages} from '../i18n/common.i18n';
 import {scheduledTaskService} from '../service/services';
 import {ConsoleMessages} from '../i18n/console.i18n';
 
+import type {VoidCallback} from '../common/types';
 
-export class RunNowDialog extends React.PureComponent {
+
+type Props = {
+    task: ScheduledTaskType,
+    onClose: VoidCallback
+};
+
+type State = {
+    running: boolean,
+    result: ?{
+        time: number,
+        runOutcome: RunOutcomeType,
+        message: ?string
+    },
+    error: string
+};
+
+export class RunNowDialog extends React.PureComponent<Props, State> {
     static propTypes = {
         task: PropTypes.object.isRequired,
         onClose: PropTypes.func.isRequired
@@ -41,14 +61,14 @@ export class RunNowDialog extends React.PureComponent {
                     running: false,
                     result
                 }),
-                error => {
+                (error: *) => {
                     this.setState({ running: false });
                     throw error;
                 }
             );
     };
 
-    render() {
+    render(): Node {
         const {task} = this.props;
         const {running, result} = this.state;
 
@@ -66,7 +86,7 @@ export class RunNowDialog extends React.PureComponent {
                         }
                     ]}
                 >
-                    {ConsoleMessages.executedIn(result.time)}
+                    {ConsoleMessages.executedIn(result.time.toString())}
                     <br/>
                     <strong>{result.runOutcome}{result.message && ':'}</strong>
                     {result.message}

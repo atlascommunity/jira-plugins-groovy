@@ -57,6 +57,12 @@
     "import/no-duplicates": ["warn"],
     "import/newline-after-import": ["error", { "count": 2 }],
 
+    "flowtype/require-valid-file-annotation": [
+      2,
+      "always", {
+        "annotationStyle": "line"
+      }
+    ],
     "flowtype/space-after-type-colon": [
       2,
       "always"
@@ -96,11 +102,6 @@
     ],
     "flowtype/no-flow-fix-me-comments": [1],
     "flowtype/semi": [2, "always"]
-  },
-  "settings": {
-    "flowtype": {
-      "onlyFilesWithFlowAnnotation": true
-    }
   },
   "extends": ["react-app"]
 }

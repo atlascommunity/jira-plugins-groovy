@@ -1,9 +1,10 @@
-import React from 'react';
+//@flow
+import React, {type Node} from 'react';
 import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
-import {Map} from 'immutable';
+import {Map, type Map as MapType} from 'immutable';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
@@ -13,9 +14,12 @@ import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
 import {colors} from '@atlaskit/theme';
 import {Label} from '@atlaskit/field-base';
 
+import type {ItemPropType} from '@atlaskit/field-radio-group/dist/cjs/types';
+
 import WarningIcon from '@atlaskit/icon/glyph/warning';
 
 import {types, typeList} from './types';
+import type {ScheduledTaskType, KeyedScheduledTaskTypeType, TransitionOptionsType} from './types';
 
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
@@ -31,17 +35,31 @@ import {getMarkers} from '../common/error';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {Bindings} from '../common/bindings';
 import {ItemActionCreators} from '../common/redux';
+import type {FullDialogComponentProps} from '../common/script-list/types';
+import type {InputEvent} from '../common/EventTypes';
+import type {BindingType} from '../common/editor/types';
 
 
 const issueBindings = [Bindings.issue];
 const emptyBindings = [];
 
-function getValue(option) {
+function getValue(option: any): ?string {
     return option ? option.value : null;
 }
 
-@connect(null, ItemActionCreators)
-export class ScheduledTaskDialog extends React.Component {
+type Props = FullDialogComponentProps & {
+    updateItem: typeof ItemActionCreators.updateItem,
+    addItem: typeof ItemActionCreators.addItem
+};
+
+type State = {
+    ready: boolean,
+    values: MapType<string, any>,
+    task: ?ScheduledTaskType,
+    error: *
+};
+
+export class ScheduledTaskDialogInternal extends React.PureComponent<Props, State> {
     static propTypes = {
         isNew: PropTypes.bool.isRequired,
         onClose: PropTypes.func.isRequired,
@@ -52,12 +70,12 @@ export class ScheduledTaskDialog extends React.Component {
 
     state = {
         ready: false,
-        values: null,
+        values: Map(),
         task: null,
         error: null
     };
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: Props) {
         this._init(nextProps);
     }
 
@@ -65,11 +83,11 @@ export class ScheduledTaskDialog extends React.Component {
         this._init(this.props);
     }
 
-    _init = props => {
+    _init = (props: Props) => {
         if (props.isNew) {
             this.setState({
                 ready: true,
-                values: new Map({
+                values: Map({
                     name: '',
                     description: '',
                     transitionOptions: {},
@@ -81,15 +99,15 @@ export class ScheduledTaskDialog extends React.Component {
         } else {
             this.setState({
                 ready: false,
-                values: null,
+                values: Map(),
                 error: null
             });
 
             scheduledTaskService
                 .get(props.id)
-                .then(task => {
+                .then((task: ScheduledTaskType) => {
                     this.setState({
-                        values: new Map({
+                        values: Map({
                             name: task.name,
                             description: task.description,
                             scriptBody: task.scriptBody,
@@ -109,7 +127,7 @@ export class ScheduledTaskDialog extends React.Component {
         }
     };
 
-    _handleError = (error) => {
+    _handleError = (error: *) => {
         const {response} = error;
 
         if (response.status === 400) {
@@ -119,11 +137,7 @@ export class ScheduledTaskDialog extends React.Component {
         }
     };
 
-    _onSubmit = (e) => {
-        if (e) {
-            e.preventDefault();
-        }
-
+    _onSubmit = () => {
         const {isNew, id, onClose} = this.props;
 
         const jsData = this.state.values.toJS();
@@ -138,7 +152,7 @@ export class ScheduledTaskDialog extends React.Component {
             scheduledTaskService
                 .create(data)
                 .then(
-                    script => {
+                    (script: ScheduledTaskType) => {
                         onClose();
                         this.props.addItem(script);
                     },
@@ -148,7 +162,7 @@ export class ScheduledTaskDialog extends React.Component {
             scheduledTaskService
                 .update(id, data)
                 .then(
-                    script => {
+                    (script: ScheduledTaskType) => {
                         onClose();
                         this.props.updateItem(script);
                     },
@@ -157,38 +171,41 @@ export class ScheduledTaskDialog extends React.Component {
         }
     };
 
-    mutateValue = (field, value) => {
-        this.setState(state => {
+    mutateValue = (field: string, value: any) => {
+        this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
             };
         });
     };
 
-    _setTextValue = (field) => (event) => this.mutateValue(field, event.target.value);
+    _setTextValue = (field: string) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
 
-    _setObjectValue = (field) => (value) => this.mutateValue(field, value);
+    _setObjectValue = (field: string) => (value: any) => this.mutateValue(field, value);
 
-    _toggleTransitionOption2 = (e) => {
+    _toggleTransitionOption2 = (e: SyntheticEvent<HTMLInputElement>) => {
         const option = e.currentTarget.value;
 
-        this.setState(state => {
-            const options = state.values.get('transitionOptions');
+        if (option) {
+            this.setState((state: State): * => {
+                const options = state.values.get('transitionOptions') || {};
 
-            return {
-                values: state.values.set('transitionOptions', {
-                    ...options,
-                    [option]: !options[option]
-                })
-            };
-        });
+                return {
+                    values: state.values.set('transitionOptions', {
+                        ...options,
+                        [option]: !options[option]
+                    })
+                };
+            });
+        }
     };
 
-    _renderField = (fieldName, error) => {
+    _renderField = (fieldName: string, e: *): Node => {
         const {values} = this.state;
+        let error: * = e;
 
-        let errorMessage = null;
-        let errorField = null;
+        let errorMessage: * = null;
+        let errorField: ?string = null;
 
         if (error) {
             errorMessage = error.message || error.messages;
@@ -197,7 +214,7 @@ export class ScheduledTaskDialog extends React.Component {
 
         switch (fieldName) {
             case 'scriptBody': {
-                let markers = null;
+                let markers: * = null;
 
                 if (error && error.field === fieldName) {
                     if (Array.isArray(error.error)) {
@@ -212,7 +229,7 @@ export class ScheduledTaskDialog extends React.Component {
 
                 const currentType = values.get('type');
 
-                let bindings = null;
+                let bindings: ?Array<BindingType> = null;
 
                 switch (currentType) {
                     case 'ISSUE_JQL_SCRIPT':
@@ -259,7 +276,7 @@ export class ScheduledTaskDialog extends React.Component {
                         <div className="ak-description">
                             <WarningIcon size="small" label="" primaryColor={colors.Y500}/>
                             {' '}
-                            {ScheduledTaskMessages.jqlLimitDescription(1000) /*todo: insert value from config when its configurable*/}
+                            {ScheduledTaskMessages.jqlLimitDescription('1000') /*todo: insert value from config when its configurable*/}
                         </div>
                         {['ISSUE_JQL_SCRIPT', 'DOCUMENT_ISSUE_JQL_SCRIPT'].includes(values.get('type')) &&
                         <div className="ak-description">
@@ -304,7 +321,8 @@ export class ScheduledTaskDialog extends React.Component {
                 );
             }
             case 'transitionOptions': {
-                const value = values.get(fieldName);
+                const value = ((values.get(fieldName) || {}): TransitionOptionsType);
+                //todo: specific flow type
                 return (
                     <div key={fieldName}>
                         <Label label={ScheduledTaskMessages.transitionOptions}/>
@@ -339,19 +357,19 @@ export class ScheduledTaskDialog extends React.Component {
         }
     };
 
-    render() {
+    render(): Node {
         const {onClose, isNew} = this.props;
         const {ready, values, task, error} = this.state;
 
-        let body = null;
+        let body: Node = null;
 
         if (!ready) {
             body = <div>{DialogMessages.notReady}</div>;
         } else {
             const currentType = values.get('type');
 
-            let errorMessage = null;
-            let errorField = null;
+            let errorMessage: * = null;
+            let errorField: ?string = null;
 
             if (error) {
                 errorMessage = error.message || error.messages;
@@ -414,7 +432,7 @@ export class ScheduledTaskDialog extends React.Component {
                         label={FieldMessages.type}
                         isRequired={true}
 
-                        items={typeList.map(type => {
+                        items={typeList.map((type: KeyedScheduledTaskTypeType): ItemPropType => {
                             return {
                                 label: type.name,
                                 value: type.key,
@@ -446,7 +464,7 @@ export class ScheduledTaskDialog extends React.Component {
             scrollBehavior="outside"
 
             isHeadingMultiline={false}
-            heading={isNew ? ScheduledTaskMessages.addTask : `${ScheduledTaskMessages.editTask}: ${task && task.name}`}
+            heading={isNew ? ScheduledTaskMessages.addTask : `${ScheduledTaskMessages.editTask}: ${task ? task.name : ''}`}
 
             onClose={onClose}
             actions={[
@@ -464,3 +482,5 @@ export class ScheduledTaskDialog extends React.Component {
         </ModalDialog>;
     }
 }
+
+export const ScheduledTaskDialog = connect(null, ItemActionCreators)(ScheduledTaskDialogInternal);

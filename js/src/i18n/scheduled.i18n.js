@@ -2,10 +2,10 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import i18n from 'external-i18n';
 
-import type {I18nMessages} from '../common/types';
+import type {I18nFunction} from '../common/types';
 
 
-export const ScheduledTaskMessages: I18nMessages = {
+export const ScheduledTaskMessages: {[string]: string, transitionOption: *, runNowConfirm: I18nFunction, jqlLimitDescription: I18nFunction} = {
     noTasks: i18n.scheduled.noTasks,
     addTask: i18n.scheduled.addTask,
     editTask: i18n.scheduled.editTask,
@@ -16,6 +16,10 @@ export const ScheduledTaskMessages: I18nMessages = {
     nextRun: i18n.scheduled.nextRun,
     jqlLimitDescription: i18n.scheduled.jqlLimitDescription,
     jqlScriptDescription: i18n.scheduled.jqlScriptDescription,
+    transitionOption: {
+        skipConditions: i18n.scheduled.transitionOption.skipConditions,
+        skipValidators: i18n.scheduled.transitionOption.skipValidators,
+        skipPermissions: i18n.scheduled.transitionOption.skipPermissions,
+    },
     transitionOptions: i18n.scheduled.transitionOptions,
-    transitionOption: i18n.scheduled.transitionOption,
 };

@@ -2,8 +2,20 @@
 import type {ScriptEntity} from '../common/types';
 import type {SingleValueType} from '../common/ak/types';
 
+//todo: rename
+export type ScheduledTaskTypeType = {
+    name: string,
+    fields: $ReadOnlyArray<'scriptBody'|'issueJql'|'workflowAction'|'transitionOptions'>
+};
+
+export type KeyedScheduledTaskTypeType = {
+    key: string,
+    name: string,
+    fields: $ReadOnlyArray<'scriptBody'|'issueJql'|'workflowAction'|'transitionOptions'>
+};
+
 //todo: move somewhere else
-export const types = {
+export const types: {[string]: ScheduledTaskTypeType} = {
     BASIC_SCRIPT: {
         name: 'Basic script',
         fields: ['scriptBody']
@@ -22,7 +34,7 @@ export const types = {
     }
 };
 
-export const typeList = Object
+export const typeList: $ReadOnlyArray<KeyedScheduledTaskTypeType> = Object
     .keys(types)
     .map((key: string): * => {
         return {
@@ -31,12 +43,13 @@ export const typeList = Object
         };
     });
 
+
 export type ScheduledTaskTypeEnum = 'BASIC_SCRIPT' | 'ISSUE_JQL_SCRIPT' | 'ISSUE_JQL_TRANSITION' | 'DOCUMENT_ISSUE_JQL_SCRIPT';
 
 export type TransitionOptionsType = {
-    skipConditions: boolean,
-    skipValidators: boolean,
-    skipPermissions: boolean
+    skipConditions?: boolean,
+    skipValidators?: boolean,
+    skipPermissions?: boolean
 };
 
 export type RunOutcomeType = 'SUCCESS' | 'UNAVAILABLE' | 'ABORTED' | 'FAILED' | 'NOT_RAN';
