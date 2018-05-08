@@ -1,3 +1,4 @@
+//@flow
 import ReactDOM from 'react-dom';
 import React from 'react';
 
@@ -18,6 +19,14 @@ import {fixStyle} from '../common/fixStyle';
 
 AJS.toInit(() => {
     fixStyle();
+
+    const element = document.getElementById('react-content');
+
+    if (element === null) {
+        alert('no element');
+        return;
+    }
+
     ReactDOM.render(
         <Page>
             <PageHeader>
@@ -25,6 +34,6 @@ AJS.toInit(() => {
             </PageHeader>
             <ScriptConsole/>
         </Page>,
-        document.getElementById('react-content')
+        element
     );
 });

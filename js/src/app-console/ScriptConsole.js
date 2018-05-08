@@ -1,4 +1,5 @@
-import React from 'react';
+//@flow
+import * as React from 'react';
 
 import Button from '@atlaskit/button';
 
@@ -16,7 +17,22 @@ import {ErrorMessage} from '../common/ak/messages';
 
 const bindings = [Bindings.currentUser];
 
-export class ScriptConsole extends React.Component {
+type Props = {
+
+};
+
+type State = {
+    script: ?string,
+    output: ?{
+        result: string,
+        time: number
+    },
+    error: ?*,
+    waiting: boolean,
+    modified: boolean
+};
+
+export class ScriptConsole extends React.Component<Props, State> {
     state = {
         script: '',
         output: null,
@@ -25,16 +41,12 @@ export class ScriptConsole extends React.Component {
         modified: false
     };
 
-    _scriptChange = (script) => this.setState({
+    _scriptChange = (script: ?string) => this.setState({
         script: script,
         modified: true
     });
 
-    _submit = (e) => {
-        if (e) {
-            e.preventDefault();
-        }
-
+    _submit = () => {
         this.setState({ waiting: true });
 
         consoleService
@@ -46,7 +58,7 @@ export class ScriptConsole extends React.Component {
                     waiting: false,
                     modified: false
                 }),
-                (err) => {
+                (err: *) => {
                     const {response} = err;
 
                     if (response.status === 400 || response.status === 500) {
@@ -69,11 +81,11 @@ export class ScriptConsole extends React.Component {
             );
     };
 
-    render() {
+    render(): React.Node {
         const {script, output, error, waiting, modified} = this.state;
 
-        let errorMessage = null;
-        let markers = null;
+        let errorMessage: * = null;
+        let markers: * = null;
 
         if (error) {
             if (error.field === 'script' && Array.isArray(error.error)) {
@@ -109,7 +121,7 @@ export class ScriptConsole extends React.Component {
                 {!waiting && <div className="result">
                     {output ?
                         <div>
-                            <strong>{ConsoleMessages.executedIn(output.time)}</strong>
+                            <strong>{ConsoleMessages.executedIn(output.time.toString())}</strong>
                             <pre>{output.result}</pre>
                         </div>
                     : null}
