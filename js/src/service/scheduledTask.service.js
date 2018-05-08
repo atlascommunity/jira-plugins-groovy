@@ -1,36 +1,39 @@
+//@flow
 import {ajaxDelete, ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
+
+import type {ScheduledTaskType, RunNowResultType} from '../app-scheduled/types';
 
 
 export class ScheduledTaskService {
-    getAllTasks() {
+    getAllTasks(): Promise<$ReadOnlyArray<ScheduledTaskType>> {
         return ajaxGet(`${getPluginBaseUrl()}/scheduled/all`);
     }
 
-    get(id) {
+    get(id: number): Promise<ScheduledTaskType> {
         return ajaxGet(`${getPluginBaseUrl()}/scheduled/${id}`);
     }
 
-    create(data) {
+    create(data: any): Promise<ScheduledTaskType> {
         return ajaxPost(`${getPluginBaseUrl()}/scheduled`, data);
     }
 
-    doDelete(id) {
+    doDelete(id: number): Promise<void> {
         return ajaxDelete(`${getPluginBaseUrl()}/scheduled/${id}`);
     }
 
-    restore(id) {
+    restore(id: number): Promise<void> {
         return ajaxPost(`${getPluginBaseUrl()}/scheduled/${id}/restore`);
     }
 
-    update(id, data) {
+    update(id: number, data: any): Promise<ScheduledTaskType> {
         return ajaxPut(`${getPluginBaseUrl()}/scheduled/${id}`, data);
     }
 
-    setEnabled(id, enabled) {
-        return ajaxPost(`${getPluginBaseUrl()}/scheduled/${id}/enabled/${enabled}`);
+    setEnabled(id: number, enabled: boolean): Promise<void> {
+        return ajaxPost(`${getPluginBaseUrl()}/scheduled/${id}/enabled/${enabled.toString()}`);
     }
 
-    runNow(id) {
+    runNow(id: number): Promise<RunNowResultType> {
         return ajaxPost(`${getPluginBaseUrl()}/scheduled/${id}/runNow`);
     }
 }

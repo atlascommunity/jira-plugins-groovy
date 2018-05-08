@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import ModalDialog from '@atlaskit/modal-dialog';
 import Spinner from '@atlaskit/spinner';
 
-import type {RunOutcomeType, ScheduledTaskType} from './types';
+import type {RunNowResultType, ScheduledTaskType} from './types';
 
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import {CommonMessages} from '../i18n/common.i18n';
@@ -22,11 +22,7 @@ type Props = {
 
 type State = {
     running: boolean,
-    result: ?{
-        time: number,
-        runOutcome: RunOutcomeType,
-        message: ?string
-    },
+    result: ?RunNowResultType,
     error: string
 };
 

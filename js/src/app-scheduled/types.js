@@ -74,3 +74,9 @@ export type ScheduledTaskType = ScriptEntity & {
     lastRunInfo: ?RunInfoType,
     nextRunDate: ?string
 };
+
+export type RunNowResultType = {
+    time: number,
+    runOutcome: RunOutcomeType,
+    message: ?string
+};

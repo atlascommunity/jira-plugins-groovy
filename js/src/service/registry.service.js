@@ -1,60 +1,64 @@
+//@flow
 import {ajaxDelete, ajaxGet, ajaxPut, ajaxPost, getPluginBaseUrl} from './ajaxHelper';
+
+import type {RegistryDirectoryType, BasicRegistryDirectoryType, RegistryScriptType} from '../app-registry/types';
+import type {ScriptDescriptionType, ScriptType} from '../app-workflow/types';
 
 
 export class RegistryService {
-    getAllDirectories() {
+    getAllDirectories(): Promise<$ReadOnlyArray<RegistryDirectoryType>> {
         return ajaxGet(`${getPluginBaseUrl()}/registry/directory/all`);
     }
 
-    getDirectory(id) {
+    getDirectory(id: number): Promise<BasicRegistryDirectoryType> {
         return ajaxGet(`${getPluginBaseUrl()}/registry/directory/${id}`);
     }
 
-    createDirectory(data) {
+    createDirectory(data: any): Promise<BasicRegistryDirectoryType> {
         return ajaxPost(`${getPluginBaseUrl()}/registry/directory`, data);
     }
 
-    updateDirectory(id, data) {
+    updateDirectory(id: number, data: any): Promise<BasicRegistryDirectoryType> {
         return ajaxPut(`${getPluginBaseUrl()}/registry/directory/${id}`, data);
     }
 
-    deleteDirectory(id) {
+    deleteDirectory(id: number): Promise<void> {
         return ajaxDelete(`${getPluginBaseUrl()}/registry/directory/${id}`);
     }
 
-    restoreDirectory(id) {
+    restoreDirectory(id: number): Promise<void> {
         return ajaxPost(`${getPluginBaseUrl()}/registry/directory/${id}/restore`);
     }
 
-    getAllScripts(type) {
+    getAllScripts(type: ScriptType): Promise<ScriptDescriptionType> {
         return ajaxGet(`${getPluginBaseUrl()}/registry/script/${type}/all`);
     }
 
-    getScript(id) {
+    getScript(id: number): Promise<RegistryScriptType> {
         return ajaxGet(`${getPluginBaseUrl()}/registry/script/${id}`);
     }
 
-    createScript(data) {
+    createScript(data: any): Promise<RegistryScriptType> {
         return ajaxPost(`${getPluginBaseUrl()}/registry/script/`, data);
     }
 
-    updateScript(id, data) {
+    updateScript(id: number, data: any): Promise<RegistryScriptType> {
         return ajaxPut(`${getPluginBaseUrl()}/registry/script/${id}`, data);
     }
 
-    deleteScript(id) {
+    deleteScript(id: number): Promise<void> {
         return ajaxDelete(`${getPluginBaseUrl()}/registry/script/${id}`);
     }
 
-    restoreScript(id) {
+    restoreScript(id: number): Promise<void> {
         return ajaxPost(`${getPluginBaseUrl()}/registry/script/${id}/restore`);
     }
 
-    moveScript(id, parentId) {
+    moveScript(id: number, parentId: number): Promise<void> {
         return ajaxPut(`${getPluginBaseUrl()}/registry/script/${id}/parent`, { parentId: parentId ? parentId : null });
     }
 
-    getScriptWorkflows(id) {
+    getScriptWorkflows(id: number) {
         return ajaxGet(`${getPluginBaseUrl()}/registry/script/${id}/workflows`);
     }
 }
