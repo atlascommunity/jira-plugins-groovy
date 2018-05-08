@@ -35,9 +35,12 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
-type Props = ScriptComponentProps<ListenerType> & {
+type ConnectProps = {
     projects: ObjectMap,
-    eventTypes: ObjectMap,
+    eventTypes: ObjectMap
+};
+
+type Props = ScriptComponentProps<ListenerType> & ConnectProps & {
     deleteItem: typeof ItemActionCreators.deleteItem,
 };
 
@@ -121,7 +124,7 @@ class ListenerInternal extends React.PureComponent<Props> {
 
 export const Listener = connect(
     memoizeOne(
-        (state: *): * => {
+        (state: *): ConnectProps => {
             return {
                 projects: state.projects,
                 eventTypes: state.eventTypes
