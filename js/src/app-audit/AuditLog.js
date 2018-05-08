@@ -1,4 +1,5 @@
-import React from 'react';
+//@flow
+import * as React from 'react';
 
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
@@ -9,14 +10,13 @@ import Button from '@atlaskit/button';
 import {DynamicTableStateless} from '@atlaskit/dynamic-table';
 import Pagination from '@atlaskit/pagination';
 
-import QuestionIcon from '@atlaskit/icon/glyph/question';
-import AddCircleIcon from '@atlaskit/icon/glyph/add-circle';
-import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
-import TrashIcon from '@atlaskit/icon/glyph/trash';
-import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
-import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
-import ArrowRightCircleIcon from '@atlaskit/icon/glyph/arrow-right-circle';
+import type {RowType} from '@atlaskit/dynamic-table/dist/cjs/types';
+
 import UndoIcon from '@atlaskit/icon/glyph/undo';
+
+import {ActionIcon} from './ActionIcon';
+
+import type {AuditLogEntry, AuditLogData} from './types';
 
 import {
     auditLogService,
@@ -27,6 +27,8 @@ import {
 } from '../service/services';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
+
+import type {EntityType} from '../common/types';
 
 
 const tableHead = {
@@ -57,43 +59,19 @@ const tableHead = {
     ]
 };
 
-function ActionsIcon({action}) {
-    let icon = null;
-    switch (action) {
-        case 'CREATED':
-            icon = <AddCircleIcon label={action}/>;
-            break;
-        case 'UPDATED':
-            icon = <EditFilledIcon label={action}/>;
-            break;
-        case 'DELETED':
-            icon = <TrashIcon label={action}/>;
-            break;
-        case 'ENABLED':
-            icon = <CheckCircleIcon label={action}/>;
-            break;
-        case 'DISABLED':
-            icon = <CrossCircleIcon label={action}/>;
-            break;
-        case 'MOVED':
-            icon = <ArrowRightCircleIcon label={action}/>;
-            break;
-        case 'RESTORED':
-            icon = <UndoIcon label={action}/>;
-            break;
-        default:
-            icon = <QuestionIcon label={action}/>;
-            break;
-    }
 
-    return (
-        <Tooltip content={action}>
-            {icon}
-        </Tooltip>
-    );
-}
+type Props = {
 
-export class AuditLog extends React.Component {
+};
+
+type State = {
+    offset: number,
+    isReady: boolean,
+    rows: Array<RowType>,
+    data: AuditLogData
+};
+
+export class AuditLog extends React.Component<Props, State> {
     state = {
         offset: 0,
         isReady: false,
@@ -101,12 +79,15 @@ export class AuditLog extends React.Component {
         data: {
             offset: 0,
             limit: 1,
+            total: 0,
+            size: 0,
+            isLast: true,
             values: []
         }
     };
 
-    _restore = (category, id) => () => {
-        let promise = null;
+    _restore = (category: EntityType, id: number) => () => {
+        let promise: ?Promise<void> = null;
         switch (category) {
             case 'REGISTRY_SCRIPT':
                 promise = registryService.restoreScript(id);
@@ -133,7 +114,7 @@ export class AuditLog extends React.Component {
             promise
                 .then(
                     () => this._loadList(this.state.offset),
-                    error => {
+                    (error: *) => {
                         this.setState({ isReady: true });
                         throw error;
                     }
@@ -141,7 +122,7 @@ export class AuditLog extends React.Component {
         }
     };
 
-    _loadList(offset) {
+    _loadList(offset: number) {
         this.setState({
             isReady: false
         });
@@ -150,9 +131,9 @@ export class AuditLog extends React.Component {
             .getAuditLogPage(offset)
             .then(data => this.setState({
                 data,
-                rows: data.values.map(value => {
+                rows: data.values.map((value: AuditLogEntry): RowType => {
                     return {
-                        key: value.id,
+                        key: value.id.toString(10),
                         cells: [
                             {
                                 content: value.date
@@ -169,7 +150,7 @@ export class AuditLog extends React.Component {
                                 )
                             },
                             {
-                                content: <ActionsIcon action={value.action}/>
+                                content: <ActionIcon action={value.action}/>
                             },
                             {
                                 content: (
@@ -194,7 +175,7 @@ export class AuditLog extends React.Component {
                                 content: value.description
                             },
                             {
-                                content: value.deleted && (value.action === 'DELETED') && (
+                                content: value.deleted && (value.action === 'DELETED') && !!value.scriptId && (
                                     <Tooltip content={AuditMessages.restore}>
                                         <Button
                                             iconBefore={<UndoIcon label="Undo"/>}
@@ -211,13 +192,13 @@ export class AuditLog extends React.Component {
             }));
     }
 
-    _goToPage = (page) => this._loadList(this.state.data.limit * (page-1));
+    _goToPage = (page: number) => this._loadList(this.state.data.limit * (page-1));
 
     componentDidMount() {
         this._loadList(0);
     }
 
-    _renderPagination() {
+    _renderPagination(): React.Node {
         const {data} = this.state;
 
         return (
@@ -234,7 +215,7 @@ export class AuditLog extends React.Component {
         );
     }
 
-    render() {
+    render(): React.Node {
         const {isReady, rows} = this.state;
 
         return <Page>

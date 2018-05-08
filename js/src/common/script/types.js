@@ -5,6 +5,7 @@ export type IssueReference = {
     summary: string
 };
 
+//todo: move to common
 export type JiraUser = {
     name: string,
     displayName: string,

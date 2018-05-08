@@ -85,3 +85,12 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export type I18nFunction = (...params: Array<string>) => string;
 //export type I18nMessageType = I18nFunction | string;
 export type I18nMessages = {[string]: string};
+
+export type Page<T> = {
+    offset: number,
+    limit: number,
+    total: number,
+    size: number,
+    isLast: boolean,
+    values: $ReadOnlyArray<T>
+};
