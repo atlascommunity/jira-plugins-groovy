@@ -10,9 +10,9 @@ import type {OldSelectItem, OldSelectValue} from './types';
 import type {FieldProps, LoadableFieldProps, MutableFieldProps} from '../types';
 
 
-type LookupMapType = Map<OldSelectValue, OldSelectItem>;
+type LookupMapType<T> = Map<OldSelectValue, OldSelectItem<T>>;
 
-function getLookupMap(items: $ReadOnlyArray<OldSelectItem>): LookupMapType {
+function getLookupMap<T: OldSelectValue>(items: $ReadOnlyArray<OldSelectItem<T>>): LookupMapType<T> {
     const lookupMap = new Map();
     for (const item of items) {
         lookupMap.set(item.value, item);
@@ -23,18 +23,18 @@ function getLookupMap(items: $ReadOnlyArray<OldSelectItem>): LookupMapType {
 
 let i: number = 0;
 
-type MultiSelectProps = FieldProps & LoadableFieldProps & MutableFieldProps<$ReadOnlyArray<OldSelectValue>> & {
-    items: $ReadOnlyArray<OldSelectItem>,
+type Props<T: OldSelectValue> = FieldProps & LoadableFieldProps & MutableFieldProps<$ReadOnlyArray<OldSelectValue>> & {
+    items: $ReadOnlyArray<OldSelectItem<T>>,
 };
 
-type MultiSelectState = {
-    lookupMap: LookupMapType
+type State<T: OldSelectValue> = {
+    lookupMap: LookupMapType<T>
 };
 
-export class MultiSelect extends React.Component<MultiSelectProps, MultiSelectState> {
+export class MultiSelect<T: OldSelectValue> extends React.PureComponent<Props<T>, State<T>> {
     i = i++;
 
-    _onChange = (val: Array<OldSelectItem>) => {
+    _onChange = (val: Array<OldSelectItem<T>>) => {
         let newVal: Array<OldSelectValue> = [];
 
         if (val) {
@@ -44,7 +44,7 @@ export class MultiSelect extends React.Component<MultiSelectProps, MultiSelectSt
         this.props.onChange(newVal);
     };
 
-    constructor(props: MultiSelectProps) {
+    constructor(props: Props<T>) {
         super(props);
 
         this.state = {
@@ -52,7 +52,7 @@ export class MultiSelect extends React.Component<MultiSelectProps, MultiSelectSt
         };
     }
 
-    componentWillReceiveProps(props: MultiSelectProps) {
+    componentWillReceiveProps(props: Props<T>) {
         this.setState({
             lookupMap: getLookupMap(props.items)
         });

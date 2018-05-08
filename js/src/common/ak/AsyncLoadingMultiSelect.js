@@ -8,14 +8,26 @@ import type {OldSelectItem, OldSelectValue} from './types';
 import type {FieldProps, MutableFieldProps} from '../types';
 
 
-export type LoaderOptionType = {
-    value: string,
-    name: string
+export type LoaderOptionType<T: OldSelectValue> = {
+    +value: T,
+    +name: string,
+    +label?: string
 };
 
-function mapOption(option: any): OldSelectItem {
+type Props<T: OldSelectValue> = FieldProps & MutableFieldProps<$ReadOnlyArray<OldSelectValue>> & {
+    loader: () => Promise<Array<LoaderOptionType<T>>>
+};
+
+type State<T: OldSelectValue> = {
+    ready: boolean,
+    options: $ReadOnlyArray<OldSelectItem<T>>
+};
+
+
+function mapOption<T: OldSelectValue>(option: LoaderOptionType<T>): OldSelectItem<T> {
     if (option.label && option.value) {
-        return (option: OldSelectItem);
+        //$FlowFixMe todo
+        return option;
     }
     return {
         value: option.value,
@@ -23,16 +35,8 @@ function mapOption(option: any): OldSelectItem {
     };
 }
 
-type AsyncLoadingMultiSelectProps = FieldProps & MutableFieldProps<$ReadOnlyArray<OldSelectValue>> & {
-    loader: () => Promise<Array<LoaderOptionType>>
-};
-
-type AsyncLoadingMultiSelectState = {
-    ready: boolean,
-    options: $ReadOnlyArray<OldSelectItem>
-};
-
-export class AsyncLoadingMultiSelect extends React.Component<AsyncLoadingMultiSelectProps, AsyncLoadingMultiSelectState> {
+//$FlowFixMe todo: https://github.com/facebook/flow/issues/5256
+export class AsyncLoadingMultiSelect<T: OldSelectValue = string> extends React.PureComponent<Props<T>, State<T>> {
     state = {
         options: [],
         ready: false
@@ -43,7 +47,7 @@ export class AsyncLoadingMultiSelect extends React.Component<AsyncLoadingMultiSe
 
         this.props
             .loader()
-            .then((options: Array<LoaderOptionType>) => {
+            .then((options: Array<LoaderOptionType<T>>) => {
                 this.setState({
                     ready: true,
                     options: options.map(mapOption)

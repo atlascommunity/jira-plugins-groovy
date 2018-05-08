@@ -21,14 +21,14 @@ import type {OldSelectItem} from '../common/ak/types';
 import type {InputEvent} from '../common/EventTypes';
 
 
-function mapScriptToOption(script: ScriptDescriptionType): OldSelectItem {
+function mapScriptToOption(script: ScriptDescriptionType): OldSelectItem<number> {
     return {
         value: script.id,
         label: script.name
     };
 }
 
-function mapScriptToOptionNullable(script: ?ScriptDescriptionType): ?OldSelectItem {
+function mapScriptToOptionNullable(script: ?ScriptDescriptionType): ?OldSelectItem<number> {
     if (!script) {
         return null;
     }
@@ -57,7 +57,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
         fieldName: PropTypes.string
     };
 
-    _onChange = (value: ?OldSelectItem) => {
+    _onChange = (value: ?OldSelectItem<number>) => {
         if (value) {
             this.setState({
                 script: this.state.scripts.find(el => el.id === value.value)

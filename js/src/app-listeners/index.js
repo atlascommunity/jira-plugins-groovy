@@ -8,15 +8,21 @@ import {Provider} from 'react-redux';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
+import {Listener} from './Listener';
 import {listenersReducer} from './listeners.reducer';
-import {ListenerRegistryContainer} from './ListenerRegistryContainer';
+import {ListenerDialog} from './ListenerDialog';
 
 import {jiraService, listenerService, watcherService} from '../service/services';
 
-import '../flex.less';
 import {fixStyle} from '../common/fixStyle';
 import {ItemActionCreators} from '../common/redux';
 import type {ObjectMap} from '../common/types';
+import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
+import {ListenerMessages} from '../i18n/listener.i18n';
+import {TitleMessages} from '../i18n/common.i18n';
+
+import '../flex.less';
+import './ListenerRegistry.less';
 
 
 function transformEventTypes(eventTypes: *): ObjectMap {
@@ -70,7 +76,15 @@ AJS.toInit(() => {
 
     ReactDOM.render(
         <Provider store={store}>
-            <ListenerRegistryContainer/>
+            <ConnectedScriptPage
+                ScriptComponent={Listener}
+                DialogComponent={ListenerDialog}
+                i18n={{
+                    addItem: ListenerMessages.addListener,
+                    noItems: ListenerMessages.noListeners,
+                    title: TitleMessages.listeners
+                }}
+            />
         </Provider>,
         element
     );

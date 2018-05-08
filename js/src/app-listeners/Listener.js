@@ -1,14 +1,11 @@
 //@flow
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
 import memoizeOne from 'memoize-one';
 
 import type {ConditionType, ListenerType} from './types';
-
-import {ListenerModel} from '../model/listener.model';
 
 import {listenerService} from '../service/services';
 
@@ -18,12 +15,13 @@ import {ListenerTypeMessages} from '../i18n/listener.i18n';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 
 import {ScriptParameters} from '../common/script';
+import {WatchableScript} from '../common/script/WatchableScript';
 
 import type {ObjectMap} from '../common/types';
 import type {ScriptParam} from '../common/script/ScriptParameters';
+import type {ScriptComponentProps} from '../common/script-list/types';
 
 import './ListenerRegistry.less';
-import {WatchableScript} from '../common/script/WatchableScript';
 
 
 const ConnectedWatchableScript = connect(
@@ -37,27 +35,21 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
-type Props = {
-    listener: ListenerType,
-    onEdit: () => void,
-    deleteItem: typeof ItemActionCreators.deleteItem,
+type Props = ScriptComponentProps<ListenerType> & {
     projects: ObjectMap,
-    eventTypes: ObjectMap
+    eventTypes: ObjectMap,
+    deleteItem: typeof ItemActionCreators.deleteItem,
 };
 
 class ListenerInternal extends React.PureComponent<Props> {
-    static propTypes = {
-        listener: ListenerModel.isRequired,
-        onEdit: PropTypes.func.isRequired,
-        deleteItem: PropTypes.func.isRequired
-    };
+    _edit = () => this.props.onEdit(this.props.script.id);
 
     _delete = () => {
-        const listener = this.props.listener;
+        const {script} = this.props;
 
         // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${listener.name}"?`)) {
-            listenerService.deleteListener(listener.id).then(() => this.props.deleteItem(listener.id));
+        if (confirm(`Are you sure you want to delete "${script.name}"?`)) {
+            listenerService.deleteListener(script.id).then(() => this.props.deleteItem(script.id));
         }
     };
 
@@ -100,28 +92,28 @@ class ListenerInternal extends React.PureComponent<Props> {
     );
 
     render(): React.Node {
-        const {listener, projects, eventTypes, onEdit} = this.props;
+        const {script, projects, eventTypes} = this.props;
 
         return (
             <ConnectedWatchableScript
-                entityId={listener.id}
+                entityId={script.id}
                 entityType={'LISTENER'}
 
                 script={{
-                    id: listener.uuid,
-                    name: listener.name,
-                    description: listener.description,
+                    id: script.uuid,
+                    name: script.name,
+                    description: script.description,
                     inline: true,
-                    scriptBody: listener.scriptBody,
-                    changelogs: listener.changelogs,
-                    errorCount: listener.errorCount
+                    scriptBody: script.scriptBody,
+                    changelogs: script.changelogs,
+                    errorCount: script.errorCount
                 }}
 
                 withChangelog={true}
-                onEdit={onEdit}
+                onEdit={this._edit}
                 onDelete={this._delete}
             >
-                <ScriptParameters params={this._getParams(projects, eventTypes, listener.condition)}/>
+                <ScriptParameters params={this._getParams(projects, eventTypes, script.condition)}/>
             </ConnectedWatchableScript>
         );
     }

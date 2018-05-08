@@ -63,7 +63,7 @@ type AsyncPickerState = {
     fetching: ?number
 };
 
-export class AsyncPicker extends React.Component<AsyncPickerProps, AsyncPickerState> {
+export class AsyncPicker extends React.PureComponent<AsyncPickerProps, AsyncPickerState> {
     i = i++;
 
     state = {

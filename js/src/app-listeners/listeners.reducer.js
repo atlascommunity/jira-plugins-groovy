@@ -9,5 +9,5 @@ export const listenersReducer = combineReducers({
     watches: watchesReducer,
     projects: wholeObjectReducerFactory('projects', {}),
     eventTypes: wholeObjectReducerFactory('eventTypes', {}),
-    ready: readinessReducer
+    isReady: readinessReducer
 });

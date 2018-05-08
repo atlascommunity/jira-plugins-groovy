@@ -1,28 +1,31 @@
+//@flow
 import {ajaxDelete, ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
+
+import type {ListenerType} from '../app-listeners/types';
 
 
 export class ListenerService {
-    getAllListeners() {
+    getAllListeners(): Promise<Array<ListenerType>> {
         return ajaxGet(`${getPluginBaseUrl()}/listener/all`);
     }
 
-    getListener(id) {
+    getListener(id: number): Promise<ListenerType> {
         return ajaxGet(`${getPluginBaseUrl()}/listener/${id}`);
     }
 
-    createListener(data) {
+    createListener(data: any): Promise<ListenerType> {
         return ajaxPost(`${getPluginBaseUrl()}/listener`, data);
     }
 
-    updateListener(id, data) {
+    updateListener(id: number, data: any): Promise<ListenerType> {
         return ajaxPut(`${getPluginBaseUrl()}/listener/${id}`, data);
     }
 
-    deleteListener(id) {
+    deleteListener(id: number): Promise<void> {
         return ajaxDelete(`${getPluginBaseUrl()}/listener/${id}`);
     }
 
-    restoreListener(id) {
+    restoreListener(id: number): Promise<void> {
         return ajaxPost(`${getPluginBaseUrl()}/listener/${id}/restore`);
     }
 }

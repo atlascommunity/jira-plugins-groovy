@@ -1,15 +1,12 @@
 //@flow
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import {AkFieldRadioGroup} from '@atlaskit/field-radio-group';
 import {FieldTextStateless} from '@atlaskit/field-text';
 
-import type {ConditionType} from './types';
+import type {ConditionInputType} from './types';
 
 import {jiraService} from '../service/services';
-
-import {ConditionModel} from '../model/listener.model';
 
 import {FieldMessages} from '../i18n/common.i18n';
 import {ListenerTypeMessages} from '../i18n/listener.i18n';
@@ -26,35 +23,29 @@ import './ConditionPicker.less';
 
 const projectsLoader = () => jiraService
     .getAllProjects()
-    .then(projects => projects.map((project: ProjectType): LoaderOptionType => {
+    .then(projects => projects.map((project: ProjectType): LoaderOptionType<number> => {
         return {
-            value: project.id,
+            value: parseInt(project.id, 10),
             name: `${project.key} - ${project.name}`
         };
     }));
 
 const eventTypeLoader = () => jiraService
     .getEventTypes()
-    .then(types => types.map((type: IssueEventType): LoaderOptionType => {
+    .then(types => types.map((type: IssueEventType): LoaderOptionType<number> => {
         return {
-            value: type.id.toString(10),
+            value: type.id,
             name: type.name
         };
     }));
 
 type Props = {
-    value: ConditionType,
-    onChange: (value: ConditionType) => void,
+    value: ConditionInputType,
+    onChange: (value: ConditionInputType) => void,
     error: any
 };
 
 export class ConditionPicker extends React.Component<Props> {
-    static propTypes = {
-        value: ConditionModel.isRequired,
-        onChange: PropTypes.func.isRequired,
-        error: PropTypes.object
-    };
-
     _onChange = (property: string): * => {
         return (val: any) => {
             const {value, onChange} = this.props;

@@ -2,8 +2,8 @@
 
 export type OldSelectValue = string | number;
 
-export type OldSelectItem = {
-    +value: OldSelectValue,
+export type OldSelectItem<T: OldSelectValue> = {
+    +value: T,
     +label: string
 };
 
