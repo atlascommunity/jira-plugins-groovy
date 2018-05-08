@@ -28,7 +28,8 @@ const defaultLoader = () => Promise.resolve(
             description: '',
             comment: ''
         }),
-        name: null}
+        name: null
+    }
 );
 
 const editLoader = (id: number) => adminScriptService
