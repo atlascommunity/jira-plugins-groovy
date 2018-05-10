@@ -12,8 +12,6 @@ public interface ScriptRepository {
 
     ScriptDirectoryDto getDirectory(int id);
 
-    List<RegistryScriptDto> getAllScripts(boolean includeErrorCount);
-
     List<ScriptDescription> getAllScriptDescriptions(WorkflowScriptType type);
 
     ScriptDirectoryDto createDirectory(ApplicationUser user, ScriptDirectoryForm form);

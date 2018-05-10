@@ -87,7 +87,17 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     @Override
     public List<ScriptDirectoryTreeDto> getAllDirectories() {
         Multimap<Integer, RegistryScriptDto> scripts = HashMultimap.create();
-        for (RegistryScriptDto scriptDto : getAllScripts(true)) {
+        List<RegistryScriptDto> allScripts = Arrays
+            .stream(ao.find(
+                Script.class,
+                Query
+                    .select()
+                    .where("DELETED = ?", Boolean.FALSE)
+            ))
+            .map(script -> buildScriptDto(script, false, false, false, true))
+            .collect(Collectors.toList());
+
+        for (RegistryScriptDto scriptDto : allScripts) {
             scripts.put(scriptDto.getDirectoryId(), scriptDto);
         }
 
@@ -194,14 +204,6 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public List<RegistryScriptDto> getAllScripts(boolean includeErrorCount) {
-        return Arrays
-            .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(script -> buildScriptDto(script, false, false, includeErrorCount))
-            .collect(Collectors.toList());
-    }
-
-    @Override
     public List<ScriptDescription> getAllScriptDescriptions(WorkflowScriptType type) {
         return Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
@@ -214,7 +216,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     //todo: cache result, maybe add new method for workflow functions
     @Override
     public RegistryScriptDto getScript(int id, boolean includeChangelogs, boolean expandName, boolean includeErrorCount) {
-        return buildScriptDto(ao.get(Script.class, id), includeChangelogs, expandName, includeErrorCount);
+        return buildScriptDto(ao.get(Script.class, id), includeChangelogs, expandName, true, includeErrorCount);
     }
 
     @Override
@@ -249,7 +251,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
         addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
-        return buildScriptDto(script, true, false, true);
+        return buildScriptDto(script, true, false, true, true);
     }
 
     @Override
@@ -307,7 +309,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
         addAuditLogAndNotify(user, EntityAction.UPDATED, script, diff, comment);
 
-        return buildScriptDto(script, true, false, true);
+        return buildScriptDto(script, true, false, true, true);
     }
 
     @Override
@@ -359,7 +361,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         auditService.addAuditLogAndNotify(user, action, EntityType.REGISTRY_SCRIPT, script, diff, description, getWatchers(script));
     }
 
-    private RegistryScriptDto buildScriptDto(Script script, boolean includeChangelogs, boolean expandName, boolean includeErrorCount) {
+    private RegistryScriptDto buildScriptDto(Script script, boolean includeChangelogs, boolean expandName, boolean includeParentName, boolean includeErrorCount) {
         RegistryScriptDto result = new RegistryScriptDto();
 
         result.setId(script.getID());
@@ -367,7 +369,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         result.setDirectoryId(script.getDirectory().getID());
         result.setScriptBody(script.getScriptBody());
         result.setDeleted(script.isDeleted());
-        result.setParentName(ScriptUtil.getExpandedName(script.getDirectory()));
+
+        if (includeParentName) {
+            result.setParentName(ScriptUtil.getExpandedName(script.getDirectory()));
+        }
 
         if (expandName) {
             result.setName(ScriptUtil.getExpandedName(script));
