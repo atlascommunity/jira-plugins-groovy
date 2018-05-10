@@ -2,6 +2,8 @@
 import {combineReducers} from 'redux';
 import sortBy from 'lodash.sortby';
 
+import type {BasicRegistryDirectoryType, RegistryDirectoryType, RegistryScriptType} from './types';
+
 
 export const registryReducer = combineReducers({
     directories: directoriesReducer,
@@ -26,62 +28,62 @@ const MOVE_SCRIPT = 'MOVE_SCRIPT';
 
 
 export const RegistryActionCreators = {
-    loadState: (tree, scriptWatches, directoryWatches) => {
+    loadState: (tree: RegistryDirectoryType, scriptWatches: $ReadOnlyArray<number>, directoryWatches: $ReadOnlyArray<number>): * => {
         return {
             type: LOAD_STATE,
             tree, scriptWatches, directoryWatches
         };
     },
-    addWatch: (kind, id) => {
+    addWatch: (kind: 'script' | 'directory', id: number): * => {
         return {
             type: ADD_WATCH,
             kind, id
         };
     },
-    removeWatch: (kind, id) => {
+    removeWatch: (kind: 'script' | 'directory', id: number): * => {
         return {
             type: REMOVE_WATCH,
             kind, id
         };
     },
-    addDirectory: directory => {
+    addDirectory: (directory: BasicRegistryDirectoryType): * => {
         return {
             type: ADD_DIRECTORY,
             directory: directory
         };
     },
-    updateDirectory: directory => {
+    updateDirectory: (directory: BasicRegistryDirectoryType): * => {
         return {
             type: UPDATE_DIRECTORY,
             directory: directory
         };
     },
-    deleteDirectory: id => {
+    deleteDirectory: (id: number): * => {
         return {
             type: DELETE_DIRECTORY,
             id: id
         };
     },
 
-    addScript: script => {
+    addScript: (script: RegistryScriptType): * => {
         return {
             type: ADD_SCRIPT,
             script: script
         };
     },
-    updateScript: script => {
+    updateScript: (script: RegistryScriptType): * => {
         return {
             type: UPDATE_SCRIPT,
             script: script
         };
     },
-    deleteScript: id => {
+    deleteScript: (id: number): * => {
         return {
             type: DELETE_SCRIPT,
             id: id
         };
     },
-    moveScript: (src, dst, script) => {
+    moveScript: (src: number, dst: number, script: RegistryScriptType): * => {
         return {
             type: MOVE_SCRIPT,
             src, dst, script
@@ -89,7 +91,9 @@ export const RegistryActionCreators = {
     }
 };
 
-function readyReducer(state, action) {
+type ActionType = any;
+
+function readyReducer(state: boolean, action: ActionType): boolean {
     if (state === undefined) {
         return false;
     }
@@ -101,7 +105,7 @@ function readyReducer(state, action) {
     return state;
 }
 
-function directoriesReducer(state, action) {
+function directoriesReducer(state: $ReadOnlyArray<RegistryDirectoryType>, action: ActionType): $ReadOnlyArray<RegistryDirectoryType> {
     if (state === undefined) {
         return [];
     }
@@ -114,12 +118,14 @@ function directoriesReducer(state, action) {
         return [...state, action.directory];
     }
 
-    return state.map(directory => directoryReducer(directory, action)).filter(e => e);
+    return state
+        .map(directory => directoryReducer(directory, action))
+        .filter(Boolean);
 }
 
 
-function directoryReducer(state, action) {
-    let result = state;
+function directoryReducer(state: RegistryDirectoryType, action: ActionType): ?RegistryDirectoryType {
+    let result: RegistryDirectoryType = state;
 
     switch (action.type) {
         case ADD_DIRECTORY:
@@ -173,7 +179,7 @@ function directoryReducer(state, action) {
         case UPDATE_SCRIPT:
             result = {
                 ...state,
-                scripts: (state.scripts || []).map(script => {
+                scripts: (state.scripts || []).map((script: RegistryScriptType): RegistryScriptType => {
                     if (script.id === action.script.id) {
                         return action.script;
                     } else {
@@ -196,12 +202,14 @@ function directoryReducer(state, action) {
 
     return {
         ...result,
-        children: (result.children || []).map(child => directoryReducer(child, action)).filter(e => e)
+        children: (result.children || [])
+            .map(child => directoryReducer(child, action))
+            .filter(Boolean)
     };
 }
 
-function watchesReducer(kind) {
-    return (state, action) => {
+function watchesReducer(kind: 'script'|'directory'): * {
+    return (state: $ReadOnlyArray<number>, action: ActionType): $ReadOnlyArray<number> => {
         if (state === undefined) {
             return [];
         }
@@ -230,6 +238,6 @@ function watchesReducer(kind) {
     };
 }
 
-function order(items) {
+function order<T: {name: string}>(items: $ReadOnlyArray<T>): $ReadOnlyArray<T> {
     return sortBy(items, 'name');
 }
