@@ -187,6 +187,16 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
     _getFilteredDirs = memoizeOne(this._getFilteredDirsInternal);
 
+    _countElements = (dir: RegistryDirectoryType): number => {
+        const children = dir.children ? dir.children.length : 0;
+        const scripts = dir.scripts ? dir.scripts.length : 0;
+        return children + scripts + dir.children.map(this._countElements).reduce((acc, i) => acc + i, 0);
+    };
+
+    _countArrayElements = (dirs: $ReadOnlyArray<RegistryDirectoryType>): number => {
+        return dirs.map(this._countElements).reduce((acc, i) => acc + i, 0);
+    };
+
     render(): Node {
         const {waiting, filter} = this.state;
         const {ready} = this.props;
@@ -196,7 +206,9 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
         if (filter && filter.length >= 2) {
             directories = this._getFilteredDirs(directories, filter.toLocaleLowerCase());
-            forceOpen = true;
+            if (this._countArrayElements(directories) <= 50) {
+                forceOpen = true;
+            }
         }
 
         return (
