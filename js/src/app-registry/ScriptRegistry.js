@@ -53,30 +53,31 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
         directories: PropTypes.arrayOf(PropTypes.object.isRequired)
     };
 
+    //$FlowFixMe
+    directoryDialogRef = React.createRef();
+    //$FlowFixMe
+    scriptDialogRef = React.createRef();
+
     state = {
         isDragging: false,
         waiting: false,
         filter: ''
     };
 
-    _setRef = (key: string) => (el: any) => {
-        this[key] = el;
-    };
-
     _activateCreateDialog = (parentId: ?number, type: 'script'|'directory') => {
         if (type === 'directory') {
-            this.directoryDialogRef.getWrappedInstance().activateCreate(parentId);
+            this.directoryDialogRef.current.getWrappedInstance().activateCreate(parentId);
         } else {
-            this.scriptDialogRef.getWrappedInstance().activateCreate(parentId);
+            this.scriptDialogRef.current.getWrappedInstance().activateCreate(parentId);
         }
     };
 
     _activateEditDialog = (id: number, type: 'script'|'directory') => {
         console.log(id, type);
         if (type === 'directory') {
-            this.directoryDialogRef.getWrappedInstance().activateEdit(id);
+            this.directoryDialogRef.current.getWrappedInstance().activateEdit(id);
         } else {
-            this.scriptDialogRef.getWrappedInstance().activateEdit(id);
+            this.scriptDialogRef.current.getWrappedInstance().activateEdit(id);
         }
     };
 
@@ -253,8 +254,8 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
                         {!ready && <LoadingSpinner/>}
                         {ready && !directories.length ? <InfoMessage title={RegistryMessages.noScripts}/> : null}
-                        <ScriptDirectoryDialog ref={this._setRef('directoryDialogRef')}/>
-                        <ScriptDialog ref={this._setRef('scriptDialogRef')}/>
+                        <ScriptDirectoryDialog ref={this.directoryDialogRef}/>
+                        <ScriptDialog ref={this.scriptDialogRef}/>
 
                         {waiting && <Blanket isTinted={true}/>}
                     </div>
