@@ -12,7 +12,7 @@ public interface ScriptRepository {
 
     ScriptDirectoryDto getDirectory(int id);
 
-    List<RegistryScriptDto> getAllScripts(boolean includeChangelog, boolean includeErrorCount);
+    List<RegistryScriptDto> getAllScripts(boolean includeErrorCount);
 
     List<ScriptDescription> getAllScriptDescriptions(WorkflowScriptType type);
 
@@ -37,4 +37,6 @@ public interface ScriptRepository {
     void deleteScript(ApplicationUser user, int id);
 
     void restoreScript(ApplicationUser user, int id);
+
+    List<ChangelogDto> getScriptChangelogs(int id);
 }

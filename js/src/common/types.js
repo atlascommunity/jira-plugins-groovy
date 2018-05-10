@@ -13,12 +13,15 @@ export type IssueEventType = {
 
 export type ProjectType = any; //todo
 
-export type ScriptEntity = {
+export type ScriptEntityWithoutChangelogs = {
     id: number,
     name: string,
     description: ?string,
     errorCount: number,
-    scriptBody: string,
+    scriptBody: string
+};
+
+export type ScriptEntity = ScriptEntityWithoutChangelogs & {
     changelogs: Array<ChangelogType>,
 };
 

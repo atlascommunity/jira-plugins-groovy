@@ -146,6 +146,17 @@ public class RegistryResource {
         }).getResponse();
     }
 
+    @GET
+    @Path("/script/{id}/changelogs")
+    @WebSudoRequired
+    public Response getScriptChangelogs(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return scriptRepository.getScriptChangelogs(id);
+        }).getResponse();
+    }
+
     @POST
     @Path("/script")
     @WebSudoRequired

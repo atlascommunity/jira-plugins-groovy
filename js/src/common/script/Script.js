@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node, type Element} from 'react';
 
 import Button, {ButtonGroup} from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
@@ -23,6 +23,7 @@ import type {ScriptParam} from './ScriptParameters';
 import type {VoidCallback} from '../types';
 
 import {Editor} from '../editor/Editor';
+import {LoadingSpinner} from '../ak/LoadingSpinner';
 
 import {CommonMessages} from '../../i18n/common.i18n';
 
@@ -41,6 +42,8 @@ export type ScriptProps = {
     headerless: boolean,
 
     script: ?ScriptType,
+    changelogsLoader?: () => Promise<$ReadOnlyArray<ChangelogType>>,
+
     template?: {
         body: string
     },
@@ -48,10 +51,10 @@ export type ScriptProps = {
     onEdit?: VoidCallback,
     onDelete?: VoidCallback,
 
-    title?: React.Node,
-    children?: React.Node,
-    additionalButtons?: Array<React.Element<any>>,
-    additionalPrimaryButtons?: Array<React.Element<any>>,
+    title?: Node,
+    children?: Node,
+    additionalButtons?: Array<Element<any>>,
+    additionalPrimaryButtons?: Array<Element<any>>,
     dropdownItems?: Array<DropdownItemType>,
     additionalParameters?: Array<ScriptParam>
 };
@@ -64,9 +67,11 @@ type ScriptState = {
         source?: string,
         templateSource?: string
     },
-    executions: Array<ExecutionType>,
+    changelogs: $ReadOnlyArray<ChangelogType>,
+    executions: $ReadOnlyArray<ExecutionType>,
     onlyLastExecutions: boolean,
-    executionsReady: boolean
+    executionsReady: boolean,
+    changelogsReady: boolean
 };
 
 export class Script extends React.Component<ScriptProps, ScriptState> {
@@ -83,13 +88,16 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             id: 'current'
         },
         executions: [],
+        changelogs: [],
         onlyLastExecutions: true,
-        executionsReady: false
+        executionsReady: false,
+        changelogsReady: false
     };
 
     componentDidMount() {
         if (!this.props.collapsible) {
             this._fetchExecutions();
+            this._fetchChangelogs();
         }
     }
 
@@ -99,6 +107,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         this.setState({ showCode: !showCode, onlyLastExecutions: true }, () => {
             if (this.state.showCode) {
                 this._fetchExecutions();
+                this._fetchChangelogs();
             }
         });
     };
@@ -114,6 +123,24 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             executionService
                 .getExecutions(script.inline, script.id, onlyLastExecutions)
                 .then(result => this.setState({executions: result, executionsReady: true}));
+        }
+    };
+
+    _fetchChangelogs = () => {
+        this.setState({ executionsReady: false });
+        const {script, changelogsLoader} = this.props;
+
+        if (script && script.changelogs) {
+            this.setState({
+                changelogs: script.changelogs,
+                changelogsReady: true
+            });
+        } else if (changelogsLoader) {
+            this.setState({ changelogsReady: false });
+            changelogsLoader()
+                .then(changelogs => this.setState({
+                    changelogs, changelogsReady: true
+                }));
         }
     };
 
@@ -137,16 +164,16 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         });
     };
 
-    render(): React.Node {
+    render(): Node {
         const {
             script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons,
             additionalPrimaryButtons, additionalParameters, dropdownItems, headerless
         } = this.props;
-        const {activeSource, showCode, executions, executionsReady, onlyLastExecutions} = this.state;
+        const {activeSource, showCode, changelogsReady, changelogs, executions, executionsReady, onlyLastExecutions} = this.state;
 
-        let codeBlock : React.Node = null;
-        let templateBlock : React.Node = null;
-        let executionBar : React.Node = null;
+        let codeBlock : Node = null;
+        let templateBlock : Node = null;
+        let executionBar : Node = null;
 
         const isOpen : boolean = showCode || !collapsible;
 
@@ -163,15 +190,25 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                 );
             }
 
+            let changelogsNode: ?Node = null;
+
+            if (withChangelog) {
+                if (changelogsReady) {
+                    changelogsNode = (
+                        <Changelog
+                            changelogs={changelogs || script.changelogs}
+                            switchToChangelog={this._switchToChangelog}
+                            switchToCurrent={this._switchToCurrent}
+                        />
+                    );
+                } else {
+                    changelogsNode = <div className="scriptChangelogs" style={{width: '150px'}}><LoadingSpinner/></div>;
+                }
+            }
+
             codeBlock = (
                 <div className="flex-row editor">
-                    {withChangelog && script && script.changelogs &&
-                    <Changelog
-                        changelogs={script.changelogs}
-                        switchToChangelog={this._switchToChangelog}
-                        switchToCurrent={this._switchToCurrent}
-                    />
-                    }
+                    {changelogsNode}
                     <div className="flex-grow flex-column">
                         <div style={{overflow: 'hidden'}}>
                             <Editor
@@ -212,7 +249,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             }
         }
 
-        const buttons : Array<React.Element<any>> = [];
+        const buttons : Array<Element<any>> = [];
 
         if (collapsible && script) {
             buttons.push(

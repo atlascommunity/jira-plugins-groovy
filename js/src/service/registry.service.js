@@ -3,6 +3,7 @@ import {ajaxDelete, ajaxGet, ajaxPut, ajaxPost, getPluginBaseUrl} from './ajaxHe
 
 import type {RegistryDirectoryType, BasicRegistryDirectoryType, RegistryScriptType} from '../app-registry/types';
 import type {ScriptDescriptionType, ScriptType} from '../app-workflow/types';
+import type {ChangelogType} from '../common/script/types';
 
 
 export class RegistryService {
@@ -36,6 +37,10 @@ export class RegistryService {
 
     getScript(id: number): Promise<RegistryScriptType> {
         return ajaxGet(`${getPluginBaseUrl()}/registry/script/${id}`);
+    }
+
+    getScriptChangelogs(id: number): Promise<$ReadOnlyArray<ChangelogType>> {
+        return ajaxGet(`${getPluginBaseUrl()}/registry/script/${id}/changelogs`);
     }
 
     createScript(data: any): Promise<RegistryScriptType> {

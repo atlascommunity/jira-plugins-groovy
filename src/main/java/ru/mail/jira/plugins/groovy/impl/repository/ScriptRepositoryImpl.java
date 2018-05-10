@@ -87,7 +87,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     @Override
     public List<ScriptDirectoryTreeDto> getAllDirectories() {
         Multimap<Integer, RegistryScriptDto> scripts = HashMultimap.create();
-        for (RegistryScriptDto scriptDto : getAllScripts(true, true)) {
+        for (RegistryScriptDto scriptDto : getAllScripts(true)) {
             scripts.put(scriptDto.getDirectoryId(), scriptDto);
         }
 
@@ -194,10 +194,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public List<RegistryScriptDto> getAllScripts(boolean includeChangelog, boolean includeErrorCount) {
+    public List<RegistryScriptDto> getAllScripts(boolean includeErrorCount) {
         return Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(script -> buildScriptDto(script, includeChangelog, false, includeErrorCount))
+            .map(script -> buildScriptDto(script, false, false, includeErrorCount))
             .collect(Collectors.toList());
     }
 
@@ -332,6 +332,11 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public List<ChangelogDto> getScriptChangelogs(int id) {
+        return changelogHelper.collect(ao.find(Changelog.class, Query.select().where("SCRIPT_ID = ?", id)));
     }
 
     private void deleteScript(ApplicationUser user, Script script) {

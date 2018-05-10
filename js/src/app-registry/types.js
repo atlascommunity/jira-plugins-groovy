@@ -1,5 +1,5 @@
 //@flow
-import type {ScriptEntity} from '../common/types';
+import type {ScriptEntityWithoutChangelogs} from '../common/types';
 
 
 export type EntityType = 'script' | 'directory';
@@ -11,9 +11,8 @@ export type DeleteCallback = (id: number, type: EntityType, name: string) => voi
 
 export type WorkflowScriptType = 'CONDITION' | 'VALIDATOR' | 'FUNCTION';
 
-//todo: change base entity to ScriptEntity
-export type RegistryScriptType = ScriptEntity & {
-    types: Array<WorkflowScriptType>,
+export type RegistryScriptType = ScriptEntityWithoutChangelogs & {
+    types: $ReadOnlyArray<WorkflowScriptType>,
     parentName: string,
     directoryId: number
 };

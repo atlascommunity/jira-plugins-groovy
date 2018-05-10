@@ -17,7 +17,7 @@ import './ExecutionBar.less';
 
 
 type ExecutionBarProps = {
-    executions: Array<ExecutionType>
+    executions: $ReadOnlyArray<ExecutionType>
 };
 
 type ExecutionBarState = {

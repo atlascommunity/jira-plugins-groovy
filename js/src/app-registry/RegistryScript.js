@@ -20,7 +20,7 @@ import type {DeleteCallback, EditCallback, RegistryScriptType, WatcherCallback} 
 import {CommonMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
-import {watcherService} from '../service/services';
+import {registryService, watcherService} from '../service/services';
 
 import Script from '../common/script';
 
@@ -86,6 +86,8 @@ class RegistryScriptInternal extends React.Component<RegistryScriptProps, Regist
         );
     };
 
+    _getChangelogs = () => registryService.getScriptChangelogs(this.props.script.id);
+
     _onEdit = () => this.props.onEdit(this.props.script.id, 'script');
     _onDelete = () => this.props.onDelete(this.props.script.id, 'script', this.props.script.name);
 
@@ -101,7 +103,8 @@ class RegistryScriptInternal extends React.Component<RegistryScriptProps, Regist
                 <Script
                     {...props}
 
-                    script={script}
+                    script={{...script}}
+                    changelogsLoader={this._getChangelogs}
 
                     withChangelog={true}
 
@@ -152,9 +155,9 @@ class RegistryScriptInternal extends React.Component<RegistryScriptProps, Regist
 
 export const RegistryScript =
     connect(
-        memoizeOne((state: any): {scriptWatches: Array<number>} => {
+        memoizeOne(({scriptWatches}: *): * => {
             return {
-                scriptWatches: state.scriptWatches
+                scriptWatches
             };
         }),
         {

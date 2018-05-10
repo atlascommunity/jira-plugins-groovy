@@ -192,9 +192,11 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
         const {ready} = this.props;
 
         let directories: * = this.props.directories;
+        let forceOpen: boolean = false;
 
         if (filter && filter.length >= 2) {
             directories = this._getFilteredDirs(directories, filter.toLocaleLowerCase());
+            forceOpen = true;
         }
 
         return (
@@ -228,6 +230,9 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                             <ScriptDirectory
                                 directory={directory}
                                 key={directory.id}
+
+                                forceOpen={forceOpen}
+
                                 onCreate={this._activateCreateDialog}
                                 onEdit={this._activateEditDialog}
                                 onDelete={this._activateDeleteDialog}

@@ -52,6 +52,7 @@ type ScriptDirectoryProps = ScriptDirectoryConnectProps & {
     onCreate: CreateCallback,
     onEdit: EditCallback,
     onDelete: DeleteCallback,
+    forceOpen: boolean,
     addWatch: typeof RegistryActionCreators.addWatch,
     removeWatch: typeof RegistryActionCreators.removeWatch
 };
@@ -99,18 +100,21 @@ class ScriptDirectoryInternal extends React.Component<ScriptDirectoryProps, Scri
 
     render(): React.Node {
         const {collapsed, waitingWatch} = this.state;
-        const {directory, directoryWatches, onCreate, onEdit, onDelete} = this.props;
+        const {forceOpen, directory, directoryWatches, onCreate, onEdit, onDelete} = this.props;
 
         let directories: * = null;
         let scripts: * = null;
 
-        if (!collapsed) {
+        const isOpen = !collapsed || forceOpen;
+
+        if (isOpen) {
             directories = (
                 <div>
                     {directory.children ? directory.children.map(child =>
                         <ScriptDirectory
                             directory={child}
                             key={child.id}
+                            forceOpen={forceOpen}
                             onCreate={onCreate}
                             onEdit={onEdit}
                             onDelete={onDelete}
@@ -141,7 +145,7 @@ class ScriptDirectoryInternal extends React.Component<ScriptDirectoryProps, Scri
                         <Button
                             appearance="subtle"
                             spacing="none"
-                            iconBefore={collapsed ? <FolderFilledIcon label=""/> : <FolderIcon label=""/>}
+                            iconBefore={!isOpen ? <FolderFilledIcon label=""/> : <FolderIcon label=""/>}
 
                             isDisabled={(directory.children.length + directory.scripts.length) === 0}
 
@@ -212,7 +216,7 @@ class ScriptDirectoryInternal extends React.Component<ScriptDirectoryProps, Scri
                         </ButtonGroup>
                     </div>
                 </div>
-                <div className={`scriptDirectoryChildren ${!collapsed ? 'open' : ''}`}>
+                <div className={`scriptDirectoryChildren ${isOpen ? 'open' : ''}`}>
                     <Droppable droppableId={`${directory.id}`}>
                         {(provided, snapshot) => (
                             <div

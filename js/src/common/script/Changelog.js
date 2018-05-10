@@ -16,7 +16,7 @@ import {getBaseUrl} from '../../service/ajaxHelper';
 
 
 type ChangelogProps = {
-    changelogs: Array<ChangelogType>,
+    changelogs: $ReadOnlyArray<ChangelogType>,
     switchToCurrent: VoidCallback,
     switchToChangelog: (ChangelogType) => () => void
 };
