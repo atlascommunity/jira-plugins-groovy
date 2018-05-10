@@ -29,7 +29,6 @@ import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import {FieldMessages} from '../i18n/common.i18n';
 import {ItemActionCreators, WatchActionCreators} from '../common/redux';
 
-import type {VoidCallback} from '../common/types';
 import type {ScriptParam} from '../common/script/ScriptParameters';
 import {WatchableScript} from '../common/script/WatchableScript';
 import type {ScriptComponentProps} from '../common/script-list/types';

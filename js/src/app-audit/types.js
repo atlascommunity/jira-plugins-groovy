@@ -18,4 +18,4 @@ export type AuditLogEntry = {
     scriptName: ?string
 };
 
-export type AuditLogData = Page<AuditLogEntry>
+export type AuditLogData = Page<AuditLogEntry>;

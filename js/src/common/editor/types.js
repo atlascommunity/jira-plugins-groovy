@@ -5,7 +5,7 @@ export type BindingType = {
     className: string,
     fullClassName: string,
     javaDoc?: string
-}
+};
 
 export type MarkerType = {
     startRow: number,

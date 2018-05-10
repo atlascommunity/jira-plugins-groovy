@@ -9,6 +9,7 @@ import 'codemirror/mode/velocity/velocity';
 import 'codemirror/addon/selection/mark-selection';
 import 'codemirror/addon/lint/lint';
 
+import Button from '@atlaskit/button';
 import InlineMessage from '@atlaskit/inline-message';
 
 import {Resizable} from 'react-resizable';
@@ -188,9 +189,9 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                     </div>
                     <div className="flex-grow"/>
                     <div className="flex-vertical-middle">
-                        <a href="" onClick={this._switchTheme}>
+                        <Button appearance="link" spacing="none" onClick={this._switchTheme}>
                             {CommonMessages.switchTheme}
-                        </a>
+                        </Button>
                     </div>
                     { bindings &&
                         <div style={{marginLeft: '5px'}}>
