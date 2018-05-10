@@ -1,17 +1,17 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import Base, {Label} from '@atlaskit/field-base';
 
 import type {BindingType, MarkerType} from '../editor/types';
-import type {FieldProps, MutableFieldProps} from '../types';
+import type {FieldProps, MutableFieldProps, AkFormFieldProps} from '../types';
 
 import Editor from '../editor';
 
 import './EditorField.less';
 
 
-type EditorFieldProps = FieldProps & MutableFieldProps<string> & {
+type EditorFieldProps = FieldProps & MutableFieldProps<string> & AkFormFieldProps & {
     mode: string,
     markers?: ?Array<MarkerType>,
     bindings?: Array<BindingType>,
@@ -20,11 +20,12 @@ type EditorFieldProps = FieldProps & MutableFieldProps<string> & {
 
 export class EditorField extends React.Component<EditorFieldProps> {
     static defaultProps = {
-        mode: 'groovy'
+        mode: 'groovy',
+        isValidationHidden: false
     };
 
-    _decorateEditor = (editor: Editor): React.Node => {
-        const {isInvalid, invalidMessage, isRequired, isDisabled} = this.props;
+    _decorateEditor = (editor: Node): Node => {
+        const {isInvalid, invalidMessage, isValidationHidden, isRequired, isDisabled} = this.props;
 
         return (
             <Base
@@ -32,6 +33,7 @@ export class EditorField extends React.Component<EditorFieldProps> {
                 isPaddingDisabled={true}
                 isDisabled={isDisabled}
                 isFitContainerWidthEnabled={true}
+                isValidationHidden={isValidationHidden}
                 isInvalid={isInvalid}
                 isRequired={isRequired}
             >
@@ -40,7 +42,7 @@ export class EditorField extends React.Component<EditorFieldProps> {
         );
     };
 
-    render(): React.Node {
+    render(): Node {
         const {label, isRequired, isLabelHidden, ...props} = this.props;
 
         return (
