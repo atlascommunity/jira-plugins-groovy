@@ -43,64 +43,28 @@ const countErrors = memoize((directory: RegistryDirectoryType): number => {
     return errors;
 });
 
-type ScriptDirectoryConnectProps = {
-    directoryWatches: Array<number>
-};
-
-type ScriptDirectoryProps = ScriptDirectoryConnectProps & {
+type ScriptDirectoryProps = {
     directory: RegistryDirectoryType,
     onCreate: CreateCallback,
     onEdit: EditCallback,
     onDelete: DeleteCallback,
-    forceOpen: boolean,
-    addWatch: typeof RegistryActionCreators.addWatch,
-    removeWatch: typeof RegistryActionCreators.removeWatch
+    forceOpen: boolean
 };
 
 type ScriptDirectoryState = {
-    collapsed: boolean,
-    waitingWatch: boolean
+    collapsed: boolean
 };
 
-class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectoryProps, ScriptDirectoryState> {
+export class ScriptDirectory extends React.PureComponent<ScriptDirectoryProps, ScriptDirectoryState> {
     state = {
-        collapsed: true,
-        waitingWatch: false
+        collapsed: true
     };
 
     _toggle = () => this.setState({collapsed: !this.state.collapsed});
 
-    _toggleWatch = () => {
-        const {directory, directoryWatches, addWatch, removeWatch} = this.props;
-
-        const isWatching = directoryWatches.includes(directory.id);
-
-        this.setState({ waitingWatch: true });
-
-        const promise = isWatching ?
-            watcherService.stopWatching('REGISTRY_DIRECTORY', directory.id) :
-            watcherService.startWatching('REGISTRY_DIRECTORY', directory.id);
-
-        promise.then(
-            () => {
-                (isWatching ? removeWatch : addWatch)('directory', directory.id);
-                this.setState({ waitingWatch: false });
-            },
-            (error: *) => {
-                this.setState({ waitingWatch: false });
-                throw error;
-            }
-        );
-    };
-
-    _onEdit = () => this.props.onEdit(this.props.directory.id, 'directory');
-    _onDelete = () => this.props.onDelete(this.props.directory.id, 'directory', this.props.directory.name);
-    _onCreateDir = () => this.props.onCreate(this.props.directory.id, 'directory');
-    _onCreateScript = () => this.props.onCreate(this.props.directory.id, 'script');
-
     render(): Node {
-        const {collapsed, waitingWatch} = this.state;
-        const {forceOpen, directory, directoryWatches, onCreate, onEdit, onDelete} = this.props;
+        const {collapsed} = this.state;
+        const {forceOpen, directory, onCreate, onEdit, onDelete} = this.props;
 
         let directories: * = null;
         let scripts: * = null;
@@ -136,7 +100,6 @@ class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectoryProps, 
         }
 
         const errorCount = countErrors(directory);
-        const isWatching = directoryWatches.includes(directory.id);
 
         return (
             <div className="flex full-width flex-column scriptDirectory">
@@ -165,55 +128,14 @@ class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectoryProps, 
                     }
                     <div className="flex-grow"/>
                     <div className="flex-none">
-                        <ButtonGroup>
-                            <Button
-                                appearance="subtle"
-                                iconBefore={<AddIcon label=""/>}
+                        <ScriptDirectoryActions
+                            id={directory.id}
+                            name={directory.name}
 
-                                onClick={this._onCreateDir}
-                            >
-                                {RegistryMessages.addDirectory}
-                            </Button>
-                            <Button
-                                appearance="subtle"
-                                iconBefore={<AddIcon label=""/>}
-
-                                onClick={this._onCreateScript}
-                            >
-                                {RegistryMessages.addScript}
-                            </Button>
-                            <Button
-                                appearance="subtle"
-                                iconBefore={<EditFilledIcon label=""/>}
-
-                                onClick={this._onEdit}
-                            />
-                            <Button
-                                key="watch"
-                                appearance="subtle"
-                                isDisabled={waitingWatch}
-                                iconBefore={isWatching ? <WatchFilledIcon label=""/> : <WatchIcon label=""/>}
-
-                                onClick={this._toggleWatch}
-                            />
-                            <DropdownMenu
-                                key="etc"
-
-                                position="bottom right"
-
-                                triggerType="button"
-                                triggerButtonProps={{
-                                    appearance: 'subtle',
-                                    iconBefore: <MoreVerticalIcon label=""/>
-                                }}
-                            >
-                                <DropdownItemGroup>
-                                    <DropdownItem onClick={this._onDelete}>
-                                        {CommonMessages.delete}
-                                    </DropdownItem>
-                                </DropdownItemGroup>
-                            </DropdownMenu>
-                        </ButtonGroup>
+                            onCreate={onCreate}
+                            onEdit={onEdit}
+                            onDelete={onDelete}
+                        />
                     </div>
                 </div>
                 <div className={`scriptDirectoryChildren ${isOpen ? 'open' : ''}`}>
@@ -237,7 +159,115 @@ class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectoryProps, 
     }
 }
 
-export const ScriptDirectory = connect(
+type ActionsProps = {
+    id: number,
+    name: string,
+    onCreate: CreateCallback,
+    onEdit: EditCallback,
+    onDelete: DeleteCallback,
+    directoryWatches: Array<number>,
+    addWatch: typeof RegistryActionCreators.addWatch,
+    removeWatch: typeof RegistryActionCreators.removeWatch
+};
+
+type ActionsState = {
+    waitingWatch: boolean
+};
+
+export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsProps, ActionsState> {
+    _onEdit = () => this.props.onEdit(this.props.id, 'directory');
+    _onDelete = () => this.props.onDelete(this.props.id, 'directory', this.props.name);
+    _onCreateDir = () => this.props.onCreate(this.props.id, 'directory');
+    _onCreateScript = () => this.props.onCreate(this.props.id, 'script');
+
+    _toggleWatch = () => {
+        const {id, directoryWatches, addWatch, removeWatch} = this.props;
+
+        const isWatching = directoryWatches.includes(id);
+
+        this.setState({ waitingWatch: true });
+
+        const promise = isWatching ?
+            watcherService.stopWatching('REGISTRY_DIRECTORY', id) :
+            watcherService.startWatching('REGISTRY_DIRECTORY', id);
+
+        promise.then(
+            () => {
+                (isWatching ? removeWatch : addWatch)('directory', id);
+                this.setState({ waitingWatch: false });
+            },
+            (error: *) => {
+                this.setState({ waitingWatch: false });
+                throw error;
+            }
+        );
+    };
+
+    state = {
+        waitingWatch: false
+    };
+
+    render(): Node {
+        const {id, directoryWatches} = this.props;
+        const {waitingWatch} = this.state;
+
+        const isWatching = directoryWatches.includes(id);
+
+        return (
+            <ButtonGroup>
+                <Button
+                    appearance="subtle"
+                    iconBefore={<AddIcon label=""/>}
+
+                    onClick={this._onCreateDir}
+                >
+                    {RegistryMessages.addDirectory}
+                </Button>
+                <Button
+                    appearance="subtle"
+                    iconBefore={<AddIcon label=""/>}
+
+                    onClick={this._onCreateScript}
+                >
+                    {RegistryMessages.addScript}
+                </Button>
+                <Button
+                    appearance="subtle"
+                    iconBefore={<EditFilledIcon label=""/>}
+
+                    onClick={this._onEdit}
+                />
+                <Button
+                    key="watch"
+                    appearance="subtle"
+                    isDisabled={waitingWatch}
+                    iconBefore={isWatching ? <WatchFilledIcon label=""/> : <WatchIcon label=""/>}
+
+                    onClick={this._toggleWatch}
+                />
+                <DropdownMenu
+                    key="etc"
+
+                    position="bottom right"
+
+                    triggerType="button"
+                    triggerButtonProps={{
+                        appearance: 'subtle',
+                        iconBefore: <MoreVerticalIcon label=""/>
+                    }}
+                >
+                    <DropdownItemGroup>
+                        <DropdownItem onClick={this._onDelete}>
+                            {CommonMessages.delete}
+                        </DropdownItem>
+                    </DropdownItemGroup>
+                </DropdownMenu>
+            </ButtonGroup>
+        );
+    }
+}
+
+const ScriptDirectoryActions = connect(
     memoizeOne((state: *): * => {
         return {
             directoryWatches: state.directoryWatches
@@ -247,4 +277,4 @@ export const ScriptDirectory = connect(
         addWatch: RegistryActionCreators.addWatch,
         removeWatch: RegistryActionCreators.removeWatch
     }
-)(ScriptDirectoryInternal);
+)(ScriptDirectoryActionsInternal);
