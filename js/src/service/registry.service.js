@@ -1,7 +1,12 @@
 //@flow
 import {ajaxDelete, ajaxGet, ajaxPut, ajaxPost, getPluginBaseUrl} from './ajaxHelper';
 
-import type {RegistryDirectoryType, BasicRegistryDirectoryType, RegistryScriptType} from '../app-registry/types';
+import type {
+    RegistryDirectoryType,
+    BasicRegistryDirectoryType,
+    RegistryScriptType,
+    WorkflowType
+} from '../app-registry/types';
 import type {ScriptDescriptionType, ScriptType} from '../app-workflow/types';
 import type {ChangelogType} from '../common/script/types';
 
@@ -63,7 +68,7 @@ export class RegistryService {
         return ajaxPut(`${getPluginBaseUrl()}/registry/script/${id}/parent`, { parentId: parentId ? parentId : null });
     }
 
-    getScriptWorkflows(id: number) {
+    getScriptWorkflows(id: number): Promise<$ReadOnlyArray<WorkflowType>> {
         return ajaxGet(`${getPluginBaseUrl()}/registry/script/${id}/workflows`);
     }
 }

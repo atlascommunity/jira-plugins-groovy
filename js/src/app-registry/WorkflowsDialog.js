@@ -44,7 +44,7 @@ type WorkflowsDialogProps = {
 
 type WorkflowsDialogState = {
     ready: boolean,
-    workflows: Array<WorkflowType>
+    workflows: $ReadOnlyArray<WorkflowType>
 };
 
 export class WorkflowsDialog extends React.PureComponent<WorkflowsDialogProps, WorkflowsDialogState> {
