@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
 
@@ -62,7 +62,7 @@ type ScriptDirectoryState = {
     waitingWatch: boolean
 };
 
-class ScriptDirectoryInternal extends React.Component<ScriptDirectoryProps, ScriptDirectoryState> {
+class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectoryProps, ScriptDirectoryState> {
     state = {
         collapsed: true,
         waitingWatch: false
@@ -98,7 +98,7 @@ class ScriptDirectoryInternal extends React.Component<ScriptDirectoryProps, Scri
     _onCreateDir = () => this.props.onCreate(this.props.directory.id, 'directory');
     _onCreateScript = () => this.props.onCreate(this.props.directory.id, 'script');
 
-    render(): React.Node {
+    render(): Node {
         const {collapsed, waitingWatch} = this.state;
         const {forceOpen, directory, directoryWatches, onCreate, onEdit, onDelete} = this.props;
 

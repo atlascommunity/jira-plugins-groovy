@@ -47,7 +47,7 @@ type RegistryScriptState = {
     waitingWatch: boolean
 };
 
-class RegistryScriptInternal extends React.Component<RegistryScriptProps, RegistryScriptState> {
+class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, RegistryScriptState> {
     state = {
         showWorkflows: false,
         waitingWatch: false

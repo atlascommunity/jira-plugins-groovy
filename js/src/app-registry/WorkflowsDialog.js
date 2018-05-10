@@ -47,7 +47,7 @@ type WorkflowsDialogState = {
     workflows: Array<WorkflowType>
 };
 
-export class WorkflowsDialog extends React.Component<WorkflowsDialogProps, WorkflowsDialogState> {
+export class WorkflowsDialog extends React.PureComponent<WorkflowsDialogProps, WorkflowsDialogState> {
     state = {
         ready: false,
         workflows: []
