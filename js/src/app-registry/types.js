@@ -1,14 +1,13 @@
 //@flow
-import type {ScriptId} from '../common/script/types';
 import type {ScriptEntity} from '../common/types';
 
 
 export type EntityType = 'script' | 'directory';
 
-export type WatcherCallback = (type: EntityType, id: ScriptId) => void;
-export type CreateCallback = (parentId: ScriptId, type: EntityType) => void;
-export type EditCallback = (id: ScriptId, type: EntityType) => void;
-export type DeleteCallback = (id: ScriptId, type: EntityType, name: string) => void;
+export type WatcherCallback = (type: EntityType, id: number) => void;
+export type CreateCallback = (parentId: ?number, type: EntityType) => void;
+export type EditCallback = (id: number, type: EntityType) => void;
+export type DeleteCallback = (id: number, type: EntityType, name: string) => void;
 
 export type WorkflowScriptType = 'CONDITION' | 'VALIDATOR' | 'FUNCTION';
 

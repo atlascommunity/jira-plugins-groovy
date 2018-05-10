@@ -110,14 +110,10 @@ class ScriptDirectoryInternal extends React.Component<ScriptDirectoryProps, Scri
                     {directory.children ? directory.children.map(child =>
                         <ScriptDirectory
                             directory={child}
-                            directoryWatches={directoryWatches}
                             key={child.id}
                             onCreate={onCreate}
                             onEdit={onEdit}
                             onDelete={onDelete}
-
-                            addWatch={this.props.addWatch}
-                            removeWatch={this.props.removeWatch}
                         />
                     ) : null}
                 </div>
