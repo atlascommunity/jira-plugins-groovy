@@ -25,6 +25,10 @@ export type ScriptEntity = ScriptEntityWithoutChangelogs & {
     changelogs: Array<ChangelogType>,
 };
 
+export type AkFormFieldProps = {
+    isValidationHidden: boolean
+};
+
 export type FieldProps = {
     label: string,
     isLabelHidden?: boolean,

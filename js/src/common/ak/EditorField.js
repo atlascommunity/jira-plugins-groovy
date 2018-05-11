@@ -43,13 +43,14 @@ export class EditorField extends React.Component<EditorFieldProps> {
     };
 
     render(): Node {
-        const {label, isRequired, isLabelHidden, ...props} = this.props;
+        const {label, isRequired, isLabelHidden, mode, ...props} = this.props;
 
         return (
             <div className="ak-editor">
                 <Label label={label} isRequired={isRequired} isLabelHidden={isLabelHidden}/>
                 <Editor
                     decorator={this._decorateEditor}
+                    mode={mode}
                     {...props}
                 />
             </div>
