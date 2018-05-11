@@ -113,7 +113,8 @@ module.exports = {
             path
                 .relative(paths.appSrc, info.absoluteResourcePath)
                 .replace(/\\/g, '/'),
-        jsonpFunction: 'mailruGroovyWebpackJsonp' //override default jsonpFunction to avoid collision with other webpack apps
+        jsonpFunction: 'mailruGroovyWebpackJsonp', //override default jsonpFunction to avoid collision with other webpack apps
+        sourceMapFilename: '[file].smap'
     },
     resolve: {
         // This allows you to set a fallback for where Webpack should look for modules.
