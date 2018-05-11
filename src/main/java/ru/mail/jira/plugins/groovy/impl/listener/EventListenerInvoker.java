@@ -4,6 +4,7 @@ import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.jira.event.issue.IssueEvent;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
+import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
 import java.util.Set;
@@ -27,18 +29,21 @@ public class EventListenerInvoker {
     private final EventListenerRepository eventListenerRepository;
     private final ScriptService scriptService;
     private final ExecutionRepository executionRepository;
+    private final SentryService sentryService;
 
     @Autowired
     public EventListenerInvoker(
         @ComponentImport EventPublisher eventPublisher,
         EventListenerRepository eventListenerRepository,
         ScriptService scriptService,
-        ExecutionRepository executionRepository
+        ExecutionRepository executionRepository,
+        SentryService sentryService
     ) {
         this.eventPublisher = eventPublisher;
         this.eventListenerRepository = eventListenerRepository;
         this.scriptService = scriptService;
         this.executionRepository = executionRepository;
+        this.sentryService = sentryService;
     }
 
     public void onStart() {
@@ -112,6 +117,9 @@ public class EventListenerInvoker {
             );
         } catch (Exception e) {
             logger.error("Was unable to execute listener {}/{}", listener.getId(), uuid, e);
+            sentryService.registerException(
+                getUser(event), e, ScriptType.LISTENER, listener.getId(), uuid, getIssueKey(event), null
+            );
             successful = false;
             error = ExceptionHelper.writeExceptionToString(e);
         } finally {
@@ -124,5 +132,22 @@ public class EventListenerInvoker {
                 "type", ScriptType.LISTENER.name()
             ));
         }
+    }
+
+    private static ApplicationUser getUser(Object event) {
+        if (event instanceof IssueEvent) {
+            return ((IssueEvent) event).getUser();
+        }
+        return null;
+    }
+
+    private static String getIssueKey(Object event) {
+        if (event instanceof IssueEvent) {
+            Issue issue = ((IssueEvent) event).getIssue();
+            if (issue != null) {
+                return issue.getKey();
+            }
+        }
+        return null;
     }
 }

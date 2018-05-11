@@ -10,6 +10,7 @@ import ru.mail.jira.plugins.groovy.api.dto.admin.AdminScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.admin.AdminScriptOutcome;
 import ru.mail.jira.plugins.groovy.api.repository.AdminScriptRepository;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
+import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.api.service.admin.AdminScriptService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.admin.BuiltInScript;
@@ -30,6 +31,7 @@ public class AdminScriptServiceImpl implements AdminScriptService {
     private final BuiltInScriptManager builtInScriptManager;
     private final AdminScriptRepository adminScriptRepository;
     private final ScriptParamFactory scriptParamFactory;
+    private final SentryService sentryService;
 
     @Autowired
     public AdminScriptServiceImpl(
@@ -37,13 +39,15 @@ public class AdminScriptServiceImpl implements AdminScriptService {
         ScriptService scriptService,
         BuiltInScriptManager builtInScriptManager,
         AdminScriptRepository adminScriptRepository,
-        ScriptParamFactory scriptParamFactory
+        ScriptParamFactory scriptParamFactory,
+        SentryService sentryService
     ) {
         this.i18nHelper = i18nHelper;
         this.scriptService = scriptService;
         this.builtInScriptManager = builtInScriptManager;
         this.adminScriptRepository = adminScriptRepository;
         this.scriptParamFactory = scriptParamFactory;
+        this.sentryService = sentryService;
     }
 
     @Override
@@ -82,6 +86,9 @@ public class AdminScriptServiceImpl implements AdminScriptService {
                 )
             );
         } catch (Exception e) {
+            sentryService.registerException(
+                user, e, ScriptType.ADMIN_SCRIPT, id, null, null, rawParams
+            );
             return new AdminScriptOutcome(false, ExceptionHelper.getMessageOrClassName(e));
         }
     }

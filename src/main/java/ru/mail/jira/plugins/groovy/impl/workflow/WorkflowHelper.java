@@ -17,6 +17,7 @@ import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
+import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.Base64Util;
 import ru.mail.jira.plugins.groovy.util.Const;
@@ -33,6 +34,7 @@ public class WorkflowHelper {
     private final ScriptService scriptService;
     private final ScriptRepository scriptRepository;
     private final ExecutionRepository executionRepository;
+    private final SentryService sentryService;
     private final ScriptParamFactory scriptParamFactory;
 
     @Autowired
@@ -40,11 +42,13 @@ public class WorkflowHelper {
         ScriptService scriptService,
         ScriptRepository scriptRepository,
         ExecutionRepository executionRepository,
+        SentryService sentryService,
         ScriptParamFactory scriptParamFactory
     ) {
         this.scriptService = scriptService;
         this.scriptRepository = scriptRepository;
         this.executionRepository = executionRepository;
+        this.sentryService = sentryService;
         this.scriptParamFactory = scriptParamFactory;
     }
 
@@ -133,6 +137,13 @@ public class WorkflowHelper {
             success = false;
             error = ExceptionHelper.writeExceptionToString(e);
             logger.error("Exception occurred while executing script {} for issue {}", id, issue.getKey(), e);
+            sentryService.registerException(
+                user, e, type,
+                script.isFromRegistry() ? Ints.tryParse(script.getId()) : null,
+                !script.isFromRegistry() ? script.getId() : null,
+                issue.getKey(),
+                ImmutableMap.of("params", script.getParams().toString())
+            );
         } finally {
             t = System.currentTimeMillis() - t;
         }
