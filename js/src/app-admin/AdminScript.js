@@ -120,7 +120,7 @@ class AdminScriptInternal extends React.PureComponent<Props, State> {
                 onDelete={!builtIn ? this._delete : undefined}
 
                 additionalPrimaryButtons={[
-                    <Button appearance="subtle" iconBefore={<VidPlayIcon label="run"/>} onClick={this._toggleDialog}>
+                    <Button key="runNow" appearance="subtle" iconBefore={<VidPlayIcon label="run"/>} onClick={this._toggleDialog}>
                         {CommonMessages.run}
                     </Button>
                 ]}
