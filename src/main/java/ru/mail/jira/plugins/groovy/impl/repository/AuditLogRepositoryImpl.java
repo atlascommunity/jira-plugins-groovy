@@ -87,6 +87,12 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
             String parentName = null;
             Boolean deleted = null;
             switch (entry.getCategory()) {
+                case ADMIN_SCRIPT: {
+                    AdminScript script = activeObjects.get(AdminScript.class, entityId);
+                    name = script.getName();
+                    deleted = script.isDeleted();
+                    break;
+                }
                 case REGISTRY_SCRIPT: {
                     Script script = activeObjects.get(Script.class, entityId);
                     name = script.getName();
