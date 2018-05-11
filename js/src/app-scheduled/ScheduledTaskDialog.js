@@ -267,13 +267,13 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
                             invalidMessage={errorField === fieldName ? errorMessage : ''}
                         />
                         <div className="ak-description">
-                            <WarningIcon size="small" label="" primaryColor={colors.Y500}/>
+                            <WarningIcon size="small" label="" primaryColor={colors.Y300}/>
                             {' '}
                             {ScheduledTaskMessages.jqlLimitDescription('1000') /*todo: insert value from config when its configurable*/}
                         </div>
                         {['ISSUE_JQL_SCRIPT', 'DOCUMENT_ISSUE_JQL_SCRIPT'].includes(values.get('type')) &&
                         <div className="ak-description">
-                            <WarningIcon size="small" label="" primaryColor={colors.Y500}/>
+                            <WarningIcon size="small" label="" primaryColor={colors.Y300}/>
                             {' '}
                             {ScheduledTaskMessages.jqlScriptDescription}
                         </div>
@@ -408,6 +408,9 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
                         value={values.get('scheduleExpression') || ''}
                         onChange={this._setTextValue('scheduleExpression')}
                     />
+                    <div className="ak-description">
+                        {ScheduledTaskMessages.scheduleDescription}
+                    </div>
 
                     <AsyncPicker
                         label={ScheduledTaskMessages.runAs}

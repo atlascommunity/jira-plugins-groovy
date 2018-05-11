@@ -154,6 +154,7 @@ define('/mailru/groovy/i18n-react', function() {
                 return AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.jqlLimitDescription', ...params);
             },
             jqlScriptDescription: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.jqlScriptDescription'),
+            scheduleDescription: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.scheduleDescription'),
             transitionOptions: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOptions'),
             transitionOption: {
                 skipConditions: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.transitionOption.skipConditions'),
