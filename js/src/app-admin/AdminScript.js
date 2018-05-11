@@ -37,8 +37,10 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
+const {deleteItem} = ItemActionCreators;
+
 type Props = ScriptComponentProps<AdminScriptType> & {
-    deleteItem: typeof ItemActionCreators.deleteItem
+    deleteItem: typeof deleteItem
 };
 
 type State = {
@@ -129,4 +131,4 @@ class AdminScriptInternal extends React.PureComponent<Props, State> {
     }
 }
 
-export const AdminScript = connect(null, { deleteItem: ItemActionCreators.deleteItem })(AdminScriptInternal);
+export const AdminScript = connect(null, { deleteItem })(AdminScriptInternal);

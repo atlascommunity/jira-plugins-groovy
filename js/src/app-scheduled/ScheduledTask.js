@@ -61,9 +61,11 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
+const {updateItem, deleteItem} = ItemActionCreators;
+
 type Props = ScriptComponentProps<ScheduledTaskType> & {
-    updateItem: typeof ItemActionCreators.updateItem,
-    deleteItem: typeof ItemActionCreators.deleteItem,
+    updateItem: typeof updateItem,
+    deleteItem: typeof deleteItem,
 };
 
 type State = {
@@ -272,8 +274,5 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
 
 export const ScheduledTask = connect(
     null,
-    {
-        updateItem: ItemActionCreators.updateItem,
-        deleteItem: ItemActionCreators.deleteItem
-    }
+    { updateItem, deleteItem }
 )(ScheduledTaskInternal);

@@ -49,9 +49,11 @@ function extractShortClassName(className: string): string {
     return className;
 }
 
+const {addItem, updateItem} = ItemActionCreators;
+
 type Props = FullDialogComponentProps & {
-    addItem: typeof ItemActionCreators.addItem,
-    updateItem: typeof ItemActionCreators.updateItem
+    addItem: typeof addItem,
+    updateItem: typeof updateItem
 };
 
 type State = {
@@ -125,7 +127,7 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
     };
 
     _onSubmit = () => {
-        const {isNew, id, onClose} = this.props;
+        const {isNew, id, onClose, addItem, updateItem} = this.props;
         const data = this.state.values.toJS();
 
         if (!isNew && id) {
@@ -134,7 +136,7 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
                 .then(
                     (listener: ListenerType) => {
                         onClose();
-                        this.props.updateItem(listener);
+                        updateItem(listener);
                     },
                     this._handleError
                 );
@@ -144,7 +146,7 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
                 .then(
                     (listener: ListenerType) => {
                         onClose();
-                        this.props.addItem(listener);
+                        addItem(listener);
                     },
                     this._handleError
                 );
@@ -293,8 +295,5 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
 
 export const ListenerDialog = connect(
     null,
-    {
-        updateItem: ItemActionCreators.updateItem,
-        addItem: ItemActionCreators.addItem
-    }
+    { addItem, updateItem }
 )(ListenerDialogInternal);

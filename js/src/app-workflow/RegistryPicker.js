@@ -43,7 +43,7 @@ type RegistryPickerProps = {
 };
 
 type RegistryPickerState = {
-    scripts: Array<ScriptDescriptionType>,
+    scripts: $ReadOnlyArray<ScriptDescriptionType>,
     script: ?ScriptDescriptionType,
     values: MapType<string, any>,
     ready: boolean
@@ -205,7 +205,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
     componentDidMount() {
         registryService
             .getAllScripts(this.props.type)
-            .then((scripts: Array<ScriptDescriptionType>) => {
+            .then((scripts: $ReadOnlyArray<ScriptDescriptionType>) => {
                 const {values} = this.props;
 
                 this.setState({

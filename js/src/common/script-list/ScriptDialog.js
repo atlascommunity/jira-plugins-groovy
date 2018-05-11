@@ -45,12 +45,14 @@ export type ProvidedState = {
     name: ?string
 };
 
+const {addItem, updateItem} = ItemActionCreators;
+
 type Props = FullDialogComponentProps & {
     defaultLoader: () => Promise<ProvidedState>,
     editLoader: (id: number) => Promise<ProvidedState>,
     onSubmit: (id: ?number, data: DataType) => Promise<SubmitResult>,
-    addItem: typeof ItemActionCreators.addItem,
-    updateItem: typeof ItemActionCreators.updateItem,
+    addItem: typeof addItem,
+    updateItem: typeof updateItem,
     i18n: {
         editTitle: string,
         createTitle: string

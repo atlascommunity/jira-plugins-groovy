@@ -43,9 +43,11 @@ const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(
 
 const bindings = [ Bindings.method, Bindings.headers, Bindings.uriInfo, Bindings.body, Bindings.currentUser ];
 
+const {updateItem, addItem} = ItemActionCreators;
+
 type Props = FullDialogComponentProps & {
-    updateItem: typeof ItemActionCreators.updateItem,
-    addItem: typeof ItemActionCreators.addItem
+    updateItem: typeof updateItem,
+    addItem: typeof addItem
 };
 
 type State = {
@@ -79,20 +81,8 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
         this._init(this.props);
     }
 
-    _init = (props: Props) => {
-        if (props.isNew) {
-            this.setState({
-                ready: true,
-                values: Map({
-                    name: '',
-                    methods: [],
-                    groups: [],
-                    scriptBody: ''
-                }),
-                error: null,
-                script: null
-            });
-        } else {
+    _init = ({isNew, id}: Props) => {
+        if (!isNew && id) {
             this.setState({
                 ready: false,
                 values: Map(),
@@ -100,7 +90,7 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
             });
 
             restService
-                .getScript(props.id)
+                .getScript(id)
                 .then((script: RestScriptType) => {
                     this.setState({
                         values: Map({
@@ -120,6 +110,18 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
                         script
                     });
                 });
+        } else {
+            this.setState({
+                ready: true,
+                values: Map({
+                    name: '',
+                    methods: [],
+                    groups: [],
+                    scriptBody: ''
+                }),
+                error: null,
+                script: null
+            });
         }
     };
 
@@ -139,23 +141,23 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
         const {groups, ...data}: any = this.state.values.toJS();
         data.groups = groups ? groups.map(group => group.value) : [];
 
-        if (isNew) {
-            restService
-                .createScript(data)
-                .then(
-                    (script: RestScriptType) => {
-                        onClose();
-                        this.props.addItem(script);
-                    },
-                    this._handleError
-                );
-        } else {
+        if (!isNew && id) {
             restService
                 .updateScript(id, data)
                 .then(
                     (script: RestScriptType) => {
                         onClose();
                         this.props.updateItem(script);
+                    },
+                    this._handleError
+                );
+        } else {
+            restService
+                .createScript(data)
+                .then(
+                    (script: RestScriptType) => {
+                        onClose();
+                        this.props.addItem(script);
                     },
                     this._handleError
                 );
@@ -307,5 +309,5 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
 
 export const RestScriptDialog = connect(
     null,
-    ItemActionCreators
+    { addItem, updateItem }
 )(RestScriptDialogInternal);

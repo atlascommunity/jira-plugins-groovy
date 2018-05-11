@@ -43,6 +43,7 @@ AJS.toInit(() => {
 
     ReactDOM.render(
         <Provider store={store}>
+            {/*$FlowFixMe*/}
             <ScriptRegistry/>
         </Provider>,
         element

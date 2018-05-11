@@ -26,9 +26,19 @@ const UPDATE_SCRIPT = 'UPDATE_SCRIPT';
 const DELETE_SCRIPT = 'DELETE_SCRIPT';
 const MOVE_SCRIPT = 'MOVE_SCRIPT';
 
+type AddDirectoryAction = {
+    type: typeof ADD_DIRECTORY,
+    directory: BasicRegistryDirectoryType
+};
+
+type UpdateDirectoryAction = {
+    type: typeof UPDATE_DIRECTORY,
+    directory: BasicRegistryDirectoryType
+};
+
 
 export const RegistryActionCreators = {
-    loadState: (tree: RegistryDirectoryType, scriptWatches: $ReadOnlyArray<number>, directoryWatches: $ReadOnlyArray<number>): * => {
+    loadState: (tree: $ReadOnlyArray<RegistryDirectoryType>, scriptWatches: $ReadOnlyArray<number>, directoryWatches: $ReadOnlyArray<number>): * => {
         return {
             type: LOAD_STATE,
             tree, scriptWatches, directoryWatches
@@ -46,13 +56,13 @@ export const RegistryActionCreators = {
             kind, id
         };
     },
-    addDirectory: (directory: BasicRegistryDirectoryType): * => {
+    addDirectory: (directory: BasicRegistryDirectoryType): AddDirectoryAction => {
         return {
             type: ADD_DIRECTORY,
             directory: directory
         };
     },
-    updateDirectory: (directory: BasicRegistryDirectoryType): * => {
+    updateDirectory: (directory: BasicRegistryDirectoryType): UpdateDirectoryAction => {
         return {
             type: UPDATE_DIRECTORY,
             directory: directory

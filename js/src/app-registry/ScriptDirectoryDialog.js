@@ -166,4 +166,13 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
     }
 }
 
-export const ScriptDirectoryDialog = connect(null, RegistryActionCreators, null, {withRef: true})(ScriptDirectoryDialogInternal);
+export const ScriptDirectoryDialog = connect(
+    null,
+    //$FlowFixMe
+    {
+        addDirectory: RegistryActionCreators.addDirectory,
+        updateDirectory: RegistryActionCreators.updateDirectory
+    },
+    null,
+    {withRef: true}
+)(ScriptDirectoryDialogInternal);

@@ -33,8 +33,10 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
+const {deleteItem} = ItemActionCreators;
+
 type Props = ScriptComponentProps<RestScriptType> & {
-    deleteItem: typeof ItemActionCreators.deleteItem
+    deleteItem: typeof deleteItem
 };
 
 class RestScriptInternal extends React.PureComponent<Props> {
@@ -97,4 +99,4 @@ class RestScriptInternal extends React.PureComponent<Props> {
     }
 }
 
-export const RestScript = connect(null, { deleteItem: ItemActionCreators.deleteItem })(RestScriptInternal);
+export const RestScript = connect(null, { deleteItem })(RestScriptInternal);

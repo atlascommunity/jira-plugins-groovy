@@ -27,13 +27,15 @@ export type DeleteItemAction = {
     id: number
 };
 
-type ItemAction<T> = {
-    type: T,
+export type AddItemAction = {
+    type: typeof ADD_ITEM,
     item: ItemType
 };
 
-export type AddItemAction = ItemAction<typeof ADD_ITEM>;
-export type UpdateItemAction = ItemAction<typeof UPDATE_ITEM>;
+export type UpdateItemAction = {
+    type: typeof UPDATE_ITEM,
+    item: ItemType
+};
 
 type Action = LoadAction | DeleteItemAction | AddItemAction | UpdateItemAction;
 
@@ -68,7 +70,7 @@ type WatcherAction<T> = {
 export type AddWatchAction = WatcherAction<typeof ADD_WATCH>;
 export type RemoveWatchAction = WatcherAction<typeof REMOVE_WATCH>;
 
-type WatcherActionType = LoadAction | DeleteItemAction | ItemAction<typeof ADD_ITEM> | AddWatchAction | RemoveWatchAction;
+type WatcherActionType = LoadAction | DeleteItemAction | AddItemAction | AddWatchAction | RemoveWatchAction;
 
 export function watchesReducer(state: WatchesListType, action: WatcherActionType): WatchesListType {
     if (state === undefined) {

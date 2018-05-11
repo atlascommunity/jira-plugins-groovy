@@ -322,4 +322,10 @@ export class ScriptDialogInternal extends React.PureComponent<Props, State> {
     }
 }
 
-export const ScriptDialog = connect(null, RegistryActionCreators, null, {withRef: true})(ScriptDialogInternal);
+export const ScriptDialog = connect(
+    null,
+    //$FlowFixMe
+    RegistryActionCreators,
+    null,
+    {withRef: true}
+)(ScriptDialogInternal);

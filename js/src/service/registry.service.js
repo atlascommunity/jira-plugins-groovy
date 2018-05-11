@@ -36,7 +36,7 @@ export class RegistryService {
         return ajaxPost(`${getPluginBaseUrl()}/registry/directory/${id}/restore`);
     }
 
-    getAllScripts(type: ScriptType): Promise<ScriptDescriptionType> {
+    getAllScripts(type: ScriptType): Promise<$ReadOnlyArray<ScriptDescriptionType>> {
         return ajaxGet(`${getPluginBaseUrl()}/registry/script/${type}/all`);
     }
 

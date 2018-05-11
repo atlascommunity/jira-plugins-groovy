@@ -1,6 +1,5 @@
 //@flow
 import React, {type Node} from 'react';
-import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
@@ -47,9 +46,11 @@ function getValue(option: any): ?string {
     return option ? option.value : null;
 }
 
+const {updateItem, addItem} = ItemActionCreators;
+
 type Props = FullDialogComponentProps & {
-    updateItem: typeof ItemActionCreators.updateItem,
-    addItem: typeof ItemActionCreators.addItem
+    updateItem: typeof updateItem,
+    addItem: typeof addItem
 };
 
 type State = {
@@ -60,14 +61,6 @@ type State = {
 };
 
 export class ScheduledTaskDialogInternal extends React.PureComponent<Props, State> {
-    static propTypes = {
-        isNew: PropTypes.bool.isRequired,
-        onClose: PropTypes.func.isRequired,
-        id: PropTypes.number,
-        updateItem: PropTypes.func.isRequired,
-        addItem: PropTypes.func.isRequired
-    };
-
     state = {
         ready: false,
         values: Map(),
@@ -83,20 +76,8 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
         this._init(this.props);
     }
 
-    _init = (props: Props) => {
-        if (props.isNew) {
-            this.setState({
-                ready: true,
-                values: Map({
-                    name: '',
-                    description: '',
-                    transitionOptions: {},
-                    scriptBody: ''
-                }),
-                error: null,
-                task: null
-            });
-        } else {
+    _init = ({isNew, id}: Props) => {
+        if (!isNew && id) {
             this.setState({
                 ready: false,
                 values: Map(),
@@ -104,7 +85,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
             });
 
             scheduledTaskService
-                .get(props.id)
+                .get(id)
                 .then((task: ScheduledTaskType) => {
                     this.setState({
                         values: Map({
@@ -124,6 +105,18 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
                         task
                     });
                 });
+        } else {
+            this.setState({
+                ready: true,
+                values: Map({
+                    name: '',
+                    description: '',
+                    transitionOptions: {},
+                    scriptBody: ''
+                }),
+                error: null,
+                task: null
+            });
         }
     };
 
@@ -138,7 +131,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
     };
 
     _onSubmit = () => {
-        const {isNew, id, onClose} = this.props;
+        const {isNew, id, onClose, updateItem, addItem} = this.props;
 
         const jsData = this.state.values.toJS();
         const data = {
@@ -148,23 +141,23 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
             issueWorkflowActionId: getValue(jsData.issueWorkflowActionId)
         };
 
-        if (isNew) {
-            scheduledTaskService
-                .create(data)
-                .then(
-                    (script: ScheduledTaskType) => {
-                        onClose();
-                        this.props.addItem(script);
-                    },
-                    this._handleError
-                );
-        } else {
+        if (!isNew && id) {
             scheduledTaskService
                 .update(id, data)
                 .then(
                     (script: ScheduledTaskType) => {
                         onClose();
-                        this.props.updateItem(script);
+                        updateItem(script);
+                    },
+                    this._handleError
+                );
+        } else {
+            scheduledTaskService
+                .create(data)
+                .then(
+                    (script: ScheduledTaskType) => {
+                        onClose();
+                        addItem(script);
                     },
                     this._handleError
                 );
@@ -483,4 +476,4 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
     }
 }
 
-export const ScheduledTaskDialog = connect(null, ItemActionCreators)(ScheduledTaskDialogInternal);
+export const ScheduledTaskDialog = connect(null, { updateItem, addItem })(ScheduledTaskDialogInternal);

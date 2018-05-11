@@ -40,8 +40,10 @@ type ConnectProps = {
     eventTypes: ObjectMap
 };
 
+const {deleteItem} = ItemActionCreators;
+
 type Props = ScriptComponentProps<ListenerType> & ConnectProps & {
-    deleteItem: typeof ItemActionCreators.deleteItem,
+    deleteItem: typeof deleteItem,
 };
 
 class ListenerInternal extends React.PureComponent<Props> {
@@ -131,7 +133,5 @@ export const Listener = connect(
             };
         }
     ),
-    {
-        deleteItem: ItemActionCreators.deleteItem
-    }
+    { deleteItem }
 )(ListenerInternal);

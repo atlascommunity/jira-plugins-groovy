@@ -19,7 +19,8 @@ export type RegistryScriptType = ScriptEntityWithoutChangelogs & {
 
 export type BasicRegistryDirectoryType = {
     id: number,
-    name: string
+    name: string,
+    fullName?: string
 };
 
 export type RegistryDirectoryType = BasicRegistryDirectoryType & {

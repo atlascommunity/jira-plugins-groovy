@@ -16,9 +16,11 @@ import type {FullDialogComponentProps} from '../common/script-list/types';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 
+const {addItem, updateItem} = ItemActionCreators;
+
 type Props = FullDialogComponentProps & {
-    addItem: typeof ItemActionCreators.addItem,
-    updateItem: typeof ItemActionCreators.updateItem
+    addItem: typeof addItem,
+    updateItem: typeof updateItem
 };
 
 const defaultLoader = () => Promise.resolve(
@@ -90,8 +92,5 @@ class AdminDialogInternal extends React.PureComponent<Props> {
 
 export const AdminDialog = connect(
     null,
-    {
-        addItem: ItemActionCreators.addItem,
-        updateItem: ItemActionCreators.updateItem
-    }
+    { addItem, updateItem }
 )(AdminDialogInternal);
