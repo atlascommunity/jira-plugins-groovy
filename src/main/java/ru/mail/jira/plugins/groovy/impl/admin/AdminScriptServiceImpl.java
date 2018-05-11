@@ -88,7 +88,7 @@ public class AdminScriptServiceImpl implements AdminScriptService {
 
     private Map<String, Object> getParams(List<ScriptParamDto> params, Map<String, String> rawValues) {
         if (params == null || rawValues == null) {
-            return ImmutableMap.of();
+            return new HashMap<>();
         }
 
         Map<String, Object> result = new HashMap<>();
