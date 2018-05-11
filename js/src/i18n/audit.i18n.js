@@ -15,6 +15,7 @@ export const AuditMessages: I18nMessages = {
 };
 
 export const CategoryNameMessages: I18nMessages = {
+    ADMIN_SCRIPT: i18n.audit.adminScript,
     REGISTRY_SCRIPT: i18n.audit.registryScript,
     REGISTRY_DIRECTORY: i18n.audit.registryDirectory,
     LISTENER: i18n.audit.listener,

@@ -106,6 +106,7 @@ define('/mailru/groovy/i18n-react', function() {
             rest: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.rest'),
             cf: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.cf'),
             scheduledTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.scheduledTask'),
+            adminScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.adminScript'),
             restore: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.restore')
         },
         rest: {

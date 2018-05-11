@@ -19,6 +19,7 @@ import {ActionIcon} from './ActionIcon';
 import type {AuditLogEntry, AuditLogData} from './types';
 
 import {
+    adminScriptService,
     auditLogService,
     listenerService,
     registryService,
@@ -89,6 +90,9 @@ export class AuditLog extends React.Component<Props, State> {
     _restore = (category: EntityType, id: number) => () => {
         let promise: ?Promise<void> = null;
         switch (category) {
+            case 'ADMIN_SCRIPT':
+                promise = adminScriptService.restoreScript(id);
+                break;
             case 'REGISTRY_SCRIPT':
                 promise = registryService.restoreScript(id);
                 break;
