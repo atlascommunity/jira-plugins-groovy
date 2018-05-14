@@ -1,6 +1,5 @@
 //@flow
 import React, {type Node} from 'react';
-import PropTypes from 'prop-types';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 import Spinner from '@atlaskit/spinner';
@@ -27,11 +26,6 @@ type State = {
 };
 
 export class RunNowDialog extends React.PureComponent<Props, State> {
-    static propTypes = {
-        task: PropTypes.object.isRequired,
-        onClose: PropTypes.func.isRequired
-    };
-
     state = {
         running: false,
         result: null,

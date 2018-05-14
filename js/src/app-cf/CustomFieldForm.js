@@ -1,6 +1,5 @@
 //@flow
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import {Record} from 'immutable';
 import type {RecordOf, RecordFactory} from 'immutable';
@@ -60,13 +59,6 @@ type State = {
 };
 
 export class CustomFieldForm extends React.Component<Props, State> {
-    static propTypes = {
-        id: PropTypes.number.isRequired,
-        fieldConfig: PropTypes.object.isRequired,
-        onChange: PropTypes.func.isRequired,
-        onCancel: PropTypes.func.isRequired
-    };
-
     constructor(props: Props) {
         super(props);
 

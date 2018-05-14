@@ -1,6 +1,5 @@
 //@flow
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import {Map} from 'immutable';
 import type {Map as MapType} from 'immutable';
@@ -50,13 +49,6 @@ type RegistryPickerState = {
 };
 
 export class RegistryPicker extends React.Component<RegistryPickerProps, RegistryPickerState> {
-    static propTypes = {
-        type: PropTypes.string.isRequired,
-        values: PropTypes.object,
-        scriptId: PropTypes.number,
-        fieldName: PropTypes.string
-    };
-
     _onChange = (value: ?OldSelectItem<number>) => {
         if (value) {
             this.setState({

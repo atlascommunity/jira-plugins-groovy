@@ -1,6 +1,5 @@
 //@flow
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
@@ -30,10 +29,6 @@ type State = {
 };
 
 export class CustomFieldFormContainer extends React.Component<Props, State> {
-    static propTypes = {
-        id: PropTypes.number.isRequired
-    };
-
     state = {
         ready: false,
         editing: false,

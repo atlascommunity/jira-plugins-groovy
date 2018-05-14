@@ -1,6 +1,5 @@
 //@flow
 import React, {type Node} from 'react';
-import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
@@ -48,11 +47,6 @@ type State = {
 
 //todo: collapse/uncollapse all
 export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
-    static propTypes = {
-        ready: PropTypes.bool.isRequired,
-        directories: PropTypes.arrayOf(PropTypes.object.isRequired)
-    };
-
     //$FlowFixMe
     directoryDialogRef = React.createRef();
     //$FlowFixMe

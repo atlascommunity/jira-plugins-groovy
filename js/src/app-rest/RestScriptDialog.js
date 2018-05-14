@@ -1,6 +1,5 @@
 //@flow
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
@@ -77,14 +76,6 @@ type State = {
 };
 
 export class RestScriptDialogInternal extends React.Component<Props, State> {
-    static propTypes = {
-        isNew: PropTypes.bool.isRequired,
-        onClose: PropTypes.func.isRequired,
-        id: PropTypes.number,
-        updateItem: PropTypes.func.isRequired,
-        addItem: PropTypes.func.isRequired
-    };
-
     state = {
         ready: false,
         values: makeForm(),
