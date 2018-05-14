@@ -2,8 +2,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import {Map} from 'immutable';
-import type {Map as MapType} from 'immutable';
+import {Record} from 'immutable';
+import type {RecordOf, RecordFactory} from 'immutable';
 
 import Button, {ButtonGroup} from '@atlaskit/button';
 import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
@@ -25,6 +25,26 @@ import type {InputEvent} from '../common/EventTypes';
 const bindings = [ Bindings.issue ];
 const bindingsWithVelocity = [ Bindings.issue, Bindings.velocityParams ];
 
+type Form = {
+    description: string,
+    comment: string,
+    scriptBody: string,
+    cacheable: boolean,
+    template?: string,
+    velocityParamsEnabled: boolean
+};
+
+type FormField = $Keys<Form>;
+
+const makeForm: RecordFactory<Form> = Record({
+    description: '',
+    comment: '',
+    scriptBody: '',
+    template: '',
+    cacheable: true,
+    velocityParamsEnabled: false
+});
+
 type Props = {
     id: number,
     fieldConfig: FieldConfig,
@@ -33,7 +53,7 @@ type Props = {
 };
 
 type State = {
-    values: MapType<string, any>,
+    values: RecordOf<Form>,
     previewKey: ?string,
     previewResult: ?FieldConfigPreviewResult,
     error: *
@@ -53,10 +73,10 @@ export class CustomFieldForm extends React.Component<Props, State> {
         const {fieldConfig} = props;
 
         this.state = {
-            values: Map({
+            values: makeForm({
                 scriptBody: fieldConfig.scriptBody,
                 cacheable: fieldConfig.cacheable,
-                template: fieldConfig.template,
+                template: fieldConfig.template || '',
                 velocityParamsEnabled: fieldConfig.velocityParamsEnabled,
                 comment: ''
             }),
@@ -87,7 +107,7 @@ export class CustomFieldForm extends React.Component<Props, State> {
             );
     };
 
-    _mutateValue = (field: string, value: any) => {
+    _mutateValue = (field: FormField, value: any) => {
         this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
@@ -95,11 +115,11 @@ export class CustomFieldForm extends React.Component<Props, State> {
         });
     };
 
-    _setObjectValue = (field: string) => (value: any) => this._mutateValue(field, value);
+    _setObjectValue = (field: FormField) => (value: any) => this._mutateValue(field, value);
 
-    _setTextValue = (field: string) => (event: InputEvent) => this._mutateValue(field, event.currentTarget.value);
+    _setTextValue = (field: FormField) => (event: InputEvent) => this._mutateValue(field, event.currentTarget.value);
 
-    _setToggleValue = (field: string) => (e: Event) => {
+    _setToggleValue = (field: FormField) => (e: Event) => {
         //$FlowFixMe
         this._mutateValue(field, e.currentTarget.checked);
     };

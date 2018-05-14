@@ -23,3 +23,10 @@ export type I18nType = {
     addItem: string,
     noItems: string
 };
+
+export type ScriptForm = {
+    name: string,
+    description: string,
+    scriptBody: string,
+    comment: string
+};

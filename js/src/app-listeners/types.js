@@ -10,10 +10,10 @@ export type ConditionType = {
 };
 
 export type ConditionInputType = {
-    type?: 'CLASS_NAME' | 'ISSUE',
-    typeIds?: $ReadOnlyArray<string>,
-    projectIds?: $ReadOnlyArray<string>,
-    className?: ?string
+    type: ?'CLASS_NAME' | 'ISSUE',
+    typeIds: $ReadOnlyArray<string>,
+    projectIds: $ReadOnlyArray<string>,
+    className: ?string
 };
 
 export type ListenerType = ScriptEntity & {

@@ -3,11 +3,9 @@ import * as React from 'react';
 
 import {connect} from 'react-redux';
 
-import {Map} from 'immutable';
-
 import type {AdminScriptType} from './types';
 
-import {ScriptDialog, type SubmitResult} from '../common/script-list/ScriptDialog';
+import {ScriptDialog, makeScriptForm, type SubmitResult} from '../common/script-list/ScriptDialog';
 import {ItemActionCreators} from '../common/redux';
 import {adminScriptService} from '../service/services';
 
@@ -25,7 +23,7 @@ type Props = FullDialogComponentProps & {
 
 const defaultLoader = () => Promise.resolve(
     {
-        values: Map({
+        values: makeScriptForm({
             name: '',
             description: '',
             comment: ''
@@ -38,8 +36,9 @@ const editLoader = (id: number) => adminScriptService
     .getScript(id)
     .then(({name, description, scriptBody}: AdminScriptType): ProvidedState => {
         return {
-            values: Map({
-                name, description, scriptBody
+            values: makeScriptForm({
+                description: description || '',
+                name, scriptBody
             }),
             name
         };

@@ -3,7 +3,7 @@ import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
 
-import {Map, type Map as MapType} from 'immutable';
+import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
@@ -18,7 +18,12 @@ import type {ItemPropType} from '@atlaskit/field-radio-group/dist/cjs/types';
 import WarningIcon from '@atlaskit/icon/glyph/warning';
 
 import {types, typeList} from './types';
-import type {ScheduledTaskType, KeyedScheduledTaskTypeType, TransitionOptionsType} from './types';
+import type {
+    ScheduledTaskType,
+    KeyedScheduledTaskTypeType,
+    TransitionOptionsType,
+    ScheduledTaskTypeEnum
+} from './types';
 
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
@@ -37,6 +42,7 @@ import {ItemActionCreators} from '../common/redux';
 import type {FullDialogComponentProps} from '../common/script-list/types';
 import type {InputEvent} from '../common/EventTypes';
 import type {BindingType} from '../common/editor/types';
+import type {SingleValueType} from '../common/ak/types';
 
 
 const issueBindings = [Bindings.issue];
@@ -48,6 +54,36 @@ function getValue(option: any): ?string {
 
 const {updateItem, addItem} = ItemActionCreators;
 
+type Form = {
+    name: string,
+    type: ?ScheduledTaskTypeEnum,
+    scheduleExpression: string,
+    transitionOptions: TransitionOptionsType,
+    issueWorkflowName: ?SingleValueType,
+    issueWorkflowActionId: ?SingleValueType,
+    userKey: ?SingleValueType,
+    description: ?string,
+    issueJql: ?string,
+    scriptBody: ?string,
+    comment: ?string,
+};
+
+type FormField = $Keys<Form>;
+
+const makeForm: RecordFactory<Form> = Record({
+    name: '',
+    type: null,
+    scheduleExpression: '',
+    transitionOptions: {},
+    issueWorkflowName: null,
+    issueWorkflowActionId: null,
+    userKey: null,
+    scriptBody: null,
+    issueJql: null,
+    comment: null,
+    description: null
+});
+
 type Props = FullDialogComponentProps & {
     updateItem: typeof updateItem,
     addItem: typeof addItem
@@ -55,7 +91,7 @@ type Props = FullDialogComponentProps & {
 
 type State = {
     ready: boolean,
-    values: MapType<string, any>,
+    values: RecordOf<Form>,
     task: ?ScheduledTaskType,
     error: *
 };
@@ -63,7 +99,7 @@ type State = {
 export class ScheduledTaskDialogInternal extends React.PureComponent<Props, State> {
     state = {
         ready: false,
-        values: Map(),
+        values: makeForm(),
         task: null,
         error: null
     };
@@ -80,7 +116,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
         if (!isNew && id) {
             this.setState({
                 ready: false,
-                values: Map(),
+                values: makeForm(),
                 error: null
             });
 
@@ -88,7 +124,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
                 .get(id)
                 .then((task: ScheduledTaskType) => {
                     this.setState({
-                        values: Map({
+                        values: makeForm({
                             name: task.name,
                             description: task.description,
                             scriptBody: task.scriptBody,
@@ -108,7 +144,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
         } else {
             this.setState({
                 ready: true,
-                values: Map({
+                values: makeForm({
                     name: '',
                     description: '',
                     transitionOptions: {},
@@ -133,6 +169,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
     _onSubmit = () => {
         const {isNew, id, onClose, updateItem, addItem} = this.props;
 
+        //$FlowFixMe flow issue?
         const jsData = this.state.values.toJS();
         const data = {
             ...jsData,
@@ -164,7 +201,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
         }
     };
 
-    mutateValue = (field: string, value: any) => {
+    mutateValue = (field: FormField, value: any) => {
         this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
@@ -172,9 +209,9 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
         });
     };
 
-    _setTextValue = (field: string) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
+    _setTextValue = (field: FormField) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
 
-    _setObjectValue = (field: string) => (value: any) => this.mutateValue(field, value);
+    _setObjectValue = (field: FormField) => (value: any) => this.mutateValue(field, value);
 
     _toggleTransitionOption2 = (e: SyntheticEvent<HTMLInputElement>) => {
         const option = e.currentTarget.value;
@@ -193,7 +230,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
         }
     };
 
-    _renderField = (fieldName: string, e: *): Node => {
+    _renderField = (fieldName: (FormField | 'workflowAction'), e: *): Node => {
         const {values} = this.state;
         let error: * = e;
 

@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 
 import {connect} from 'react-redux';
 
-import {Map} from 'immutable';
-import type {Map as MapType} from 'immutable';
+import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
@@ -28,7 +27,7 @@ import {RegistryMessages} from '../i18n/registry.i18n';
 import {ItemActionCreators} from '../common/redux';
 import type {FullDialogComponentProps} from '../common/script-list/types';
 import type {HttpMethod} from '../common/types';
-import type {OldSelectItem} from '../common/ak/types';
+import type {OldSelectItem, SingleValueType} from '../common/ak/types';
 import type {InputEvent} from '../common/EventTypes';
 
 
@@ -45,6 +44,26 @@ const bindings = [ Bindings.method, Bindings.headers, Bindings.uriInfo, Bindings
 
 const {updateItem, addItem} = ItemActionCreators;
 
+type Form = {
+    name: string,
+    description: string,
+    comment: string,
+    scriptBody: string,
+    methods: $ReadOnlyArray<HttpMethod>,
+    groups: $ReadOnlyArray<SingleValueType>
+};
+
+type FormField = $Keys<Form>;
+
+const makeForm: RecordFactory<Form> = Record({
+    name: '',
+    description: '',
+    comment: '',
+    scriptBody: '',
+    methods: [],
+    groups: []
+});
+
 type Props = FullDialogComponentProps & {
     updateItem: typeof updateItem,
     addItem: typeof addItem
@@ -52,7 +71,7 @@ type Props = FullDialogComponentProps & {
 
 type State = {
     ready: boolean,
-    values: MapType<string, any>,
+    values: RecordOf<Form>,
     error: *,
     script: ?RestScriptType
 };
@@ -68,7 +87,7 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
 
     state = {
         ready: false,
-        values: Map(),
+        values: makeForm(),
         error: null,
         script: null
     };
@@ -85,7 +104,7 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
         if (!isNew && id) {
             this.setState({
                 ready: false,
-                values: Map(),
+                values: makeForm(),
                 error: null
             });
 
@@ -93,17 +112,17 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
                 .getScript(id)
                 .then((script: RestScriptType) => {
                     this.setState({
-                        values: Map({
+                        values: makeForm({
                             name: script.name,
                             methods: script.methods,
                             scriptBody: script.scriptBody,
-                            groups: script.groups.map((group: string): OldSelectItem<string> => {
+                            groups: script.groups.map((group: string): SingleValueType => {
                                 return {
                                     label: group,
                                     value: group
                                 };
                             }),
-                            description: script.description,
+                            description: script.description || '',
                             comment: ''
                         }),
                         ready: true,
@@ -113,7 +132,7 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
         } else {
             this.setState({
                 ready: true,
-                values: Map({
+                values: makeForm({
                     name: '',
                     methods: [],
                     groups: [],
@@ -164,7 +183,7 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
         }
     };
 
-    mutateValue = (field: string, value: any) => {
+    mutateValue = (field: FormField, value: any) => {
         this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
@@ -172,9 +191,9 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
         });
     };
 
-    _setTextValue = (field: string) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
+    _setTextValue = (field: FormField) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
 
-    _setObjectValue = (field: string) => (value: any) => this.mutateValue(field, value);
+    _setObjectValue = (field: FormField) => (value: any) => this.mutateValue(field, value);
 
     render(): React.Node {
         const {onClose, isNew} = this.props;

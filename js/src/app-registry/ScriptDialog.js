@@ -10,11 +10,11 @@ import Spinner from '@atlaskit/spinner';
 import {Label} from '@atlaskit/field-base';
 import {CheckboxStateless} from '@atlaskit/checkbox';
 
-import {Map, type Map as MapType} from 'immutable';
+import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
 import {RegistryActionCreators} from './registry.reducer';
 
-import type {RegistryScriptType} from './types';
+import type {WorkflowScriptType, RegistryScriptType} from './types';
 
 import {FieldMessages, CommonMessages} from '../i18n/common.i18n';
 
@@ -32,6 +32,26 @@ import type {InputEvent} from '../common/EventTypes';
 
 const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
 
+type Form = {
+    directoryId: number,
+    types: $ReadOnlyArray<WorkflowScriptType>,
+    name: string,
+    description: string,
+    comment: string,
+    scriptBody: string
+};
+
+type FormField = $Keys<Form>;
+
+const makeForm: RecordFactory<Form> = Record({
+    directoryId: 0,
+    name: '',
+    types: [],
+    description: '',
+    comment: '',
+    scriptBody: '',
+});
+
 type Props = {
     addScript: typeof RegistryActionCreators.addScript,
     updateScript: typeof RegistryActionCreators.updateScript
@@ -41,7 +61,7 @@ type State = {
     active: boolean,
     fetching: boolean,
     id: ?number,
-    values: MapType<string, any>,
+    values: RecordOf<Form>,
     parentName: string,
     error: *,
     modified: boolean,
@@ -55,7 +75,7 @@ export class ScriptDialogInternal extends React.PureComponent<Props, State> {
         active: false,
         fetching: false,
         id: null,
-        values: new Map(),
+        values: makeForm(),
         parentName: '',
         error: null,
         modified: false,
@@ -73,7 +93,7 @@ export class ScriptDialogInternal extends React.PureComponent<Props, State> {
                     fetching: false,
                     active: true,
                     id: null,
-                    values: Map({
+                    values: makeForm({
                         directoryId: directoryId,
                         types: []
                     }),
@@ -93,10 +113,10 @@ export class ScriptDialogInternal extends React.PureComponent<Props, State> {
                 fetching: false,
                 active: true,
                 id: id,
-                values: Map({
+                values: makeForm({
                     name: data.name,
-                    description: data.description,
-                    types: data.types,
+                    description: data.description || '',
+                    types: data.types || [],
                     scriptBody: data.scriptBody,
                     directoryId: data.directoryId
                 }),
@@ -148,9 +168,9 @@ export class ScriptDialogInternal extends React.PureComponent<Props, State> {
         }
     };
 
-    _close = () => this.setState({ active: false, waiting: false, values: Map() });
+    _close = () => this.setState({ active: false, waiting: false, values: makeForm() });
 
-    mutateValue = (field: string, value: any) => {
+    mutateValue = (field: FormField, value: any) => {
         this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value),
@@ -159,9 +179,9 @@ export class ScriptDialogInternal extends React.PureComponent<Props, State> {
         });
     };
 
-    _setTextValue = (field: string) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
+    _setTextValue = (field: FormField) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
 
-    _setObjectValue = (field: string) => (value: any) => this.mutateValue(field, value);
+    _setObjectValue = (field: FormField) => (value: any) => this.mutateValue(field, value);
 
     _setScript = this._setObjectValue('scriptBody');
 
@@ -174,6 +194,7 @@ export class ScriptDialogInternal extends React.PureComponent<Props, State> {
             const isRemove = types.includes(option);
 
             return {
+                //$FlowFixMe todo
                 values: state.values.set('types', isRemove ? types.filter(type => type !== option) : [...types, option])
             };
         });

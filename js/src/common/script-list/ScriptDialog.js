@@ -1,14 +1,14 @@
 //@flow
 import * as React from 'react';
 
-import {Map} from 'immutable';
-import type {Map as MapType} from 'immutable';
+import {Record} from 'immutable';
+import type {RecordOf, RecordFactory} from 'immutable';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 
-import type {FullDialogComponentProps} from './types';
+import type {FullDialogComponentProps, ScriptForm} from './types';
 
 import {LoadingSpinner} from '../ak/LoadingSpinner';
 import {EditorField} from '../ak/EditorField';
@@ -37,7 +37,7 @@ export type SubmitResult = {
     error: any
 };
 
-type ValuesType = MapType<string, any>;
+type ValuesType = RecordOf<ScriptForm>;
 type DataType = {[string]: any};
 
 export type ProvidedState = {
@@ -57,7 +57,7 @@ type Props = FullDialogComponentProps & {
         editTitle: string,
         createTitle: string
     },
-    valuesTransformer: (values: Map<string, any>) => DataType,
+    valuesTransformer: (values: ValuesType) => DataType,
     modalProps?: any
 };
 
@@ -69,20 +69,30 @@ type State = {
     name: ?string,
 };
 
+export const makeScriptForm: RecordFactory<ScriptForm> = Record({
+    name: '',
+    description: '',
+    scriptBody: '',
+    comment: ''
+});
+
+type ScriptFormField = $Keys<ScriptForm>;
+
 export class ScriptDialog extends React.PureComponent<Props, State> {
     static defaultProps = {
+        //$FlowFixMe todo: flow issue?
         valuesTransformer: (values: ValuesType): DataType => values.toJS()
     };
 
     state = {
-        values: new Map(),
+        values: makeScriptForm(),
         isLoadingState: true,
         isSubmitting: false,
         error: null,
         name: null
     };
 
-    mutateValue = (field: string, value: any) => {
+    mutateValue = (field: ScriptFormField, value: any) => {
         this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
@@ -90,9 +100,9 @@ export class ScriptDialog extends React.PureComponent<Props, State> {
         });
     };
 
-    _setTextValue = (field: string) => (event: SyntheticEvent<HTMLInputElement|HTMLTextAreaElement>) => this.mutateValue(field, event.currentTarget.value);
+    _setTextValue = (field: ScriptFormField) => (event: SyntheticEvent<HTMLInputElement|HTMLTextAreaElement>) => this.mutateValue(field, event.currentTarget.value);
 
-    _setObjectValue = (field: string) => (value: any) => this.mutateValue(field, value);
+    _setObjectValue = (field: ScriptFormField) => (value: any) => this.mutateValue(field, value);
 
     _init = () => {
         const {id, isNew, defaultLoader, editLoader} = this.props;

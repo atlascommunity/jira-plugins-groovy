@@ -45,7 +45,7 @@ function SingleValueImpl({data, children, ...props}: any): React.Node {
 
 let i: number = 0;
 
-type ValueType = SingleValueType | Array<SingleValueType>;
+type ValueType = SingleValueType | $ReadOnlyArray<SingleValueType>;
 
 type AsyncPickerProps = FieldProps & OptMutableFieldProps<ValueType> & FormFieldProps & {
     src: string,
@@ -54,7 +54,7 @@ type AsyncPickerProps = FieldProps & OptMutableFieldProps<ValueType> & FormField
 
 type DataType = {
     complete: boolean,
-    options: Array<ValueType>
+    options: $ReadOnlyArray<ValueType>
 };
 
 type AsyncPickerState = {

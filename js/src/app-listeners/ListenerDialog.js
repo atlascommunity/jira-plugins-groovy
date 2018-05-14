@@ -3,8 +3,8 @@ import * as React from 'react';
 
 import {connect} from 'react-redux';
 
-import {Map} from 'immutable';
-import type {Map as MapType} from 'immutable';
+import {Record} from 'immutable';
+import type {RecordOf, RecordFactory} from 'immutable';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
@@ -12,7 +12,7 @@ import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 
 import {ConditionPicker} from './ConditionPicker';
 
-import type {ListenerType, ListenerInputType} from './types';
+import type {ListenerType, ConditionInputType} from './types';
 
 import {ListenerMessages} from '../i18n/listener.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
@@ -51,6 +51,29 @@ function extractShortClassName(className: string): string {
 
 const {addItem, updateItem} = ItemActionCreators;
 
+type Form = {
+    name: string,
+    description: string,
+    comment: string,
+    scriptBody: string,
+    condition: ConditionInputType
+};
+
+type FormField = $Keys<Form>;
+
+const makeForm: RecordFactory<Form> = Record({
+    name: '',
+    description: '',
+    comment: '',
+    scriptBody: '',
+    condition: {
+        type: null,
+        typeIds: [],
+        projectIds: [],
+        className: null
+    }
+});
+
 type Props = FullDialogComponentProps & {
     addItem: typeof addItem,
     updateItem: typeof updateItem
@@ -58,15 +81,15 @@ type Props = FullDialogComponentProps & {
 
 type State = {
     ready: boolean,
-    values: MapType<string, any>,
-    listener: ?ListenerInputType,
+    values: RecordOf<Form>,
+    listener: ?ListenerType,
     error: *
 };
 
 class ListenerDialogInternal extends React.PureComponent<Props, State> {
     state = {
         ready: false,
-        values: Map(),
+        values: makeForm(),
         listener: null,
         error: null
     };
@@ -83,34 +106,28 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
         if (!isNew && id) {
             this.setState({
                 ready: false,
-                values: Map()
+                values: makeForm()
             });
 
             listenerService
                 .getListener(id)
                 .then((listener: ListenerType) => {
                     this.setState({
-                        values: Map({
+                        values: makeForm({
                             name: listener.name,
-                            description: listener.description,
+                            description: listener.description || '',
                             scriptBody: listener.scriptBody,
+                            //$FlowFixMe todo
                             condition: listener.condition
                         }),
-                        //$FlowFixMe todo: ?
-                        listener: (listener: ListenerInputType),
+                        listener: listener,
                         ready: true
                     });
                 });
         } else {
             this.setState({
                 ready: true,
-                values: Map({
-                    condition: {},
-                    name: '',
-                    description: '',
-                    comment: '',
-                    scriptBody: ''
-                }),
+                values: makeForm(),
                 listener: null
             });
         }
@@ -153,7 +170,7 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
         }
     };
 
-    mutateValue = (field: string, value: any) =>
+    mutateValue = (field: FormField, value: any) =>
         this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
