@@ -58,8 +58,8 @@
     <web-resource key="admin-scripts-resources" name="groovy console Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
-        <resource type="download" name="admin.css" location="/ru/mail/jira/plugins/groovy/css/admin.css"/>
-        <resource type="download" name="admin.css.smap" location="/ru/mail/jira/plugins/groovy/css/admin.css.smap"/>
+        <!--resource type="download" name="admin.css" location="/ru/mail/jira/plugins/groovy/css/admin.css"/>
+        <resource type="download" name="admin.css.smap" location="/ru/mail/jira/plugins/groovy/css/admin.css.smap"/-->
 
         <resource type="download" name="admin.js" location="/ru/mail/jira/plugins/groovy/js/admin.js"/>
         <resource type="download" name="admin.js.smap" location="/ru/mail/jira/plugins/groovy/js/admin.js.smap"/>
@@ -94,8 +94,8 @@
     <web-resource key="audit-resources" name="groovy audit Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
-        <resource type="download" name="audit.css" location="/ru/mail/jira/plugins/groovy/css/audit.css"/>
-        <resource type="download" name="audit.css.smap" location="/ru/mail/jira/plugins/groovy/css/audit.css.smap"/>
+        <!--resource type="download" name="audit.css" location="/ru/mail/jira/plugins/groovy/css/audit.css"/>
+        <resource type="download" name="audit.css.smap" location="/ru/mail/jira/plugins/groovy/css/audit.css.smap"/-->
 
         <resource type="download" name="audit.js" location="/ru/mail/jira/plugins/groovy/js/audit.js"/>
         <resource type="download" name="audit.js.smap" location="/ru/mail/jira/plugins/groovy/js/audit.js.smap"/>
@@ -106,8 +106,8 @@
     <web-resource key="rest-resources" name="groovy rest Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
-        <resource type="download" name="rest.css" location="/ru/mail/jira/plugins/groovy/css/rest.css"/>
-        <resource type="download" name="rest.css.smap" location="/ru/mail/jira/plugins/groovy/css/rest.css.smap"/>
+        <!--resource type="download" name="rest.css" location="/ru/mail/jira/plugins/groovy/css/rest.css"/>
+        <resource type="download" name="rest.css.smap" location="/ru/mail/jira/plugins/groovy/css/rest.css.smap"/-->
 
         <resource type="download" name="rest.js" location="/ru/mail/jira/plugins/groovy/js/rest.js"/>
         <resource type="download" name="rest.js.smap" location="/ru/mail/jira/plugins/groovy/js/rest.js.smap"/>
@@ -118,8 +118,8 @@
     <web-resource key="fields-resources" name="groovy fields Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
-        <resource type="download" name="fields.css" location="/ru/mail/jira/plugins/groovy/css/fields.css"/>
-        <resource type="download" name="fields.css.smap" location="/ru/mail/jira/plugins/groovy/css/fields.css.smap"/>
+        <!--resource type="download" name="fields.css" location="/ru/mail/jira/plugins/groovy/css/fields.css"/>
+        <resource type="download" name="fields.css.smap" location="/ru/mail/jira/plugins/groovy/css/fields.css.smap"/-->
 
         <resource type="download" name="fields.js" location="/ru/mail/jira/plugins/groovy/js/fields.js"/>
         <resource type="download" name="fields.js.smap" location="/ru/mail/jira/plugins/groovy/js/fields.js.smap"/>
@@ -130,8 +130,8 @@
     <web-resource key="cf-resources" name="groovy custom field Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
-        <resource type="download" name="cf.css" location="/ru/mail/jira/plugins/groovy/css/cf.css"/>
-        <resource type="download" name="cf.css.smap" location="/ru/mail/jira/plugins/groovy/css/cf.css.smap"/>
+        <!--resource type="download" name="cf.css" location="/ru/mail/jira/plugins/groovy/css/cf.css"/>
+        <resource type="download" name="cf.css.smap" location="/ru/mail/jira/plugins/groovy/css/cf.css.smap"/-->
 
         <resource type="download" name="cf.js" location="/ru/mail/jira/plugins/groovy/js/cf.js"/>
         <resource type="download" name="cf.js.smap" location="/ru/mail/jira/plugins/groovy/js/cf.js.smap"/>
@@ -154,8 +154,8 @@
     <web-resource key="extras-resources" name="groovy extras Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
-        <resource type="download" name="extras.css" location="/ru/mail/jira/plugins/groovy/css/extras.css"/>
-        <resource type="download" name="extras.css.smap" location="/ru/mail/jira/plugins/groovy/css/extras.css.smap"/>
+        <!--resource type="download" name="extras.css" location="/ru/mail/jira/plugins/groovy/css/extras.css"/>
+        <resource type="download" name="extras.css.smap" location="/ru/mail/jira/plugins/groovy/css/extras.css.smap"/-->
 
         <resource type="download" name="extras.js" location="/ru/mail/jira/plugins/groovy/js/extras.js"/>
         <resource type="download" name="extras.js.smap" location="/ru/mail/jira/plugins/groovy/js/extras.js.smap"/>
