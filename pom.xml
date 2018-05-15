@@ -116,6 +116,18 @@
             <artifactId>caffeine</artifactId>
             <version>2.6.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.atlassian.pocketknife</groupId>
+            <artifactId>atlassian-pocketknife-querydsl</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <!-- explicitly set as provided, so it won't be bundled with plugin (not sure where compile dependency comes from) -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -129,11 +141,23 @@
                     <productDataVersion>${jira.version}</productDataVersion>
                     <enableQuickReload>true</enableQuickReload>
                     <enableFastdev>false</enableFastdev>
-                    <jvmArgs>-Xmx1536m -Djira.websudo.is.disabled=false -Datlassian.mail.senddisabled=false</jvmArgs>
+                    <jvmArgs>-Xmx2048m -Djira.websudo.is.disabled=false -Datlassian.mail.senddisabled=false</jvmArgs>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <Export-Package>ru.mail.jira.plugins.api,</Export-Package>
-                        <Import-Package>org.springframework.osgi.*;resolution:="optional", org.eclipse.gemini.blueprint.*;resolution:="optional", com.atlassian.jira.plugin.webfragment.conditions, com.atlassian.jira.issue.customfields.searchers, com.atlassian.jira.jql.operand, *;resolution:=optional</Import-Package>
+                        <Import-Package>
+                            <!-- imports -->
+                            org.springframework.osgi.*;resolution:="optional",
+                            org.eclipse.gemini.blueprint.*;resolution:="optional",
+                            com.atlassian.jira.plugin.webfragment.conditions,
+                            com.atlassian.jira.issue.customfields.searchers,
+                            com.atlassian.jira.jql.operand,
+                            <!-- exclude stuff for querydsl pocketknife -->
+                            !net.sf.cglib.proxy,
+                            !org.jvnet.hudson.annotation_indexer,
+                            <!-- everything else -->
+                            *;resolution:=optional
+                        </Import-Package>
                         <Spring-Context>*</Spring-Context>
                     </instructions>
                     <compressJs>false</compressJs>
@@ -169,6 +193,10 @@
                         <dependency>
                             <groupId>com.atlassian.plugin</groupId>
                             <artifactId>atlassian-spring-scanner-external-jar</artifactId>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.atlassian.pocketknife</groupId>
+                            <artifactId>atlassian-pocketknife-querydsl</artifactId>
                         </dependency>
                     </scannedDependencies>
                     <verbose>false</verbose>

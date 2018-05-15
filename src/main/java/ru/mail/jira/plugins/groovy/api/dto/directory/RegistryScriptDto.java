@@ -23,5 +23,5 @@ public class RegistryScriptDto extends RegistryScriptForm {
     @XmlElement
     private List<ScriptParamDto> params;
     @XmlElement
-    private Integer errorCount;
+    private Long errorCount;
 }

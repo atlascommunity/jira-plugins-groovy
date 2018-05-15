@@ -86,13 +86,16 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     @Override
     public List<ScriptDirectoryTreeDto> getAllDirectories() {
+        Map<Integer, Long> errors = executionRepository.getRegistryErrorCount();
+
         Multimap<Integer, RegistryScriptDto> scripts = HashMultimap.create();
         List<RegistryScriptDto> allScripts = Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(script -> buildScriptDto(script, false, false, false, true))
+            .map(script -> buildScriptDto(script, false, false, false, false))
             .collect(Collectors.toList());
 
         for (RegistryScriptDto scriptDto : allScripts) {
+            scriptDto.setErrorCount(errors.get(scriptDto.getId()));
             scripts.put(scriptDto.getDirectoryId(), scriptDto);
         }
 
@@ -387,7 +390,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             result.setChangelogs(changelogHelper.collect(script.getChangelogs()));
         }
         if (includeErrorCount) {
-            result.setErrorCount(executionRepository.getErrorCount(script.getID()));
+            result.setErrorCount((long) executionRepository.getErrorCount(script.getID()));
         }
 
         if (script.getParameters() != null) {

@@ -10,6 +10,8 @@ public interface ExecutionRepository {
 
     void trackInline(String id, long time, boolean successful, String error, Map<String, String> additionalParams);
 
+    Map<Integer, Long> getRegistryErrorCount();
+
     List<ScriptExecutionDto> getRegistryExecutions(int scriptId);
 
     List<ScriptExecutionDto> getInlineExecutions(String scriptId);
