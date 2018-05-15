@@ -8,6 +8,12 @@ import 'codemirror/mode/diff/diff';
 import 'codemirror/mode/velocity/velocity';
 import 'codemirror/addon/selection/mark-selection';
 import 'codemirror/addon/lint/lint';
+import 'codemirror/addon/fold/foldcode';
+import 'codemirror/addon/fold/foldgutter';
+import 'codemirror/addon/fold/brace-fold';
+import 'codemirror/addon/fold/xml-fold';
+import 'codemirror/addon/fold/comment-fold';
+
 
 import Button from '@atlaskit/button';
 import InlineMessage from '@atlaskit/inline-message';
@@ -137,13 +143,14 @@ export class Editor extends React.Component<EditorProps, EditorState> {
             return {
                 theme: isLight ? 'eclipse' : 'lesser-dark',
                 mode: mode,
-                lineNumbers: true,
                 readOnly: readOnly || isDisabled || false,
-                gutters: ['CodeMirror-lint-markers'],
                 lint: {
                     getAnnotations: this._getAnnotations,
                     tooltips: true
                 },
+                lineNumbers: true,
+                foldGutter: true,
+                gutters: ['CodeMirror-lint-markers', 'CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
                 //todo: remove for now, too big performance hit
                 //viewportMargin: Infinity
             };
