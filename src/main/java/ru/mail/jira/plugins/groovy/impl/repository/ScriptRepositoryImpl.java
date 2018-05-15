@@ -88,12 +88,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     public List<ScriptDirectoryTreeDto> getAllDirectories() {
         Multimap<Integer, RegistryScriptDto> scripts = HashMultimap.create();
         List<RegistryScriptDto> allScripts = Arrays
-            .stream(ao.find(
-                Script.class,
-                Query
-                    .select()
-                    .where("DELETED = ?", Boolean.FALSE)
-            ))
+            .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
             .map(script -> buildScriptDto(script, false, false, false, true))
             .collect(Collectors.toList());
 
@@ -101,9 +96,18 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             scripts.put(scriptDto.getDirectoryId(), scriptDto);
         }
 
-        return Arrays
-            .stream(ao.find(ScriptDirectory.class, Query.select().where("DELETED = ? AND PARENT_ID IS NULL", Boolean.FALSE)))
-            .map(directory -> buildDirectoryTreeDto(directory, scripts))
+        Multimap<Integer, ScriptDirectory> dirs = HashMultimap.create();
+        ScriptDirectory[] allDirs = ao.find(ScriptDirectory.class, Query.select().where("DELETED = ?", Boolean.FALSE));
+
+        for (ScriptDirectory dir : allDirs) {
+            ScriptDirectory parent = dir.getParent();
+            dirs.put(parent != null ? parent.getID() : null, dir);
+        }
+
+        return dirs
+            .get(null)
+            .stream()
+            .map(directory -> buildDirectoryTreeDto(directory, dirs, scripts))
             .collect(Collectors.toList());
     }
 
@@ -418,15 +422,16 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return result;
     }
 
-    private ScriptDirectoryTreeDto buildDirectoryTreeDto(ScriptDirectory directory, Multimap<Integer, RegistryScriptDto> scripts) {
+    private ScriptDirectoryTreeDto buildDirectoryTreeDto(ScriptDirectory directory, Multimap<Integer, ScriptDirectory> dirs, Multimap<Integer, RegistryScriptDto> scripts) {
         ScriptDirectoryTreeDto result = new ScriptDirectoryTreeDto();
 
         result.setId(directory.getID());
         result.setName(directory.getName());
         result.setChildren(
-            Arrays
-                .stream(getChildren(directory))
-                .map(child -> buildDirectoryTreeDto(child, scripts))
+            dirs
+                .get(directory.getID())
+                .stream()
+                .map(child -> buildDirectoryTreeDto(child, dirs, scripts))
                 .sorted(Comparator.comparing(ScriptDirectoryTreeDto::getName))
                 .collect(Collectors.toList())
         );
