@@ -18,6 +18,7 @@ import {ErrorMessages} from '../i18n/common.i18n';
 
 import '../flex.less';
 import './workflow.less';
+import {registryService} from '../service/services';
 
 
 export type ScriptParamValueProps = {
@@ -50,16 +51,17 @@ function ScriptParamValue({value, param}: ScriptParamValueProps): React.Node {
 }
 
 define('mailru/groovy/renderRegistryScript', (): any => {
-    return (element: Element, id: number, name: string, source: string, errorCount?: number, params: Array<ParamType>, paramValues: {[string]: any}) => {
+    return (element: Element, id: number, name: string, source: string, description: string, errorCount?: number, params: Array<ParamType>, paramValues: {[string]: any}) => {
         ReactDOM.render(
             <Script
-                withChangelog={false}
+                withChangelog={true}
+                changelogsLoader={() => registryService.getScriptChangelogs(id)}
 
                 script={{
                     id: id,
                     name: name,
                     scriptBody: source,
-                    errorCount
+                    description, errorCount
                 }}
             >
                 {params &&
