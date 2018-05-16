@@ -25,7 +25,6 @@ const bindings = [ Bindings.issue ];
 const bindingsWithVelocity = [ Bindings.issue, Bindings.velocityParams ];
 
 type Form = {
-    description: string,
     comment: string,
     scriptBody: string,
     cacheable: boolean,
@@ -36,7 +35,6 @@ type Form = {
 type FormField = $Keys<Form>;
 
 const makeForm: RecordFactory<Form> = Record({
-    description: '',
     comment: '',
     scriptBody: '',
     template: '',
