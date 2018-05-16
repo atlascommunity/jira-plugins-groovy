@@ -152,6 +152,8 @@
                             com.atlassian.jira.plugin.webfragment.conditions,
                             com.atlassian.jira.issue.customfields.searchers,
                             com.atlassian.jira.jql.operand,
+                            <!-- required for spring lifecycle annotations -->
+                            javax.annotation,
                             <!-- exclude stuff for querydsl pocketknife -->
                             !net.sf.cglib.proxy,
                             !org.jvnet.hudson.annotation_indexer,
