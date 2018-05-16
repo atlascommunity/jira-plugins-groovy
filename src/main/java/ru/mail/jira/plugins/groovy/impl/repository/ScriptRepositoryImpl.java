@@ -111,6 +111,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             .get(null)
             .stream()
             .map(directory -> buildDirectoryTreeDto(directory, dirs, scripts))
+            .sorted(Comparator.comparing(ScriptDirectoryTreeDto::getName))
             .collect(Collectors.toList());
     }
 
