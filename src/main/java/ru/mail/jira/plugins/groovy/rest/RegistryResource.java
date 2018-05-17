@@ -11,7 +11,9 @@ import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.dto.directory.ScriptDirectoryForm;
 import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptForm;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
-import ru.mail.jira.plugins.groovy.impl.workflow.WorkflowSearchService;
+import ru.mail.jira.plugins.groovy.impl.workflow.search.AllScriptUsageCollector;
+import ru.mail.jira.plugins.groovy.impl.workflow.search.ScriptUsageCollector;
+import ru.mail.jira.plugins.groovy.impl.workflow.search.WorkflowSearchService;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.RestExecutor;
 
@@ -227,7 +229,18 @@ public class RegistryResource {
     public Response findScriptWorkflows(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
-            return workflowSearchService.findScriptUsages(id);
+            return workflowSearchService.search(new ScriptUsageCollector(id)).getResult();
+        }).getResponse();
+    }
+
+    @GET
+    @Path("/workflowUsage")
+    @WebSudoRequired
+    public Response getWorkflowUsage() {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return workflowSearchService.search(new AllScriptUsageCollector()).getResult();
         }).getResponse();
     }
 }
