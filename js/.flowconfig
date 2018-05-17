@@ -15,7 +15,6 @@ all=warn
 suppress_comment=\\(.\\|\n\\)*\\$ExpectError
 suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe
 module.name_mapper.extension='less' -> 'less'
-module.name_mapper='AJS' -> 'less'
 experimental.const_params=true
 
 [strict]

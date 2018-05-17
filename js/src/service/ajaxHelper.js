@@ -33,11 +33,11 @@ export function ajaxPut(url: string, data: any): Promise<any> {
 }
 
 export function ajaxPromise(url: string, method: HttpMethod, _params: any, data: any): Promise<any> {
-    return new Promise((resolve: PromiseCallback, reject: PromiseRejectCallback): void => {
-        return AJS.$
+    return new Promise((resolve: PromiseCallback, reject: PromiseRejectCallback) => {
+        AJS.$
             .ajax({
                 url: url,
-                type: method,
+                type: (method: string),
                 contentType: method !== 'GET' ? 'application/json' : undefined,
                 dataType: 'json',
                 data: method !== 'GET' && method !== 'DELETE' ? JSON.stringify(data) : undefined
