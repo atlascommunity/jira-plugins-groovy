@@ -111,7 +111,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             .get(null)
             .stream()
             .map(directory -> buildDirectoryTreeDto(directory, dirs, scripts))
-            .sorted(Comparator.comparing(ScriptDirectoryTreeDto::getName))
+            .sorted(Comparator.comparing(ScriptDirectoryTreeDto::getName, String.CASE_INSENSITIVE_ORDER))
             .collect(Collectors.toList());
     }
 
@@ -217,7 +217,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
             .map(this::buildScriptDescription)
             .filter(description -> description.getTypes().contains(type))
-            .sorted(Comparator.comparing(ScriptDescription::getName))
+            .sorted(Comparator.comparing(ScriptDescription::getName, String.CASE_INSENSITIVE_ORDER))
             .collect(Collectors.toList());
     }
 
@@ -436,14 +436,14 @@ public class ScriptRepositoryImpl implements ScriptRepository {
                 .get(directory.getID())
                 .stream()
                 .map(child -> buildDirectoryTreeDto(child, dirs, scripts))
-                .sorted(Comparator.comparing(ScriptDirectoryTreeDto::getName))
+                .sorted(Comparator.comparing(ScriptDirectoryTreeDto::getName, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList())
         );
         result.setScripts(
             scripts
                 .get(directory.getID())
                 .stream()
-                .sorted(Comparator.comparing(RegistryScriptDto::getName))
+                .sorted(Comparator.comparing(RegistryScriptDto::getName, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList())
         );
 
