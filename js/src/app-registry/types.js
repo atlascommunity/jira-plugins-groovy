@@ -47,3 +47,10 @@ export type WorkflowType = {
 };
 
 export type WorkflowMode = 'live' | 'draft';
+
+export type ScriptUsageItems = {[string]: number};
+
+export type ScriptUsageType = {
+    ready: boolean,
+    items: ScriptUsageItems
+};

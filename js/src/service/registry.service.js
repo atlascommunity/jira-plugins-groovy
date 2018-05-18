@@ -5,7 +5,8 @@ import type {
     RegistryDirectoryType,
     BasicRegistryDirectoryType,
     RegistryScriptType,
-    WorkflowType
+    WorkflowType,
+    ScriptUsageItems
 } from '../app-registry/types';
 import type {ScriptDescriptionType, ScriptType} from '../app-workflow/types';
 import type {ChangelogType} from '../common/script/types';
@@ -70,5 +71,9 @@ export class RegistryService {
 
     getScriptWorkflows(id: number): Promise<$ReadOnlyArray<WorkflowType>> {
         return ajaxGet(`${getPluginBaseUrl()}/registry/script/${id}/workflows`);
+    }
+
+    getAllScriptUsage(): Promise<ScriptUsageItems> {
+        return ajaxGet(`${getPluginBaseUrl()}/registry/workflowUsage`);
     }
 }

@@ -2,7 +2,7 @@
 import {combineReducers} from 'redux';
 import sortBy from 'lodash.sortby';
 
-import type {BasicRegistryDirectoryType, RegistryDirectoryType, RegistryScriptType} from './types';
+import type {BasicRegistryDirectoryType, RegistryDirectoryType, RegistryScriptType, ScriptUsageItems, ScriptUsageType} from './types';
 
 
 export const registryReducer = combineReducers({
@@ -10,6 +10,7 @@ export const registryReducer = combineReducers({
     ready: readyReducer,
     scriptWatches: watchesReducer('script'),
     directoryWatches: watchesReducer('directory'),
+    scriptUsage: scriptUsageReducer
 });
 
 const LOAD_STATE = 'LOAD_STATE';
@@ -25,6 +26,8 @@ const ADD_SCRIPT = 'ADD_SCRIPT';
 const UPDATE_SCRIPT = 'UPDATE_SCRIPT';
 const DELETE_SCRIPT = 'DELETE_SCRIPT';
 const MOVE_SCRIPT = 'MOVE_SCRIPT';
+
+const LOAD_USAGE = 'LOAD_USAGE';
 
 type AddDirectoryAction = {
     type: typeof ADD_DIRECTORY,
@@ -97,6 +100,12 @@ export const RegistryActionCreators = {
         return {
             type: MOVE_SCRIPT,
             src, dst, script
+        };
+    },
+    loadUsage: (items: ScriptUsageItems): * => {
+        return {
+            type: LOAD_USAGE,
+            items
         };
     }
 };
@@ -250,4 +259,27 @@ function watchesReducer(kind: 'script'|'directory'): * {
 
 function order<T: {name: string}>(items: $ReadOnlyArray<T>): $ReadOnlyArray<T> {
     return sortBy(items, 'name');
+}
+
+type LoadUsageAction = {
+    type: typeof LOAD_USAGE,
+    items: ScriptUsageItems
+};
+
+function scriptUsageReducer(state: ScriptUsageType, action: LoadUsageAction): ScriptUsageType {
+    if (state === undefined) {
+        return {
+            ready: false,
+            items: {}
+        };
+    }
+
+    if (action.type === LOAD_USAGE) {
+        return {
+            ready: true,
+            items: action.items
+        };
+    }
+
+    return state;
 }

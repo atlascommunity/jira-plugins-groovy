@@ -34,6 +34,10 @@ AJS.toInit(() => {
             }
         );
 
+    registryService
+        .getAllScriptUsage()
+        .then(usage => store.dispatch(RegistryActionCreators.loadUsage(usage)));
+
     const element = document.getElementById('react-content');
 
     if (element === null) {

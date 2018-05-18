@@ -1,6 +1,9 @@
 //@flow
 import * as React from 'react';
 
+import memoizeOne from 'memoize-one';
+import {connect} from 'react-redux';
+
 import {Draggable} from 'react-beautiful-dnd';
 
 import Badge from '@atlaskit/badge';
@@ -8,11 +11,17 @@ import Badge from '@atlaskit/badge';
 import CodeIcon from '@atlaskit/icon/glyph/code';
 
 import {RegistryScript, type PublicRegistryScriptProps} from './RegistryScript';
+import type {ScriptUsageType} from './types';
 
 
-export class DraggableRegistryScript extends React.PureComponent<PublicRegistryScriptProps> {
+type Props = {
+    scriptUsage: ScriptUsageType
+};
+
+export class DraggableRegistryScriptInternal extends React.PureComponent<PublicRegistryScriptProps & Props> {
     render(): React.Node {
-        const {script} = this.props;
+        const {script, scriptUsage} = this.props;
+        const isUsed = !scriptUsage.ready || ((scriptUsage.items[script.id.toString()] || 0) > 0);
 
         return (
             <div className="DraggableScript">
@@ -27,7 +36,7 @@ export class DraggableRegistryScript extends React.PureComponent<PublicRegistryS
                                     </div>
                                     {' '}
                                     <div className="flex-vertical-middle">
-                                        <h3 title={script.name}>
+                                        <h3 title={script.name} className={!isUsed ? 'muted-text' : undefined}>
                                             {script.name}
                                         </h3>
                                     </div>
@@ -49,3 +58,11 @@ export class DraggableRegistryScript extends React.PureComponent<PublicRegistryS
         );
     }
 }
+
+export const DraggableRegistryScript = connect(
+    memoizeOne(({scriptUsage}: *): * => {
+        return {
+            scriptUsage
+        };
+    })
+)(DraggableRegistryScriptInternal);

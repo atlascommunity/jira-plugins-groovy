@@ -17,6 +17,7 @@ import {ScriptDialog} from './ScriptDialog';
 import {ScriptDirectory} from './ScriptDirectory';
 import {ScriptDirectoryDialog} from './ScriptDirectoryDialog';
 import {RegistryActionCreators} from './registry.reducer';
+import {UsageStatusFlag} from './UsageStatusFlag';
 
 import type {RegistryDirectoryType, RegistryScriptType} from './types';
 
@@ -253,6 +254,8 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
                         {waiting && <Blanket isTinted={true}/>}
                     </div>
+
+                    <UsageStatusFlag/>
                 </Page>
             </DragDropContext>
         );
