@@ -1,6 +1,5 @@
 //@flow
 import {combineReducers} from 'redux';
-import sortBy from 'lodash.sortby';
 
 import type {BasicRegistryDirectoryType, RegistryDirectoryType, RegistryScriptType, ScriptUsageItems, ScriptUsageType} from './types';
 
@@ -134,7 +133,7 @@ function directoriesReducer(state: $ReadOnlyArray<RegistryDirectoryType>, action
     }
 
     if (action.type === ADD_DIRECTORY && !action.directory.parentId) {
-        return [...state, action.directory];
+        return order([...state, action.directory]);
     }
 
     return state
@@ -258,7 +257,7 @@ function watchesReducer(kind: 'script'|'directory'): * {
 }
 
 function order<T: {name: string}>(items: $ReadOnlyArray<T>): $ReadOnlyArray<T> {
-    return sortBy(items, 'name');
+    return [...items].sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity: 'base'}));
 }
 
 type LoadUsageAction = {
