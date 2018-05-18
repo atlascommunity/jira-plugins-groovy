@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.impl;
+package ru.mail.jira.plugins.groovy.impl.param;
 
 import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.issue.CustomFieldManager;
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.JiraUser;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
+import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
 
 @Component
@@ -23,6 +24,7 @@ public class ScriptParamFactory {
     private final GroupManager groupManager;
     private final ConstantsManager constantsManager;
     private final UserMapper userMapper;
+    private final ScriptService scriptService;
 
     @Autowired
     public ScriptParamFactory(
@@ -30,13 +32,15 @@ public class ScriptParamFactory {
         @ComponentImport CustomFieldManager customFieldManager,
         @ComponentImport GroupManager groupManager,
         @ComponentImport ConstantsManager constantsManager,
-        UserMapper userMapper
+        UserMapper userMapper,
+        ScriptService scriptService
     ) {
         this.constantsManager = constantsManager;
         this.userMapper = userMapper;
         this.userManager = userManager;
         this.customFieldManager = customFieldManager;
         this.groupManager = groupManager;
+        this.scriptService = scriptService;
     }
 
     public Object getParamObject(ScriptParamDto paramDto, String value) {
@@ -62,6 +66,8 @@ public class ScriptParamFactory {
                 return groupManager.getGroup(value);
             case RESOLUTION:
                 return constantsManager.getResolution(value);
+            case SCRIPT:
+                return new ScriptParamImpl(scriptService, value);
         }
 
         return null;
@@ -75,6 +81,7 @@ public class ScriptParamFactory {
             case TEXT:
             case LONG:
             case DOUBLE:
+            case SCRIPT:
                 return value;
             case CUSTOM_FIELD:
                 CustomField customFieldObject = customFieldManager.getCustomFieldObject(value);

@@ -28,7 +28,7 @@ export type ScriptParamValueProps = {
 
 function ScriptParamValue({value, param}: ScriptParamValueProps): React.Node {
     if (value === null || value === undefined) {
-        return <strong style={{color: 'red'}}>{ErrorMessages.noValue}</strong>;
+        return <strong style={!param.optional ? {color: 'red'} : undefined}>{ErrorMessages.noValue}</strong>;
     }
     switch (param.paramType) {
         case 'USER':
@@ -45,6 +45,12 @@ function ScriptParamValue({value, param}: ScriptParamValueProps): React.Node {
         case 'DOUBLE':
         case 'BOOLEAN':
             return value.toString();
+        case 'SCRIPT':
+            return (
+                <pre>
+                    {value}
+                </pre>
+            );
         default:
             return <div>{'Unsupported type'}</div>;
     }

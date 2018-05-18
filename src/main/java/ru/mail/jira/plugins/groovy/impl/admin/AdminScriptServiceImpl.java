@@ -2,7 +2,6 @@ package ru.mail.jira.plugins.groovy.impl.admin;
 
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
-import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
@@ -14,7 +13,7 @@ import ru.mail.jira.plugins.groovy.api.service.admin.AdminScriptService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.admin.BuiltInScript;
 import ru.mail.jira.plugins.groovy.api.service.admin.BuiltInScriptManager;
-import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
+import ru.mail.jira.plugins.groovy.impl.param.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 

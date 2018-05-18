@@ -40,6 +40,7 @@ public class ParamExtension extends CompilationCustomizer {
                                 String varName = leftExpression.getName();
                                 String displayName = null;
                                 ParamType type = null;
+                                Boolean optional;
 
                                 Expression displayNameExpression = annotationNode.getMember("displayName");
                                 if (displayNameExpression instanceof ConstantExpression) {
@@ -54,6 +55,13 @@ public class ParamExtension extends CompilationCustomizer {
                                     }
                                 }
 
+                                Expression optionalExpression = annotationNode.getMember("optional");
+                                if (optionalExpression instanceof ConstantExpression) {
+                                    optional = (Boolean) ((ConstantExpression) optionalExpression).getValue();
+                                } else {
+                                    optional = false;
+                                }
+
                                 if (type == null) {
                                     throw new IllegalArgumentException("type must be present");
                                 }
@@ -63,7 +71,7 @@ public class ParamExtension extends CompilationCustomizer {
                                 }
 
                                 if (parseContextHolder.get().isExtended()) {
-                                    parseContextHolder.get().getParameters().add(new ScriptParamDto(varName, displayName, type));
+                                    parseContextHolder.get().getParameters().add(new ScriptParamDto(varName, displayName, type, optional));
                                 }
                                 expression.setRightExpression(new VariableExpression(varName));
 

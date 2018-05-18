@@ -17,6 +17,8 @@ public class ScriptDescription {
     @XmlElement
     private String name;
     @XmlElement
+    private String description;
+    @XmlElement
     private List<ScriptParamDto> params;
     @XmlElement
     private Set<WorkflowScriptType> types;

@@ -16,7 +16,8 @@ public enum ParamType {
     CUSTOM_FIELD(CustomField.class), //todo: system fields, script, current workflow action
     USER(ApplicationUser.class),
     GROUP(Group.class),
-    RESOLUTION(Resolution.class);
+    RESOLUTION(Resolution.class),
+    SCRIPT(ScriptParam.class);
 
     private final Class type;
 

@@ -9,5 +9,6 @@ public enum ScriptType {
     REST,
     CUSTOM_FIELD,
     SCHEDULED_TASK,
-    ADMIN_SCRIPT
+    ADMIN_SCRIPT,
+    PARAM
 }

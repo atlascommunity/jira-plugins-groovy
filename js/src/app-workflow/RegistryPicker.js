@@ -16,8 +16,10 @@ import {SingleSelect} from '../common/ak/SingleSelect';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {CommonMessages} from '../i18n/common.i18n';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
+import {EditorField} from '../common/ak/EditorField';
 import type {OldSelectItem} from '../common/ak/types';
 import type {InputEvent} from '../common/EventTypes';
+import {InfoMessage} from '../common/ak/messages';
 
 
 function mapScriptToOption(script: ScriptDescriptionType): OldSelectItem<number> {
@@ -83,11 +85,13 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
         const paramName = param.name;
         const inputName = `${fieldName}-${paramName}`;
         const value = values.get(paramName);
+        const isRequired = !param.optional;
+
         switch (param.paramType) {
             case 'USER':
                 return <AsyncPicker
                     label={label}
-                    isRequired={true}
+                    isRequired={isRequired}
 
                     src={`${getPluginBaseUrl()}/jira-api/userPicker`}
                     name={inputName}
@@ -97,7 +101,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
             case 'GROUP':
                 return <AsyncPicker
                     label={label}
-                    isRequired={true}
+                    isRequired={isRequired}
 
                     src={`${getPluginBaseUrl()}/jira-api/groupPicker`}
                     name={inputName}
@@ -107,7 +111,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
             case 'CUSTOM_FIELD':
                 return <AsyncPicker
                     label={label}
-                    isRequired={true}
+                    isRequired={isRequired}
 
                     src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`}
                     name={inputName}
@@ -117,7 +121,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
             case 'RESOLUTION':
                 return <AsyncPicker
                     label={label}
-                    isRequired={true}
+                    isRequired={isRequired}
 
                     src={`${getPluginBaseUrl()}/jira-api/resolutionPicker`}
                     name={inputName}
@@ -127,7 +131,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
             case 'STRING':
                 return <FieldTextStateless
                     label={label}
-                    required={true}
+                    required={isRequired}
                     shouldFitContainer={true}
                     type="text"
 
@@ -138,7 +142,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
             case 'TEXT':
                 return <FieldTextAreaStateless
                     label={label}
-                    required={true}
+                    required={isRequired}
                     shouldFitContainer={true}
 
                     name={inputName}
@@ -148,7 +152,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
             case 'LONG':
                 return <FieldTextStateless
                     label={label}
-                    required={true}
+                    required={isRequired}
                     shouldFitContainer={true}
                     type="number"
 
@@ -159,7 +163,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
             case 'DOUBLE':
                 return <FieldTextStateless
                     label={label}
-                    required={true}
+                    required={isRequired}
                     shouldFitContainer={true}
                     type="text"
 
@@ -170,7 +174,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                 />;
             case 'BOOLEAN':
                 return <div>
-                    <Label label={label}/>
+                    <Label label={label} isRequired={isRequired}/>
                     <ToggleStateless
                         label={label}
                         size="large"
@@ -182,6 +186,25 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                         value="true"
                     />
                 </div>;
+            case 'SCRIPT':
+                return (
+                    <div>
+                        <EditorField
+                            label={label}
+                            isRequired={isRequired}
+
+                            onChange={this._setValue(paramName)}
+                            value={value}
+                        />
+                        <textarea
+                            className="hidden"
+
+                            readOnly={true}
+                            value={value}
+                            name={inputName}
+                        />
+                    </div>
+                );
             default:
                 return <div>{'Unsupported type'}</div>;
         }
@@ -228,6 +251,14 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                 isRequired={true}
                 shouldFitContainer={true}
             />
+
+            {script && script.description &&
+                <div style={{marginTop: '8px'}}>
+                    <InfoMessage title={null}>
+                        {script.description}
+                    </InfoMessage>
+                </div>
+            }
 
             {script && script.params &&
                 script.params.map(param =>

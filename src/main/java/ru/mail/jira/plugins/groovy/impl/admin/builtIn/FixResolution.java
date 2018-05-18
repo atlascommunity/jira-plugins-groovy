@@ -79,9 +79,9 @@ public class FixResolution implements BuiltInScript {
     @Override
     public List<ScriptParamDto> getParams() {
         return ImmutableList.of(
-            new ScriptParamDto("jql", "Query", ParamType.STRING),
-            new ScriptParamDto("resolution", "Resolution", ParamType.RESOLUTION),
-            new ScriptParamDto("sendEmail", "Send email", ParamType.BOOLEAN)
+            new ScriptParamDto("jql", "Query", ParamType.STRING, false),
+            new ScriptParamDto("resolution", "Resolution", ParamType.RESOLUTION, false),
+            new ScriptParamDto("sendEmail", "Send email", ParamType.BOOLEAN, false)
         );
     }
 }

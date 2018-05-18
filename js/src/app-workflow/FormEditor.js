@@ -22,7 +22,9 @@ export class FormEditor extends React.Component<FormEditorProps, FormEditorState
         value: this.props.initialValue || ''
     };
 
-    _setValue = (value: ?string) => this.setState({ value: value || '' });
+    _setValue = (value: ?string) => {
+        this.setState({ value: value || '' });
+    };
 
     render(): React.Node {
         return <div>

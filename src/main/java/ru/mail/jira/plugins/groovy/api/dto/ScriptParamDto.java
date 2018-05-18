@@ -19,4 +19,6 @@ public class ScriptParamDto {
     private String displayName;
     @XmlElement
     private ParamType paramType;
+    @XmlElement
+    private boolean optional = false;
 }

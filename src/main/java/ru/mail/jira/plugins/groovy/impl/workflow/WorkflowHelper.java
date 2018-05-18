@@ -17,7 +17,7 @@ import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
-import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
+import ru.mail.jira.plugins.groovy.impl.param.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.Base64Util;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
@@ -76,7 +76,7 @@ public class WorkflowHelper {
                                 String paramName = param.getName();
                                 String value = Base64Util.decode((String) args.get(Const.getParamKey(paramName)));
 
-                                if (value == null) {
+                                if (value == null && !param.isOptional()) {
                                     logger.error("Value for script param {} is not found", paramName);
                                     return null;
                                 } else {

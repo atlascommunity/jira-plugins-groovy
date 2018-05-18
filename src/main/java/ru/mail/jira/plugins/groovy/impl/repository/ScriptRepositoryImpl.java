@@ -479,6 +479,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         ScriptDescription result = new ScriptDescription();
         result.setId(script.getID());
         result.setName(ScriptUtil.getExpandedName(script));
+        result.setDescription(script.getDescription());
         result.setTypes(parseTypes(script.getTypes()));
 
         if (script.getParameters() != null) {

@@ -7,6 +7,7 @@ import {ToggleStateless} from '@atlaskit/toggle';
 import {Label} from '@atlaskit/field-base';
 
 import {AsyncPicker} from '../common/ak/AsyncPicker';
+import {EditorField} from '../common/ak/EditorField';
 
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 
@@ -24,7 +25,7 @@ type Props = (CommonProps & {
     type: SingleValueTypesEnum,
     value: ?SingleValueType,
 }) | (CommonProps & {
-    type: 'STRING' | 'TEXT' | 'LONG' | 'DOUBLE',
+    type: 'STRING' | 'TEXT' | 'LONG' | 'DOUBLE' | 'SCRIPT',
     value: ?string
 }) | (CommonProps & {
     type: 'BOOLEAN',
@@ -142,6 +143,17 @@ export class PropField extends React.PureComponent<Props> {
                         value="true"
                     />
                 </div>;
+            case 'SCRIPT':
+                return (
+                    <EditorField
+                        label={label}
+                        isRequired={true}
+
+                        onChange={onChange}
+                        //$FlowFixMe
+                        value={value}
+                    />
+                );
             default:
                 return <div>{'Unsupported type'}</div>;
         }
