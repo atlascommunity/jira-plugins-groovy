@@ -3,6 +3,9 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 
 import Avatar from '@atlaskit/avatar';
+import Button from '@atlaskit/button';
+
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import define from 'extDefine';
@@ -19,6 +22,7 @@ import {ErrorMessages} from '../i18n/common.i18n';
 import '../flex.less';
 import './workflow.less';
 import {registryService} from '../service/services';
+import {getBaseUrl} from '../service/ajaxHelper';
 
 
 export type ScriptParamValueProps = {
@@ -69,6 +73,16 @@ define('mailru/groovy/renderRegistryScript', (): any => {
                     scriptBody: source,
                     description, errorCount
                 }}
+
+                additionalButtons={[
+                    <Button
+                        key="edit"
+                        appearance="subtle"
+                        iconBefore={<EditFilledIcon label=""/>}
+
+                        href={`${getBaseUrl()}/plugins/servlet/my-groovy/registry/script/edit/${id}`}
+                    />
+                ]}
             >
                 {params &&
                     <ScriptParameters
