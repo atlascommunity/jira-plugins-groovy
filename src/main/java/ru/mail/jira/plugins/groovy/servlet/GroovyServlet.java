@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Optional;
 import java.util.Set;
 
 @Scanned
@@ -62,8 +63,10 @@ public class GroovyServlet extends HttpServlet {
                 path = path.substring(1);
             }
 
-            if (!ALLOWED_RESOURCES.contains(path)) {
+            Optional<String> matchedResource = ALLOWED_RESOURCES.stream().filter(path::startsWith).findAny();
+            if (!matchedResource.isPresent()) {
                 response.sendError(404);
+                return;
             }
 
             if (!permissionHelper.isAdmin()) {
@@ -74,7 +77,7 @@ public class GroovyServlet extends HttpServlet {
             webSudoManager.willExecuteWebSudoRequest(request);
 
             response.setContentType("text/html;charset=utf-8");
-            templateRenderer.render("ru/mail/jira/plugins/groovy/templates/" + path + ".vm", response.getWriter());
+            templateRenderer.render("ru/mail/jira/plugins/groovy/templates/" + matchedResource.get() + ".vm", response.getWriter());
         } catch (WebSudoSessionException wes) {
             webSudoManager.enforceWebSudoProtection(request, response);
         }

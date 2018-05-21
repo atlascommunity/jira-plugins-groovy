@@ -6,7 +6,7 @@
     "@atlaskit/avatar": "^10.0.5",
     "@atlaskit/badge": "^7.1.1",
     "@atlaskit/blanket": "^5.0.1",
-    "@atlaskit/button": "^7.2.1",
+    "@atlaskit/button": "^7.2.5",
     "@atlaskit/checkbox": "^2.0.1",
     "@atlaskit/css-reset": "^2.0.0",
     "@atlaskit/dropdown-menu": "^4.0.2",
@@ -53,6 +53,7 @@
     "react-popover": "^0.5.4",
     "react-redux": "^5.0.7",
     "react-resizable": "^1.7.5",
+    "react-router-dom": "^4.2.2",
     "react-select": "2.0.0-beta.2",
     "react-string-replace": "^0.4.1",
     "redux": "^4.0.0",
@@ -111,7 +112,8 @@
     "url-loader": "0.5.9",
     "webpack": "3.11.0",
     "webpack-bundle-analyzer": "^2.9.0",
-    "webpack-manifest-plugin": "1.2.1"
+    "webpack-manifest-plugin": "1.2.1",
+    "why-did-you-update": "^0.1.1"
   },
   "resolutions": {
     "react": "16.3.2",

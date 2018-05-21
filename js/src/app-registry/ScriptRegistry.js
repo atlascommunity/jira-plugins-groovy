@@ -13,7 +13,6 @@ import PageHeader from '@atlaskit/page-header';
 import Button from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
 
-import {ScriptDialog} from './ScriptDialog';
 import {ScriptDirectory} from './ScriptDirectory';
 import {ScriptDirectoryDialog} from './ScriptDirectoryDialog';
 import {RegistryActionCreators} from './registry.reducer';
@@ -21,7 +20,6 @@ import {UsageStatusFlag} from './UsageStatusFlag';
 
 import type {RegistryDirectoryType, RegistryScriptType} from './types';
 
-import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 import {InfoMessage} from '../common/ak/messages';
 
 import {registryService} from '../service/services';
@@ -33,7 +31,6 @@ import './ScriptRegistry.less';
 
 
 type Props = {
-    ready: boolean,
     directories: $ReadOnlyArray<RegistryDirectoryType>,
     deleteDirectory: typeof RegistryActionCreators.deleteDirectory,
     deleteScript: typeof RegistryActionCreators.deleteScript,
@@ -195,7 +192,6 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
     render(): Node {
         const {waiting, filter} = this.state;
-        const {ready} = this.props;
 
         let directories: * = this.props.directories;
         let forceOpen: boolean = false;
@@ -247,10 +243,8 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                             />
                         )}
 
-                        {!ready && <LoadingSpinner/>}
-                        {ready && !directories.length ? <InfoMessage title={RegistryMessages.noScripts}/> : null}
+                        {!directories.length ? <InfoMessage title={RegistryMessages.noScripts}/> : null}
                         <ScriptDirectoryDialog ref={this.directoryDialogRef}/>
-                        <ScriptDialog ref={this.scriptDialogRef}/>
 
                         {waiting && <Blanket isTinted={true}/>}
                     </div>
@@ -264,12 +258,7 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
 export const ScriptRegistry = connect(
     memoizeOne(
-        (state: *): * => {
-            return {
-                ready: state.ready,
-                directories: state.directories
-            };
-        }
+        ({directories}) => ({directories})
     ),
     RegistryActionCreators
 )(ScriptRegistryInternal);

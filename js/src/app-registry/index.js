@@ -2,6 +2,7 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 import {Provider} from 'react-redux';
+import {BrowserRouter, Switch, Route} from 'react-router-dom';
 
 import {createStore} from 'redux';
 
@@ -9,12 +10,15 @@ import {createStore} from 'redux';
 import AJS from 'AJS';
 
 import {ScriptRegistry} from './ScriptRegistry';
+import {ScriptForm} from './ScriptForm';
+import {Loader} from './Loader';
 import {RegistryActionCreators, registryReducer} from './registry.reducer';
 
 import {registryService, watcherService} from '../service/services';
 import {fixStyle} from '../common/fixStyle';
 
 import '../flex.less';
+import {getBaseUrl} from '../service/ajaxHelper';
 
 
 const store = createStore(registryReducer, {directories: []});
@@ -47,8 +51,23 @@ AJS.toInit(() => {
 
     ReactDOM.render(
         <Provider store={store}>
-            {/*$FlowFixMe*/}
-            <ScriptRegistry/>
+            <BrowserRouter basename={`${getBaseUrl()}/plugins/servlet/my-groovy/registry`}>
+                <Loader>
+                    <Switch>
+                        <Route path="/" exact={true} component={ScriptRegistry}/>
+                        <Route path="/script/create/:directoryId">
+                            {({match}) =>
+                                <ScriptForm isNew={true} id={null} directoryId={parseInt(match.params.directoryId, 10)}/>
+                            }
+                        </Route>
+                        <Route path="/script/edit/:id">
+                            {({match}) =>
+                                <ScriptForm isNew={false} id={parseInt(match.params.id, 10)}/>
+                            }
+                        </Route>
+                    </Switch>
+                </Loader>
+            </BrowserRouter>
         </Provider>,
         element
     );

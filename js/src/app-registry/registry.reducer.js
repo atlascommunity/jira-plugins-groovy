@@ -9,7 +9,8 @@ export const registryReducer = combineReducers({
     ready: readyReducer,
     scriptWatches: watchesReducer('script'),
     directoryWatches: watchesReducer('directory'),
-    scriptUsage: scriptUsageReducer
+    scriptUsage: scriptUsageReducer,
+    openDirectories: openDirsReducer
 });
 
 const LOAD_STATE = 'LOAD_STATE';
@@ -27,6 +28,9 @@ const DELETE_SCRIPT = 'DELETE_SCRIPT';
 const MOVE_SCRIPT = 'MOVE_SCRIPT';
 
 const LOAD_USAGE = 'LOAD_USAGE';
+
+const OPEN_DIRECTORY = 'OPEN_DIRECTORY';
+const CLOSE_DIRECTORY = 'CLOSE_DIRECTORY';
 
 type AddDirectoryAction = {
     type: typeof ADD_DIRECTORY,
@@ -123,9 +127,17 @@ function readyReducer(state: boolean, action: ActionType): boolean {
     return state;
 }
 
+const directoryRelatedActions = [
+    LOAD_STATE, ADD_DIRECTORY, UPDATE_DIRECTORY, DELETE_DIRECTORY, DELETE_SCRIPT, MOVE_SCRIPT, UPDATE_SCRIPT, ADD_SCRIPT
+];
+
 function directoriesReducer(state: $ReadOnlyArray<RegistryDirectoryType>, action: ActionType): $ReadOnlyArray<RegistryDirectoryType> {
     if (state === undefined) {
         return [];
+    }
+
+    if (!directoryRelatedActions.includes(action.type)) {
+        return state;
     }
 
     if (action.type === LOAD_STATE) {
@@ -278,6 +290,40 @@ function scriptUsageReducer(state: ScriptUsageType, action: LoadUsageAction): Sc
             ready: true,
             items: action.items
         };
+    }
+
+    return state;
+}
+
+type DirectoryStateAction = {
+    type: typeof OPEN_DIRECTORY | typeof CLOSE_DIRECTORY,
+    id: number
+};
+
+export const DirectoryStateActionCreators = {
+    open: (id: number): DirectoryStateAction => {
+        return {
+            type: OPEN_DIRECTORY,
+            id
+        };
+    },
+    close: (id: number): DirectoryStateAction => {
+        return {
+            type: CLOSE_DIRECTORY,
+            id
+        };
+    }
+};
+
+function openDirsReducer(state: $ReadOnlyArray<number>, action: DirectoryStateAction): $ReadOnlyArray<number> {
+    if (state === undefined) {
+        return [];
+    }
+
+    if (action.type === OPEN_DIRECTORY) {
+        return [...state, action.id];
+    } else if (action.type === CLOSE_DIRECTORY) {
+        return state.filter(id => id !== action.id);
     }
 
     return state;

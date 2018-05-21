@@ -2,6 +2,8 @@
 import * as React from 'react';
 
 import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
+
 import memoizeOne from 'memoize-one';
 
 import Button from '@atlaskit/button';
@@ -11,6 +13,7 @@ import Lozenge from '@atlaskit/lozenge';
 import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import {RegistryActionCreators} from './registry.reducer';
 
@@ -88,7 +91,6 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
 
     _getChangelogs = () => registryService.getScriptChangelogs(this.props.script.id);
 
-    _onEdit = () => this.props.onEdit(this.props.script.id, 'script');
     _onDelete = () => this.props.onDelete(this.props.script.id, 'script', this.props.script.name);
 
     render(): React.Node {
@@ -108,8 +110,15 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
 
                     withChangelog={true}
 
-                    onEdit={this._onEdit}
                     additionalButtons={[
+                        <Button
+                            key="edit"
+                            appearance="subtle"
+                            iconBefore={<EditFilledIcon label=""/>}
+
+                            component={Link}
+                            to={`/script/edit/${script.id}`}
+                        />,
                         <Button
                             key="watch"
                             appearance="subtle"

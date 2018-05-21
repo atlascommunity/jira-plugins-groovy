@@ -2,6 +2,7 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
 
 import memoize from 'fast-memoize';
 import memoizeOne from 'memoize-one';
@@ -20,7 +21,7 @@ import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
 
-import {RegistryActionCreators} from './registry.reducer';
+import {DirectoryStateActionCreators, RegistryActionCreators} from './registry.reducer';
 
 import {DraggableRegistryScript} from './DraggableRegistryScript';
 
@@ -48,30 +49,30 @@ type ScriptDirectoryProps = {
     onCreate: CreateCallback,
     onEdit: EditCallback,
     onDelete: DeleteCallback,
-    forceOpen: boolean
+    open: typeof DirectoryStateActionCreators.open,
+    close: typeof DirectoryStateActionCreators.close,
+    forceOpen: boolean,
+    isOpen: boolean,
 };
 
-type ScriptDirectoryState = {
-    collapsed: boolean
-};
+export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectoryProps> {
+    _toggle = () => {
+        const {directory, isOpen, open, close} = this.props;
 
-export class ScriptDirectory extends React.PureComponent<ScriptDirectoryProps, ScriptDirectoryState> {
-    state = {
-        collapsed: true
+        if (isOpen) {
+            close(directory.id);
+        } else {
+            open(directory.id);
+        }
     };
 
-    _toggle = () => this.setState({collapsed: !this.state.collapsed});
-
     render(): Node {
-        const {collapsed} = this.state;
-        const {forceOpen, directory, onCreate, onEdit, onDelete} = this.props;
+        const {forceOpen, isOpen, directory, onCreate, onEdit, onDelete} = this.props;
 
         let directories: * = null;
         let scripts: * = null;
 
-        const isOpen = !collapsed || forceOpen;
-
-        if (isOpen) {
+        if (isOpen || forceOpen) {
             directories = (
                 <div>
                     {directory.children ? directory.children.map(child =>
@@ -159,15 +160,31 @@ export class ScriptDirectory extends React.PureComponent<ScriptDirectoryProps, S
     }
 }
 
+export const ScriptDirectory = connect(
+    () => memoizeOne(
+        //$FlowFixMe
+        ({openDirectories}: *, {directory}: *): * => {
+            return {
+                isOpen: openDirectories.includes(directory.id)
+            };
+        }
+    ),
+    {
+        open: DirectoryStateActionCreators.open,
+        close: DirectoryStateActionCreators.close
+    }
+)(ScriptDirectoryInternal);
+
 type ActionsProps = {
     id: number,
     name: string,
     onCreate: CreateCallback,
     onEdit: EditCallback,
     onDelete: DeleteCallback,
-    directoryWatches: Array<number>,
     addWatch: typeof RegistryActionCreators.addWatch,
-    removeWatch: typeof RegistryActionCreators.removeWatch
+    removeWatch: typeof RegistryActionCreators.removeWatch,
+    isOpen: boolean,
+    isWatched: boolean
 };
 
 type ActionsState = {
@@ -178,22 +195,19 @@ export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsP
     _onEdit = () => this.props.onEdit(this.props.id, 'directory');
     _onDelete = () => this.props.onDelete(this.props.id, 'directory', this.props.name);
     _onCreateDir = () => this.props.onCreate(this.props.id, 'directory');
-    _onCreateScript = () => this.props.onCreate(this.props.id, 'script');
 
     _toggleWatch = () => {
-        const {id, directoryWatches, addWatch, removeWatch} = this.props;
-
-        const isWatching = directoryWatches.includes(id);
+        const {id, isWatched, addWatch, removeWatch} = this.props;
 
         this.setState({ waitingWatch: true });
 
-        const promise = isWatching ?
+        const promise = isWatched ?
             watcherService.stopWatching('REGISTRY_DIRECTORY', id) :
             watcherService.startWatching('REGISTRY_DIRECTORY', id);
 
         promise.then(
             () => {
-                (isWatching ? removeWatch : addWatch)('directory', id);
+                (isWatched ? removeWatch : addWatch)('directory', id);
                 this.setState({ waitingWatch: false });
             },
             (error: *) => {
@@ -208,10 +222,8 @@ export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsP
     };
 
     render(): Node {
-        const {id, directoryWatches} = this.props;
+        const {id, isWatched} = this.props;
         const {waitingWatch} = this.state;
-
-        const isWatching = directoryWatches.includes(id);
 
         return (
             <ButtonGroup>
@@ -227,7 +239,8 @@ export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsP
                     appearance="subtle"
                     iconBefore={<AddIcon label=""/>}
 
-                    onClick={this._onCreateScript}
+                    component={Link}
+                    to={`/script/create/${id}`}
                 >
                     {RegistryMessages.addScript}
                 </Button>
@@ -241,7 +254,7 @@ export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsP
                     key="watch"
                     appearance="subtle"
                     isDisabled={waitingWatch}
-                    iconBefore={isWatching ? <WatchFilledIcon label=""/> : <WatchIcon label=""/>}
+                    iconBefore={isWatched ? <WatchFilledIcon label=""/> : <WatchIcon label=""/>}
 
                     onClick={this._toggleWatch}
                 />
@@ -268,11 +281,13 @@ export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsP
 }
 
 const ScriptDirectoryActions = connect(
-    memoizeOne((state: *): * => {
-        return {
-            directoryWatches: state.directoryWatches
-        };
-    }),
+    (): * => {
+        //$FlowFixMe
+        return ({directoryWatches}, {id}): * =>
+            ({
+                isWatched: directoryWatches.includes(id)
+            });
+    },
     {
         addWatch: RegistryActionCreators.addWatch,
         removeWatch: RegistryActionCreators.removeWatch
