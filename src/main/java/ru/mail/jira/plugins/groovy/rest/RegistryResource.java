@@ -55,6 +55,17 @@ public class RegistryResource {
     }
 
     @GET
+    @Path("/directory/picker")
+    @WebSudoRequired
+    public Response getDirectoriesPicker() {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return scriptRepository.getAllDirectoriesForPicker();
+        }).getResponse();
+    }
+
+    @GET
     @Path("/directory/{id}")
     @WebSudoRequired
     public Response getDirectory(@PathParam("id") int id) {

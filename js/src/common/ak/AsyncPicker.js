@@ -47,9 +47,8 @@ let i: number = 0;
 
 type ValueType = SingleValueType | $ReadOnlyArray<SingleValueType>;
 
-type AsyncPickerProps = FieldProps & OptMutableFieldProps<ValueType> & FormFieldProps & {
-    src: string,
-    isMulti?: boolean
+type Props<T: ValueType> = FieldProps & FormFieldProps & OptMutableFieldProps<T> & {
+    src: string
 };
 
 type DataType = {
@@ -63,7 +62,7 @@ type AsyncPickerState = {
     fetching: ?number
 };
 
-export class AsyncPicker extends React.PureComponent<AsyncPickerProps, AsyncPickerState> {
+export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, AsyncPickerState> {
     i = i++;
 
     state = {
@@ -113,7 +112,7 @@ export class AsyncPicker extends React.PureComponent<AsyncPickerProps, AsyncPick
         }
     }
 
-    componentWillReceiveProps(props: AsyncPickerProps) {
+    componentWillReceiveProps(props: Props<T>) {
         const value = props.value;
         if (this.props.value !== value) {
             if (!Array.isArray(value)) {

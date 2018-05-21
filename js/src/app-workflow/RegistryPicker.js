@@ -4,16 +4,19 @@ import * as React from 'react';
 import {Map} from 'immutable';
 import type {Map as MapType} from 'immutable';
 
+import Button from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import {ToggleStateless} from '@atlaskit/toggle';
 import {Label} from '@atlaskit/field-base';
 
+import AddIcon from '@atlaskit/icon/glyph/add';
+
 import type {ScriptType, ParamType, ScriptDescriptionType} from './types';
 
 import {registryService} from '../service/services';
 import {SingleSelect} from '../common/ak/SingleSelect';
-import {getPluginBaseUrl} from '../service/ajaxHelper';
+import {getBaseUrl, getPluginBaseUrl} from '../service/ajaxHelper';
 import {CommonMessages} from '../i18n/common.i18n';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {EditorField} from '../common/ak/EditorField';
@@ -240,17 +243,29 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
         }
 
         return <div className="flex-column">
-            <SingleSelect
-                options={scripts.map(mapScriptToOption)}
-                onChange={this._onChange}
-                value={mapScriptToOptionNullable(script)}
-
-                name={this.props.fieldName}
-
+            <Label
                 label={CommonMessages.script}
                 isRequired={true}
-                shouldFitContainer={true}
             />
+            <div className="flex-row full-width">
+                <div className="flex-grow">
+                    <SingleSelect
+                        options={scripts.map(mapScriptToOption)}
+                        onChange={this._onChange}
+                        value={mapScriptToOptionNullable(script)}
+
+                        name={this.props.fieldName}
+
+                        label=""
+                        isLabelHidden={true}
+                        shouldFitContainer={true}
+                    />
+                </div>
+                <Button
+                    iconBefore={<AddIcon label="add"/>}
+                    href={`${getBaseUrl()}/plugins/servlet/my-groovy/registry/script/create`}
+                />
+            </div>
 
             {script && script.description &&
                 <div style={{marginTop: '8px'}}>

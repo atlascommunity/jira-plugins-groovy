@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
+import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
 import ru.mail.jira.plugins.groovy.util.*;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
@@ -116,6 +117,15 @@ public class ScriptRepositoryImpl implements ScriptRepository {
             .map(directory -> buildDirectoryTreeDto(directory, dirs, scripts))
             .sorted(Comparator.comparing(ScriptDirectoryTreeDto::getName, COLLATOR))
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public PickerResultSet<PickerOption> getAllDirectoriesForPicker() {
+        List<PickerOption> options = Arrays
+            .stream(ao.find(ScriptDirectory.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
+            .map(directory -> new PickerOption(ScriptUtil.getExpandedName(directory), String.valueOf(directory.getID()), null))
+            .collect(Collectors.toList());
+        return new PickerResultSet<>(options, true);
     }
 
     @Override
@@ -464,6 +474,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     private ParseContext validateScriptForm(boolean isNew, RegistryScriptForm form) {
+        if (isNew && (form.getDirectoryId() == null || form.getDirectoryId() <= 0)) {
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "directoryId");
+        }
+
         ValidationUtils.validateForm(i18nHelper, isNew, form);
 
         if (StringUtils.isEmpty(form.getScriptBody())) {

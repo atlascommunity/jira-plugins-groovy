@@ -4,11 +4,14 @@ import com.atlassian.jira.user.ApplicationUser;
 import ru.mail.jira.plugins.groovy.api.dto.*;
 import ru.mail.jira.plugins.groovy.api.dto.directory.*;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
+import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
 
 import java.util.List;
 
 public interface ScriptRepository {
     List<ScriptDirectoryTreeDto> getAllDirectories();
+
+    PickerResultSet<PickerOption> getAllDirectoriesForPicker();
 
     ScriptDirectoryDto getDirectory(int id);
 

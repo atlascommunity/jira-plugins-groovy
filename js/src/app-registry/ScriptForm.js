@@ -33,6 +33,9 @@ import {RegistryMessages} from '../i18n/registry.i18n';
 import type {InputEvent} from '../common/EventTypes';
 
 import './ScriptForm.less';
+import {AsyncPicker} from '../common/ak/AsyncPicker';
+import {getPluginBaseUrl} from '../service/ajaxHelper';
+import type {SingleValueType} from '../common/ak/types';
 
 
 const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
@@ -71,6 +74,7 @@ type State = {
     id: ?number,
     values: RecordOf<Form>,
     parentName: string,
+    noParent: boolean,
     error: *,
     modified: boolean,
     waiting: boolean,
@@ -86,7 +90,8 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
         error: null,
         modified: false,
         waiting: false,
-        script: null
+        script: null,
+        noParent: false
     };
 
     componentDidMount() {
@@ -109,25 +114,42 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                     }),
                     script: data,
                     parentName: data.parentName,
+                    noParent: false,
                     error: null,
                     waiting: false
                 }));
         } else if (directoryId) {
-            registryService
-                .getDirectory(directoryId)
-                .then(directory =>
-                    this.setState({
-                        fetching: false,
-                        id: null,
-                        values: makeForm({
-                            directoryId: directoryId,
-                            types: []
-                        }),
-                        parentName: directory.fullName,
-                        error: null,
-                        waiting: false
-                    })
-                );
+            if (directoryId === -1) {
+                this.setState({
+                    fetching: false,
+                    id: null,
+                    values: makeForm({
+                        directoryId: -1,
+                        types: []
+                    }),
+                    parentName: '',
+                    noParent: true,
+                    error: null,
+                    waiting: false
+                });
+            } else {
+                registryService
+                    .getDirectory(directoryId)
+                    .then(directory =>
+                        this.setState({
+                            fetching: false,
+                            id: null,
+                            values: makeForm({
+                                directoryId: directoryId,
+                                types: []
+                            }),
+                            parentName: directory.fullName,
+                            noParent: false,
+                            error: null,
+                            waiting: false
+                        })
+                    );
+            }
         }
     }
 
@@ -206,8 +228,21 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
         });
     };
 
+    _setDirectory = (value: ?SingleValueType) => {
+        if (value) {
+            const id = parseInt(value.value, 10);
+            this.setState(({values}: *): * => {
+                return {
+                    values: values.set('directoryId', id),
+                    parentName: value.label,
+                    noParent: false
+                };
+            });
+        }
+    };
+
     render(): Node {
-        const {values, script, parentName, error, modified, fetching, waiting} = this.state;
+        const {values, script, parentName, noParent, error, modified, fetching, waiting} = this.state;
         let errorMessage: * = null;
         let errorField: ?string = null;
 
@@ -238,9 +273,22 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 {fetching && <div className="flex-horizontal-middle"><div className="flex-vertical-middle"><Spinner size="medium"/></div></div>}
                 {!fetching && <div className="ScriptForm">
                     {error && !errorField && <ErrorMessage title={errorMessage}/>}
-                    <StaticField label={FieldMessages.parentName}>
-                        {parentName}
-                    </StaticField>
+                    {noParent ?
+                        <AsyncPicker
+                            label={FieldMessages.parentName}
+                            isRequired={true}
+                            src={`${getPluginBaseUrl()}/registry/directory/picker`}
+
+                            value={null}
+                            onChange={this._setDirectory}
+
+                            isInvalid={errorField === 'directoryId'}
+                            invalidMessage={errorField === 'directoryId' ? errorMessage : null}
+                        /> :
+                        <StaticField label={FieldMessages.parentName}>
+                            {parentName}
+                        </StaticField>
+                    }
 
                     <FieldTextStateless
                         shouldFitContainer={true}

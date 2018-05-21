@@ -9,6 +9,8 @@ import {createStore} from 'redux';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
+import EmptyState from '@atlaskit/empty-state';
+
 import {ScriptRegistry} from './ScriptRegistry';
 import {ScriptForm} from './ScriptForm';
 import {Loader} from './Loader';
@@ -55,6 +57,11 @@ AJS.toInit(() => {
                 <Loader>
                     <Switch>
                         <Route path="/" exact={true} component={ScriptRegistry}/>
+                        <Route path="/script/create/">
+                            {() =>
+                                <ScriptForm isNew={true} id={null} directoryId={-1}/>
+                            }
+                        </Route>
                         <Route path="/script/create/:directoryId">
                             {({match}) =>
                                 <ScriptForm isNew={true} id={null} directoryId={parseInt(match.params.directoryId, 10)}/>
@@ -64,6 +71,9 @@ AJS.toInit(() => {
                             {({match}) =>
                                 <ScriptForm isNew={false} id={parseInt(match.params.id, 10)}/>
                             }
+                        </Route>
+                        <Route>
+                            {() => <EmptyState header="Not found" description="¯\_(ツ)_/¯"/>}
                         </Route>
                     </Switch>
                 </Loader>
