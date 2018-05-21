@@ -124,6 +124,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         List<PickerOption> options = Arrays
             .stream(ao.find(ScriptDirectory.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
             .map(directory -> new PickerOption(ScriptUtil.getExpandedName(directory), String.valueOf(directory.getID()), null))
+            .sorted(Comparator.comparing(PickerOption::getLabel, COLLATOR))
             .collect(Collectors.toList());
         return new PickerResultSet<>(options, true);
     }
