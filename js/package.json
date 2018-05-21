@@ -18,7 +18,7 @@
     "@atlaskit/field-text-area": "^2.0.3",
     "@atlaskit/flag": "^7.0.2",
     "@atlaskit/form": "^1.0.1",
-    "@atlaskit/icon": "^11.1.1",
+    "@atlaskit/icon": "^11.3.0",
     "@atlaskit/inline-dialog": "^6.0.1",
     "@atlaskit/inline-message": "^4.0.1",
     "@atlaskit/layer-manager": "^3.0.1",
@@ -27,11 +27,11 @@
     "@atlaskit/page": "^6.0.2",
     "@atlaskit/page-header": "^4.0.1",
     "@atlaskit/pagination": "^5.0.0",
-    "@atlaskit/select": "^2.0.1",
+    "@atlaskit/select": "^3.0.2",
     "@atlaskit/spinner": "^5.0.1",
-    "@atlaskit/theme": "^3.1.1",
+    "@atlaskit/theme": "^3.2.2",
     "@atlaskit/toggle": "^3.0.1",
-    "@atlaskit/tooltip": "^9.1.6",
+    "@atlaskit/tooltip": "^9.2.1",
     "@atlaskit/util-shared-styles": "^2.10.8",
     "classnames": "^2.2.5",
     "codemirror": "^5.36.0",
@@ -55,7 +55,7 @@
     "react-redux": "^5.0.7",
     "react-resizable": "^1.7.5",
     "react-router-dom": "^4.2.2",
-    "react-select": "2.0.0-beta.2",
+    "react-select": "2.0.0-beta.4",
     "react-string-replace": "^0.4.1",
     "redux": "^4.0.0",
     "whatwg-fetch": "2.0.3"
@@ -117,9 +117,6 @@
     "why-did-you-update": "^0.1.1"
   },
   "resolutions": {
-    "react": "16.3.2",
-    "@atlaskit/theme": "3.1.1",
-    "@atlaskit/util-shared-styles": "2.10.8",
-    "@atlaskit/button": "7.2.1"
+    "react": "16.3.2"
   }
 }
