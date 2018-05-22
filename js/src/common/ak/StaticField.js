@@ -16,10 +16,19 @@ function StaticFieldValue({children}: StaticFieldValueProps): React.Node {
 
 type StaticFieldProps = {
     label: string,
+    isValidationHidden: boolean,
     children: React.Node
 };
 
-export function StaticField({label, children}: StaticFieldProps): React.Node {
+export function StaticField({label, children, isValidationHidden}: StaticFieldProps): React.Node {
+    if (isValidationHidden) {
+        return (
+            <StaticFieldValue>
+                {children}
+            </StaticFieldValue>
+        );
+    }
+
     return (
         <div>
             <Label label={label}/>
@@ -29,3 +38,7 @@ export function StaticField({label, children}: StaticFieldProps): React.Node {
         </div>
     );
 }
+
+StaticField.defaultProps = {
+    isValidationHidden: false
+};

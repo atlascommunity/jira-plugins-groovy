@@ -11,7 +11,7 @@ import {components} from 'react-select';
 import type {SingleValueType} from './types';
 
 import {ajaxGet} from '../../service/ajaxHelper';
-import type {OptMutableFieldProps, FieldProps, FormFieldProps} from '../types';
+import type {OptMutableFieldProps, FieldProps, FormFieldProps, AkFormFieldProps} from '../types';
 
 
 function ValueImpl({data, children}: any): React.Node {
@@ -47,7 +47,7 @@ let i: number = 0;
 
 type ValueType = SingleValueType | $ReadOnlyArray<SingleValueType>;
 
-type Props<T: ValueType> = FieldProps & FormFieldProps & OptMutableFieldProps<T> & {
+type Props<T: ValueType> = FieldProps & FormFieldProps & OptMutableFieldProps<T> & AkFormFieldProps & {
     src: string
 };
 
@@ -63,6 +63,10 @@ type AsyncPickerState = {
 };
 
 export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, AsyncPickerState> {
+    static defaultProps = {
+        isValidationHidden: false
+    };
+
     i = i++;
 
     state = {
@@ -122,8 +126,32 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
     }
 
     render(): React.Node {
-        const {label, isRequired, isLabelHidden, isInvalid, invalidMessage} = this.props;
-        const {fetching, data} = this.state;
+        const {label, isRequired, isLabelHidden, isInvalid, invalidMessage, isValidationHidden} = this.props;
+        const {fetching, data, filter} = this.state;
+
+        const options = filter === '' ? data.options.slice(0, 50) : data.options;
+
+        if (isValidationHidden) {
+            return (
+                <Select
+                    {...this.props}
+                    shouldFitContainer={true}
+
+                    hasAutocomplete={true}
+                    onInputChange={this._onFilterChange}
+
+                    isLoading={!!fetching}
+                    options={options}
+
+                    validationState={isInvalid ? 'error' : 'default'}
+
+                    components={{
+                        Option: OptionImpl,
+                        SingleValue: SingleValueImpl
+                    }}
+                />
+            );
+        }
 
         return (
             <div>
@@ -143,7 +171,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
                         onInputChange={this._onFilterChange}
 
                         isLoading={!!fetching}
-                        options={data.options}
+                        options={options}
 
                         components={{
                             Option: OptionImpl,

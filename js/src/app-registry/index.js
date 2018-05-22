@@ -57,12 +57,12 @@ AJS.toInit(() => {
                 <Loader>
                     <Switch>
                         <Route path="/" exact={true} component={ScriptRegistry}/>
-                        <Route path="/script/create/">
+                        <Route path="/script/create/" exact={true}>
                             {() =>
                                 <ScriptForm isNew={true} id={null} directoryId={-1}/>
                             }
                         </Route>
-                        <Route path="/script/create/:directoryId">
+                        <Route path="/script/create/:directoryId" exact={true}>
                             {({match}) =>
                                 <ScriptForm isNew={true} id={null} directoryId={parseInt(match.params.directoryId, 10)}/>
                             }

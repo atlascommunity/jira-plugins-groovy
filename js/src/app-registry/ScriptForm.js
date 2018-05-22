@@ -8,10 +8,10 @@ import Button, {ButtonGroup} from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import Spinner from '@atlaskit/spinner';
-import {Label} from '@atlaskit/field-base';
-import {CheckboxStateless} from '@atlaskit/checkbox';
+import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
+import {Field} from '@atlaskit/form';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
@@ -27,15 +27,15 @@ import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
 import {StaticField} from '../common/ak/StaticField';
-import {FieldError} from '../common/ak/FieldError';
 import {ErrorMessage} from '../common/ak/messages';
+import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {RegistryMessages} from '../i18n/registry.i18n';
+import {getPluginBaseUrl} from '../service/ajaxHelper';
+
 import type {InputEvent} from '../common/EventTypes';
+import type {SingleValueType} from '../common/ak/types';
 
 import './ScriptForm.less';
-import {AsyncPicker} from '../common/ak/AsyncPicker';
-import {getPluginBaseUrl} from '../service/ajaxHelper';
-import type {SingleValueType} from '../common/ak/types';
 
 
 const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
@@ -180,7 +180,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                     (data: RegistryScriptType) => {
                         this.props.updateScript(data);
                         history.push('/');
-                        this.setState({ waiting: false });
+                        //component should be unmounted at this point
                     },
                     this._handleError
                 );
@@ -191,7 +191,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                     (data: RegistryScriptType) => {
                         this.props.addScript(data);
                         history.push('/');
-                        this.setState({ waiting: false });
+                        //component should be unmounted at this point
                     },
                     this._handleError
                 );
@@ -243,7 +243,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
 
     render(): Node {
         const {values, script, parentName, noParent, error, modified, fetching, waiting} = this.state;
-        let errorMessage: * = null;
+        let errorMessage: ?string = null;
         let errorField: ?string = null;
 
         let markers: * = null;
@@ -253,9 +253,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 if (!modified) {
                     markers = getMarkers(errors);
                 }
-                errorMessage = errors
-                    .map(error => error.message)
-                    .map(error => <p key={error}>{error}</p>);
+                errorMessage = errors.map(error => error.message).join(';');
             } else {
                 errorMessage = error.message;
             }
@@ -274,103 +272,151 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 {!fetching && <div className="ScriptForm">
                     {error && !errorField && <ErrorMessage title={errorMessage}/>}
                     {noParent ?
-                        <AsyncPicker
+                        <Field
                             label={FieldMessages.parentName}
                             isRequired={true}
-                            src={`${getPluginBaseUrl()}/registry/directory/picker`}
-
-                            value={null}
-                            onChange={this._setDirectory}
 
                             isInvalid={errorField === 'directoryId'}
-                            invalidMessage={errorField === 'directoryId' ? errorMessage : null}
-                        /> :
-                        <StaticField label={FieldMessages.parentName}>
-                            {parentName}
-                        </StaticField>
+                            invalidMessage={errorMessage || ''}
+
+                            validateOnChange={false}
+                            validateOnBlur={false}
+                        >
+                            <AsyncPicker
+                                src={`${getPluginBaseUrl()}/registry/directory/picker`}
+
+                                value={null}
+                                onChange={this._setDirectory}
+
+                                label=""
+                            />
+                        </Field>:
+                        <Field label={FieldMessages.parentName}>
+                            <StaticField label="">
+                                {parentName}
+                            </StaticField>
+                        </Field>
                     }
 
-                    <FieldTextStateless
-                        shouldFitContainer={true}
-                        required={true}
-                        maxLength={64}
-
-                        disabled={waiting}
-                        isInvalid={errorField === 'name'}
-                        invalidMessage={errorField === 'name' ? errorMessage : null}
-
+                    <Field
                         label={FieldMessages.name}
-                        value={values.get('name') || ''}
-                        onChange={this._setTextValue('name')}
-                    />
+                        isRequired={true}
 
-                    <FieldTextAreaStateless
-                        shouldFitContainer={true}
-                        minimumRows={5}
+                        isInvalid={errorField === 'name'}
+                        invalidMessage={errorMessage || ''}
 
-                        disabled={waiting}
-                        isInvalid={errorField === 'description'}
-                        invalidMessage={errorField === 'description' ? errorMessage : null}
+                        validateOnChange={false}
+                        validateOnBlur={false}
+                    >
+                        <FieldTextStateless
+                            shouldFitContainer={true}
+                            maxLength={64}
 
+                            disabled={waiting}
+
+                            value={values.get('name') || ''}
+                            onChange={this._setTextValue('name')}
+                        />
+                    </Field>
+
+                    <Field
                         label={FieldMessages.description}
-                        value={values.get('description') || ''}
-                        onChange={this._setTextValue('description')}
-                    />
 
-                    <div>
-                        <Label isRequired={true} label={FieldMessages.type}/>
-                        <CheckboxStateless
-                            isChecked={types.includes('CONDITION')}
-                            onChange={this._toggleType}
-                            label={CommonMessages.condition}
-                            value="CONDITION"
-                            name="script-type-options"
-                        />
-                        <CheckboxStateless
-                            isChecked={types.includes('VALIDATOR')}
-                            onChange={this._toggleType}
-                            label={CommonMessages.validator}
-                            value="VALIDATOR"
-                            name="script-type-options"
-                        />
-                        <CheckboxStateless
-                            isChecked={types.includes('FUNCTION')}
-                            onChange={this._toggleType}
-                            label={CommonMessages.function}
-                            value="FUNCTION"
-                            name="script-type-options"
-                        />
-                        {errorField === 'types' && <FieldError error={errorMessage}/>}
-                    </div>
+                        isInvalid={errorField === 'description'}
+                        invalidMessage={errorMessage || ''}
 
-                    <EditorField
+                        validateOnChange={false}
+                        validateOnBlur={false}
+                    >
+                        <FieldTextAreaStateless
+                            shouldFitContainer={true}
+                            minimumRows={5}
+
+                            disabled={waiting}
+
+                            value={values.get('description') || ''}
+                            onChange={this._setTextValue('description')}
+                        />
+                    </Field>
+
+                    <Field
+                        label={FieldMessages.type}
+                        isRequired={true}
+
+                        isInvalid={errorField === 'types'}
+                        invalidMessage={errorMessage || ''}
+
+                        validateOnChange={false}
+                        validateOnBlur={false}
+                    >
+                        <CheckboxGroup>
+                            <CheckboxStateless
+                                isChecked={types.includes('CONDITION')}
+                                onChange={this._toggleType}
+                                label={CommonMessages.condition}
+                                value="CONDITION"
+                                name="script-type-options"
+                            />
+                            <CheckboxStateless
+                                isChecked={types.includes('VALIDATOR')}
+                                onChange={this._toggleType}
+                                label={CommonMessages.validator}
+                                value="VALIDATOR"
+                                name="script-type-options"
+                            />
+                            <CheckboxStateless
+                                isChecked={types.includes('FUNCTION')}
+                                onChange={this._toggleType}
+                                label={CommonMessages.function}
+                                value="FUNCTION"
+                                name="script-type-options"
+                            />
+                        </CheckboxGroup>
+                    </Field>
+
+                    <Field
                         label={FieldMessages.scriptCode}
                         isRequired={true}
-                        resizable={true}
 
-                        isDisabled={waiting}
                         isInvalid={errorField === 'scriptBody'}
-                        invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
-                        markers={markers}
+                        invalidMessage={errorMessage || ''}
 
-                        bindings={bindings}
+                        validateOnChange={false}
+                        validateOnBlur={false}
+                    >
+                        <EditorField
+                            label=""
+                            resizable={true}
 
-                        value={values.get('scriptBody') || ''}
-                        onChange={this._setScript}
-                    />
+                            isDisabled={waiting}
+                            markers={markers}
 
-                    <FieldTextAreaStateless
-                        shouldFitContainer={true}
-                        required={!!this.state.id}
+                            bindings={bindings}
 
-                        disabled={waiting}
-                        isInvalid={errorField === 'comment'}
-                        invalidMessage={errorField === 'comment' ? errorMessage : null}
+                            value={values.get('scriptBody') || ''}
+                            onChange={this._setScript}
+                        />
+                    </Field>
 
+                    <Field
                         label={FieldMessages.comment}
-                        value={values.get('comment') || ''}
-                        onChange={this._setTextValue('comment')}
-                    />
+                        isRequired={!!this.state.id}
+
+                        isInvalid={errorField === 'comment'}
+                        invalidMessage={errorMessage || ''}
+
+                        validateOnChange={false}
+                        validateOnBlur={false}
+                    >
+                        <FieldTextAreaStateless
+                            shouldFitContainer={true}
+
+                            disabled={waiting}
+
+                            value={values.get('comment') || ''}
+                            onChange={this._setTextValue('comment')}
+                        />
+                    </Field>
 
                     <div className="formButtons">
                         <ButtonGroup>
