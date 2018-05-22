@@ -183,7 +183,6 @@ type ActionsProps = {
     onDelete: DeleteCallback,
     addWatch: typeof RegistryActionCreators.addWatch,
     removeWatch: typeof RegistryActionCreators.removeWatch,
-    isOpen: boolean,
     isWatched: boolean
 };
 
