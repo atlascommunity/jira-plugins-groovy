@@ -13,7 +13,7 @@ export type WorkflowScriptType = 'CONDITION' | 'VALIDATOR' | 'FUNCTION';
 
 export type RegistryScriptType = ScriptEntityWithoutChangelogs & {
     types: $ReadOnlyArray<WorkflowScriptType>,
-    parentName: string,
+    parentName?: string,
     directoryId: number
 };
 
