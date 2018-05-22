@@ -2,7 +2,8 @@
 import React, {type Node} from 'react';
 
 import {Label} from '@atlaskit/field-base';
-import Select from '@atlaskit/select';
+
+import {LargeSelect} from './LargeSelect';
 
 import type {OldSelectItem, OldSelectValue} from './types';
 
@@ -20,7 +21,7 @@ export class SingleSelect<T: OldSelectValue> extends React.PureComponent<SingleS
         return (
             <div>
                 <Label label={label} isRequired={isRequired} isLabelHidden={isLabelHidden}/>
-                <Select value={value} onChange={onChange} options={options} {...props}/>
+                <LargeSelect value={value} onChange={onChange} options={options} {...props}/>
             </div>
         );
     }

@@ -1,13 +1,13 @@
 //@flow
 import * as React from 'react';
 
-import Select from '@atlaskit/select';
 import SelectWrapper from '@atlaskit/select/dist/esm/SelectWrapper';
 import Avatar from '@atlaskit/avatar';
 import {Label} from '@atlaskit/field-base';
 
 import {components} from 'react-select';
 
+import {LargeSelect} from './LargeSelect';
 import type {SingleValueType} from './types';
 
 import {ajaxGet} from '../../service/ajaxHelper';
@@ -127,13 +127,11 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
 
     render(): React.Node {
         const {label, isRequired, isLabelHidden, isInvalid, invalidMessage, isValidationHidden} = this.props;
-        const {fetching, data, filter} = this.state;
-
-        const options = filter === '' ? data.options.slice(0, 50) : data.options;
+        const {fetching, data} = this.state;
 
         if (isValidationHidden) {
             return (
-                <Select
+                <LargeSelect
                     {...this.props}
                     shouldFitContainer={true}
 
@@ -141,7 +139,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
                     onInputChange={this._onFilterChange}
 
                     isLoading={!!fetching}
-                    options={options}
+                    options={data.options}
 
                     validationState={isInvalid ? 'error' : 'default'}
 
@@ -163,7 +161,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
                     //$FlowFixMe
                     validationMessage={isInvalid ? invalidMessage : undefined}
                 >
-                    <Select
+                    <LargeSelect
                         {...this.props}
                         shouldFitContainer={true}
 
@@ -171,7 +169,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
                         onInputChange={this._onFilterChange}
 
                         isLoading={!!fetching}
-                        options={options}
+                        options={data.options}
 
                         components={{
                             Option: OptionImpl,
