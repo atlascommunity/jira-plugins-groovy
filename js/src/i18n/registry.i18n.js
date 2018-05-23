@@ -12,4 +12,5 @@ export const RegistryMessages: I18nMessages = {
     editDirectory: i18n.registry.editDirectory,
     noScripts: i18n.registry.noScripts,
     findWorkflows: i18n.registry.findWorkflows,
+    onlyUnused: i18n.registry.onlyUnused
 };

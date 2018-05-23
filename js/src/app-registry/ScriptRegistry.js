@@ -12,13 +12,14 @@ import Blanket from '@atlaskit/blanket';
 import PageHeader from '@atlaskit/page-header';
 import Button from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
+import {CheckboxStateless} from '@atlaskit/checkbox';
 
 import {ScriptDirectory} from './ScriptDirectory';
 import {ScriptDirectoryDialog} from './ScriptDirectoryDialog';
 import {RegistryActionCreators} from './registry.reducer';
 import {UsageStatusFlag} from './UsageStatusFlag';
 
-import type {RegistryDirectoryType, RegistryScriptType} from './types';
+import type {RegistryDirectoryType, RegistryScriptType, ScriptUsageType} from './types';
 
 import {InfoMessage} from '../common/ak/messages';
 
@@ -32,6 +33,7 @@ import './ScriptRegistry.less';
 
 type Props = {
     directories: $ReadOnlyArray<RegistryDirectoryType>,
+    scriptUsage: ScriptUsageType,
     deleteDirectory: typeof RegistryActionCreators.deleteDirectory,
     deleteScript: typeof RegistryActionCreators.deleteScript,
     moveScript: typeof RegistryActionCreators.moveScript
@@ -40,7 +42,8 @@ type Props = {
 type State = {
     waiting: boolean,
     isDragging: boolean,
-    filter: string
+    filter: string,
+    onlyUnused: boolean
 };
 
 //todo: collapse/uncollapse all
@@ -53,6 +56,7 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
     state = {
         isDragging: false,
         waiting: false,
+        onlyUnused: false,
         filter: ''
     };
 
@@ -180,6 +184,21 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
     _getFilteredDirs = memoizeOne(this._getFilteredDirsInternal);
 
+    _getUnusedDirs = (dirs: $ReadOnlyArray<RegistryDirectoryType>): $ReadOnlyArray<RegistryDirectoryType> => {
+        const {scriptUsage} = this.props;
+
+        return dirs
+            .map((dir: RegistryDirectoryType): ?RegistryDirectoryType => {
+                const scripts = dir.scripts.filter(script => !scriptUsage.items[script.id.toString()]);
+
+                if (scripts.length > 0) {
+                    return { ...dir, scripts };
+                }
+                return null;
+            })
+            .filter(Boolean);
+    };
+
     _countElements = (dir: RegistryDirectoryType): number => {
         const children = dir.children ? dir.children.length : 0;
         const scripts = dir.scripts ? dir.scripts.length : 0;
@@ -190,8 +209,11 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
         return dirs.map(this._countElements).reduce((acc, i) => acc + i, 0);
     };
 
+    _toggleUnused = () => this.setState(state => ({ onlyUnused: !state.onlyUnused }));
+
     render(): Node {
-        const {waiting, filter} = this.state;
+        const {scriptUsage} = this.props;
+        const {waiting, filter, onlyUnused} = this.state;
 
         let directories: * = this.props.directories;
         let forceOpen: boolean = false;
@@ -201,6 +223,10 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
             if (this._countArrayElements(directories) <= 50) {
                 forceOpen = true;
             }
+        }
+
+        if (onlyUnused && scriptUsage.ready) {
+            directories = this._getUnusedDirs(directories);
         }
 
         return (
@@ -216,14 +242,25 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                             </Button>
                         }
                         bottomBar={
-                            <FieldTextStateless
-                                isLabelHidden
-                                compact
-                                label="hidden"
-                                placeholder="Filter"
-                                value={filter}
-                                onChange={this._onFilterChange}
-                            />
+                            <div className="flex-row">
+                                <FieldTextStateless
+                                    isLabelHidden
+                                    compact
+                                    label="hidden"
+                                    placeholder="Filter"
+                                    value={filter}
+                                    onChange={this._onFilterChange}
+                                />
+                                <div className="flex-vertical-middle">
+                                    <CheckboxStateless
+                                        label={RegistryMessages.onlyUnused}
+                                        isDisabled={!scriptUsage.ready}
+
+                                        isChecked={onlyUnused}
+                                        onChange={this._toggleUnused}
+                                    />
+                                </div>
+                            </div>
                         }
                     >
                         {TitleMessages.registry}
@@ -258,7 +295,7 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
 export const ScriptRegistry = connect(
     memoizeOne(
-        ({directories}) => ({directories})
+        ({directories, scriptUsage}) => ({directories, scriptUsage})
     ),
     RegistryActionCreators
 )(ScriptRegistryInternal);
