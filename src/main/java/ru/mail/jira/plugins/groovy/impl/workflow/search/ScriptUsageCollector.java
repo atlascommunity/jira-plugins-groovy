@@ -1,20 +1,14 @@
 package ru.mail.jira.plugins.groovy.impl.workflow.search;
 
 import com.atlassian.jira.workflow.JiraWorkflow;
-import com.opensymphony.workflow.loader.ActionDescriptor;
-import com.opensymphony.workflow.loader.ConditionDescriptor;
-import com.opensymphony.workflow.loader.FunctionDescriptor;
-import com.opensymphony.workflow.loader.ValidatorDescriptor;
+import com.opensymphony.workflow.loader.*;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowActionDto;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowActionItem;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowDto;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.util.Const;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class ScriptUsageCollector implements WorkflowSearchCollector {
     private final int scriptId;
@@ -54,8 +48,11 @@ public class ScriptUsageCollector implements WorkflowSearchCollector {
     @Override
     public void actionComplete() {
         if (currentActionItems.size() > 0) {
+            Collection<StepDescriptor> steps = workflow.getStepsForTransition(action);
+
             currentActions.add(new WorkflowActionDto(
                 action.getId(),
+                steps.size() > 0 ? steps.iterator().next().getId() : null,
                 action.getName(),
                 currentActionItems
             ));

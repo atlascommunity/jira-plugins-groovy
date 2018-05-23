@@ -35,6 +35,7 @@ export type WorkflowActionItemType = {
 
 export type WorkflowActionType = {
     id: number,
+    stepId: ?number,
     name: string,
     items: Array<WorkflowActionItemType>
 };

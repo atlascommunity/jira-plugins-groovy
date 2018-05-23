@@ -30,7 +30,7 @@ function getTabForType(type: WorkflowScriptType): ?string {
 }
 
 function getWorkflowActionLink(workflow: WorkflowType, action: WorkflowActionType, item: WorkflowActionItemType, mode: WorkflowMode='live'): string {
-    return `${getBaseUrl()}/secure/admin/workflows/ViewWorkflowTransition.jspa?workflowMode=${mode}&workflowName=${encodeURIComponent(workflow.name)}&descriptorTab=${getTabForType(item.type) || ''}&workflowStep=1&workflowTransition=${action.id}`;
+    return `${getBaseUrl()}/secure/admin/workflows/ViewWorkflowTransition.jspa?workflowMode=${mode}&workflowName=${encodeURIComponent(workflow.name)}&descriptorTab=${getTabForType(item.type) || ''}&workflowStep=${action.stepId || ''}&workflowTransition=${action.id}`;
 }
 
 function getWorkflowLink(workflow: WorkflowType, mode: WorkflowMode='live'): string {
