@@ -23,6 +23,7 @@ import '../flex.less';
 import './workflow.less';
 import {registryService} from '../service/services';
 import {getBaseUrl} from '../service/ajaxHelper';
+import {RegistryMessages} from '../i18n/registry.i18n';
 
 
 export type ScriptParamValueProps = {
@@ -81,7 +82,9 @@ define('mailru/groovy/renderRegistryScript', (): any => {
                         iconBefore={<EditFilledIcon label=""/>}
 
                         href={`${getBaseUrl()}/plugins/servlet/my-groovy/registry/script/edit/${id}`}
-                    />
+                    >
+                        {RegistryMessages.editScript}
+                    </Button>
                 ]}
             >
                 {params &&
