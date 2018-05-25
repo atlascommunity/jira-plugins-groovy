@@ -465,6 +465,8 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     private void validateDirectoryForm(ScriptDirectoryForm form) {
+        form.setName(StringUtils.trimToNull(form.getName()));
+
         if (StringUtils.isEmpty(form.getName())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
         }
