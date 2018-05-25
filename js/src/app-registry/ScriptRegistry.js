@@ -67,7 +67,6 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
     };
 
     _activateEditDialog = (id: number, type: 'script'|'directory') => {
-        console.log(id, type);
         if (type === 'directory') {
             this.setState({ directoryDialogProps: {isNew: false, id} });
         }
