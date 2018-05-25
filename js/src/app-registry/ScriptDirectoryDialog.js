@@ -15,55 +15,48 @@ import {registryService} from '../service/services';
 
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
+import type {VoidCallback} from '../common/types';
 
 
-type Props = {
+export type DialogParams = { isNew: false, id: number, parentId?: null } | { isNew: true, id?: null, parentId: ?number };
+
+type Props = DialogParams & {
     addDirectory: typeof RegistryActionCreators.addDirectory,
-    updateDirectory: typeof RegistryActionCreators.updateDirectory
+    updateDirectory: typeof RegistryActionCreators.updateDirectory,
+    onClose: VoidCallback
 };
 
 type State = {
-    active: boolean,
     name: string,
-    parentId: ?number,
-    id: ?number,
     directory: ?BasicRegistryDirectoryType,
     error: *
 };
 
-//todo: declarative activation
 export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, State> {
     state = {
-        active: false,
         name: '',
-        parentId: null,
-        id: null,
         directory: null,
         error: null
     };
 
-    activateCreate = (parentId: number) => {
-        this.setState({
-            active: true,
-            name: '',
-            parentId: parentId,
-            id: null,
-            error: null
-        });
-    };
+    componentDidMount() {
+        const {isNew, id} = this.props;
 
-    activateEdit = (id: number) => {
-        registryService
-            .getDirectory(id)
-            .then(data => this.setState({
-                active: true,
-                id: id,
-                parentId: null,
-                name: data.name,
-                error: null,
-                directory: data
-            }));
-    };
+        if (!isNew) {
+            registryService
+                .getDirectory(id)
+                .then(data => this.setState({
+                    name: data.name,
+                    error: null,
+                    directory: data
+                }));
+        } else {
+            this.setState({
+                name: '',
+                error: null
+            });
+        }
+    }
 
     _handleError = (error: *) => {
         const {response} = error;
@@ -76,20 +69,21 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
     };
 
     _onSubmit = () => {
-        const {id, name, parentId} = this.state;
+        const {id, parentId, isNew, updateDirectory, addDirectory, onClose} = this.props;
+        const {name} = this.state;
 
         const data = {
             name: name,
             parentId: parentId || undefined
         };
 
-        if (id) {
+        if (!isNew && id) {
             registryService
                 .updateDirectory(id, data)
                 .then(
                     (result: BasicRegistryDirectoryType) => {
-                        this.props.updateDirectory(result);
-                        this.setState({active: false});
+                        updateDirectory(result);
+                        onClose();
                     },
                     this._handleError);
         } else {
@@ -97,23 +91,22 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
                 .createDirectory(data)
                 .then(
                     (result: BasicRegistryDirectoryType) => {
-                        this.props.addDirectory({
+                        addDirectory({
                             ...result,
                             children: [],
                             scripts: []
                         });
-                        this.setState({active: false});
+                        onClose();
                     },
                     this._handleError
                 );
         }
     };
 
-    _close = () => this.setState({active: false});
-
     _setName = (event: SyntheticEvent<HTMLInputElement>) => this.setState({ name: event.currentTarget.value });
 
     render(): Node {
+        const {onClose, isNew} = this.props;
         const {error, directory} = this.state;
 
         let errorMessage: * = null;
@@ -124,44 +117,40 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
         }
 
         return (
-            <div>
-                {this.state.active ?
-                    <ModalDialog
-                        width="medium"
+            <ModalDialog
+                width="medium"
 
-                        isHeadingMultiline={false}
-                        heading={this.state.id ? `${RegistryMessages.editDirectory}: ${directory ? directory.name : ''}` : RegistryMessages.addDirectory}
+                isHeadingMultiline={false}
+                heading={isNew ? RegistryMessages.addDirectory : `${RegistryMessages.editDirectory}: ${directory ? directory.name : ''}`}
 
-                        onClose={this._close}
-                        actions={[
-                            {
-                                text: this.state.id ? CommonMessages.update : CommonMessages.create,
-                                onClick: this._onSubmit
-                            },
-                            {
-                                text: CommonMessages.cancel,
-                                onClick: this._close
-                            }
-                        ]}
-                    >
-                        {error && !errorField && <ErrorMessage title={errorMessage}/>}
-                        <div className="flex-column">
-                            <FieldTextStateless
-                                shouldFitContainer={true}
-                                required={true}
-                                maxLength={32}
+                onClose={onClose}
+                actions={[
+                    {
+                        text: isNew ? CommonMessages.create : CommonMessages.update,
+                        onClick: this._onSubmit
+                    },
+                    {
+                        text: CommonMessages.cancel,
+                        onClick: onClose
+                    }
+                ]}
+            >
+                {error && !errorField && <ErrorMessage title={errorMessage}/>}
+                <div className="flex-column">
+                    <FieldTextStateless
+                        shouldFitContainer={true}
+                        required={true}
+                        maxLength={32}
 
-                                isInvalid={errorField === 'name'}
-                                invalidMessage={errorMessage}
+                        isInvalid={errorField === 'name'}
+                        invalidMessage={errorMessage}
 
-                                label={FieldMessages.name}
-                                value={this.state.name}
-                                onChange={this._setName}
-                            />
-                        </div>
-                    </ModalDialog>
-                    : null}
-            </div>
+                        label={FieldMessages.name}
+                        value={this.state.name}
+                        onChange={this._setName}
+                    />
+                </div>
+            </ModalDialog>
         );
     }
 }

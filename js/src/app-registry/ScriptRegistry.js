@@ -15,7 +15,7 @@ import {FieldTextStateless} from '@atlaskit/field-text';
 import {CheckboxStateless} from '@atlaskit/checkbox';
 
 import {ScriptDirectory} from './ScriptDirectory';
-import {ScriptDirectoryDialog} from './ScriptDirectoryDialog';
+import {ScriptDirectoryDialog, type DialogParams} from './ScriptDirectoryDialog';
 import {RegistryActionCreators} from './registry.reducer';
 import {UsageStatusFlag} from './UsageStatusFlag';
 
@@ -43,39 +43,37 @@ type State = {
     waiting: boolean,
     isDragging: boolean,
     filter: string,
-    onlyUnused: boolean
+    onlyUnused: boolean,
+    directoryDialogProps: ?DialogParams
 };
 
 //todo: collapse/uncollapse all
 export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
     //$FlowFixMe
     directoryDialogRef = React.createRef();
-    //$FlowFixMe
-    scriptDialogRef = React.createRef();
 
     state = {
         isDragging: false,
         waiting: false,
         onlyUnused: false,
+        directoryDialogProps: null,
         filter: ''
     };
 
     _activateCreateDialog = (parentId: ?number, type: 'script'|'directory') => {
         if (type === 'directory') {
-            this.directoryDialogRef.current.getWrappedInstance().activateCreate(parentId);
-        } else {
-            this.scriptDialogRef.current.getWrappedInstance().activateCreate(parentId);
+            this.setState({ directoryDialogProps: {isNew: true, parentId} });
         }
     };
 
     _activateEditDialog = (id: number, type: 'script'|'directory') => {
         console.log(id, type);
         if (type === 'directory') {
-            this.directoryDialogRef.current.getWrappedInstance().activateEdit(id);
-        } else {
-            this.scriptDialogRef.current.getWrappedInstance().activateEdit(id);
+            this.setState({ directoryDialogProps: {isNew: false, id} });
         }
     };
+
+    _closeDirectoryDialog = () => this.setState({ directoryDialogProps: null });
 
     _activateDeleteDialog = (id: number, type: 'script'|'directory', name: string) => {
         // eslint-disable-next-line no-restricted-globals
@@ -213,7 +211,7 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
     render(): Node {
         const {scriptUsage} = this.props;
-        const {waiting, filter, onlyUnused} = this.state;
+        const {waiting, filter, onlyUnused, directoryDialogProps} = this.state;
 
         let directories: * = this.props.directories;
         let forceOpen: boolean = false;
@@ -281,7 +279,7 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                         )}
 
                         {!directories.length ? <InfoMessage title={RegistryMessages.noScripts}/> : null}
-                        <ScriptDirectoryDialog ref={this.directoryDialogRef}/>
+                        {directoryDialogProps && <ScriptDirectoryDialog {...directoryDialogProps} onClose={this._closeDirectoryDialog}/>}
 
                         {waiting && <Blanket isTinted={true}/>}
                     </div>
