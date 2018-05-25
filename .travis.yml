@@ -21,7 +21,7 @@ matrix:
         - cd js
         - yarn install
         - yarn build-prod
-        - yarn flow
+        - yarn flow check
 notifications:
   email:
     recipients:
