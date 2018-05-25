@@ -44,6 +44,7 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
 
         if (!isNew) {
             registryService
+                //$FlowFixMe id will be non-null here
                 .getDirectory(id)
                 .then(data => this.setState({
                     name: data.name,
