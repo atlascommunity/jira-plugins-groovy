@@ -111,7 +111,7 @@ export const filteredSelector = createSelector(
         return {
             scripts: scriptsResult,
             directories: dirsResult,
-            isForceOpen: (Object.keys(scriptsResult).length + Object.keys(dirsResult).length) >= 50
+            isForceOpen: (Object.keys(scriptsResult).length + Object.keys(dirsResult).length) <= 50
         };
     }
 );
