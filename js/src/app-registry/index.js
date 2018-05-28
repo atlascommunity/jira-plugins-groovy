@@ -6,6 +6,8 @@ import {BrowserRouter, Switch, Route} from 'react-router-dom';
 
 import {createStore} from 'redux';
 
+import keyBy from 'lodash.keyby';
+
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
@@ -14,7 +16,8 @@ import EmptyState from '@atlaskit/empty-state';
 import {ScriptRegistry} from './ScriptRegistry';
 import {ScriptForm} from './ScriptForm';
 import {Loader} from './Loader';
-import {RegistryActionCreators, registryReducer} from './registry.reducer';
+import {reducer} from './redux/reducer';
+import {RegistryActionCreators} from './redux/actions';
 
 import {registryService, watcherService} from '../service/services';
 import {fixStyle} from '../common/fixStyle';
@@ -23,7 +26,7 @@ import '../flex.less';
 import {getBaseUrl} from '../service/ajaxHelper';
 
 
-const store = createStore(registryReducer, {directories: []});
+const store = createStore(reducer);
 
 AJS.toInit(() => {
     fixStyle();
@@ -31,12 +34,13 @@ AJS.toInit(() => {
     Promise
         .all([
             registryService.getAllDirectories(),
+            registryService.getRegistryScripts(),
             watcherService.getAllWatches('REGISTRY_SCRIPT'),
             watcherService.getAllWatches('REGISTRY_DIRECTORY')
         ])
         .then(
-            ([tree, scriptWatches, directoryWatches]: *) => {
-                store.dispatch(RegistryActionCreators.loadState(tree, scriptWatches, directoryWatches));
+            ([dirs, scripts, scriptWatches, directoryWatches]: *) => {
+                store.dispatch(RegistryActionCreators.loadState(keyBy(dirs, 'id'), keyBy(scripts, 'id'), scriptWatches, directoryWatches));
             }
         );
 

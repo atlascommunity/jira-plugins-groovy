@@ -6,8 +6,8 @@ import {connect} from 'react-redux';
 import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 
-import {RegistryActionCreators} from './registry.reducer';
-import type {BasicRegistryDirectoryType} from './types';
+import {RegistryActionCreators} from './redux/actions';
+import type {RegistryDirectoryType} from './types';
 
 import {ErrorMessage} from '../common/ak/messages';
 
@@ -28,7 +28,7 @@ type Props = DialogParams & {
 
 type State = {
     name: string,
-    directory: ?BasicRegistryDirectoryType,
+    directory: ?RegistryDirectoryType,
     error: *
 };
 
@@ -82,7 +82,7 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
             registryService
                 .updateDirectory(id, data)
                 .then(
-                    (result: BasicRegistryDirectoryType) => {
+                    (result: RegistryDirectoryType) => {
                         updateDirectory(result);
                         onClose();
                     },
@@ -91,7 +91,7 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
             registryService
                 .createDirectory(data)
                 .then(
-                    (result: BasicRegistryDirectoryType) => {
+                    (result: RegistryDirectoryType) => {
                         addDirectory({
                             ...result,
                             children: [],

@@ -9,7 +9,9 @@ import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
 import java.util.List;
 
 public interface ScriptRepository {
-    List<ScriptDirectoryTreeDto> getAllDirectories();
+    List<ScriptDirectoryDto> getAllDirectories();
+
+    List<RegistryScriptDto> getAllScripts();
 
     PickerResultSet<PickerOption> getAllDirectoriesForPicker();
 

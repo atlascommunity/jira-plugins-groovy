@@ -17,15 +17,11 @@ export type RegistryScriptType = ScriptEntityWithoutChangelogs & {
     directoryId: number
 };
 
-export type BasicRegistryDirectoryType = {
+export type RegistryDirectoryType = {
     id: number,
     name: string,
+    parentId: ?number,
     fullName?: string
-};
-
-export type RegistryDirectoryType = BasicRegistryDirectoryType & {
-    scripts: $ReadOnlyArray<RegistryScriptType>,
-    children: $ReadOnlyArray<RegistryDirectoryType>
 };
 
 export type WorkflowActionItemType = {
@@ -49,9 +45,18 @@ export type WorkflowType = {
 
 export type WorkflowMode = 'live' | 'draft';
 
-export type ScriptUsageItems = {[string]: number};
+export type ScriptUsageItems = {[number]: number};
 
 export type ScriptUsageType = {
     ready: boolean,
     items: ScriptUsageItems
+};
+
+export type KeyedEntities<T> = {[number]: T};
+
+export type GroupedEntities<T> = KeyedEntities<$ReadOnlyArray<T>>;
+
+export type FilterType = {
+    name: string,
+    onlyUnused: boolean
 };

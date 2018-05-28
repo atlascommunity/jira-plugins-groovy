@@ -3,7 +3,6 @@ import {ajaxDelete, ajaxGet, ajaxPut, ajaxPost, getPluginBaseUrl} from './ajaxHe
 
 import type {
     RegistryDirectoryType,
-    BasicRegistryDirectoryType,
     RegistryScriptType,
     WorkflowType,
     ScriptUsageItems
@@ -17,15 +16,19 @@ export class RegistryService {
         return ajaxGet(`${getPluginBaseUrl()}/registry/directory/all`);
     }
 
-    getDirectory(id: number): Promise<BasicRegistryDirectoryType> {
+    getRegistryScripts(): Promise<$ReadOnlyArray<RegistryScriptType>> {
+        return ajaxGet(`${getPluginBaseUrl()}/registry/script/all`);
+    }
+
+    getDirectory(id: number): Promise<RegistryDirectoryType> {
         return ajaxGet(`${getPluginBaseUrl()}/registry/directory/${id}`);
     }
 
-    createDirectory(data: any): Promise<BasicRegistryDirectoryType> {
+    createDirectory(data: any): Promise<RegistryDirectoryType> {
         return ajaxPost(`${getPluginBaseUrl()}/registry/directory`, data);
     }
 
-    updateDirectory(id: number, data: any): Promise<BasicRegistryDirectoryType> {
+    updateDirectory(id: number, data: any): Promise<RegistryDirectoryType> {
         return ajaxPut(`${getPluginBaseUrl()}/registry/directory/${id}`, data);
     }
 

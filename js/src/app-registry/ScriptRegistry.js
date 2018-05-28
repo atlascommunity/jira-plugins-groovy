@@ -2,8 +2,7 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
-
-import memoizeOne from 'memoize-one';
+import {createSelector} from 'reselect';
 
 import {DragDropContext} from 'react-beautiful-dnd';
 
@@ -16,10 +15,11 @@ import {CheckboxStateless} from '@atlaskit/checkbox';
 
 import {ScriptDirectory} from './ScriptDirectory';
 import {ScriptDirectoryDialog, type DialogParams} from './ScriptDirectoryDialog';
-import {RegistryActionCreators} from './registry.reducer';
+import {RegistryActionCreators, UpdateActionCreators as FilterActionCreators} from './redux/actions';
+import {filteredSelector, filterSelector, groupedDirsSelector} from './redux/selectors';
 import {UsageStatusFlag} from './UsageStatusFlag';
 
-import type {RegistryDirectoryType, RegistryScriptType, ScriptUsageType} from './types';
+import type {FilterType, RegistryDirectoryType} from './types';
 
 import {InfoMessage} from '../common/ak/messages';
 
@@ -33,25 +33,23 @@ import './ScriptRegistry.less';
 
 type Props = {
     directories: $ReadOnlyArray<RegistryDirectoryType>,
-    scriptUsage: ScriptUsageType,
+    isScriptUsageReady: boolean,
+    isForceOpen: boolean,
+    filter: FilterType,
     deleteDirectory: typeof RegistryActionCreators.deleteDirectory,
     deleteScript: typeof RegistryActionCreators.deleteScript,
-    moveScript: typeof RegistryActionCreators.moveScript
+    moveScript: typeof RegistryActionCreators.moveScript,
+    updateFilter: typeof FilterActionCreators.updateFilter
 };
 
 type State = {
     waiting: boolean,
     isDragging: boolean,
-    filter: string,
-    onlyUnused: boolean,
     directoryDialogProps: ?DialogParams
 };
 
 //todo: collapse/uncollapse all
 export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
-    //$FlowFixMe
-    directoryDialogRef = React.createRef();
-
     state = {
         isDragging: false,
         waiting: false,
@@ -108,123 +106,33 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
         const destId = parseInt(destination.droppableId, 10);
         const scriptId = parseInt(draggableId, 10);
 
-        const script = this._findScript(scriptId);
-
-        if (!script) {
-            console.error('unable to find script', result);
-            return;
-        }
-
-        this.props.moveScript(sourceId, destId, script);
+        this.props.moveScript(sourceId, destId, scriptId);
 
         this.setState({ waiting: true });
 
         registryService
-            .moveScript(script.id, destId)
+            .moveScript(scriptId, destId)
             .then(
                 () => {
                     this.setState({ waiting: false });
                     //todo: maybe show flag that script was successfully moved
                 },
                 () => {
-                    this.props.moveScript(destId, sourceId, script); //move script to old parent
+                    this.props.moveScript(destId, sourceId, scriptId); //move script to old parent
                     this.setState({ waiting: false });
                 }
             );
     };
 
-    _findScript(id: number): ?RegistryScriptType {
-        for (const dir of this.props.directories) {
-            const found = this._findScriptInDirectory(dir, id);
-            if (found) {
-                return found;
-            }
-        }
-        return null;
-    }
+    _onFilterChange = (e: SyntheticEvent<HTMLInputElement>) => this.props.updateFilter({ name: e.currentTarget.value });
 
-    _findScriptInDirectory(dir: RegistryDirectoryType, id: number): ?RegistryScriptType {
-        if (dir.children) {
-            for (const child of dir.children) {
-                const foundInDir = this._findScriptInDirectory(child, id);
-                if (foundInDir) {
-                    return foundInDir;
-                }
-            }
-        }
-        if (dir.scripts) {
-            return dir.scripts.find(script => script.id === id);
-        }
-        return null;
-    }
-
-    _onFilterChange = (e: SyntheticEvent<HTMLInputElement>) => this.setState({ filter: e.currentTarget.value });
-
-    _matchesFilter = (item: RegistryDirectoryType|RegistryScriptType, filter: string): boolean => {
-        return item.name.toLocaleLowerCase().includes(filter);
-    };
-
-    _getFilteredDirsInternal = (dirs: $ReadOnlyArray<RegistryDirectoryType>, filter: string): $ReadOnlyArray<RegistryDirectoryType> => {
-        return dirs
-            .map((dir: RegistryDirectoryType): RegistryDirectoryType => {
-                if (this._matchesFilter(dir, filter)) {
-                    return dir;
-                }
-                return {
-                    ...dir,
-                    scripts: dir.scripts.filter(script => this._matchesFilter(script, filter)),
-                    children: this._getFilteredDirsInternal(dir.children, filter)
-                };
-            })
-            .filter(dir => (dir.scripts.length + dir.children.length) > 0);
-    };
-
-    _getFilteredDirs = memoizeOne(this._getFilteredDirsInternal);
-
-    _getUnusedDirs = (dirs: $ReadOnlyArray<RegistryDirectoryType>): $ReadOnlyArray<RegistryDirectoryType> => {
-        const {scriptUsage} = this.props;
-
-        return dirs
-            .map((dir: RegistryDirectoryType): ?RegistryDirectoryType => {
-                const scripts = dir.scripts.filter(script => !scriptUsage.items[script.id.toString()]);
-
-                if (scripts.length > 0) {
-                    return { ...dir, scripts };
-                }
-                return null;
-            })
-            .filter(Boolean);
-    };
-
-    _countElements = (dir: RegistryDirectoryType): number => {
-        const children = dir.children ? dir.children.length : 0;
-        const scripts = dir.scripts ? dir.scripts.length : 0;
-        return children + scripts + dir.children.map(this._countElements).reduce((acc, i) => acc + i, 0);
-    };
-
-    _countArrayElements = (dirs: $ReadOnlyArray<RegistryDirectoryType>): number => {
-        return dirs.map(this._countElements).reduce((acc, i) => acc + i, 0);
-    };
-
-    _toggleUnused = () => this.setState(state => ({ onlyUnused: !state.onlyUnused }));
+    _toggleUnused = () => this.props.updateFilter({ onlyUnused: !this.props.filter.onlyUnused });
 
     render(): Node {
-        const {scriptUsage} = this.props;
-        const {waiting, filter, onlyUnused, directoryDialogProps} = this.state;
+        const {waiting, directoryDialogProps} = this.state;
+        const {isScriptUsageReady, isForceOpen, filter} = this.props;
 
         let directories: * = this.props.directories;
-        let forceOpen: boolean = false;
-
-        if (filter && filter.length >= 2) {
-            directories = this._getFilteredDirs(directories, filter.toLocaleLowerCase());
-            if (this._countArrayElements(directories) <= 50) {
-                forceOpen = true;
-            }
-        }
-
-        if (onlyUnused && scriptUsage.ready) {
-            directories = this._getUnusedDirs(directories);
-        }
 
         return (
             <DragDropContext onDragStart={this._onDragStart} onDragEnd={this._onDragEnd}>
@@ -245,15 +153,15 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                                     compact
                                     label="hidden"
                                     placeholder="Filter"
-                                    value={filter}
+                                    value={filter.name}
                                     onChange={this._onFilterChange}
                                 />
                                 <div className="flex-vertical-middle">
                                     <CheckboxStateless
                                         label={RegistryMessages.onlyUnused}
-                                        isDisabled={!scriptUsage.ready}
+                                        isDisabled={!isScriptUsageReady}
 
-                                        isChecked={onlyUnused}
+                                        isChecked={filter.onlyUnused}
                                         onChange={this._toggleUnused}
                                     />
                                 </div>
@@ -269,7 +177,7 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                                 directory={directory}
                                 key={directory.id}
 
-                                forceOpen={forceOpen}
+                                forceOpen={isForceOpen}
 
                                 onCreate={this._activateCreateDialog}
                                 onEdit={this._activateEditDialog}
@@ -290,9 +198,25 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
     }
 }
 
+const rootSelector = createSelector(
+    [groupedDirsSelector],
+    dirs => [...(dirs[undefined] || [])].sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity: 'base'}))
+);
+
+const isForceOpenSelector = createSelector(
+    [filteredSelector],
+    state => state.isForceOpen
+);
+
 export const ScriptRegistry = connect(
-    memoizeOne(
-        ({directories, scriptUsage}) => ({directories, scriptUsage})
-    ),
-    RegistryActionCreators
+    (state) => ({
+        directories: rootSelector(state),
+        isForceOpen: isForceOpenSelector(state),
+        filter: filterSelector(state),
+        isScriptUsageReady: state.scriptUsage.ready
+    }),
+    {
+        ...RegistryActionCreators,
+        updateFilter: FilterActionCreators.updateFilter
+    }
 )(ScriptRegistryInternal);

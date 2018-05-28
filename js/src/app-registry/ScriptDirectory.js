@@ -2,10 +2,9 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
-import {Link} from 'react-router-dom';
+import {createSelector} from 'reselect';
 
-import memoize from 'fast-memoize';
-import memoizeOne from 'memoize-one';
+import {Link} from 'react-router-dom';
 
 import {Droppable} from 'react-beautiful-dnd';
 
@@ -21,11 +20,12 @@ import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
 
-import {DirectoryStateActionCreators, RegistryActionCreators} from './registry.reducer';
+import {DirectoryStateActionCreators, RegistryActionCreators} from './redux/actions';
+import {groupedDirsSelector, groupedScriptsSelector} from './redux/selectors';
 
 import {DraggableRegistryScript} from './DraggableRegistryScript';
 
-import type {DeleteCallback, CreateCallback, EditCallback, RegistryDirectoryType} from './types';
+import type {DeleteCallback, CreateCallback, EditCallback, RegistryDirectoryType, RegistryScriptType} from './types';
 
 import {watcherService} from '../service/services';
 
@@ -33,19 +33,11 @@ import {CommonMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 
-const countErrors = memoize((directory: RegistryDirectoryType): number => {
-    let errors: * = 0;
-    if (directory.scripts) {
-        errors += directory.scripts.map(script => script.errorCount || 0).reduce((a, b) => a + b, 0);
-    }
-    if (directory.children) {
-        errors += directory.children.map(child => countErrors(child)).reduce((a, b) => a + b, 0);
-    }
-    return errors;
-});
-
 type ScriptDirectoryProps = {
     directory: RegistryDirectoryType,
+    children: $ReadOnlyArray<RegistryDirectoryType>,
+    scripts: $ReadOnlyArray<RegistryScriptType>,
+    errorCount: number,
     onCreate: CreateCallback,
     onEdit: EditCallback,
     onDelete: DeleteCallback,
@@ -67,15 +59,15 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
     };
 
     render(): Node {
-        const {forceOpen, isOpen, directory, onCreate, onEdit, onDelete} = this.props;
+        const {forceOpen, isOpen, directory, children, scripts, errorCount, onCreate, onEdit, onDelete} = this.props;
 
         let directories: * = null;
-        let scripts: * = null;
+        let scriptsEl: * = null;
 
         if (isOpen || forceOpen) {
             directories = (
                 <div>
-                    {directory.children ? directory.children.map(child =>
+                    {children && children.map(child =>
                         <ScriptDirectory
                             directory={child}
                             key={child.id}
@@ -84,11 +76,11 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                             onEdit={onEdit}
                             onDelete={onDelete}
                         />
-                    ) : null}
+                    )}
                 </div>
             );
-            scripts = (
-                directory.scripts && directory.scripts.map(script =>
+            scriptsEl = (
+                scripts && scripts.map(script =>
                     <DraggableRegistryScript
                         key={script.id}
                         script={script}
@@ -100,8 +92,6 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
             );
         }
 
-        const errorCount = countErrors(directory);
-
         return (
             <div className="flex full-width flex-column scriptDirectory">
                 <div className="scriptDirectoryTitle">
@@ -109,9 +99,9 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                         <Button
                             appearance="subtle"
                             spacing="none"
-                            iconBefore={!isOpen ? <FolderFilledIcon label=""/> : <FolderIcon label=""/>}
+                            iconBefore={!(isOpen || forceOpen) ? <FolderFilledIcon label=""/> : <FolderIcon label=""/>}
 
-                            isDisabled={(directory.children.length + directory.scripts.length) === 0}
+                            isDisabled={(children.length + scripts.length) === 0}
 
                             onClick={this._toggle}
                         >
@@ -145,10 +135,10 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                             <div
                                 ref={provided.innerRef}
                                 className={`ScriptList scriptDropArea ${snapshot.isDraggingOver ? 'draggingOver' : ''}`}
-                                style={{minHeight: (scripts && scripts.length) ? (65*scripts.length + 10*(scripts.length-1)) : null}}
+                                style={{minHeight: (scriptsEl && scriptsEl.length) ? (65*scriptsEl.length + 10*(scriptsEl.length-1)) : null}}
                                 {...provided.droppableProps}
                             >
-                                {scripts}
+                                {scriptsEl}
                                 {provided.placeholder}
                             </div>
                         )}
@@ -160,15 +150,48 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
     }
 }
 
+const countErrors = (dirId: number, scripts: {[?number]: ?$ReadOnlyArray<RegistryScriptType>}, dirs: {[?number]: ?$ReadOnlyArray<RegistryDirectoryType>}): number => {
+    let errors: * = 0;
+    if (scripts[dirId]) {
+        errors += scripts[dirId].map(script => script.errorCount || 0).reduce((a, b) => a + b, 0);
+    }
+    if (dirs[dirId]) {
+        errors += dirs[dirId].map(child => countErrors(child.id, scripts, dirs)).reduce((a, b) => a + b, 0);
+    }
+    return errors;
+};
+
 export const ScriptDirectory = connect(
-    () => memoizeOne(
+    (): * => {
+        const idSelector = (_state, props) => props.directory.id;
+        const entitySelector = (entities, id) => [...(entities[id] || [])].sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity: 'base'}));
+
+        const childrenSelector = createSelector(
+            [groupedDirsSelector, idSelector], entitySelector
+        );
+
+        const scriptsSelector = createSelector(
+            [groupedScriptsSelector, idSelector], entitySelector
+        );
+
+        const isOpenSelector = createSelector(
+            [state => state.openDirectories, idSelector],
+            (openDirectories, id) => openDirectories.includes(id)
+        );
+
+        const errorsSelector = createSelector(
+            [groupedDirsSelector, groupedScriptsSelector, idSelector],
+            (dirs, scripts, id) => countErrors(id, scripts, dirs)
+        );
+
         //$FlowFixMe
-        ({openDirectories}: *, {directory}: *): * => {
-            return {
-                isOpen: openDirectories.includes(directory.id)
-            };
-        }
-    ),
+        return (state, props): * => ({
+            isOpen: isOpenSelector(state, props),
+            errorCount: errorsSelector(state, props),
+            children: childrenSelector(state, props),
+            scripts: scriptsSelector(state, props)
+        });
+    },
     {
         open: DirectoryStateActionCreators.open,
         close: DirectoryStateActionCreators.close
@@ -281,10 +304,15 @@ export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsP
 
 const ScriptDirectoryActions = connect(
     (): * => {
+        const isWatchedSelector = createSelector(
+            [state => state.directoryWatches, (_state, props) => props.id],
+            (directoryWatches, id) => directoryWatches.includes(id)
+        );
+
         //$FlowFixMe
-        return ({directoryWatches}, {id}): * =>
+        return (state, props): * =>
             ({
-                isWatched: directoryWatches.includes(id)
+                isWatched: isWatchedSelector(state, props)
             });
     },
     {

@@ -19,6 +19,7 @@
       }
     ],
     "eol-last": ["error", "always"],
+    "no-console": ["error", { "allow": ["warn", "error"] }],
 
     "react/prefer-stateless-function": [1, { "ignorePureComponents": true }],
     "react/jsx-no-literals": [1, {"noStrings": false}],

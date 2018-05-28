@@ -126,7 +126,6 @@ export class Editor extends React.Component<EditorProps, EditorState> {
     };
 
     _resize = (_e: any, {size}: ResizeCallbackData) => {
-        console.log(size);
         this.setState({height: size.height});
     };
 

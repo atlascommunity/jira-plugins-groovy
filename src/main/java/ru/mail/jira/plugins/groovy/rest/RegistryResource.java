@@ -55,6 +55,17 @@ public class RegistryResource {
     }
 
     @GET
+    @Path("/script/all")
+    @WebSudoRequired
+    public Response getAllScripts() {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return scriptRepository.getAllScripts();
+        }).getResponse();
+    }
+
+    @GET
     @Path("/directory/picker")
     @WebSudoRequired
     public Response getDirectoriesPicker() {

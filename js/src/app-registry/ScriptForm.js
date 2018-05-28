@@ -15,7 +15,7 @@ import {Field} from '@atlaskit/form';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
-import {RegistryActionCreators} from './registry.reducer';
+import {RegistryActionCreators} from './redux/actions';
 
 import type {WorkflowScriptType, RegistryScriptType} from './types';
 

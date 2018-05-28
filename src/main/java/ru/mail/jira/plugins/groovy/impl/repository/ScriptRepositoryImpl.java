@@ -6,8 +6,6 @@ import com.atlassian.beehive.ClusterLockService;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
@@ -89,34 +87,37 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     }
 
     @Override
-    public List<ScriptDirectoryTreeDto> getAllDirectories() {
+    public List<ScriptDirectoryDto> getAllDirectories() {
+        return Arrays
+            .stream(ao.find(ScriptDirectory.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
+            .map(directory -> {
+                ScriptDirectoryDto result = new ScriptDirectoryDto();
+
+                result.setId(directory.getID());
+                result.setName(directory.getName());
+                if (directory.getParent() != null) {
+                    result.setParentId(directory.getParent().getID());
+                }
+
+                return result;
+            })
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RegistryScriptDto> getAllScripts() {
         Map<Integer, Long> errors = executionRepository.getRegistryErrorCount();
 
-        Multimap<Integer, RegistryScriptDto> scripts = HashMultimap.create();
-        List<RegistryScriptDto> allScripts = Arrays
+        List<RegistryScriptDto> scripts = Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
             .map(script -> buildScriptDto(script, false, false, false, false))
             .collect(Collectors.toList());
 
-        for (RegistryScriptDto scriptDto : allScripts) {
+        for (RegistryScriptDto scriptDto : scripts) {
             scriptDto.setErrorCount(errors.get(scriptDto.getId()));
-            scripts.put(scriptDto.getDirectoryId(), scriptDto);
         }
 
-        Multimap<Integer, ScriptDirectory> dirs = HashMultimap.create();
-        ScriptDirectory[] allDirs = ao.find(ScriptDirectory.class, Query.select().where("DELETED = ?", Boolean.FALSE));
-
-        for (ScriptDirectory dir : allDirs) {
-            ScriptDirectory parent = dir.getParent();
-            dirs.put(parent != null ? parent.getID() : null, dir);
-        }
-
-        return dirs
-            .get(null)
-            .stream()
-            .map(directory -> buildDirectoryTreeDto(directory, dirs, scripts))
-            .sorted(Comparator.comparing(ScriptDirectoryTreeDto::getName, COLLATOR))
-            .collect(Collectors.toList());
+        return scripts;
     }
 
     @Override
@@ -436,30 +437,6 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         if (parent != null) {
             result.setParentId(parent.getID());
         }
-
-        return result;
-    }
-
-    private ScriptDirectoryTreeDto buildDirectoryTreeDto(ScriptDirectory directory, Multimap<Integer, ScriptDirectory> dirs, Multimap<Integer, RegistryScriptDto> scripts) {
-        ScriptDirectoryTreeDto result = new ScriptDirectoryTreeDto();
-
-        result.setId(directory.getID());
-        result.setName(directory.getName());
-        result.setChildren(
-            dirs
-                .get(directory.getID())
-                .stream()
-                .map(child -> buildDirectoryTreeDto(child, dirs, scripts))
-                .sorted(Comparator.comparing(ScriptDirectoryTreeDto::getName, COLLATOR))
-                .collect(Collectors.toList())
-        );
-        result.setScripts(
-            scripts
-                .get(directory.getID())
-                .stream()
-                .sorted(Comparator.comparing(RegistryScriptDto::getName, COLLATOR))
-                .collect(Collectors.toList())
-        );
 
         return result;
     }

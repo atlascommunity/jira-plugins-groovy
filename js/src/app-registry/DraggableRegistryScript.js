@@ -21,7 +21,7 @@ type Props = {
 export class DraggableRegistryScriptInternal extends React.PureComponent<PublicRegistryScriptProps & Props> {
     render(): React.Node {
         const {script, scriptUsage} = this.props;
-        const isUsed = !scriptUsage.ready || ((scriptUsage.items[script.id.toString()] || 0) > 0);
+        const isUsed = !scriptUsage.ready || ((scriptUsage.items[script.id] || 0) > 0);
 
         return (
             <div className="DraggableScript">
