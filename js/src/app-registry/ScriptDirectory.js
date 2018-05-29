@@ -64,7 +64,10 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
         let directories: * = null;
         let scriptsEl: * = null;
 
-        if (isOpen || forceOpen) {
+        const hasChildren = (children.length + scripts.length) > 0;
+        const open = (isOpen || forceOpen) && hasChildren;
+
+        if (open) {
             directories = (
                 <div>
                     {children && children.map(child =>
@@ -99,9 +102,9 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                         <Button
                             appearance="subtle"
                             spacing="none"
-                            iconBefore={!(isOpen || forceOpen) ? <FolderFilledIcon label=""/> : <FolderIcon label=""/>}
+                            iconBefore={!open ? <FolderFilledIcon label=""/> : <FolderIcon label=""/>}
 
-                            isDisabled={(children.length + scripts.length) === 0}
+                            isDisabled={!hasChildren}
 
                             onClick={this._toggle}
                         >
@@ -129,7 +132,7 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                         />
                     </div>
                 </div>
-                <div className={`scriptDirectoryChildren ${isOpen ? 'open' : ''}`}>
+                <div className={`scriptDirectoryChildren ${open ? 'open' : ''}`}>
                     <Droppable droppableId={`${directory.id}`}>
                         {(provided, snapshot) => (
                             <div
