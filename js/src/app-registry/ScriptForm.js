@@ -24,7 +24,7 @@ import {FieldMessages, CommonMessages} from '../i18n/common.i18n';
 import {registryService} from '../service/services';
 
 import {getMarkers} from '../common/error';
-import {Bindings} from '../common/bindings';
+import {Bindings, ReturnTypes} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
 import {StaticField} from '../common/ak/StaticField';
 import {ErrorMessage} from '../common/ak/messages';
@@ -37,6 +37,21 @@ import type {SingleValueType} from '../common/ak/types';
 
 import './ScriptForm.less';
 
+
+const returnTypesMap = {
+    CONDITION: {
+        ...ReturnTypes.boolean,
+        label: CommonMessages.condition
+    },
+    FUNCTION: {
+        ...ReturnTypes.void,
+        label: CommonMessages.function
+    },
+    VALIDATOR: {
+        ...ReturnTypes.void,
+        label: CommonMessages.validator
+    }
+};
 
 const bindings = [ Bindings.mutableIssue, Bindings.currentUser, Bindings.transientVars ];
 
@@ -262,6 +277,8 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
 
         const types = values.get('types') || [];
 
+        const returnTypes = types.map(type => returnTypesMap[type]);
+
         return (
             <Page>
                 <PageHeader>
@@ -392,6 +409,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                             markers={markers}
 
                             bindings={bindings}
+                            returnTypes={returnTypes}
 
                             value={values.get('scriptBody') || ''}
                             onChange={this._setScript}

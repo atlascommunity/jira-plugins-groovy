@@ -12,6 +12,7 @@ import {adminScriptService} from '../service/services';
 import type {ProvidedState} from '../common/script-list/ScriptDialog';
 import type {FullDialogComponentProps} from '../common/script-list/types';
 import {RegistryMessages} from '../i18n/registry.i18n';
+import {ReturnTypes} from '../common/bindings';
 
 
 const {addItem, updateItem} = ItemActionCreators;
@@ -72,6 +73,11 @@ const onSubmit = (id: ?number, data: {[string]: any}): Promise<SubmitResult> => 
         );
 };
 
+const returnTypes = [{
+    ...ReturnTypes.string,
+    optional: true
+}];
+
 class AdminDialogInternal extends React.PureComponent<Props> {
     render(): React.Node {
         return (
@@ -83,6 +89,7 @@ class AdminDialogInternal extends React.PureComponent<Props> {
                     editTitle: RegistryMessages.editScript,
                     createTitle: RegistryMessages.addScript
                 }}
+                returnTypes={returnTypes}
                 {...this.props}
             />
         );

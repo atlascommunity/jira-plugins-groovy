@@ -19,12 +19,13 @@ import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n
 
 import {listenerService} from '../service/services';
 import {getMarkers} from '../common/error';
-import {Bindings} from '../common/bindings';
+import {Bindings, ReturnTypes} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
 import {ErrorMessage} from '../common/ak/messages';
 import {ItemActionCreators} from '../common/redux';
 import type {FullDialogComponentProps} from '../common/script-list/types';
 import type {BindingType} from '../common/editor/types';
+import {extractShortClassName} from '../common/classNames';
 
 
 //AbstractProjectEvent
@@ -40,14 +41,7 @@ import type {BindingType} from '../common/editor/types';
 //IssueWatcherDeletedEvent
 
 const issueEventBindings = [Bindings.issueEvent];
-
-function extractShortClassName(className: string): string {
-    if (className.indexOf('.') !== -1) {
-        const tokens = className.split('.');
-        return tokens[tokens.length-1];
-    }
-    return className;
-}
+const returnTypes = [ReturnTypes.void];
 
 const {addItem, updateItem} = ItemActionCreators;
 
@@ -267,6 +261,7 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
                         markers={markers}
 
                         bindings={bindings || undefined}
+                        returnTypes={returnTypes}
 
                         value={values.get('scriptBody') || ''}
                         onChange={this._setObjectValue('scriptBody')}

@@ -12,6 +12,7 @@ export type FieldConfig = {
     velocityParamsEnabled: boolean,
     needsTemplate: boolean,
     type: string,
+    expectedType: string,
     searcher: ?string,
     template: ?string
 };

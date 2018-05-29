@@ -3,7 +3,7 @@ import React, {type Node} from 'react';
 
 import Base, {Label} from '@atlaskit/field-base';
 
-import type {BindingType, MarkerType} from '../editor/types';
+import type {BindingType, MarkerType, ReturnType} from '../editor/types';
 import type {FieldProps, MutableFieldProps, AkFormFieldProps} from '../types';
 
 import Editor from '../editor';
@@ -13,8 +13,9 @@ import './EditorField.less';
 
 type EditorFieldProps = FieldProps & MutableFieldProps<string> & AkFormFieldProps & {
     mode: string,
-    markers?: ?Array<MarkerType>,
-    bindings?: Array<BindingType>,
+    markers?: ?$ReadOnlyArray<MarkerType>,
+    bindings?: $ReadOnlyArray<BindingType>,
+    returnTypes?: $ReadOnlyArray<ReturnType>,
     resizable?: boolean,
 };
 

@@ -60,7 +60,8 @@ define('/mailru/groovy/i18n-react', function() {
                 AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.issuesFound', ...params)
             },
             run: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.run'),
-            back: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.back')
+            back: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.back'),
+            returnTypes: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.returnTypes')
         },
         error: {
             noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue'),

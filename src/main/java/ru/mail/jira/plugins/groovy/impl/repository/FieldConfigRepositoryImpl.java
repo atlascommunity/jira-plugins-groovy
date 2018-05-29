@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
+import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
 import ru.mail.jira.plugins.groovy.util.RestFieldException;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
@@ -58,6 +59,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
     private final Cache<Long, FieldScript> scriptCache;
     private final ScriptInvalidationService invalidationService;
     private final ExecutionRepository executionRepository;
+    private final CustomFieldHelper customFieldHelper;
 
     @Autowired
     public FieldConfigRepositoryImpl(
@@ -71,7 +73,8 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         ScriptService scriptService,
         ChangelogHelper changelogHelper,
         ScriptInvalidationService invalidationService,
-        ExecutionRepository executionRepository
+        ExecutionRepository executionRepository,
+        CustomFieldHelper customFieldHelper
     ) {
         this.ao = ao;
         this.i18nHelper = i18nHelper;
@@ -83,6 +86,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         this.changelogHelper = changelogHelper;
         this.invalidationService = invalidationService;
         this.executionRepository = executionRepository;
+        this.customFieldHelper = customFieldHelper;
 
         this.scriptCache = cacheManager
             .getCache(
@@ -288,6 +292,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         if (searcher != null) {
             result.setSearcher(searcher.getDescriptor().getName());
         }
+        result.setExpectedType(customFieldHelper.getExpectedType(customField).getCanonicalName());
 
         if (fieldConfig == null) {
             result.setCacheable(true);

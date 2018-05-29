@@ -1,10 +1,18 @@
 //@flow
 
-export type BindingType = {
-    name: string,
+export type VariableType = {
     className: string,
     fullClassName: string,
     javaDoc?: string
+};
+
+export type BindingType = VariableType & {
+    name: string
+};
+
+export type ReturnType = VariableType & {
+    label?: string,
+    optional?: boolean
 };
 
 export type MarkerType = {

@@ -59,6 +59,7 @@ export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction }) =
     condition: i18n.common.condition,
     validator: i18n.common.validator,
     function: i18n.common.function,
+    returnTypes: i18n.common.returnTypes,
     showAll: i18n.common.showAll,
     preview: i18n.common.preview,
     validating: i18n.common.validating,

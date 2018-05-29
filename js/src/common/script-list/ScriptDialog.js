@@ -17,8 +17,10 @@ import {getMarkers} from '../error';
 import {ErrorMessage} from '../ak/messages';
 import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
 import {Bindings} from '../bindings';
-import type {ItemType} from '../redux';
 import {ItemActionCreators} from '../redux';
+
+import type {ItemType} from '../redux';
+import type {ReturnType} from '../editor/types';
 
 
 const bindings = [ Bindings.currentUser ];
@@ -58,7 +60,8 @@ type Props = FullDialogComponentProps & {
         createTitle: string
     },
     valuesTransformer: (values: ValuesType) => DataType,
-    modalProps?: any
+    modalProps?: any,
+    returnTypes?: $ReadOnlyArray<ReturnType>
 };
 
 type State = {
@@ -159,7 +162,7 @@ export class ScriptDialog extends React.PureComponent<Props, State> {
     }
 
     render(): React.Node {
-        const {i18n, isNew, modalProps, onClose} = this.props;
+        const {i18n, isNew, returnTypes, modalProps, onClose} = this.props;
         const {values, isLoadingState, isSubmitting, error, name} = this.state;
 
         let content: React.Node = null;
@@ -188,25 +191,6 @@ export class ScriptDialog extends React.PureComponent<Props, State> {
             content = (
                 <div className="flex-column">
                     {error && !errorField && errorMessage && <ErrorMessage title={errorMessage}/>}
-
-                    {/* todo: wait for form fix
-                    <Field
-                        name="name"
-                        isRequired={true}
-
-                        isInvalid={errorField === 'name'}
-                        invalidMessage={errorField === 'name' ? errorMessage : ''}
-
-                        label={FieldMessages.name}
-                    >
-                        <FieldTextStateless
-                            disabled={isSubmitting}
-
-                            value={values.get('name') || ''}
-                            onChange={this._setTextValue('name')}
-                        />
-                    </Field>
-                     */}
 
                     <FieldTextStateless
                         shouldFitContainer={true}
@@ -244,6 +228,7 @@ export class ScriptDialog extends React.PureComponent<Props, State> {
                         markers={markers}
 
                         bindings={bindings}
+                        returnTypes={returnTypes}
 
                         value={values.get('scriptBody') || ''}
                         onChange={this._setObjectValue('scriptBody')}

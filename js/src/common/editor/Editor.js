@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {Fragment, type Node} from 'react';
 
 import memoizeOne from 'memoize-one';
 
@@ -16,11 +16,16 @@ import 'codemirror/addon/fold/comment-fold';
 
 
 import Button from '@atlaskit/button';
+import Lozenge from '@atlaskit/lozenge';
+import Tooltip from '@atlaskit/tooltip';
 import InlineMessage from '@atlaskit/inline-message';
+import {Label} from '@atlaskit/field-base';
+
+import QuestionIcon from '@atlaskit/icon/glyph/question';
 
 import {Resizable} from 'react-resizable';
 
-import type {BindingType, MarkerType} from './types';
+import type {BindingType, ReturnType, MarkerType} from './types';
 
 import {CodeMirror} from './CM';
 
@@ -64,12 +69,13 @@ type EditorProps = {
     value?: string,
     onChange?: (string) => void,
     isDisabled?: boolean,
-    markers?: Array<MarkerType>,
-    bindings?: Array<BindingType>,
+    markers?: $ReadOnlyArray<MarkerType>,
+    bindings?: $ReadOnlyArray<BindingType>,
+    returnTypes?: $ReadOnlyArray<ReturnType>,
     readOnly?: boolean,
     decorated?: boolean,
     resizable?: boolean,
-    decorator?: (React.Node) => React.Node
+    decorator?: (Node) => Node
 };
 
 type EditorState = {
@@ -156,13 +162,13 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         }
     );
 
-    render(): React.Node {
-        const {onChange, value, bindings, decorated, resizable, decorator, readOnly, isDisabled, mode} = this.props;
+    render(): Node {
+        const {onChange, value, bindings, returnTypes, decorated, resizable, decorator, readOnly, isDisabled, mode} = this.props;
         const {isLight} = this.state;
 
         const options = this._getOptions(readOnly, isDisabled, mode, isLight);
 
-        let el: React.Node = <CodeMirror
+        let el: Node = <CodeMirror
             options={options}
 
             onBeforeChange={onChange && this._onChange}
@@ -206,6 +212,37 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                                     {globalBindings.map(binding => <Binding key={binding.name} binding={binding}/>)}
                                     <hr className="full-width"/>
                                     {bindings.map(binding => <Binding key={binding.name} binding={binding}/>)}
+                                    {returnTypes &&
+                                        <Fragment>
+                                            <hr className="full-width"/>
+                                            <Label label={CommonMessages.returnTypes} isFirstChild={true}/>
+                                            {returnTypes.map((e, i) =>
+                                                <div className="flex-row" key={i}>
+                                                    {e.label &&
+                                                        <Fragment>
+                                                            <div className="flex-none">
+                                                                <Lozenge>{e.label}</Lozenge>
+                                                            </div>
+                                                            <div className="flex-grow"/>
+                                                        </Fragment>
+                                                    }
+                                                    {e.optional &&
+                                                        <div className="flex-vertical-middle">
+                                                            <Tooltip content="Optional">
+                                                                <QuestionIcon size="small" label="optional"/>
+                                                            </Tooltip>
+                                                        </div>
+                                                    }
+                                                    <div className="flex-none" style={{marginLeft: '5px'}}>
+                                                        {e.javaDoc ?
+                                                            <a href={e.javaDoc} title={e.fullClassName} target="_blank">{e.className}</a> :
+                                                            <abbr title={e.fullClassName}>{e.className}</abbr>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </Fragment>
+                                    }
                                 </div>
                             </InlineMessage>
                         </div>
@@ -220,7 +257,7 @@ type BindingProps = {
     binding: BindingType
 };
 
-function Binding({binding}: BindingProps): React.Node {
+function Binding({binding}: BindingProps): Node {
     return (
         <div className="flex-row">
             <div className="flex-none">{binding.name}</div>

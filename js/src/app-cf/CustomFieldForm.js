@@ -19,6 +19,7 @@ import {EditorField} from '../common/ak/EditorField';
 import {ConsoleMessages} from '../i18n/console.i18n';
 import type {VoidCallback} from '../common/types';
 import type {InputEvent} from '../common/EventTypes';
+import {extractShortClassName} from '../common/classNames';
 
 
 const bindings = [ Bindings.issue ];
@@ -155,6 +156,14 @@ export class CustomFieldForm extends React.Component<Props, State> {
             errorField = error.field;
         }
 
+        const returnTypes = [
+            {
+                className: extractShortClassName(fieldConfig.expectedType),
+                fullClassName: fieldConfig.expectedType,
+                optional: true
+            }
+        ];
+
         const velocityParamsEnabled = values.get('velocityParamsEnabled');
         return (
             <div className="flex-column">
@@ -177,6 +186,7 @@ export class CustomFieldForm extends React.Component<Props, State> {
                     isRequired={true}
 
                     bindings={velocityParamsEnabled ? bindingsWithVelocity : bindings}
+                    returnTypes={returnTypes}
 
                     value={values.get('scriptBody')}
                     onChange={this._setScript}

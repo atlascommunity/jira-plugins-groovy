@@ -37,7 +37,7 @@ import {ErrorMessage} from '../common/ak/messages';
 import {scheduledTaskService} from '../service/services';
 import {getMarkers} from '../common/error';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
-import {Bindings} from '../common/bindings';
+import {Bindings, ReturnTypes} from '../common/bindings';
 import {ItemActionCreators} from '../common/redux';
 import type {FullDialogComponentProps} from '../common/script-list/types';
 import type {InputEvent} from '../common/EventTypes';
@@ -47,6 +47,7 @@ import type {SingleValueType} from '../common/ak/types';
 
 const issueBindings = [Bindings.issue];
 const emptyBindings = [];
+const returnTypes = [ReturnTypes.void];
 
 function getValue(option: any): ?string {
     return option ? option.value : null;
@@ -282,6 +283,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
                         markers={markers}
 
                         bindings={bindings}
+                        returnTypes={returnTypes}
 
                         value={values.get(fieldName) || ''}
                         onChange={this._setObjectValue(fieldName)}

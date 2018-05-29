@@ -29,6 +29,8 @@ public class FieldConfigDto extends FieldConfigForm {
     @XmlElement
     private String searcher;
     @XmlElement
+    private String expectedType;
+    @XmlElement
     private List<ChangelogDto> changelogs;
     @XmlElement
     private Integer errorCount;

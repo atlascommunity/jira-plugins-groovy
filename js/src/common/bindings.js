@@ -1,6 +1,6 @@
 //@flow
 
-import type {BindingType} from './editor/types';
+import type {BindingType, ReturnType} from './editor/types';
 
 
 export const globalBindings : Array<BindingType> = [
@@ -32,7 +32,7 @@ export const globalBindings : Array<BindingType> = [
 
 const jiraVersion = '7.6.1';
 
-export const Bindings : {[string]: BindingType} = {
+export const Bindings: {[string]: BindingType} = {
     currentUser: {
         name: 'currentUser',
         className: 'ApplicationUser',
@@ -98,5 +98,21 @@ export const Bindings : {[string]: BindingType} = {
         className: 'Map<String, Object>',
         fullClassName: 'java.util.Map',
         javaDoc: 'https://docs.oracle.com/javase/8/docs/api/java/util/Map.html'
+    }
+};
+
+export const ReturnTypes: {[string]: ReturnType} = {
+    void: {
+        className: 'void',
+        fullClassName: 'void'
+    },
+    boolean: {
+        className: 'boolean',
+        fullClassName: 'boolean'
+    },
+    string: {
+        className: 'String',
+        fullClassName: 'java.lang.String',
+        javaDoc: 'https://docs.oracle.com/javase/8/docs/api/java/lang/String.html'
     }
 };

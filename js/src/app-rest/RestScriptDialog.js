@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
 
@@ -29,6 +29,21 @@ import type {HttpMethod} from '../common/types';
 import type {OldSelectItem, SingleValueType} from '../common/ak/types';
 import type {InputEvent} from '../common/EventTypes';
 
+
+const returnTypes = [
+    {
+        label: 'custom', //todo: i18n
+        className: 'Response',
+        fullClassName: 'javax.ws.rs.core.Response',
+        javaDoc: 'https://docs.oracle.com/javaee/7/api/javax/ws/rs/core/Response.html',
+        optional: true
+    },
+    {
+        label: 'No content (204)', //todo: i18n
+        className: 'null',
+        fullClassName: 'null'
+    }
+];
 
 const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(
     (method: HttpMethod): OldSelectItem<string> => {
@@ -186,11 +201,11 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
 
     _setObjectValue = (field: FormField) => (value: any) => this.mutateValue(field, value);
 
-    render(): React.Node {
+    render(): Node {
         const {onClose, isNew} = this.props;
         const {ready, values, script, error} = this.state;
 
-        let body: ?React.Node = null;
+        let body: ?Node = null;
 
         if (!ready) {
             body = <div>{DialogMessages.notReady}</div>;
@@ -275,6 +290,7 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
                         markers={markers}
 
                         bindings={bindings}
+                        returnTypes={returnTypes}
 
                         value={values.get('scriptBody') || ''}
                         onChange={this._setObjectValue('scriptBody')}
