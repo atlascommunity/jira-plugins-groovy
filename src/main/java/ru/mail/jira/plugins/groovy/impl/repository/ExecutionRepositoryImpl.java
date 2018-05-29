@@ -205,6 +205,20 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
     }
 
     @Override
+    public void deleteExecutions(int scriptId, Timestamp until) {
+        databaseAccessor.run(
+            connection -> connection
+                .delete(SCRIPT_EXECUTION)
+                .where(
+                    SCRIPT_EXECUTION.SCRIPT_ID.eq(scriptId),
+                    SCRIPT_EXECUTION.DATE.before(until)
+                )
+                .execute(),
+            OnRollback.NOOP
+        );
+    }
+
+    @Override
     public void onStart() {}
 
     @Override

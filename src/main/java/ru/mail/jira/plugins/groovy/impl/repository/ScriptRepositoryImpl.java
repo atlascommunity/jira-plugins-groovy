@@ -26,6 +26,7 @@ import ru.mail.jira.plugins.groovy.api.service.WatcherService;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 
+import java.sql.Timestamp;
 import java.text.Collator;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -331,6 +332,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         script.save();
 
         addAuditLogAndNotify(user, EntityAction.UPDATED, script, diff, comment);
+
+        if (!diff.isEmpty()) {
+            executionRepository.deleteExecutions(id, new Timestamp(System.currentTimeMillis()));
+        }
 
         return buildScriptDto(script, true, false, true, true);
     }
