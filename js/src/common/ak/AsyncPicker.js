@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import SelectWrapper from '@atlaskit/select/dist/esm/SelectWrapper';
 import Avatar from '@atlaskit/avatar';
@@ -14,7 +14,7 @@ import {ajaxGet} from '../../service/ajaxHelper';
 import type {OptMutableFieldProps, FieldProps, FormFieldProps, AkFormFieldProps} from '../types';
 
 
-function ValueImpl({data, children}: any): React.Node {
+function ValueImpl({data, children}: any): Node {
     return (
         <div className="flex-row">
             {data.imgSrc && <Avatar size="xsmall" src={data.imgSrc}/>}
@@ -25,7 +25,7 @@ function ValueImpl({data, children}: any): React.Node {
     );
 }
 
-function OptionImpl({data, children, ...props}: any): React.Node {
+function OptionImpl({data, children, ...props}: any): Node {
     return (
         <components.Option
             {...props}
@@ -35,7 +35,7 @@ function OptionImpl({data, children, ...props}: any): React.Node {
     );
 }
 
-function SingleValueImpl({data, children, ...props}: any): React.Node {
+function SingleValueImpl({data, children, ...props}: any): Node {
     return (
         <components.SingleValue {...props}>
             {props.in && <ValueImpl data={data}>{children}</ValueImpl>}
@@ -125,7 +125,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
         }
     }
 
-    render(): React.Node {
+    render() {
         const {label, isRequired, isLabelHidden, isInvalid, invalidMessage, isValidationHidden} = this.props;
         const {fetching, data} = this.state;
 

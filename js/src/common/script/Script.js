@@ -164,7 +164,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         });
     };
 
-    render(): Node {
+    render() {
         const {
             script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons,
             additionalPrimaryButtons, additionalParameters, dropdownItems, headerless

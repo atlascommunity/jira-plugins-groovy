@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {Record} from 'immutable';
 import type {RecordOf, RecordFactory} from 'immutable';
@@ -134,7 +134,7 @@ export class CustomFieldForm extends React.Component<Props, State> {
             );
     };
 
-    render(): React.Node {
+    render() {
         const {fieldConfig} = this.props;
         const {values, error, previewKey, previewResult} = this.state;
 

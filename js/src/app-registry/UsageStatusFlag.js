@@ -1,5 +1,5 @@
 //@flow
-import React, {type Node} from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 
@@ -12,7 +12,7 @@ type Props = {
 };
 
 class UsageStatusFlagInternal extends React.PureComponent<Props> {
-    render(): Node {
+    render() {
         const {ready} = this.props;
 
         if (ready) {

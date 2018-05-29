@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import Button from '@atlaskit/button';
 
@@ -62,7 +62,7 @@ export class WatchableScript extends React.PureComponent<Props, State> {
         );
     };
 
-    render(): React.Node {
+    render() {
         const {watches, entityId, entityType, dropdownItems, additionalButtons, onDelete, isUnwatchable, ...props} = this.props;
         const {waitingWatch} = this.state;
 

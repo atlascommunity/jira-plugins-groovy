@@ -54,6 +54,7 @@
         "peerDependencies": false
       }
     ],
+    "import/no-namespace": ["warn"],
     "import/no-mutable-exports": ["warn"],
     "import/no-duplicates": ["warn"],
     "import/newline-after-import": ["error", { "count": 2 }],
@@ -80,7 +81,8 @@
       2,
       "always",
       {
-        "excludeArrowFunctions": "expressionsOnly"
+        "excludeArrowFunctions": "expressionsOnly",
+        "excludeMatching": ["render"]
       }
     ],
     "flowtype/require-parameter-type": [

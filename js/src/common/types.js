@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import type {Node} from 'react';
 
 import type {ChangelogType} from './script/types';
 
@@ -34,7 +34,7 @@ export type FieldProps = {
     isLabelHidden?: boolean,
 
     isInvalid?: boolean,
-    invalidMessage?: React.Node,
+    invalidMessage?: Node,
 
     isRequired?: boolean,
     isDisabled?: boolean

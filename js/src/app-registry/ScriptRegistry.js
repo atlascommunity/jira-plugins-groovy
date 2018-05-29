@@ -1,5 +1,5 @@
 //@flow
-import React, {type Node} from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 import {createSelector} from 'reselect';
@@ -128,7 +128,7 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
     _toggleUnused = () => this.props.updateFilter({ onlyUnused: !this.props.filter.onlyUnused });
 
-    render(): Node {
+    render() {
         const {waiting, directoryDialogProps} = this.state;
         const {isScriptUsageReady, isForceOpen, filter} = this.props;
 

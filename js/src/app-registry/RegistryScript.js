@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
@@ -38,8 +38,8 @@ export type PublicRegistryScriptProps = {
     script: RegistryScriptType,
     onEdit: EditCallback,
     onDelete: DeleteCallback,
-    title?: React.Node,
-    children?: React.Node,
+    title?: Node,
+    children?: Node,
     wrapperProps?: any
 };
 
@@ -93,7 +93,7 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
 
     _onDelete = () => this.props.onDelete(this.props.script.id, 'script', this.props.script.name);
 
-    render(): React.Node {
+    render() {
         const {script, scriptWatches, wrapperProps, onEdit, onDelete, ...props} = this.props;
         const {showWorkflows, waitingWatch} = this.state;
 

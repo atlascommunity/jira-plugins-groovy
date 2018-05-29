@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {AkFieldRadioGroup} from '@atlaskit/field-radio-group';
 import {FieldTextStateless} from '@atlaskit/field-text';
@@ -78,7 +78,7 @@ export class ConditionPicker extends React.Component<Props> {
         };
     };
 
-    render(): React.Node {
+    render() {
         const {value, error} = this.props;
 
         let errorField: * = null;
@@ -89,7 +89,7 @@ export class ConditionPicker extends React.Component<Props> {
             errorMessage = error.message;
         }
 
-        let paramEl: ?React.Node = null;
+        let paramEl: ?Node = null;
 
         if (value.type) {
             switch (value.type) {

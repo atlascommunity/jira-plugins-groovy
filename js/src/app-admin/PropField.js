@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
@@ -43,7 +43,7 @@ export class PropField extends React.PureComponent<Props> {
 
     _textCallback = (e: SyntheticEvent<HTMLInputElement|HTMLTextAreaElement>) => this.props.onChange(e.currentTarget.value);
 
-    render(): React.Node {
+    render() {
         const {label, type, onChange, value} = this.props;
 
         switch (type) {

@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {colors} from '@atlaskit/theme';
 
@@ -11,16 +11,16 @@ import './messages.less';
 
 
 type MessageProps = {
-    title: React.Node,
-    children?: React.Node
+    title: Node,
+    children?: Node
 };
 
 type BaseMessageProps = MessageProps & {
-    icon: React.Node,
+    icon: Node,
     className: string
 };
 
-function Message({title, children, icon, className}: BaseMessageProps): React.Node {
+function Message({title, children, icon, className}: BaseMessageProps): Node {
     return (
         <div className={className}>
             <div className="Icon">
@@ -36,7 +36,7 @@ function Message({title, children, icon, className}: BaseMessageProps): React.No
     );
 }
 
-export function InfoMessage(props: MessageProps): React.Node {
+export function InfoMessage(props: MessageProps): Node {
     return (
         <Message
             className="InfoMessage"
@@ -46,7 +46,7 @@ export function InfoMessage(props: MessageProps): React.Node {
     );
 }
 
-export function ErrorMessage(props: MessageProps): React.Node {
+export function ErrorMessage(props: MessageProps): Node {
     return (
         <Message
             className="ErrorMessage"
@@ -56,7 +56,7 @@ export function ErrorMessage(props: MessageProps): React.Node {
     );
 }
 
-export function SuccessMessage(props: MessageProps): React.Node {
+export function SuccessMessage(props: MessageProps): Node {
     return (
         <Message
             className="SuccessMessage"

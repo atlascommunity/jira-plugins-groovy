@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type ComponentType} from 'react';
 
 import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
@@ -16,8 +16,8 @@ type Props<T> = {
     i18n: I18nType,
     isReady: boolean,
     items: Array<T>,
-    ScriptComponent: React.ComponentType<ScriptComponentProps<T>>,
-    DialogComponent?: React.ComponentType<FullDialogComponentProps>,
+    ScriptComponent: ComponentType<ScriptComponentProps<T>>,
+    DialogComponent?: ComponentType<FullDialogComponentProps>,
 
     isCreateDisabled: boolean
 };
@@ -42,7 +42,7 @@ export class ScriptPage<T: ItemType> extends React.PureComponent<Props<T>, State
 
     _closeEdit = () => this.setState({ editProps: null });
 
-    render(): React.Node {
+    render() {
         const {isReady, items, i18n, DialogComponent, ScriptComponent, isCreateDisabled} = this.props;
         const {editProps} = this.state;
 

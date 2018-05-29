@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import debounce from 'lodash.debounce';
 
@@ -21,7 +21,7 @@ type JqlInputProps = FieldProps & MutableTextFieldProps<string, HTMLTextAreaElem
 type JqlInputState = {
     validating: boolean,
     isInvalid: ?boolean,
-    invalidMessage: ?React.Node,
+    invalidMessage: ?Node,
     issues: ?number
 };
 
@@ -82,12 +82,12 @@ export class JqlInput extends React.Component<JqlInputProps, JqlInputState> {
         }
     }
 
-    render(): React.Node {
+    render() {
         const {value, onChange, isInvalid, invalidMessage, ...props} = this.props;
         const {issues, validating} = this.state;
 
         let invalid: boolean = isInvalid || false;
-        let invalidMsg: ?React.Node = invalidMessage;
+        let invalidMsg: ?Node = invalidMessage;
 
         if (this.state.isInvalid !== null && this.state.isInvalid !== undefined) {
             invalid = this.state.isInvalid;

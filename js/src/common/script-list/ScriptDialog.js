@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {Record} from 'immutable';
 import type {RecordOf, RecordFactory} from 'immutable';
@@ -161,16 +161,16 @@ export class ScriptDialog extends React.PureComponent<Props, State> {
         }
     }
 
-    render(): React.Node {
+    render() {
         const {i18n, isNew, returnTypes, modalProps, onClose} = this.props;
         const {values, isLoadingState, isSubmitting, error, name} = this.state;
 
-        let content: React.Node = null;
+        let content: Node = null;
 
         if (isLoadingState) {
             content = <LoadingSpinner/>;
         } else {
-            let errorMessage: React.Node = null;
+            let errorMessage: Node = null;
             let errorField: ?string = null;
 
             let markers: * = null;

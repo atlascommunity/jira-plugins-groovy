@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
@@ -26,7 +26,7 @@ export class FormEditor extends React.Component<FormEditorProps, FormEditorState
         this.setState({ value: value || '' });
     };
 
-    render(): React.Node {
+    render() {
         return <div>
             <EditorField
                 label={CommonMessages.script}

@@ -162,7 +162,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         }
     );
 
-    render(): Node {
+    render() {
         const {onChange, value, bindings, returnTypes, decorated, resizable, decorator, readOnly, isDisabled, mode} = this.props;
         const {isLight} = this.state;
 

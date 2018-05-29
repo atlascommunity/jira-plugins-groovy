@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import Button, {ButtonGroup} from '@atlaskit/button';
 import Modal from '@atlaskit/modal-dialog';
@@ -66,7 +66,7 @@ export class WorkflowsDialog extends React.PureComponent<WorkflowsDialogProps, W
             }));
     }
 
-    render(): React.Node {
+    render() {
         const {onClose} = this.props;
         const {ready, workflows} = this.state;
 

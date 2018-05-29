@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 import EditorSuccessIcon from '@atlaskit/icon/glyph/editor/success';
@@ -33,7 +33,7 @@ export class ExecutionBar extends React.PureComponent<ExecutionBarProps, Executi
 
     _hideExecution = () => this.setState({ displayedExecution: null });
 
-    render(): React.Node {
+    render() {
         const {displayedExecution} = this.state;
 
         return (
@@ -53,7 +53,7 @@ type ExecutionItemProps = {
 };
 
 class ExecutionItem extends React.PureComponent<ExecutionItemProps> {
-    render(): React.Node {
+    render() {
         const execution = this.props.execution;
         const params = execution.extraParams || {};
 

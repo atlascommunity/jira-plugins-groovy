@@ -1,5 +1,5 @@
 //@flow
-import React, {type Node} from 'react';
+import React from 'react';
 
 import Select, {createFilter} from '@atlaskit/select';
 
@@ -51,7 +51,7 @@ export class LargeSelect extends React.PureComponent<any, State> {
         );
     };
 
-    render(): Node {
+    render() {
         const {options: ignoreOptions, ...props} = this.props;
         const {options} = this.state;
 

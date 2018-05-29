@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
@@ -14,7 +14,7 @@ export class ExtrasPage extends React.Component<{}> {
         extrasService.clearCache().then(() => alert('done'));
     };
 
-    render(): React.Node {
+    render() {
         return <Page>
             <PageHeader>
                 {TitleMessages.extras}

@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {MultiSelect} from './MultiSelect';
 
@@ -55,7 +55,7 @@ export class AsyncLoadingMultiSelect<T: OldSelectValue = string> extends React.P
             });
     }
 
-    render(): React.Node {
+    render() {
         return <MultiSelect
             label={this.props.label}
             isRequired={this.props.isRequired}

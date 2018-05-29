@@ -1,5 +1,5 @@
 //@flow
-import React, {type Node} from 'react';
+import React, {Fragment} from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
@@ -14,11 +14,11 @@ type Props = {
 };
 
 export class LoaderInternal extends React.PureComponent<Props> {
-    render(): Node {
+    render() {
         const {ready, children} = this.props;
 
         if (ready) {
-            return children;
+            return <Fragment>{children}</Fragment>;
         }
 
         return <LoadingSpinner/>;

@@ -1,5 +1,5 @@
 //@flow
-import React, {type Node} from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 import {Link, Prompt, withRouter} from 'react-router-dom';
@@ -256,7 +256,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
         }
     };
 
-    render(): Node {
+    render() {
         const {values, script, parentName, noParent, error, modified, fetching, waiting} = this.state;
         let errorMessage: ?string = null;
         let errorField: ?string = null;

@@ -201,7 +201,7 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
 
     _setObjectValue = (field: FormField) => (value: any) => this.mutateValue(field, value);
 
-    render(): Node {
+    render() {
         const {onClose, isNew} = this.props;
         const {ready, values, script, error} = this.state;
 

@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
 
@@ -165,7 +165,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
         }
     );
 
-    render(): React.Node {
+    render() {
         const {script} = this.props;
         const {showStatusInfo, showRunDialog} = this.state;
         const {lastRunInfo} = script;
@@ -196,7 +196,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
             </div>
             {lastRun}
         </div>;
-        let titleEl: React.Node = (
+        let titleEl: Node = (
             <div className="flex-row space-between">
                 <div className="flex-vertical-middle">
                     <ToggleStateless

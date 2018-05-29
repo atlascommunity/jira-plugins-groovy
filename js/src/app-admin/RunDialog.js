@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import memoizeOne from 'memoize-one';
 
@@ -87,7 +87,7 @@ export class RunDialog extends React.PureComponent<Props, State> {
         };
     }));
 
-    _renderFields = (): React.Node => {
+    _renderFields = (): Node => {
         const {params} = this.props.script;
 
         if (!params || !params.length) {
@@ -96,7 +96,7 @@ export class RunDialog extends React.PureComponent<Props, State> {
 
         return (
             <div className="flex-column">
-                {params.map((param: ParamType): React.Node =>
+                {params.map((param: ParamType): Node =>
                     <PropField
                         key={param.name}
                         label={param.displayName}
@@ -151,11 +151,11 @@ export class RunDialog extends React.PureComponent<Props, State> {
         }
     };
 
-    render(): React.Node {
+    render() {
         const {script, onClose} = this.props;
         const {stage, outcome} = this.state;
 
-        let content: ?React.Node = null;
+        let content: ?Node = null;
 
         if (stage === 'params') {
             content = this._renderFields();

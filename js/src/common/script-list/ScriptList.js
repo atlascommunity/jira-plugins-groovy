@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type ComponentType} from 'react';
 
 import type {ScriptComponentProps, I18nType, ScriptCallbackType} from './types';
 
@@ -14,11 +14,11 @@ type Props<T> = {
     isReady: boolean,
     items: Array<T>,
     onEdit: ScriptCallbackType,
-    ScriptComponent: React.ComponentType<ScriptComponentProps<T>>
+    ScriptComponent: ComponentType<ScriptComponentProps<T>>
 };
 
 export class ScriptList<T> extends React.PureComponent<Props<T&ItemType>> {
-    render(): React.Node {
+    render() {
         const {isReady, items, i18n, onEdit, ScriptComponent} = this.props;
 
         if (!isReady) {

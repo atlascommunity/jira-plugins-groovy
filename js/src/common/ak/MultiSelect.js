@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import Select from '@atlaskit/select';
 import SelectWrapper from '@atlaskit/select/dist/esm/SelectWrapper';
@@ -58,7 +58,7 @@ export class MultiSelect<T: OldSelectValue> extends React.PureComponent<Props<T>
         });
     }
 
-    render(): React.Node {
+    render() {
         const {isInvalid, invalidMessage, value} = this.props;
         const {lookupMap} = this.state;
 

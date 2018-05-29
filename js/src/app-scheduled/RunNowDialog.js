@@ -1,5 +1,5 @@
 //@flow
-import React, {type Node} from 'react';
+import React from 'react';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 import Spinner from '@atlaskit/spinner';
@@ -58,7 +58,7 @@ export class RunNowDialog extends React.PureComponent<Props, State> {
             );
     };
 
-    render(): Node {
+    render() {
         const {task} = this.props;
         const {running, result} = this.state;
 

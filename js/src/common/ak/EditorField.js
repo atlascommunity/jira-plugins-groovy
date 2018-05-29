@@ -43,7 +43,7 @@ export class EditorField extends React.Component<EditorFieldProps> {
         );
     };
 
-    render(): Node {
+    render() {
         const {label, isRequired, isLabelHidden, mode, ...props} = this.props;
 
         return (

@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import type {FieldConfigItem} from './types';
 
@@ -17,7 +17,7 @@ type Props = {
 };
 
 export class FieldScript extends React.PureComponent<Props> {
-    render(): React.Node {
+    render() {
         const {script} = this.props;
 
         return (

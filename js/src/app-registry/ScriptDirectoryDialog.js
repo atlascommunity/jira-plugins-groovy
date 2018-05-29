@@ -1,5 +1,5 @@
 //@flow
-import React, {type Node} from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 
@@ -106,7 +106,7 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
 
     _setName = (event: SyntheticEvent<HTMLInputElement>) => this.setState({ name: event.currentTarget.value });
 
-    render(): Node {
+    render() {
         const {onClose, isNew} = this.props;
         const {error, directory} = this.state;
 

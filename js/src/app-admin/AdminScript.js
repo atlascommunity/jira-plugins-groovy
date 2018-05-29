@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 
@@ -81,7 +81,7 @@ class AdminScriptInternal extends React.PureComponent<Props, State> {
         }
     );
 
-    render(): React.Node {
+    render() {
         const {script} = this.props;
         const {isRunning} = this.state;
         const {builtIn} = script;

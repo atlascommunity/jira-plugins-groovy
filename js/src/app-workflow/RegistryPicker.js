@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {Map} from 'immutable';
 import type {Map as MapType} from 'immutable';
@@ -82,7 +82,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
         };
     });
 
-    _renderParam(param: ParamType, label: string): React.Node {
+    _renderParam(param: ParamType, label: string): Node {
         const {values} = this.state;
 
         const {fieldName} = this.props;
@@ -251,7 +251,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
             });
     }
 
-    render(): React.Node {
+    render() {
         const {ready, scripts, script} = this.state;
 
         if (!ready) {

@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Element} from 'react';
 
 import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
@@ -49,7 +49,7 @@ export class CustomFieldFormContainer extends React.Component<Props, State> {
         }
     }
 
-    render(): React.Node {
+    render() {
         const {config, ready, editing} = this.state;
 
         if (!ready || !config) {
@@ -64,7 +64,7 @@ export class CustomFieldFormContainer extends React.Component<Props, State> {
             );
         }
 
-        let actions: ?React.Element<any> = null;
+        let actions: ?Element<any> = null;
 
         if (config.uuid && !editing) {
             actions = (

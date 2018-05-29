@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import Button from '@atlaskit/button';
 
@@ -80,7 +80,7 @@ export class ScriptConsole extends React.Component<Props, State> {
             );
     };
 
-    render(): React.Node {
+    render() {
         const {script, output, error, waiting, modified} = this.state;
 
         let errorMessage: * = null;

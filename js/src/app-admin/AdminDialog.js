@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 
@@ -79,7 +79,7 @@ const returnTypes = [{
 }];
 
 class AdminDialogInternal extends React.PureComponent<Props> {
-    render(): React.Node {
+    render() {
         return (
             <ScriptDialog
                 defaultLoader={defaultLoader}

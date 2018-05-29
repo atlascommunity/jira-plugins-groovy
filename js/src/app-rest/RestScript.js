@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 
@@ -51,7 +51,7 @@ class RestScriptInternal extends React.PureComponent<Props> {
         }
     };
 
-    render(): React.Node {
+    render() {
         const {script} = this.props;
 
         const url = `${getPluginBaseUrl()}/custom/${script.name}`;

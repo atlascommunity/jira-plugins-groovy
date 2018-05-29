@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
 
@@ -175,11 +175,11 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
 
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
 
-    render(): React.Node {
+    render() {
         const {onClose, isNew} = this.props;
         const {ready, values, listener, error} = this.state;
 
-        let body: ?React.Node = null;
+        let body: ?Node = null;
 
         if (!ready) {
             body = <div>{DialogMessages.notReady}</div>;

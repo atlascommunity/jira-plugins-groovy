@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 import ReactDOM from 'react-dom';
 
 import Avatar from '@atlaskit/avatar';
@@ -31,7 +31,7 @@ export type ScriptParamValueProps = {
     param: ParamType
 };
 
-function ScriptParamValue({value, param}: ScriptParamValueProps): React.Node {
+function ScriptParamValue({value, param}: ScriptParamValueProps): Node {
     if (value === null || value === undefined) {
         return <strong style={!param.optional ? {color: 'red'} : undefined}>{ErrorMessages.noValue}</strong>;
     }

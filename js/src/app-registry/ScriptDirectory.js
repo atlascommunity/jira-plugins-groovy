@@ -1,5 +1,5 @@
 //@flow
-import React, {type Node} from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 import {createSelector} from 'reselect';
@@ -58,7 +58,7 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
         }
     };
 
-    render(): Node {
+    render() {
         const {forceOpen, isOpen, directory, children, scripts, errorCount, onCreate, onEdit, onDelete} = this.props;
 
         let directories: * = null;
@@ -246,7 +246,7 @@ export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsP
         waitingWatch: false
     };
 
-    render(): Node {
+    render() {
         const {id, isWatched} = this.props;
         const {waitingWatch} = this.state;
 

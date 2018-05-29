@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Element} from 'react';
 
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
@@ -202,7 +202,7 @@ export class AuditLog extends React.Component<Props, State> {
         this._loadList(0);
     }
 
-    _renderPagination(): React.Node {
+    _renderPagination(): Element<typeof Pagination> {
         const {data} = this.state;
 
         return (
@@ -219,7 +219,7 @@ export class AuditLog extends React.Component<Props, State> {
         );
     }
 
-    render(): React.Node {
+    render() {
         const {isReady, rows} = this.state;
 
         return <Page>

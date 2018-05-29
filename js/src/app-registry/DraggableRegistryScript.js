@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import memoizeOne from 'memoize-one';
 import {connect} from 'react-redux';
@@ -19,7 +19,7 @@ type Props = {
 };
 
 export class DraggableRegistryScriptInternal extends React.PureComponent<PublicRegistryScriptProps & Props> {
-    render(): React.Node {
+    render() {
         const {script, scriptUsage} = this.props;
         const isUsed = !scriptUsage.ready || ((scriptUsage.items[script.id] || 0) > 0);
 

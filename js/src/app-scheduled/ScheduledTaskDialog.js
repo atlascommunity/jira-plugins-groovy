@@ -389,7 +389,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
         }
     };
 
-    render(): Node {
+    render() {
         const {onClose, isNew} = this.props;
         const {ready, values, task, error} = this.state;
 

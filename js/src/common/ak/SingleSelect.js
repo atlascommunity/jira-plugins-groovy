@@ -1,5 +1,5 @@
 //@flow
-import React, {type Node} from 'react';
+import React from 'react';
 
 import {Label} from '@atlaskit/field-base';
 
@@ -15,7 +15,7 @@ type SingleSelectProps<T: OldSelectValue> = FieldProps & MutableFieldProps<OldSe
 };
 
 export class SingleSelect<T: OldSelectValue> extends React.PureComponent<SingleSelectProps<T>> {
-    render(): Node {
+    render() {
         const {label, isRequired, isLabelHidden, options, value, onChange, ...props} = this.props;
 
         return (

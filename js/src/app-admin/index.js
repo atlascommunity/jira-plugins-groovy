@@ -1,6 +1,6 @@
 //@flow
 import ReactDOM from 'react-dom';
-import * as React from 'react';
+import React, {type ComponentType} from 'react';
 
 import {Provider} from 'react-redux';
 import {combineReducers, createStore} from 'redux';
@@ -52,7 +52,7 @@ AJS.toInit(() => {
     ReactDOM.render(
         <Provider store={store}>
             <ConnectedScriptPage
-                DialogComponent={(AdminDialog: React.ComponentType<FullDialogComponentProps>)}
+                DialogComponent={(AdminDialog: ComponentType<FullDialogComponentProps>)}
                 ScriptComponent={AdminScript}
                 i18n={{
                     title: TitleMessages.adminScripts,

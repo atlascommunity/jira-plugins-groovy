@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 
@@ -96,7 +96,7 @@ class ListenerInternal extends React.PureComponent<Props> {
         }
     );
 
-    render(): React.Node {
+    render() {
         const {script, projects, eventTypes} = this.props;
 
         return (
