@@ -30,6 +30,9 @@ type Props = (CommonProps & {
 }) | (CommonProps & {
     type: 'BOOLEAN',
     value: boolean
+}) | (CommonProps & {
+    type: 'MULTI_USER',
+    value: ?$ReadOnlyArray<SingleValueType>
 });
 
 export class PropField extends React.PureComponent<Props> {
@@ -53,6 +56,18 @@ export class PropField extends React.PureComponent<Props> {
                     onChange={onChange}
                     //$FlowFixMe
                     value={value}
+                />;
+            }
+            case 'MULTI_USER': {
+                return <AsyncPicker
+                    label={label}
+                    isRequired={true}
+                    isMulti={true}
+
+                    src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                    onChange={onChange}
+                    //$FlowFixMe
+                    value={value || []}
                 />;
             }
             case 'GROUP':

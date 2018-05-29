@@ -17,6 +17,11 @@ import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 @Component
 public class ScriptParamFactory {
     private final UserManager userManager;
@@ -68,6 +73,8 @@ public class ScriptParamFactory {
                 return constantsManager.getResolution(value);
             case SCRIPT:
                 return new ScriptParamImpl(scriptService, value);
+            case MULTI_USER:
+                return Arrays.stream(value.split(";")).map(userManager::getUserByKey).collect(Collectors.toList());
         }
 
         return null;
@@ -94,17 +101,7 @@ public class ScriptParamFactory {
                     "value", value
                 );
             case USER:
-                JiraUser user = userMapper.buildUserNullable(value);
-
-                if (user == null) {
-                    return null;
-                }
-
-                return ImmutableMap.of(
-                    "label", user.getDisplayName(),
-                    "value", value,
-                    "avatarUrl", user.getAvatarUrl()
-                );
+                return buildUser(value);
             case GROUP:
                 return ImmutableMap.of(
                     "label", value,
@@ -116,7 +113,30 @@ public class ScriptParamFactory {
                     "label", resolution != null ? resolution.getName() : value,
                     "value", value
                 );
+            case MULTI_USER:
+                if (value == null) {
+                    return null;
+                }
+                return Arrays
+                    .stream(value.split(";"))
+                    .map(this::buildUser)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
         }
         return null;
+    }
+
+    private Map<String, String> buildUser(String value) {
+        JiraUser user = userMapper.buildUserNullable(value);
+
+        if (user == null) {
+            return null;
+        }
+
+        return ImmutableMap.of(
+            "label", user.getDisplayName(),
+            "value", value,
+            "avatarUrl", user.getAvatarUrl()
+        );
     }
 }

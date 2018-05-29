@@ -6,6 +6,8 @@ import com.atlassian.jira.issue.resolution.Resolution;
 import com.atlassian.jira.user.ApplicationUser;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public enum ParamType {
     BOOLEAN(Boolean.class),
@@ -17,7 +19,8 @@ public enum ParamType {
     USER(ApplicationUser.class),
     GROUP(Group.class),
     RESOLUTION(Resolution.class),
-    SCRIPT(ScriptParam.class);
+    SCRIPT(ScriptParam.class),
+    MULTI_USER(List.class);
 
     private final Class type;
 

@@ -16,6 +16,7 @@ import type {ScriptType, ParamType, ScriptDescriptionType} from './types';
 
 import {registryService} from '../service/services';
 import {SingleSelect} from '../common/ak/SingleSelect';
+import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 import {getBaseUrl, getPluginBaseUrl} from '../service/ajaxHelper';
 import {CommonMessages} from '../i18n/common.i18n';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
@@ -101,6 +102,21 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                     onChange={this._setValue(paramName)}
                     value={value}
                 />;
+            case 'MULTI_USER': {
+                return <AsyncPicker
+                    label={label}
+                    isRequired={true}
+                    isMulti={true}
+
+                    name={inputName}
+                    delimiter=";"
+
+                    src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                    onChange={this._setValue(paramName)}
+                    //$FlowFixMe
+                    value={value}
+                />;
+            }
             case 'GROUP':
                 return <AsyncPicker
                     label={label}
@@ -238,8 +254,8 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
     render(): React.Node {
         const {ready, scripts, script} = this.state;
 
-        if (!ready && !scripts) {
-            return <span className="aui-icon aui-icon-wait"/>;
+        if (!ready) {
+            return <LoadingSpinner/>;
         }
 
         return <div className="flex-column">
@@ -261,10 +277,12 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                         shouldFitContainer={true}
                     />
                 </div>
-                <Button
-                    iconBefore={<AddIcon label="add"/>}
-                    href={`${getBaseUrl()}/plugins/servlet/my-groovy/registry/script/create`}
-                />
+                <div className="flex-vertical-middle" style={{marginLeft: '10px'}}>
+                    <Button
+                        iconBefore={<AddIcon label="add"/>}
+                        href={`${getBaseUrl()}/plugins/servlet/my-groovy/registry/script/create`}
+                    />
+                </div>
             </div>
 
             {script && script.description &&

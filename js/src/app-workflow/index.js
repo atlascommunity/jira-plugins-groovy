@@ -40,6 +40,12 @@ function ScriptParamValue({value, param}: ScriptParamValueProps): React.Node {
             return <div>
                 <Avatar size="xsmall" src={value.avatarUrl}/>{' '}{value.label}
             </div>;
+        case 'MULTI_USER':
+            return value.map(item =>
+                <div>
+                    <Avatar key={item.value} size="xsmall" src={item.avatarUrl}/>{' '}{item.label}
+                </div>
+            );
         case 'GROUP':
             return value.label;
         case 'CUSTOM_FIELD':
