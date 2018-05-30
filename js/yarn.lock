@@ -9,8 +9,8 @@
     prop-types "^15.5.10"
 
 "@atlaskit/avatar@^10.0.5":
-  version "10.0.6"
-  resolved "https://registry.yarnpkg.com/@atlaskit/avatar/-/avatar-10.0.6.tgz#f8e1ff857f96d98ae27fb00217034208321adeff"
+  version "10.0.7"
+  resolved "https://registry.yarnpkg.com/@atlaskit/avatar/-/avatar-10.0.7.tgz#83025dd30dc56d1054b8ddb02f7163a3df5dedf2"
   dependencies:
     "@atlaskit/dropdown-menu" "^4.0.3"
     "@atlaskit/item" "^6.0.3"
@@ -44,8 +44,8 @@
     styled-components "1.4.6 - 3"
 
 "@atlaskit/checkbox@^2.0.1":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@atlaskit/checkbox/-/checkbox-2.0.2.tgz#99f67f9a008101fd17e5e4f294f74d0e1df93e62"
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/checkbox/-/checkbox-2.1.0.tgz#487dcfa9ec62c64c85760f6612e040df7c9a7358"
   dependencies:
     "@atlaskit/button" "^7.2.5"
     "@atlaskit/icon" "^11.3.0"
@@ -81,7 +81,21 @@
     string-raw "^1.0.1"
     styled-components "1.4.6 - 3"
 
-"@atlaskit/dropdown-menu@^4.0.2", "@atlaskit/dropdown-menu@^4.0.3":
+"@atlaskit/dropdown-menu@^4.0.2":
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/@atlaskit/dropdown-menu/-/dropdown-menu-4.0.5.tgz#0ee106390bd69be3222c44c0b13cb6d6fd4a7603"
+  dependencies:
+    "@atlaskit/button" "^7.2.5"
+    "@atlaskit/droplist" "^5.0.3"
+    "@atlaskit/icon" "^11.3.0"
+    "@atlaskit/item" "^6.0.3"
+    "@atlaskit/theme" "^3.2.2"
+    array-find "^1.0.0"
+    prop-types "^15.5.10"
+    styled-components "1.4.6 - 3"
+    uuid "^3.1.0"
+
+"@atlaskit/dropdown-menu@^4.0.3":
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/@atlaskit/dropdown-menu/-/dropdown-menu-4.0.3.tgz#b626fc83cb4a33994388ac04ee7d451cc0c20c65"
   dependencies:
@@ -112,8 +126,8 @@
     styled-components "1.4.6 - 3"
 
 "@atlaskit/dynamic-table@^8.0.2":
-  version "8.0.3"
-  resolved "https://registry.yarnpkg.com/@atlaskit/dynamic-table/-/dynamic-table-8.0.3.tgz#1d68be7c07b15904cd9abaa90ff58dd8613d10c3"
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/dynamic-table/-/dynamic-table-8.1.0.tgz#71cc8d2dabdcea920c061135ffc4e64d1dc5769e"
   dependencies:
     "@atlaskit/button" "^7.2.5"
     "@atlaskit/pagination" "^5.0.1"
@@ -143,8 +157,8 @@
     styled-components "1.4.6 - 3"
 
 "@atlaskit/field-radio-group@^2.0.2":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@atlaskit/field-radio-group/-/field-radio-group-2.0.3.tgz#edc22a8287c944fc7f90eba89969aa50eb09ce07"
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/field-radio-group/-/field-radio-group-2.1.0.tgz#624b54f85ce2aebce3f2d2db458e3b0e138b11aa"
   dependencies:
     "@atlaskit/field-base" "^9.0.3"
     "@atlaskit/icon" "^11.3.0"
@@ -152,8 +166,8 @@
     styled-components "1.4.6 - 3"
 
 "@atlaskit/field-text-area@^2.0.3":
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/@atlaskit/field-text-area/-/field-text-area-2.0.4.tgz#b676a73dd44a725de40f4bf34d8ee08c55822521"
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/field-text-area/-/field-text-area-2.1.0.tgz#358195336ed5646d6a0856b0108d5df5834dcef9"
   dependencies:
     "@atlaskit/button" "^7.2.5"
     "@atlaskit/field-base" "^9.0.3"
@@ -163,8 +177,8 @@
     styled-components "1.4.6 - 3"
 
 "@atlaskit/field-text@^5.0.2":
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/@atlaskit/field-text/-/field-text-5.0.3.tgz#c77b5810da8e314962a50534736666ffab0168d6"
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/field-text/-/field-text-5.1.1.tgz#e5995140f2db6fc508ca4ddb13b240f2ffebffbf"
   dependencies:
     "@atlaskit/field-base" "^9.0.3"
     "@atlaskit/theme" "^3.2.2"
@@ -184,8 +198,8 @@
     uuid "^3.1.0"
 
 "@atlaskit/form@^1.0.1":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@atlaskit/form/-/form-1.0.3.tgz#6042ff0181cae22f5ae172375d311954ec3e2f3e"
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@atlaskit/form/-/form-1.0.4.tgz#c78c4144b75fe3f038426ad09ed6cf6744faceaf"
   dependencies:
     "@atlaskit/icon" "^11.3.0"
     "@atlaskit/theme" "^3.2.2"
@@ -193,8 +207,8 @@
     styled-components "1.4.6 - 3"
 
 "@atlaskit/icon@^11.3.0":
-  version "11.3.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-11.3.0.tgz#63cecca718e049d38791d3ff000ddadda03ec6cd"
+  version "11.3.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-11.3.2.tgz#59e3583ea4c1039f4cd61ae5cd0b19a2beb9ef9f"
   dependencies:
     "@atlaskit/theme" "^3.2.2"
     babel-runtime "^6.26.0"
@@ -247,9 +261,10 @@
     styled-components "1.4.6 - 3"
 
 "@atlaskit/lozenge@^4.0.0":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@atlaskit/lozenge/-/lozenge-4.0.1.tgz#10d4188eeae0a7b4bf375ef7e9c058f301efa509"
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/lozenge/-/lozenge-4.1.1.tgz#91db746989a4e83e9b38ad03363f5fb63e4f34bc"
   dependencies:
+    "@atlaskit/theme" "^3.1.1"
     "@atlaskit/util-shared-styles" "^2.10.3"
     babel-runtime "^6.26.0"
     styled-components "1.4.6 - 3"
@@ -293,12 +308,12 @@
     styled-components "1.4.6 - 3"
 
 "@atlaskit/select@^3.0.2":
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/@atlaskit/select/-/select-3.0.2.tgz#769298c8a851b23382b6c7968acbdf1850f9cadf"
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/select/-/select-3.1.0.tgz#974a6fc913dc08110647eca225c1bbec727efdd9"
   dependencies:
     "@atlaskit/icon" "^11.3.0"
     "@atlaskit/theme" "^3.2.2"
-    react-select "^2.0.0-beta.4"
+    react-select "^2.0.0-beta.6"
     react-transition-group "^2.2.1"
     styled-components "1.4.6 - 3"
 
@@ -311,7 +326,7 @@
     react-transition-group "^2.2.1"
     styled-components "1.4.6 - 3"
 
-"@atlaskit/theme@^3.2.2":
+"@atlaskit/theme@^3.1.1", "@atlaskit/theme@^3.2.2":
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-3.2.2.tgz#14e55188a6561e34fa697445ec5582ef0c733942"
   dependencies:
@@ -5835,20 +5850,9 @@ react-scrolllock@^2.0.2:
   dependencies:
     exenv "^1.2.2"
 
-react-select@2.0.0-beta.4:
-  version "2.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/react-select/-/react-select-2.0.0-beta.4.tgz#44009c06d9d5c8f8580b9969fa062cf6f4ec8d52"
-  dependencies:
-    classnames "^2.2.5"
-    emotion "^9.1.2"
-    prop-types "^15.6.0"
-    raf "^3.4.0"
-    react-input-autosize "^2.2.1"
-    react-transition-group "^2.2.1"
-
-react-select@^2.0.0-beta.4:
-  version "2.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/react-select/-/react-select-2.0.0-beta.5.tgz#5fd79f8b890eeac707f9d09585aeab746df2d186"
+react-select@2.0.0-beta.6, react-select@^2.0.0-beta.6:
+  version "2.0.0-beta.6"
+  resolved "https://registry.yarnpkg.com/react-select/-/react-select-2.0.0-beta.6.tgz#87ac27831f348cb9535dfd825534934adcfb7e97"
   dependencies:
     classnames "^2.2.5"
     emotion "^9.1.2"
