@@ -30,7 +30,7 @@ export type AkFormFieldProps = {
 };
 
 export type FieldProps = {
-    label: string,
+    label?: string,
     isLabelHidden?: boolean,
 
     isInvalid?: boolean,

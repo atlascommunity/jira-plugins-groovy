@@ -127,18 +127,6 @@
         <context>ru.mail.jira.plugins.groovy.fields</context>
     </web-resource>
 
-    <web-resource key="cf-resources" name="groovy custom field Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <!--resource type="download" name="cf.css" location="/ru/mail/jira/plugins/groovy/css/cf.css"/>
-        <resource type="download" name="cf.css.smap" location="/ru/mail/jira/plugins/groovy/css/cf.css.smap"/-->
-
-        <resource type="download" name="cf.js" location="/ru/mail/jira/plugins/groovy/js/cf.js"/>
-        <resource type="download" name="cf.js.smap" location="/ru/mail/jira/plugins/groovy/js/cf.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.cf</context>
-    </web-resource>
-
     <web-resource key="scheduled-resources" name="groovy scheduled Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 
@@ -370,7 +358,7 @@
     <web-item key="groovy-admin-scripts-menu-item" name="Groovy admin scripts menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy admin scripts.</description>
         <label key="ru.mail.jira.plugins.groovy.link.adminScripts" />
-        <link linkId="mailru-groovy-console-link">/plugins/servlet/my-groovy/admin-scripts</link>
+        <link linkId="mailru-groovy-admin-link">/plugins/servlet/my-groovy/admin-scripts</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -400,7 +388,7 @@
     <web-item key="groovy-rest-menu-item" name="Groovy rest menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy rest page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.rest" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/rest</link>
+        <link linkId="mailru-groovy-rest-link">/plugins/servlet/my-groovy/rest</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -410,7 +398,7 @@
     <web-item key="groovy-fields-menu-item" name="Groovy fields menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy fields page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.fields" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/fields</link>
+        <link linkId="mailru-groovy-fields-link">/plugins/servlet/my-groovy/fields</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -430,7 +418,7 @@
     <web-item key="groovy-audit-menu-item" name="Groovy audit menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy audit page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.audit" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/audit</link>
+        <link linkId="mailru-groovy-audit-link">/plugins/servlet/my-groovy/audit</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -440,7 +428,7 @@
     <web-item key="groovy-extras-menu-item" name="Groovy listeners menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy extras page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.extras" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/extras</link>
+        <link linkId="mailru-groovy-extras-link">/plugins/servlet/my-groovy/extras</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>

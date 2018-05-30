@@ -30,7 +30,9 @@ export const FieldMessages: I18nMessages = {
     order: i18n.fields.order,
     searcher: i18n.fields.searcher,
     groups: i18n.fields.groups,
-    issue: i18n.fields.issue
+    issue: i18n.fields.issue,
+    options: i18n.fields.options,
+    template: i18n.fields.template
 };
 
 export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction }) = {

@@ -65,7 +65,7 @@ export class MultiSelect<T: OldSelectValue> extends React.PureComponent<Props<T>
         return (
             <div>
                 <Label
-                    label={this.props.label}
+                    label={this.props.label || ''}
                     isRequired={this.props.isRequired}
                 />
                 <SelectWrapper

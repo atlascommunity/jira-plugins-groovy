@@ -63,6 +63,11 @@ public class GroovyServlet extends HttpServlet {
                 path = path.substring(1);
             }
 
+            if ("custom-field".equals(path)) {
+                response.sendRedirect("fields/" + request.getParameter("fieldConfigId") + "/edit");
+                return;
+            }
+
             Optional<String> matchedResource = ALLOWED_RESOURCES.stream().filter(path::startsWith).findAny();
             if (!matchedResource.isPresent()) {
                 response.sendError(404);

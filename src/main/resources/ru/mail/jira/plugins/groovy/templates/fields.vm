@@ -2,7 +2,8 @@
 <head>
     <title>$i18n.getText("ru.mail.jira.plugins.groovy.link.fields")</title>
     <meta name="decorator" content="atl.admin">
-    <meta name="admin.active.section" content="mailru-groovy-fields-link" />
+    <meta name="admin.active.section" content="admin_plugins_menu/admin_mailru_groovy_section" />
+    <meta name="admin.active.tab" content="mailru-groovy-fields-link" />
 </head>
 <body>
 <div id="react-content">

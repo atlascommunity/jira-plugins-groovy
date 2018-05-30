@@ -1,8 +1,8 @@
 //@flow
 import ReactDOM from 'react-dom';
 import React from 'react';
-
 import {Provider} from 'react-redux';
+import {BrowserRouter, Switch, Route} from 'react-router-dom';
 
 import {combineReducers, createStore} from 'redux';
 
@@ -10,6 +10,7 @@ import {combineReducers, createStore} from 'redux';
 import AJS from 'AJS';
 
 import {FieldScript} from './FieldScript';
+import {CustomFieldForm} from './CustomFieldForm';
 
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 
@@ -19,6 +20,9 @@ import {fixStyle} from '../common/fixStyle';
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {TitleMessages} from '../i18n/common.i18n';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
+
+import {getBaseUrl} from '../service/ajaxHelper';
+import {Loader} from '../common/ak/Loader';
 
 import '../flex.less';
 
@@ -48,16 +52,31 @@ AJS.toInit(() => {
 
     ReactDOM.render(
         <Provider store={store}>
-            <ConnectedScriptPage
-                ScriptComponent={FieldScript}
-                i18n={{
-                    title: TitleMessages.fields,
-                    addItem: '',
-                    noItems: ScriptFieldMessages.noFields
-                }}
+            <BrowserRouter basename={`${getBaseUrl()}/plugins/servlet/my-groovy/fields`}>
+                <Loader>
+                    <Switch>
+                        <Route path="/" exact={true}>
+                            {() =>
+                                <ConnectedScriptPage
+                                    ScriptComponent={FieldScript}
+                                    i18n={{
+                                        title: TitleMessages.fields,
+                                        addItem: '',
+                                        noItems: ScriptFieldMessages.noFields
+                                    }}
 
-                isCreateDisabled={true}
-            />
+                                    isCreateDisabled={true}
+                                />
+                            }
+                        </Route>
+                        <Route path="/:id/edit" exact={true}>
+                            {({match}) =>
+                                <CustomFieldForm id={parseInt(match.params.id, 10)}/>
+                            }
+                        </Route>
+                    </Switch>
+                </Loader>
+            </BrowserRouter>
         </Provider>,
         element
     );

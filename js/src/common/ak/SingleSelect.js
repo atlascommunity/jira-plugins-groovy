@@ -20,7 +20,7 @@ export class SingleSelect<T: OldSelectValue> extends React.PureComponent<SingleS
 
         return (
             <div>
-                <Label label={label} isRequired={isRequired} isLabelHidden={isLabelHidden}/>
+                <Label label={label || ''} isRequired={isRequired} isLabelHidden={isLabelHidden}/>
                 <LargeSelect value={value} onChange={onChange} options={options} {...props}/>
             </div>
         );

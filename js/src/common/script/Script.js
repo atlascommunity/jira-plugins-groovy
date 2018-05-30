@@ -311,9 +311,9 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                     }}
                 >
                     <DropdownItemGroup>
-                        {dropdownItems.map((item: *, i: number): * =>
-                            <DropdownItem onClick={item.onClick} key={i} href={item.href}>
-                                {item.label}
+                        {dropdownItems.map(({label, ...itemProps}: *, i: number): * =>
+                            <DropdownItem key={i} {...itemProps}>
+                                {label}
                             </DropdownItem>
                         )}
                     </DropdownItemGroup>

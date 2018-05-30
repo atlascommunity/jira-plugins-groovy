@@ -153,7 +153,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
 
         return (
             <div>
-                <Label label={label} isRequired={isRequired} isHidden={isLabelHidden}/>
+                <Label label={label || ''} isRequired={isRequired} isHidden={isLabelHidden}/>
                 <SelectWrapper
                     id={`async-picker-${this.i}`}
 

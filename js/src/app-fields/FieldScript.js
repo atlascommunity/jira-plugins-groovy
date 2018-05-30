@@ -1,15 +1,35 @@
 //@flow
 import React from 'react';
+import {Link} from 'react-router-dom';
+import {connect} from 'react-redux';
+
+import memoizeOne from 'memoize-one';
+
+import Button from '@atlaskit/button';
+
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import type {FieldConfigItem} from './types';
 
 import {getBaseUrl} from '../service/ajaxHelper';
-import {Script} from '../common/script/Script';
 
 import {JiraMessages, FieldMessages, ErrorMessages, CommonMessages} from '../i18n/common.i18n';
 import {FieldError} from '../common/ak/FieldError';
 import {ScriptParameters} from '../common/script';
+import {WatchableScript} from '../common/script/WatchableScript';
+import {WatchActionCreators} from '../common/redux';
 
+
+const ConnectedWatchableScript = connect(
+    memoizeOne(
+        (state: *): * => {
+            return {
+                watches: state.watches
+            };
+        }
+    ),
+    WatchActionCreators
+)(WatchableScript);
 
 type Props = {
     script: FieldConfigItem,
@@ -21,7 +41,10 @@ export class FieldScript extends React.PureComponent<Props> {
         const {script} = this.props;
 
         return (
-            <Script
+            <ConnectedWatchableScript
+                entityId={script.id}
+                entityType="CUSTOM_FIELD"
+
                 script={{
                     id: script.uuid,
                     name: `${script.customFieldName} - ${script.contextName}`,
@@ -38,10 +61,6 @@ export class FieldScript extends React.PureComponent<Props> {
 
                 dropdownItems={[
                     {
-                        label: `${JiraMessages.edit} ${CommonMessages.script}`,
-                        href: `${getBaseUrl()}/plugins/servlet/my-groovy/custom-field?fieldConfigId=${script.id}`
-                    },
-                    {
                         label: `${JiraMessages.edit} ${FieldMessages.customField}`,
                         href: `${getBaseUrl()}/secure/admin/EditCustomField!default.jspa?id=${script.customFieldId}`
                     },
@@ -49,6 +68,17 @@ export class FieldScript extends React.PureComponent<Props> {
                         label: `${JiraMessages.configure} ${FieldMessages.customField}`,
                         href: `${getBaseUrl()}/secure/admin/ConfigureCustomField!default.jspa?customFieldId=${script.customFieldId}`
                     }
+                ]}
+
+                additionalButtons={[
+                    <Button
+                        key="edit"
+                        appearance="subtle"
+                        iconBefore={<EditFilledIcon label=""/>}
+
+                        component={Link}
+                        to={`/${script.id}/edit`}
+                    />
                 ]}
             >
                 {!script.uuid && <FieldError error={ErrorMessages.notConfigured}/>}
@@ -68,7 +98,7 @@ export class FieldScript extends React.PureComponent<Props> {
                         },
                     ]}
                 />
-            </Script>
+            </ConnectedWatchableScript>
         );
     }
 }
