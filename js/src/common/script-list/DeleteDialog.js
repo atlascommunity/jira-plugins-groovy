@@ -30,7 +30,7 @@ type State = {
     waiting: boolean
 };
 
-class DeleteDialog extends React.PureComponent<Props, State> {
+export class DeleteDialog extends React.PureComponent<Props, State> {
     state = {
         waiting: false
     };

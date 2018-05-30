@@ -25,10 +25,12 @@ import {InfoMessage} from '../common/ak/messages';
 
 import {registryService} from '../service/services';
 
-import {TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import './ScriptRegistry.less';
+import type {DeleteDialogProps} from '../common/script-list/DeleteDialog';
+import {DeleteDialog} from '../common/script-list/DeleteDialog';
 
 
 type Props = {
@@ -45,7 +47,9 @@ type Props = {
 type State = {
     waiting: boolean,
     isDragging: boolean,
-    directoryDialogProps: ?DialogParams
+    directoryDialogProps: ?DialogParams,
+    deleteScriptProps: ?DeleteDialogProps,
+    deleteDirectoryProps: ?DeleteDialogProps
 };
 
 //todo: collapse/uncollapse all
@@ -55,6 +59,8 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
         waiting: false,
         onlyUnused: false,
         directoryDialogProps: null,
+        deleteScriptProps: null,
+        deleteDirectoryProps: null,
         filter: ''
     };
 
@@ -72,14 +78,19 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
     _closeDirectoryDialog = () => this.setState({ directoryDialogProps: null });
 
+    _closeDeleteScriptDialog = () => this.setState({ deleteScriptProps: null });
+
+    _closeDeleteDirectoryDialog = () => this.setState({ deleteDirectoryProps: null });
+
     _activateDeleteDialog = (id: number, type: 'script'|'directory', name: string) => {
-        // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${name}"?`)) {
-            if (type === 'directory') {
-                registryService.deleteDirectory(id).then(() => this.props.deleteDirectory(id));
-            } else {
-                registryService.deleteScript(id).then(() => this.props.deleteScript(id));
-            }
+        if (type === 'directory') {
+            this.setState({
+                deleteDirectoryProps: { id, name, onConfirm: () => registryService.deleteDirectory(id) }
+            });
+        } else {
+            this.setState({
+                deleteScriptProps: { id, name, onConfirm: () => registryService.deleteScript(id) }
+            });
         }
     };
 
@@ -129,8 +140,8 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
     _toggleUnused = () => this.props.updateFilter({ onlyUnused: !this.props.filter.onlyUnused });
 
     render() {
-        const {waiting, directoryDialogProps} = this.state;
-        const {isScriptUsageReady, isForceOpen, filter} = this.props;
+        const {waiting, directoryDialogProps, deleteScriptProps, deleteDirectoryProps} = this.state;
+        const {isScriptUsageReady, isForceOpen, filter, deleteScript, deleteDirectory} = this.props;
 
         let directories: * = this.props.directories;
 
@@ -187,6 +198,30 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
                         {!directories.length ? <InfoMessage title={RegistryMessages.noScripts}/> : null}
                         {directoryDialogProps && <ScriptDirectoryDialog {...directoryDialogProps} onClose={this._closeDirectoryDialog}/>}
+                        {deleteDirectoryProps &&
+                            <DeleteDialog
+                                deleteItem={deleteDirectory}
+                                onClose={this._closeDeleteDirectoryDialog}
+                                i18n={{
+                                    heading: RegistryMessages.deleteDirectory,
+                                    areYouSure: CommonMessages.confirmDelete
+                                }}
+
+                                {...deleteDirectoryProps}
+                            />
+                        }
+                        {deleteScriptProps &&
+                            <DeleteDialog
+                                deleteItem={deleteScript}
+                                onClose={this._closeDeleteScriptDialog}
+                                i18n={{
+                                    heading: RegistryMessages.deleteScript,
+                                    areYouSure: CommonMessages.confirmDelete
+                                }}
+
+                                {...deleteScriptProps}
+                            />
+                        }
 
                         {waiting && <Blanket isTinted={true}/>}
                     </div>

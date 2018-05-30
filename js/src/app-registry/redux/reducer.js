@@ -125,7 +125,8 @@ function directoriesReducer(state: KeyedEntities<RegistryDirectoryType>, action:
             };
         }
         case DELETE_DIRECTORY: {
-            const {[action.id]: deleted, ...newState} = state;
+            //we must use toString here to work around babel bug https://github.com/babel/babel/issues/6341
+            const {[action.id.toString()]: deleted, ...newState} = state;
             return newState;
         }
         default:
@@ -157,7 +158,8 @@ function scriptsReducer(state: KeyedEntities<RegistryScriptType>, action: *): Ke
                 [action.script.id]: action.script
             };
         case DELETE_SCRIPT: {
-            const {[action.id]: deleted, ...newState} = state;
+            //we must use toString here to work around babel bug https://github.com/babel/babel/issues/6341
+            const {[action.id.toString()]: deleted, ...newState} = state;
             return newState;
         }
         default:
