@@ -20,7 +20,7 @@ import {fieldConfigSelectorFactory} from './selectors';
 import type {FieldConfig, FieldConfigPreviewResult} from './types';
 
 import {fieldConfigService} from '../service/services';
-import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
+import {CommonMessages, ErrorMessages, FieldMessages} from '../i18n/common.i18n';
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
@@ -29,6 +29,7 @@ import type {InputEvent} from '../common/EventTypes';
 import {extractShortClassName} from '../common/classNames';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
 import {ItemActionCreators} from '../common/redux';
+import {ErrorMessage, InfoMessage} from '../common/ak/messages';
 
 
 const bindings = [ Bindings.issue ];
@@ -62,9 +63,11 @@ type Props = {
 type State = {
     values: RecordOf<Form>,
     waiting: boolean,
+    waitingPreview: boolean,
     previewKey: ?string,
     previewResult: ?FieldConfigPreviewResult,
-    error: *
+    error: *,
+    previewError: *
 };
 
 export class CustomFieldFormInternal extends React.Component<Props, State> {
@@ -82,9 +85,11 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                 comment: ''
             }),
             waiting: false,
+            waitingPreview: false,
             previewKey: '',
             previewResult: null,
-            error: null
+            error: null,
+            previewError: null
         };
     }
 
@@ -104,9 +109,35 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                     const {response} = error;
 
                     if (response.status === 400) {
-                        this.setState({ error: response.data, waiting: false });
+                        this.setState({ error: response.data, waiting: false, previewError: null });
                     } else {
-                        this.setState({ waiting: false });
+                        this.setState({ waiting: false, error: null, previewError: null });
+                        throw error;
+                    }
+                }
+            );
+    };
+
+    _preview = () => {
+        this.setState({ waitingPreview: true });
+
+        fieldConfigService
+            .preview(
+                this.props.id,
+                {
+                    issueKey: this.state.previewKey,
+                    configForm: this.state.values.toJS()
+                }
+            )
+            .then(
+                previewResult => this.setState({ previewResult, waitingPreview: false, previewError: null }),
+                (error: *) => {
+                    const {response} = error;
+
+                    if (response.status === 400) {
+                        this.setState({ previewError: response.data, previewResult: null, waitingPreview: false });
+                    } else {
+                        this.setState({ waitingPreview: false, previewError: null, previewResult: null });
                         throw error;
                     }
                 }
@@ -135,23 +166,9 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
 
     _setPreviewKey = (e: InputEvent) => this.setState({ previewKey: e.currentTarget.value });
 
-    _preview = () => {
-        fieldConfigService
-            .preview(
-                this.props.id,
-                {
-                    issueKey: this.state.previewKey,
-                    configForm: this.state.values.toJS()
-                }
-            )
-            .then(
-                previewResult => this.setState({ previewResult })
-            );
-    };
-
     render() {
         const {fieldConfig} = this.props;
-        const {values, error, waiting, previewKey, previewResult} = this.state;
+        const {values, error, previewError, waiting, waitingPreview, previewKey, previewResult} = this.state;
 
         let errorMessage: * = null;
         let errorField: ?string = null;
@@ -281,17 +298,37 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                             onChange={this._setTextValue('comment')}
                         />
                     </Field>
+                    <Field
+                        label="Preview issue key"
+
+                        validateOnChange={false}
+                        validateOnBlur={false}
+                    >
+                        <FieldTextStateless
+                            value={previewKey || ''}
+                            onChange={this._setPreviewKey}
+                            shouldFitContainer={true}
+                        />
+                    </Field>
                     <div style={{marginTop: '10px'}}>
                         <ButtonGroup>
                             <Button
                                 appearance="primary"
 
-                                isDisabled={waiting}
+                                isDisabled={waiting || waitingPreview}
                                 isLoading={waiting}
 
                                 onClick={this._onSubmit}
                             >
                                 {CommonMessages.update}
+                            </Button>
+                            <Button
+                                isDisabled={waiting || waitingPreview}
+                                isLoading={waitingPreview}
+
+                                onClick={this._preview}
+                            >
+                                {CommonMessages.preview}
                             </Button>
                             {fieldConfig.uuid ?
                                 <Button
@@ -308,24 +345,15 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                     </div>
 
                     <div className="flex-column" style={{marginTop: '20px'}}>
-                        <FieldTextStateless
-                            label="Issue key"
-
-                            value={previewKey || ''}
-                            onChange={this._setPreviewKey}
-                        />
-                        <div style={{marginTop: '10px'}}>
-                            <Button appearance="primary" onClick={this._preview}>
-                                {CommonMessages.preview}
-                            </Button>
-                        </div>
-
                         {previewResult &&
-                            <div>
-                                {ConsoleMessages.executedIn(previewResult.time.toString())}{':'}
-
+                            <InfoMessage title={ConsoleMessages.executedIn(previewResult.time.toString())}>
                                 <div dangerouslySetInnerHTML={{__html: previewResult.htmlResult}}/>
-                            </div>
+                            </InfoMessage>
+                        }
+                        {previewError &&
+                            <ErrorMessage title={ErrorMessages.errorOccurred}>
+                                {previewError.messages.map((e, i) => <div key={i}>{e}</div>)}
+                            </ErrorMessage>
                         }
                     </div>
                 </div>

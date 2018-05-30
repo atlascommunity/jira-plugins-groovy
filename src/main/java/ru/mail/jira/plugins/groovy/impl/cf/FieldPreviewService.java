@@ -65,7 +65,7 @@ public class FieldPreviewService {
 
         FieldConfig fieldConfig = fieldConfigManager.getFieldConfig(configId);
         if (fieldConfig == null) {
-            throw new ValidationException("Unknonwn field config");
+            throw new ValidationException("Unknown field config");
         }
 
         FieldConfigForm configForm = form.getConfigForm();
