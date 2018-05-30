@@ -61,20 +61,13 @@ type Props = {
 
 type State = {
     values: RecordOf<Form>,
+    waiting: boolean,
     previewKey: ?string,
     previewResult: ?FieldConfigPreviewResult,
     error: *
 };
 
 export class CustomFieldFormInternal extends React.Component<Props, State> {
-    state = {
-        values: makeForm(),
-        isReady: false,
-        previewKey: null,
-        previewResult: null,
-        error: null
-    };
-
     constructor(props: Props) {
         super(props);
 
@@ -88,6 +81,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                 velocityParamsEnabled: fieldConfig.velocityParamsEnabled,
                 comment: ''
             }),
+            waiting: false,
             previewKey: '',
             previewResult: null,
             error: null
@@ -96,6 +90,8 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
 
     _onSubmit = () => {
         const {history} = this.props;
+
+        this.setState({ waiting: true });
 
         fieldConfigService
             .updateFieldConfig(this.props.id, this.state.values.toJS())
@@ -108,8 +104,9 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                     const {response} = error;
 
                     if (response.status === 400) {
-                        this.setState({ error: response.data });
+                        this.setState({ error: response.data, waiting: false });
                     } else {
+                        this.setState({ waiting: false });
                         throw error;
                     }
                 }
@@ -154,7 +151,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
 
     render() {
         const {fieldConfig} = this.props;
-        const {values, error, previewKey, previewResult} = this.state;
+        const {values, error, waiting, previewKey, previewResult} = this.state;
 
         let errorMessage: * = null;
         let errorField: ?string = null;
@@ -205,11 +202,15 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                             <CheckboxStateless
                                 label={FieldMessages.cacheable}
 
+                                isDisabled={waiting}
+
                                 onChange={this._setToggleValue('cacheable')}
                                 isChecked={values.get('cacheable')}
                             />
                             <CheckboxStateless
                                 label="Velocity params"
+
+                                isDisabled={waiting}
 
                                 onChange={this._setToggleValue('velocityParamsEnabled')}
                                 isChecked={velocityParamsEnabled}
@@ -229,6 +230,8 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                         <EditorField
                             bindings={velocityParamsEnabled ? bindingsWithVelocity : bindings}
                             returnTypes={returnTypes}
+
+                            isDisabled={waiting}
 
                             value={values.get('scriptBody')}
                             onChange={this._setScript}
@@ -252,6 +255,8 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                                 mode="velocity"
                                 //todo: bindings={[ Bindings.issue ]}
 
+                                isDisabled={waiting}
+
                                 value={values.get('template')}
                                 onChange={this._setTemplate}
                             />
@@ -270,16 +275,29 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
 
+                            disabled={waiting}
+
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}
                         />
                     </Field>
                     <div style={{marginTop: '10px'}}>
                         <ButtonGroup>
-                            <Button appearance="primary" onClick={this._onSubmit}>{CommonMessages.update}</Button>
+                            <Button
+                                appearance="primary"
+
+                                isDisabled={waiting}
+                                isLoading={waiting}
+
+                                onClick={this._onSubmit}
+                            >
+                                {CommonMessages.update}
+                            </Button>
                             {fieldConfig.uuid ?
                                 <Button
                                     appearance="link"
+
+                                    isDisabled={waiting}
 
                                     component={Link}
                                     to="/"
