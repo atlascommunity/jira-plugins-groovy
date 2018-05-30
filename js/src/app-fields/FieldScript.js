@@ -19,6 +19,8 @@ import {ScriptParameters} from '../common/script';
 import {WatchableScript} from '../common/script/WatchableScript';
 import {WatchActionCreators} from '../common/redux';
 
+import type {ScriptComponentProps} from '../common/script-list/types';
+
 
 const ConnectedWatchableScript = connect(
     memoizeOne(
@@ -31,10 +33,7 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
-type Props = {
-    script: FieldConfigItem,
-    onEdit: any //ignored
-};
+type Props = ScriptComponentProps<FieldConfigItem>;
 
 export class FieldScript extends React.PureComponent<Props> {
     render() {

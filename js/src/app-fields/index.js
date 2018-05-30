@@ -62,7 +62,11 @@ AJS.toInit(() => {
                                     i18n={{
                                         title: TitleMessages.fields,
                                         addItem: '',
-                                        noItems: ScriptFieldMessages.noFields
+                                        noItems: ScriptFieldMessages.noFields,
+                                        delete: {
+                                            heading: '',
+                                            areYouSure: () => ''
+                                        }
                                     }}
 
                                     isCreateDisabled={true}

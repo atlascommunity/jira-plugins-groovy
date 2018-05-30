@@ -13,7 +13,7 @@ import {getPluginBaseUrl} from '../service/ajaxHelper';
 
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 
-import {ItemActionCreators, WatchActionCreators} from '../common/redux';
+import {WatchActionCreators} from '../common/redux';
 
 import {restService} from '../service/services';
 
@@ -33,23 +33,16 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
-const {deleteItem} = ItemActionCreators;
+type Props = ScriptComponentProps<RestScriptType>;
 
-type Props = ScriptComponentProps<RestScriptType> & {
-    deleteItem: typeof deleteItem
-};
-
-class RestScriptInternal extends React.PureComponent<Props> {
+export class RestScript extends React.PureComponent<Props> {
     _onEdit = () => this.props.onEdit(this.props.script.id);
 
-    _delete = () => {
-        const script = this.props.script;
-
-        // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${script.name}"?`)) {
-            restService.deleteScript(script.id).then(() => this.props.deleteItem(script.id));
-        }
-    };
+    _delete = () => this.props.onDelete(
+        this.props.script.id,
+        this.props.script.name,
+        () => restService.deleteScript(this.props.script.id)
+    );
 
     render() {
         const {script} = this.props;
@@ -98,5 +91,3 @@ class RestScriptInternal extends React.PureComponent<Props> {
         );
     }
 }
-
-export const RestScript = connect(null, { deleteItem })(RestScriptInternal);

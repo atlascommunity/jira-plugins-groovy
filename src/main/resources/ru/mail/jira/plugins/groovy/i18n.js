@@ -59,11 +59,14 @@ define('/mailru/groovy/i18n-react', function() {
             preview: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.preview'),
             validating: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.validating'),
             issuesFound: function(...params) {
-                AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.issuesFound', ...params)
+                return AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.issuesFound', ...params);
             },
             run: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.run'),
             back: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.back'),
-            returnTypes: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.returnTypes')
+            returnTypes: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.returnTypes'),
+            confirmDelete: function(...params) {
+                return AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.confirmDelete', ...params);
+            }
         },
         error: {
             noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue'),
@@ -82,6 +85,7 @@ define('/mailru/groovy/i18n-react', function() {
             addDirectory: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.addDirectory'),
             editScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.editScript'),
             editDirectory: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.editDirectory'),
+            deleteScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.deleteScript'),
             noScripts: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.noScripts'),
             findWorkflows: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.findWorkflows'),
             onlyUnused: AJS.I18n.getText('ru.mail.jira.plugins.groovy.registry.onlyUnused')
@@ -91,6 +95,7 @@ define('/mailru/groovy/i18n-react', function() {
             editListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.editListener'),
             createListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.createListener'),
             updateListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.updateListener'),
+            deleteListener: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.deleteListener'),
             addCondition: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.addCondition'),
             noListeners: AJS.I18n.getText('ru.mail.jira.plugins.groovy.listener.noListeners'),
             type: {
@@ -118,6 +123,7 @@ define('/mailru/groovy/i18n-react', function() {
             addScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.addScript'),
             updateScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.updateScript'),
             createScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.createScript'),
+            deleteScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.deleteScript'),
             noScripts: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.noScripts'),
         },
         dialog: {
@@ -148,6 +154,7 @@ define('/mailru/groovy/i18n-react', function() {
             noTasks: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.noTasks'),
             addTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.addTask'),
             editTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.editTask'),
+            deleteTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.deleteTask'),
             runAs: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.runAs'),
             runNow: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.runNow'),
             runNowConfirm: function(...params) {

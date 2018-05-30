@@ -7,9 +7,7 @@ import memoizeOne from 'memoize-one';
 
 import type {ConditionType, ListenerType} from './types';
 
-import {listenerService} from '../service/services';
-
-import {ItemActionCreators, WatchActionCreators} from '../common/redux';
+import {WatchActionCreators} from '../common/redux';
 
 import {ListenerTypeMessages} from '../i18n/listener.i18n';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
@@ -22,6 +20,7 @@ import type {ScriptParam} from '../common/script/ScriptParameters';
 import type {ScriptComponentProps} from '../common/script-list/types';
 
 import './ListenerRegistry.less';
+import {listenerService} from '../service/services';
 
 
 const ConnectedWatchableScript = connect(
@@ -40,23 +39,16 @@ type ConnectProps = {
     eventTypes: ObjectMap
 };
 
-const {deleteItem} = ItemActionCreators;
-
-type Props = ScriptComponentProps<ListenerType> & ConnectProps & {
-    deleteItem: typeof deleteItem,
-};
+type Props = ScriptComponentProps<ListenerType> & ConnectProps;
 
 class ListenerInternal extends React.PureComponent<Props> {
     _edit = () => this.props.onEdit(this.props.script.id);
 
-    _delete = () => {
-        const {script} = this.props;
-
-        // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${script.name}"?`)) {
-            listenerService.deleteListener(script.id).then(() => this.props.deleteItem(script.id));
-        }
-    };
+    _delete = () => this.props.onDelete(
+        this.props.script.id,
+        this.props.script.name,
+        () => listenerService.deleteListener(this.props.script.id)
+    );
 
     _getParams = memoizeOne(
         (projects: ObjectMap, eventTypes: ObjectMap, condition: ConditionType): Array<ScriptParam> => {
@@ -132,6 +124,5 @@ export const Listener = connect(
                 eventTypes: state.eventTypes
             };
         }
-    ),
-    { deleteItem }
+    )
 )(ListenerInternal);

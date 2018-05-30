@@ -9,6 +9,9 @@ import {ScriptList} from './ScriptList';
 
 import type {FullDialogComponentProps, DialogComponentProps, ScriptComponentProps, I18nType} from './types';
 
+import type {DeleteDialogProps} from './DeleteDialog';
+import {ConnectedDeleteDialog} from './DeleteDialog';
+
 import type {ItemType} from '../redux';
 
 
@@ -23,7 +26,8 @@ type Props<T> = {
 };
 
 type State = {
-    editProps: ?DialogComponentProps
+    editProps: ?DialogComponentProps,
+    deleteProps: ?DeleteDialogProps
 };
 
 export class ScriptPage<T: ItemType> extends React.PureComponent<Props<T>, State> {
@@ -42,9 +46,13 @@ export class ScriptPage<T: ItemType> extends React.PureComponent<Props<T>, State
 
     _closeEdit = () => this.setState({ editProps: null });
 
+    _triggerDelete = (id: number, name: string, onConfirm: () => Promise<void>) => this.setState({ deleteProps: {id, name, onConfirm} });
+
+    _closeDelete = () => this.setState({ deleteProps: null });
+
     render() {
         const {isReady, items, i18n, DialogComponent, ScriptComponent, isCreateDisabled} = this.props;
-        const {editProps} = this.state;
+        const {editProps, deleteProps} = this.state;
 
         return (
             <Page>
@@ -66,10 +74,12 @@ export class ScriptPage<T: ItemType> extends React.PureComponent<Props<T>, State
                         i18n={i18n}
                         ScriptComponent={ScriptComponent}
                         onEdit={this._triggerEdit}
+                        onDelete={this._triggerDelete}
                     />
                 </div>
 
                 {editProps && DialogComponent ? <DialogComponent {...editProps} onClose={this._closeEdit}/> : null}
+                {deleteProps && <ConnectedDeleteDialog {...deleteProps} i18n={i18n.delete} onClose={this._closeDelete}/>}
             </Page>
         );
     }

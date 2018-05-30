@@ -19,7 +19,7 @@ import {ItemActionCreators} from '../common/redux';
 import type {ObjectMap} from '../common/types';
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 import {ListenerMessages} from '../i18n/listener.i18n';
-import {TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 
 import '../flex.less';
 import './ListenerRegistry.less';
@@ -84,7 +84,11 @@ AJS.toInit(() => {
                 i18n={{
                     addItem: ListenerMessages.addListener,
                     noItems: ListenerMessages.noListeners,
-                    title: TitleMessages.listeners
+                    title: TitleMessages.listeners,
+                    delete: {
+                        heading: ListenerMessages.deleteListener,
+                        areYouSure: CommonMessages.confirmDelete
+                    }
                 }}
             />
         </Provider>,

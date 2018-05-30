@@ -61,11 +61,10 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
-const {updateItem, deleteItem} = ItemActionCreators;
+const {updateItem} = ItemActionCreators;
 
 type Props = ScriptComponentProps<ScheduledTaskType> & {
-    updateItem: typeof updateItem,
-    deleteItem: typeof deleteItem,
+    updateItem: typeof updateItem
 };
 
 type State = {
@@ -81,16 +80,11 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
 
     _edit = () => this.props.onEdit(this.props.script.id);
 
-    _delete = () => {
-        const {script} = this.props;
-
-        // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${script.name}"?`)) {
-            scheduledTaskService
-                .doDelete(script.id)
-                .then(() => this.props.deleteItem(script.id));
-        }
-    };
+    _delete = () => this.props.onDelete(
+        this.props.script.id,
+        this.props.script.name,
+        () => scheduledTaskService.doDelete(this.props.script.id)
+    );
 
     _showStatusInfo = () => this.setState({ showStatusInfo: true });
 
@@ -274,5 +268,5 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
 
 export const ScheduledTask = connect(
     null,
-    { updateItem, deleteItem }
+    { updateItem }
 )(ScheduledTaskInternal);

@@ -35,7 +35,7 @@ export const FieldMessages: I18nMessages = {
     template: i18n.fields.template
 };
 
-export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction }) = {
+export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction, confirmDelete: I18nFunction }) = {
     loading: i18n.common.loading,
     completed: i18n.common.completed,
     update: i18n.common.update,
@@ -67,7 +67,8 @@ export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction }) =
     validating: i18n.common.validating,
     issuesFound: i18n.common.issuesFound,
     run: i18n.common.run,
-    back: i18n.common.back
+    back: i18n.common.back,
+    confirmDelete: i18n.common.confirmDelete
 };
 
 export const DialogMessages: I18nMessages = {

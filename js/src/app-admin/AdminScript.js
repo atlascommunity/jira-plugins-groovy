@@ -15,7 +15,7 @@ import {RunDialog} from './RunDialog';
 
 import type {AdminScriptType} from './types';
 
-import {ItemActionCreators, WatchActionCreators} from '../common/redux';
+import {WatchActionCreators} from '../common/redux';
 
 import {adminScriptService} from '../service/services';
 
@@ -37,17 +37,13 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
-const {deleteItem} = ItemActionCreators;
-
-type Props = ScriptComponentProps<AdminScriptType> & {
-    deleteItem: typeof deleteItem
-};
+type Props = ScriptComponentProps<AdminScriptType>;
 
 type State = {
     isRunning: boolean
 };
 
-class AdminScriptInternal extends React.PureComponent<Props, State> {
+export class AdminScript extends React.PureComponent<Props, State> {
     state = {
         isRunning: false
     };
@@ -60,14 +56,11 @@ class AdminScriptInternal extends React.PureComponent<Props, State> {
 
     _onEdit = () => this.props.onEdit(this.props.script.id);
 
-    _delete = () => {
-        const script = this.props.script;
-
-        // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${script.name}"?`)) {
-            adminScriptService.deleteScript(script.id).then(() => this.props.deleteItem(script.id));
-        }
-    };
+    _delete = () => this.props.onDelete(
+        this.props.script.id,
+        this.props.script.name,
+        () => adminScriptService.deleteScript(this.props.script.id)
+    );
 
     _getScript = memoizeOne(
         (script) => script.builtIn ? null : {
@@ -130,5 +123,3 @@ class AdminScriptInternal extends React.PureComponent<Props, State> {
         );
     }
 }
-
-export const AdminScript = connect(null, { deleteItem })(AdminScriptInternal);

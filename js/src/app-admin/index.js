@@ -18,7 +18,7 @@ import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from
 
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 
-import {TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import type {FullDialogComponentProps} from '../common/script-list/types';
@@ -57,7 +57,11 @@ AJS.toInit(() => {
                 i18n={{
                     title: TitleMessages.adminScripts,
                     addItem: RegistryMessages.addScript,
-                    noItems: RegistryMessages.noScripts
+                    noItems: RegistryMessages.noScripts,
+                    delete: {
+                        heading: RegistryMessages.deleteScript,
+                        areYouSure: CommonMessages.confirmDelete
+                    }
                 }}
             />
         </Provider>,

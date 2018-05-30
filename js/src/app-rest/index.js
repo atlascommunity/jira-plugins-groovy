@@ -16,7 +16,7 @@ import {fixStyle} from '../common/fixStyle';
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 
-import {TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RestMessages} from '../i18n/rest.i18n';
 
 import '../flex.less';
@@ -54,7 +54,11 @@ AJS.toInit(() => {
                 i18n={{
                     title: TitleMessages.rest,
                     addItem: RestMessages.addScript,
-                    noItems: RestMessages.noScripts
+                    noItems: RestMessages.noScripts,
+                    delete: {
+                        heading: RestMessages.deleteScript,
+                        areYouSure: CommonMessages.confirmDelete
+                    }
                 }}
             />
         </Provider>,

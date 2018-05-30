@@ -1,7 +1,7 @@
 //@flow
 import React, {type ComponentType} from 'react';
 
-import type {ScriptComponentProps, I18nType, ScriptCallbackType} from './types';
+import type {ScriptComponentProps, I18nType, ScriptCallbackType, DeleteCallbackType} from './types';
 
 import {LoadingSpinner} from '../ak/LoadingSpinner';
 import {InfoMessage} from '../ak/messages';
@@ -14,12 +14,13 @@ type Props<T> = {
     isReady: boolean,
     items: Array<T>,
     onEdit: ScriptCallbackType,
+    onDelete: DeleteCallbackType,
     ScriptComponent: ComponentType<ScriptComponentProps<T>>
 };
 
 export class ScriptList<T> extends React.PureComponent<Props<T&ItemType>> {
     render() {
-        const {isReady, items, i18n, onEdit, ScriptComponent} = this.props;
+        const {isReady, items, i18n, onEdit, onDelete, ScriptComponent} = this.props;
 
         if (!isReady) {
             return <LoadingSpinner/>;
@@ -29,7 +30,7 @@ export class ScriptList<T> extends React.PureComponent<Props<T&ItemType>> {
             <div className="ScriptList page-content">
                 {items.length ?
                     items.map(item =>
-                        <ScriptComponent key={item.id} script={item} onEdit={onEdit}/>
+                        <ScriptComponent key={item.id} script={item} onEdit={onEdit} onDelete={onDelete}/>
                     ) :
                     <InfoMessage title={i18n.noItems}/>
                 }

@@ -19,7 +19,7 @@ import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 
 import './ScheduledTaskRegistry.less';
-import {TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import type {FullDialogComponentProps} from '../common/script-list/types';
 
@@ -58,7 +58,11 @@ AJS.toInit(() => {
                 i18n={{
                     title: TitleMessages.rest,
                     addItem: ScheduledTaskMessages.addTask,
-                    noItems: ScheduledTaskMessages.noTasks
+                    noItems: ScheduledTaskMessages.noTasks,
+                    delete: {
+                        heading: ScheduledTaskMessages.deleteTask,
+                        areYouSure: CommonMessages.confirmDelete
+                    }
                 }}
             />
         </Provider>,

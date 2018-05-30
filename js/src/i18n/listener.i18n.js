@@ -11,6 +11,7 @@ export const ListenerMessages: I18nMessages = {
     addCondition: i18n.listener.addCondition,
     createListener: i18n.listener.createListener,
     updateListener: i18n.listener.updateListener,
+    deleteListener: i18n.listener.deleteListener,
     noListeners: i18n.listener.noListeners
 };
 
