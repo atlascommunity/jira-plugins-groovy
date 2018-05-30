@@ -114,7 +114,14 @@ export class ScriptConsole extends React.Component<Props, State> {
                 />
                 <br/>
                 <div>
-                    <Button appearance="primary" isDisabled={waiting} onClick={this._submit}>{ConsoleMessages.execute}</Button>
+                    <Button
+                        appearance="primary"
+                        isDisabled={waiting}
+                        isLoading={waiting}
+                        onClick={this._submit}
+                    >
+                        {ConsoleMessages.execute}
+                        </Button>
                 </div>
                 <br/>
                 {!waiting && <div className="result">
@@ -132,7 +139,6 @@ export class ScriptConsole extends React.Component<Props, State> {
                         </ErrorMessage>
                     : null}
                 </div>}
-                {waiting && <div className="aui-icon aui-icon-wait"/>}
             </div>
         );
     }
