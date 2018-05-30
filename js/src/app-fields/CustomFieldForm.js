@@ -330,17 +330,16 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                             >
                                 {CommonMessages.preview}
                             </Button>
-                            {fieldConfig.uuid ?
-                                <Button
-                                    appearance="link"
+                            <Button
+                                appearance="link"
 
-                                    isDisabled={waiting}
+                                isDisabled={waiting}
 
-                                    component={Link}
-                                    to="/"
-                                >{CommonMessages.cancel}</Button>
-                                : undefined
-                            }
+                                component={Link}
+                                to="/"
+                            >
+                                {CommonMessages.cancel}
+                            </Button>
                         </ButtonGroup>
                     </div>
 
