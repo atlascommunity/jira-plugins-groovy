@@ -1,6 +1,7 @@
 //@flow
 import type {EntityType, Page} from '../common/types';
 import type {JiraUser} from '../common/script/types';
+import type {OldSelectItem} from '../common/ak/types';
 
 
 export type EntityAction = 'CREATED' | 'UPDATED' | 'DELETED' | 'RESTORED' | 'ENABLED' | 'DISABLED' | 'MOVED';
@@ -19,3 +20,8 @@ export type AuditLogEntry = {
 };
 
 export type AuditLogData = Page<AuditLogEntry>;
+
+export type AuditLogFilterType = {
+    users: $ReadOnlyArray<OldSelectItem<string>>,
+    categories: $ReadOnlyArray<string>
+};

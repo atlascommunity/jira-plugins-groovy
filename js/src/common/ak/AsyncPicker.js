@@ -10,7 +10,7 @@ import {LargeSelect} from './LargeSelect';
 import type {SingleValueType} from './types';
 
 import {ajaxGet} from '../../service/ajaxHelper';
-import type {OptMutableFieldProps, FieldProps, FormFieldProps, AkFormFieldProps} from '../types';
+import type {OptMutableFieldProps, FieldProps, FormFieldProps, SelectProps, AkFormFieldProps} from '../types';
 
 
 function ValueImpl({data, children}: any): Node {
@@ -46,7 +46,7 @@ let i: number = 0;
 
 type ValueType = SingleValueType | $ReadOnlyArray<SingleValueType>;
 
-type Props<T: ValueType> = FieldProps & FormFieldProps & OptMutableFieldProps<T> & AkFormFieldProps & {
+type Props<T: ValueType> = FieldProps & FormFieldProps & OptMutableFieldProps<T> & AkFormFieldProps & SelectProps & {
     src: string
 };
 
@@ -125,7 +125,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
     }
 
     render() {
-        const {label, isRequired, isLabelHidden, isInvalid, invalidMessage, isValidationHidden} = this.props;
+        const {label, isRequired, isLabelHidden, isInvalid, invalidMessage, isValidationHidden, components} = this.props;
         const {fetching, data} = this.state;
 
         if (isValidationHidden) {
@@ -144,7 +144,8 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
 
                     components={{
                         Option: OptionImpl,
-                        SingleValue: SingleValueImpl
+                        SingleValue: SingleValueImpl,
+                        ...(components || {})
                     }}
                 />
             );
@@ -172,7 +173,8 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
 
                         components={{
                             Option: OptionImpl,
-                            SingleValue: SingleValueImpl
+                            SingleValue: SingleValueImpl,
+                            ...(components || {})
                         }}
                     />
                 </SelectWrapper>

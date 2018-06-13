@@ -14,7 +14,7 @@ public class Page<T> {
     @XmlElement
     private final int limit;
     @XmlElement
-    private final int total;
+    private final long total;
     @XmlElement
     private final int size;
     @XmlElement
@@ -22,7 +22,7 @@ public class Page<T> {
     @XmlElement
     private final List<T> values;
 
-    public Page(int offset, int limit, int total, List<T> values) {
+    public Page(int offset, int limit, long total, List<T> values) {
         this.offset = offset;
         this.limit = limit;
         this.total = total;

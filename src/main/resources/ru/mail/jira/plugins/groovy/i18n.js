@@ -66,7 +66,8 @@ define('/mailru/groovy/i18n-react', function() {
             returnTypes: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.returnTypes'),
             confirmDelete: function(...params) {
                 return AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.confirmDelete', ...params);
-            }
+            },
+            all: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.all')
         },
         error: {
             noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue'),
@@ -117,7 +118,8 @@ define('/mailru/groovy/i18n-react', function() {
             cf: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.cf'),
             scheduledTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.scheduledTask'),
             adminScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.adminScript'),
-            restore: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.restore')
+            restore: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.restore'),
+            noItems: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.noItems')
         },
         rest: {
             nameDescription: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.nameDescription'),

@@ -15,8 +15,9 @@ import type {RowType} from '@atlaskit/dynamic-table/dist/cjs/types';
 import UndoIcon from '@atlaskit/icon/glyph/undo';
 
 import {ActionIcon} from './ActionIcon';
+import {AuditLogFilter} from './AuditLogFilter';
 
-import type {AuditLogEntry, AuditLogData} from './types';
+import type {AuditLogEntry, AuditLogData, AuditLogFilterType} from './types';
 
 import {
     adminScriptService,
@@ -29,7 +30,8 @@ import {
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 
-import type {EntityType} from '../common/types';
+import {type EntityType} from '../common/types';
+import {InfoMessage} from '../common/ak/messages';
 
 
 const tableHead = {
@@ -66,6 +68,7 @@ type Props = {
 };
 
 type State = {
+    filter: AuditLogFilterType,
     offset: number,
     isReady: boolean,
     rows: Array<RowType>,
@@ -84,6 +87,10 @@ export class AuditLog extends React.Component<Props, State> {
             size: 0,
             isLast: true,
             values: []
+        },
+        filter: {
+            users: [],
+            categories: []
         }
     };
 
@@ -117,7 +124,7 @@ export class AuditLog extends React.Component<Props, State> {
 
             promise
                 .then(
-                    () => this._loadList(this.state.offset),
+                    () => this._loadList(this.state.offset, this.state.filter),
                     (error: *) => {
                         this.setState({ isReady: true });
                         throw error;
@@ -126,13 +133,13 @@ export class AuditLog extends React.Component<Props, State> {
         }
     };
 
-    _loadList(offset: number) {
+    _loadList(offset: number, filter: AuditLogFilterType) {
         this.setState({
             isReady: false
         });
 
         auditLogService
-            .getAuditLogPage(offset)
+            .getAuditLogPage(offset, filter.users.map(it => it.value), filter.categories)
             .then(data => this.setState({
                 data,
                 rows: data.values.map((value: AuditLogEntry): RowType => {
@@ -196,10 +203,14 @@ export class AuditLog extends React.Component<Props, State> {
             }));
     }
 
-    _goToPage = (page: number) => this._loadList(this.state.data.limit * (page-1));
+    _goToPage = (page: number) => this._loadList(this.state.data.limit * (page-1), this.state.filter);
+
+    _updateFilter = (filter: AuditLogFilterType) => {
+        this.setState({ filter }, () => this._loadList(0, filter));
+    };
 
     componentDidMount() {
-        this._loadList(0);
+        this._loadList(0, this.state.filter);
     }
 
     _renderPagination(): Element<typeof Pagination> {
@@ -220,10 +231,16 @@ export class AuditLog extends React.Component<Props, State> {
     }
 
     render() {
-        const {isReady, rows} = this.state;
+        const {isReady, rows, filter} = this.state;
 
         return <Page>
-            <PageHeader>
+            <PageHeader
+                bottomBar={
+                    <div className="flex-row">
+                        <AuditLogFilter value={filter} onChange={this._updateFilter}/>
+                    </div>
+                }
+            >
                 {TitleMessages.audit}
             </PageHeader>
 
@@ -231,6 +248,8 @@ export class AuditLog extends React.Component<Props, State> {
                 {this._renderPagination()}
                 <DynamicTableStateless
                     head={tableHead}
+                    emptyView={<InfoMessage title={AuditMessages.noItems}/>}
+
                     isLoading={!isReady}
                     rows={rows}
                 />

@@ -68,7 +68,8 @@ export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction, con
     issuesFound: i18n.common.issuesFound,
     run: i18n.common.run,
     back: i18n.common.back,
-    confirmDelete: i18n.common.confirmDelete
+    confirmDelete: i18n.common.confirmDelete,
+    all: i18n.common.all
 };
 
 export const DialogMessages: I18nMessages = {

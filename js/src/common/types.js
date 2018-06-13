@@ -1,8 +1,14 @@
 //@flow
 import type {Node} from 'react';
 
+import {components} from '@atlaskit/select';
+
 import type {ChangelogType} from './script/types';
 
+
+export const entityTypes = [
+    'REGISTRY_SCRIPT', 'REGISTRY_DIRECTORY', 'LISTENER', 'REST', 'CUSTOM_FIELD', 'SCHEDULED_TASK', 'ADMIN_SCRIPT'
+];
 
 export type EntityType = 'REGISTRY_SCRIPT' | 'REGISTRY_DIRECTORY' | 'LISTENER' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK' | 'ADMIN_SCRIPT';
 
@@ -23,6 +29,10 @@ export type ScriptEntityWithoutChangelogs = {
 
 export type ScriptEntity = ScriptEntityWithoutChangelogs & {
     changelogs: Array<ChangelogType>,
+};
+
+export type SelectProps = {
+    components?: typeof components
 };
 
 export type AkFormFieldProps = {
