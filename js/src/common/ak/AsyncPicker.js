@@ -4,8 +4,7 @@ import React, {type Node} from 'react';
 import SelectWrapper from '@atlaskit/select/dist/esm/SelectWrapper';
 import Avatar from '@atlaskit/avatar';
 import {Label} from '@atlaskit/field-base';
-
-import {components} from 'react-select';
+import {components} from '@atlaskit/select';
 
 import {LargeSelect} from './LargeSelect';
 import type {SingleValueType} from './types';
@@ -153,7 +152,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
 
         return (
             <div>
-                <Label label={label || ''} isRequired={isRequired} isHidden={isLabelHidden}/>
+                <Label label={label || ''} isRequired={isRequired} isLabelHidden={isLabelHidden}/>
                 <SelectWrapper
                     id={`async-picker-${this.i}`}
 
