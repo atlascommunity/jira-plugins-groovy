@@ -156,7 +156,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
 
     _setTextValue = (field: FormField) => (event: InputEvent) => this._mutateValue(field, event.currentTarget.value);
 
-    _setToggleValue = (field: FormField) => (e: Event) => {
+    _setToggleValue = (field: FormField) => (e: SyntheticEvent<HTMLInputElement>) => {
         //$FlowFixMe
         this._mutateValue(field, e.currentTarget.checked);
     };
@@ -223,6 +223,9 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
 
                                 onChange={this._setToggleValue('cacheable')}
                                 isChecked={values.get('cacheable')}
+
+                                name="cacheable"
+                                value="true"
                             />
                             <CheckboxStateless
                                 label="Velocity params"
@@ -231,6 +234,9 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
 
                                 onChange={this._setToggleValue('velocityParamsEnabled')}
                                 isChecked={velocityParamsEnabled}
+
+                                name="velocityParamsEnabled"
+                                value="true"
                             />
                         </CheckboxGroup>
                     </Field>

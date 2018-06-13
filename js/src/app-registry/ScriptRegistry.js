@@ -174,6 +174,9 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
                                         isChecked={filter.onlyUnused}
                                         onChange={this._toggleUnused}
+
+                                        value="true"
+                                        name="onlyUnused"
                                     />
                                 </div>
                             </div>
