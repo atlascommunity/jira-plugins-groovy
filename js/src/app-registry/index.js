@@ -6,7 +6,7 @@ import {BrowserRouter, Switch, Route} from 'react-router-dom';
 
 import {createStore} from 'redux';
 
-import keyBy from 'lodash.keyby';
+import keyBy from 'lodash/keyby';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';

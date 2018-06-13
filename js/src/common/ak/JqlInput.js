@@ -1,7 +1,7 @@
 //@flow
 import React, {type Node} from 'react';
 
-import debounce from 'lodash.debounce';
+import debounce from 'lodash/debounce';
 
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import Spinner from '@atlaskit/spinner';
