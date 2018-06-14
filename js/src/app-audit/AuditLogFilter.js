@@ -19,7 +19,7 @@ import {CommonMessages} from '../i18n/common.i18n';
 
 
 type State = {
-    activeEl: null | 'users' | 'types'
+    activeEl: null | 'users' | 'categories'
 };
 
 type Props = {
@@ -32,15 +32,15 @@ export class AuditLogFilter extends React.PureComponent<Props, State> {
         activeEl: null
     };
 
-    _updateField = memoize(field => (value) => this.props.onChange({ ...this.props.value, [field]: value }));
+    _updateField = memoize((field, defaultVal: any) => (value: any) => this.props.onChange({ ...this.props.value, [field]: value || defaultVal }));
 
     _toggleType = memoize(type => () => {
         const {categories} = this.props.value;
 
         if (categories.includes(type)) {
-            this._updateField('categories')(categories.filter(it => it !== type));
+            this._updateField('categories', [])(categories.filter(it => it !== type));
         } else {
-            this._updateField('categories')([...categories, type]);
+            this._updateField('categories', [])([...categories, type]);
         }
     });
 
@@ -56,8 +56,7 @@ export class AuditLogFilter extends React.PureComponent<Props, State> {
                     src={`${getPluginBaseUrl()}/jira-api/userPicker`}
 
                     isMulti={true}
-                    onChange={this._updateField('users')}
-                    //$FlowFixMe
+                    onChange={this._updateField('users', [])}
                     value={value.users}
                 />
             </div>

@@ -52,7 +52,7 @@ export type ScriptUsageType = {
     items: ScriptUsageItems
 };
 
-export type KeyedEntities<T> = {[number]: T};
+export type KeyedEntities<T> = {[number]: T | null | typeof undefined};
 
 export type GroupedEntities<T> = KeyedEntities<$ReadOnlyArray<T>>;
 
