@@ -27,6 +27,11 @@ public class WithPluginGroovyExtension extends CompilationCustomizer {
 
     @Override
     public void call(SourceUnit source, GeneratorContext context, ClassNode classNode) throws CompilationFailedException {
+        ParseContext parseContext = parseContextHolder.get();
+        if (parseContext.getCompletedExtensions().contains(WithPluginGroovyExtension.class)) {
+            return;
+        }
+
         for (Statement statement : source.getAST().getStatementBlock().getStatements()) {
             if (statement instanceof ExpressionStatement) {
                 ExpressionStatement castedStatement = (ExpressionStatement) statement;
@@ -34,7 +39,7 @@ public class WithPluginGroovyExtension extends CompilationCustomizer {
                     if (annotationNode.getClassNode().getNameWithoutPackage().equals("WithPlugin")) {
                         Expression expression = annotationNode.getMember("value");
 
-                        Set<String> plugins = parseContextHolder.get().getPlugins();
+                        Set<String> plugins = parseContext.getPlugins();
 
                         if (expression instanceof ConstantExpression) {
                             plugins.add(((String) ((ConstantExpression) expression).getValue()));
@@ -57,6 +62,8 @@ public class WithPluginGroovyExtension extends CompilationCustomizer {
                 }
             }
         }
+
+        parseContext.getCompletedExtensions().add(WithPluginGroovyExtension.class);
     }
 
     private String getStringConstant(ConstantExpression expression) {

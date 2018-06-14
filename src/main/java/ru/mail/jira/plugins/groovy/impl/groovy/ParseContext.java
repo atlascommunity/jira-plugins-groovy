@@ -16,4 +16,5 @@ public class ParseContext {
     private final List<ScriptParamDto> parameters = new ArrayList<>();
     private final Set<String> plugins = new HashSet<>();
     private final List<ScriptInjection> injections = new ArrayList<>();
+    private final Set<Class> completedExtensions = new HashSet<>();
 }

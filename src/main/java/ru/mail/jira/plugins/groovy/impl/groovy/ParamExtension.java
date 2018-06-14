@@ -25,6 +25,11 @@ public class ParamExtension extends CompilationCustomizer {
 
     @Override
     public void call(SourceUnit source, GeneratorContext context, ClassNode classNode) throws CompilationFailedException {
+        ParseContext parseContext = parseContextHolder.get();
+        if (parseContext.getCompletedExtensions().contains(ParamExtension.class)) {
+            return;
+        }
+
         for (Statement statement : source.getAST().getStatementBlock().getStatements()) {
             if (statement instanceof ExpressionStatement) {
                 ExpressionStatement castedStatement = (ExpressionStatement) statement;
@@ -70,8 +75,8 @@ public class ParamExtension extends CompilationCustomizer {
                                     throw new IllegalArgumentException(type.name() + " must be declared with class " + type.getType());
                                 }
 
-                                if (parseContextHolder.get().isExtended()) {
-                                    parseContextHolder.get().getParameters().add(new ScriptParamDto(varName, displayName, type, optional));
+                                if (parseContext.isExtended()) {
+                                    parseContext.getParameters().add(new ScriptParamDto(varName, displayName, type, optional));
                                 }
                                 expression.setRightExpression(new VariableExpression(varName));
 
@@ -82,5 +87,7 @@ public class ParamExtension extends CompilationCustomizer {
                 }
             }
         }
+
+        parseContext.getCompletedExtensions().add(ParamExtension.class);
     }
 }

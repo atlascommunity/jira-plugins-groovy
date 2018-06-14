@@ -26,10 +26,14 @@ public class LoadClassesExtension extends CompilationCustomizer {
 
     @Override
     public void call(SourceUnit source, GeneratorContext context, ClassNode classNode) throws CompilationFailedException {
+        ParseContext parseContext = parseContextHolder.get();
+        if (parseContext.getCompletedExtensions().contains(LoadClassesExtension.class)) {
+            return;
+        }
+
         //make sure we load all plugins before class resolution happens
         classLoader.ensureAvailability(
-            parseContextHolder
-                .get()
+            parseContext
                 .getPlugins()
                 .stream()
                 .map(key -> {
@@ -42,5 +46,7 @@ public class LoadClassesExtension extends CompilationCustomizer {
                 })
                 .collect(Collectors.toSet())
         );
+
+        parseContext.getCompletedExtensions().add(LoadClassesExtension.class);
     }
 }

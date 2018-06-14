@@ -23,6 +23,11 @@ public class InjectionExtension extends CompilationCustomizer {
 
     @Override
     public void call(SourceUnit source, GeneratorContext context, ClassNode classNode) throws CompilationFailedException {
+        ParseContext parseContext = parseContextHolder.get();
+        if (parseContext.getCompletedExtensions().contains(InjectionExtension.class)) {
+            return;
+        }
+
         for (Statement statement : source.getAST().getStatementBlock().getStatements()) {
             if (statement instanceof ExpressionStatement) {
                 ExpressionStatement castedStatement = (ExpressionStatement) statement;
@@ -65,7 +70,7 @@ public class InjectionExtension extends CompilationCustomizer {
                                     );
                                 }
 
-                                parseContextHolder.get().getInjections().add(injectionObject);
+                                parseContext.getInjections().add(injectionObject);
                                 expression.setRightExpression(new VariableExpression(varName));
 
                                 break;
@@ -75,5 +80,7 @@ public class InjectionExtension extends CompilationCustomizer {
                 }
             }
         }
+
+        parseContext.getCompletedExtensions().add(InjectionExtension.class);
     }
 }
