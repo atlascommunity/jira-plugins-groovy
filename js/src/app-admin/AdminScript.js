@@ -2,6 +2,7 @@
 import React from 'react';
 
 import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
 
 import memoizeOne from 'memoize-one';
 
@@ -10,6 +11,7 @@ import Lozenge from '@atlaskit/lozenge';
 
 import VidPlayIcon from '@atlaskit/icon/glyph/vid-play'; //todo: better icon
 import CodeIcon from '@atlaskit/icon/glyph/code';
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import {RunDialog} from './RunDialog';
 
@@ -109,13 +111,25 @@ export class AdminScript extends React.PureComponent<Props, State> {
 
                 withChangelog={true}
 
-                onEdit={!builtIn ? this._onEdit : undefined}
                 onDelete={!builtIn ? this._delete : undefined}
 
                 additionalPrimaryButtons={[
-                    <Button key="runNow" appearance="subtle" iconBefore={<VidPlayIcon label="run"/>} onClick={this._toggleDialog}>
+                    <Button
+                        key="runNow"
+                        appearance="subtle"
+                        iconBefore={<VidPlayIcon label="run"/>}
+                        onClick={this._toggleDialog}
+                    >
                         {CommonMessages.run}
-                    </Button>
+                    </Button>,
+                    <Button
+                        key="edit"
+                        appearance="subtle"
+                        iconBefore={<EditFilledIcon label=""/>}
+
+                        component={Link}
+                        to={`/${script.id}/edit`}
+                    />
                 ]}
             >
                 {isRunning && <RunDialog script={script} onClose={this._toggleDialog}/>}

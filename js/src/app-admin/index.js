@@ -1,15 +1,17 @@
 //@flow
 import ReactDOM from 'react-dom';
-import React, {type ComponentType} from 'react';
-
+import React from 'react';
+import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import {Provider} from 'react-redux';
 import {combineReducers, createStore} from 'redux';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
+import Button from '@atlaskit/button';
+
 import {AdminScript} from './AdminScript';
-import {AdminDialog} from './AdminDialog';
+import {AdminForm} from './AdminForm';
 
 import {adminScriptService, watcherService} from '../service/services';
 import {fixStyle} from '../common/fixStyle';
@@ -21,7 +23,8 @@ import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
-import type {FullDialogComponentProps} from '../common/script-list/types';
+import {getBaseUrl} from '../service/ajaxHelper';
+import {Loader} from '../common/ak/Loader';
 
 import '../flex.less';
 
@@ -51,19 +54,48 @@ AJS.toInit(() => {
 
     ReactDOM.render(
         <Provider store={store}>
-            <ConnectedScriptPage
-                DialogComponent={(AdminDialog: ComponentType<FullDialogComponentProps>)}
-                ScriptComponent={AdminScript}
-                i18n={{
-                    title: TitleMessages.adminScripts,
-                    addItem: RegistryMessages.addScript,
-                    noItems: RegistryMessages.noScripts,
-                    delete: {
-                        heading: RegistryMessages.deleteScript,
-                        areYouSure: CommonMessages.confirmDelete
-                    }
-                }}
-            />
+            <BrowserRouter basename={`${getBaseUrl()}/plugins/servlet/my-groovy/admin-scripts`}>
+                <Loader>
+                    <Switch>
+                        <Route path="/" exact={true}>
+                            {() =>
+                                <ConnectedScriptPage
+                                    ScriptComponent={AdminScript}
+                                    i18n={{
+                                        title: TitleMessages.adminScripts,
+                                        addItem: RegistryMessages.addScript,
+                                        noItems: RegistryMessages.noScripts,
+                                        delete: {
+                                            heading: RegistryMessages.deleteScript,
+                                            areYouSure: CommonMessages.confirmDelete
+                                        }
+                                    }}
+                                    actions={
+                                        <Button
+                                            appearance="primary"
+
+                                            component={Link}
+                                            to="/create"
+                                        >
+                                            {RegistryMessages.addScript}
+                                        </Button>
+                                    }
+                                />
+                            }
+                        </Route>
+                        <Route path="/:id/edit" exact={true}>
+                            {({match}) =>
+                                <AdminForm id={parseInt(match.params.id, 10)} isNew={false}/>
+                            }
+                        </Route>
+                        <Route path="/create" exact={true}>
+                            {() =>
+                                <AdminForm isNew={true}/>
+                            }
+                        </Route>
+                    </Switch>
+                </Loader>
+            </BrowserRouter>
         </Provider>,
         element
     );

@@ -2,22 +2,25 @@
 import React from 'react';
 
 import {connect} from 'react-redux';
+import {withRouter} from 'react-router-dom';
 
 import type {AdminScriptType} from './types';
 
-import {ScriptDialog, makeScriptForm, type SubmitResult} from '../common/script-list/ScriptDialog';
+import {makeScriptForm, type SubmitResult} from '../common/script-list/ScriptDialog';
 import {ItemActionCreators} from '../common/redux';
 import {adminScriptService} from '../service/services';
 
-import type {ProvidedState} from '../common/script-list/ScriptDialog';
-import type {FullDialogComponentProps} from '../common/script-list/types';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {ReturnTypes} from '../common/bindings';
+import {ScriptForm} from '../common/script-list/ScriptForm';
+import type {ProvidedState} from '../common/script-list/ScriptDialog';
+import type {DialogComponentProps} from '../common/script-list/types';
 
 
 const {addItem, updateItem} = ItemActionCreators;
 
-type Props = FullDialogComponentProps & {
+type Props = DialogComponentProps & {
+    history: any,
     addItem: typeof addItem,
     updateItem: typeof updateItem
 };
@@ -81,7 +84,7 @@ const returnTypes = [{
 class AdminDialogInternal extends React.PureComponent<Props> {
     render() {
         return (
-            <ScriptDialog
+            <ScriptForm
                 defaultLoader={defaultLoader}
                 editLoader={editLoader}
                 onSubmit={onSubmit}
@@ -96,7 +99,9 @@ class AdminDialogInternal extends React.PureComponent<Props> {
     }
 }
 
-export const AdminDialog = connect(
-    null,
-    { addItem, updateItem }
-)(AdminDialogInternal);
+export const AdminForm = withRouter(
+    connect(
+        null,
+        { addItem, updateItem }
+    )(AdminDialogInternal)
+);

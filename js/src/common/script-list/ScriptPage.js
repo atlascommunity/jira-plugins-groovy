@@ -1,5 +1,5 @@
 //@flow
-import React, {type ComponentType} from 'react';
+import React, {type ComponentType, type Element} from 'react';
 
 import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
@@ -22,7 +22,9 @@ type Props<T> = {
     ScriptComponent: ComponentType<ScriptComponentProps<T>>,
     DialogComponent?: ComponentType<FullDialogComponentProps>,
 
-    isCreateDisabled: boolean
+    isCreateDisabled: boolean,
+
+    actions?: Element<any>,
 };
 
 type State = {
@@ -51,16 +53,20 @@ export class ScriptPage<T: ItemType> extends React.PureComponent<Props<T>, State
     _closeDelete = () => this.setState({ deleteProps: null });
 
     render() {
-        const {isReady, items, i18n, DialogComponent, ScriptComponent, isCreateDisabled} = this.props;
+        const {isReady, items, i18n, DialogComponent, ScriptComponent, isCreateDisabled, actions} = this.props;
         const {editProps, deleteProps} = this.state;
 
         return (
             <Page>
                 <PageHeader
                     actions={
-                        !isCreateDisabled ? <Button appearance="primary" onClick={this._triggerCreate} isDisabled={!isReady}>
-                            {i18n.addItem}
-                        </Button> : undefined
+                        actions || (
+                            !isCreateDisabled ?
+                                <Button appearance="primary" onClick={this._triggerCreate} isDisabled={!isReady}>
+                                    {i18n.addItem}
+                                </Button>:
+                                undefined
+                        )
                     }
                 >
                     {i18n.title}

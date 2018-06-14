@@ -268,7 +268,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 if (!modified) {
                     markers = getMarkers(errors);
                 }
-                errorMessage = errors.map(error => error.message).join(';');
+                errorMessage = errors.map(error => error.message).join('; ');
             } else {
                 errorMessage = error.message;
             }
