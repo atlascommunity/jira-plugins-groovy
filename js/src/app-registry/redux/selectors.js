@@ -1,7 +1,7 @@
 //@flow
 import {createSelector} from 'reselect';
 
-import groupBy from 'lodash/groupby';
+import groupBy from 'lodash/groupBy';
 
 import type {FilterType, KeyedEntities, RegistryDirectoryType, RegistryScriptType, ScriptUsageType} from '../types';
 
