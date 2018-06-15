@@ -263,7 +263,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                 label={CommonMessages.script}
                 isRequired={true}
             />
-            <div className="flex-row full-width">
+            <div className="flex-row full-width" style={{zIndex: 2}}>
                 <div className="flex-grow">
                     <SingleSelect
                         options={scripts.map(mapScriptToOption)}
@@ -295,7 +295,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
 
             {script && script.params &&
                 script.params.map(param =>
-                    <div key={param.name}>
+                    <div key={param.name} style={{zIndex: 1}}>
                         {this._renderParam(param, param.displayName)}
                     </div>
                 )
