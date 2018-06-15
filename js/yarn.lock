@@ -189,15 +189,6 @@
     react-addons-text-content "^0.0.4"
     uuid "^3.1.0"
 
-"@atlaskit/layer-manager@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/layer-manager/-/layer-manager-4.1.0.tgz#87904b1e21325b550b51c8f9f84df2e797c3252f"
-  dependencies:
-    focusin "^2.0.0"
-    prop-types "^15.5.10"
-    react-transition-group "^2.2.1"
-    tabbable "^1.1.0"
-
 "@atlaskit/layer-manager@^4.2.1":
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/@atlaskit/layer-manager/-/layer-manager-4.2.1.tgz#0a73f77250f4da9d8bb770e66b87551ce8abefa5"
@@ -270,12 +261,6 @@
     babel-runtime "^6.26.0"
     react-transition-group "^2.2.1"
 
-"@atlaskit/theme@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-4.0.2.tgz#df04b4e596f4e2bc57837d55695d30746a1b9d65"
-  dependencies:
-    prop-types "^15.5.10"
-
 "@atlaskit/theme@^4.0.3", "@atlaskit/theme@^4.0.4":
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-4.0.4.tgz#d39820e3ffd331d8b1bf7fa4f1af7694ba51c601"
@@ -290,16 +275,7 @@
     "@atlaskit/theme" "^4.0.4"
     uuid "^3.1.0"
 
-"@atlaskit/tooltip@^10.2.0":
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/tooltip/-/tooltip-10.2.0.tgz#f014718d5bdb88d71ca67f6be56e0cd91c023d3d"
-  dependencies:
-    "@atlaskit/layer-manager" "^4.1.0"
-    "@atlaskit/theme" "^4.0.2"
-    react-deprecate "^0.1.0"
-    react-transition-group "^2.2.1"
-
-"@atlaskit/tooltip@^10.2.1":
+"@atlaskit/tooltip@10.2.1", "@atlaskit/tooltip@^10.2.0", "@atlaskit/tooltip@^10.2.1":
   version "10.2.1"
   resolved "https://registry.yarnpkg.com/@atlaskit/tooltip/-/tooltip-10.2.1.tgz#5cdd9204b55b5c6eab515278357560d80f468b7e"
   dependencies:
@@ -3128,10 +3104,6 @@ focus-trap@^2.4.5:
   resolved "https://registry.yarnpkg.com/focus-trap/-/focus-trap-2.4.6.tgz#332b475b317cec6a4a129f5307ce7ebc0da90b40"
   dependencies:
     tabbable "^1.0.3"
-
-focusin@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/focusin/-/focusin-2.0.0.tgz#58c01180dfb1949f03e3ddeee063739fc33b6ffc"
 
 for-in@^1.0.1:
   version "1.0.2"
@@ -6391,10 +6363,6 @@ symbol-observable@^1.2.0:
 tabbable@^1.0.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/tabbable/-/tabbable-1.1.3.tgz#0e4ee376f3631e42d7977a074dbd2b3827843081"
-
-tabbable@^1.1.0:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/tabbable/-/tabbable-1.1.2.tgz#b171680aea6e0a3e9281ff23532e2e5de11c0d94"
 
 table@4.0.2:
   version "4.0.2"

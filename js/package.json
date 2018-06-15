@@ -114,6 +114,7 @@
     "why-did-you-update": "^0.1.1"
   },
   "resolutions": {
-    "react": "16.3.2"
+    "react": "16.3.2",
+    "@atlaskit/tooltip": "10.2.1"
   }
 }
