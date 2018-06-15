@@ -358,7 +358,7 @@
     <web-item key="groovy-admin-scripts-menu-item" name="Groovy admin scripts menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy admin scripts.</description>
         <label key="ru.mail.jira.plugins.groovy.link.adminScripts" />
-        <link linkId="mailru-groovy-admin-link">/plugins/servlet/my-groovy/admin-scripts</link>
+        <link linkId="mailru-groovy-admin-scripts-link">/plugins/servlet/my-groovy/admin-scripts</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
