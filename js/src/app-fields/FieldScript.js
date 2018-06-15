@@ -14,7 +14,7 @@ import type {FieldConfigItem} from './types';
 import {getBaseUrl} from '../service/ajaxHelper';
 
 import {JiraMessages, FieldMessages, ErrorMessages, CommonMessages} from '../i18n/common.i18n';
-import {FieldError} from '../common/ak/FieldError';
+import {ErrorMessage} from '../common/ak/messages';
 import {ScriptParameters} from '../common/script';
 import {WatchableScript} from '../common/script/WatchableScript';
 import {WatchActionCreators} from '../common/redux';
@@ -80,7 +80,7 @@ export class FieldScript extends React.PureComponent<Props> {
                     />
                 ]}
             >
-                {!script.uuid && <FieldError error={ErrorMessages.notConfigured}/>}
+                {!script.uuid && <ErrorMessage title={ErrorMessages.notConfigured}/>}
                 <ScriptParameters
                     params={[
                         {
