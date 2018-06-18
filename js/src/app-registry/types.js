@@ -4,7 +4,6 @@ import type {ScriptEntityWithoutChangelogs} from '../common/types';
 
 export type EntityType = 'script' | 'directory';
 
-export type WatcherCallback = (type: EntityType, id: number) => void;
 export type CreateCallback = (parentId: ?number, type: EntityType) => void;
 export type EditCallback = (id: number, type: EntityType) => void;
 export type DeleteCallback = (id: number, type: EntityType, name: string) => void;

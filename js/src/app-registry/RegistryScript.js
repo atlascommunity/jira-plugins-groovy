@@ -18,7 +18,7 @@ import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 import {RegistryActionCreators} from './redux/actions';
 
 import {WorkflowsDialog} from './WorkflowsDialog';
-import type {DeleteCallback, EditCallback, RegistryScriptType, WatcherCallback} from './types';
+import type {DeleteCallback, EditCallback, RegistryScriptType} from './types';
 
 import {CommonMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
@@ -30,8 +30,8 @@ import Script from '../common/script';
 
 type RegistryScriptConnectProps = {
     scriptWatches: Array<number>,
-    addWatch: WatcherCallback,
-    removeWatch: WatcherCallback,
+    addWatch: typeof RegistryActionCreators.addWatch,
+    removeWatch: typeof RegistryActionCreators.removeWatch,
 };
 
 export type PublicRegistryScriptProps = {

@@ -60,7 +60,9 @@ AJS.toInit(() => {
             <BrowserRouter basename={`${getBaseUrl()}/plugins/servlet/my-groovy/registry`}>
                 <Loader>
                     <Switch>
-                        <Route path="/" exact={true} component={ScriptRegistry}/>
+                        <Route path="/" exact={true}>
+                            {() => <ScriptRegistry/>}
+                        </Route>
                         <Route path="/script/create/" exact={true}>
                             {() =>
                                 <ScriptForm isNew={true} id={null} directoryId={-1}/>
