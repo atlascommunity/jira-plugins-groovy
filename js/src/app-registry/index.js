@@ -17,7 +17,7 @@ import {ScriptRegistry} from './ScriptRegistry';
 import {ScriptForm} from './ScriptForm';
 import {Loader} from './Loader';
 import {reducer} from './redux/reducer';
-import {RegistryActionCreators} from './redux/actions';
+import {loadState, loadUsage} from './redux/actions';
 
 import {registryService, watcherService} from '../service/services';
 import {fixStyle} from '../common/fixStyle';
@@ -40,13 +40,13 @@ AJS.toInit(() => {
         ])
         .then(
             ([dirs, scripts, scriptWatches, directoryWatches]: *) => {
-                store.dispatch(RegistryActionCreators.loadState(keyBy(dirs, 'id'), keyBy(scripts, 'id'), scriptWatches, directoryWatches));
+                store.dispatch(loadState(keyBy(dirs, 'id'), keyBy(scripts, 'id'), scriptWatches, directoryWatches));
             }
         );
 
     registryService
         .getAllScriptUsage()
-        .then(usage => store.dispatch(RegistryActionCreators.loadUsage(usage)));
+        .then(usage => store.dispatch(loadUsage(usage)));
 
     const element = document.getElementById('react-content');
 

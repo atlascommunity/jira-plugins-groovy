@@ -27,7 +27,7 @@ import {scheduledTaskService} from '../service/services';
 
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import {FieldMessages} from '../i18n/common.i18n';
-import {ItemActionCreators, WatchActionCreators} from '../common/redux';
+import {updateItem, WatchActionCreators} from '../common/redux';
 
 import type {ScriptParam} from '../common/script/ScriptParameters';
 import {WatchableScript} from '../common/script/WatchableScript';
@@ -60,8 +60,6 @@ const ConnectedWatchableScript = connect(
     ),
     WatchActionCreators
 )(WatchableScript);
-
-const {updateItem} = ItemActionCreators;
 
 type Props = ScriptComponentProps<ScheduledTaskType> & {
     updateItem: typeof updateItem

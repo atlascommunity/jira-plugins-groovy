@@ -20,7 +20,7 @@ import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
 
-import {DirectoryStateActionCreators, RegistryActionCreators} from './redux/actions';
+import {DirectoryStateActionCreators, addWatch, removeWatch} from './redux/actions';
 import {groupedDirsSelector, groupedScriptsSelector} from './redux/selectors';
 
 import {DraggableRegistryScript} from './DraggableRegistryScript';
@@ -207,8 +207,8 @@ type ActionsProps = {
     onCreate: CreateCallback,
     onEdit: EditCallback,
     onDelete: DeleteCallback,
-    addWatch: typeof RegistryActionCreators.addWatch,
-    removeWatch: typeof RegistryActionCreators.removeWatch,
+    addWatch: typeof addWatch,
+    removeWatch: typeof removeWatch,
     isWatched: boolean
 };
 
@@ -319,8 +319,5 @@ const ScriptDirectoryActions = connect(
                 isWatched: isWatchedSelector(state, props)
             });
     },
-    {
-        addWatch: RegistryActionCreators.addWatch,
-        removeWatch: RegistryActionCreators.removeWatch
-    }
+    { addWatch, removeWatch }
 )(ScriptDirectoryActionsInternal);

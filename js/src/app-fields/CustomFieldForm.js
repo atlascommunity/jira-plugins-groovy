@@ -28,7 +28,7 @@ import {ConsoleMessages} from '../i18n/console.i18n';
 import type {InputEvent} from '../common/EventTypes';
 import {extractShortClassName} from '../common/classNames';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
-import {ItemActionCreators} from '../common/redux';
+import {updateItem} from '../common/redux';
 import {ErrorMessage, InfoMessage} from '../common/ak/messages';
 
 
@@ -57,7 +57,7 @@ type Props = {
     id: number,
     fieldConfig: FieldConfig,
     history: any,
-    updateItem: typeof ItemActionCreators.updateItem
+    updateItem: typeof updateItem
 };
 
 type State = {
@@ -378,7 +378,7 @@ export const CustomFieldForm =
                 });
             },
             {
-                updateItem: ItemActionCreators.updateItem
+                updateItem: updateItem
             }
         )(CustomFieldFormInternal)
     );

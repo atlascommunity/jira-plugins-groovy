@@ -17,7 +17,7 @@ import {getMarkers} from '../error';
 import {ErrorMessage} from '../ak/messages';
 import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
 import {Bindings} from '../bindings';
-import {ItemActionCreators} from '../redux';
+import {addItem, updateItem} from '../redux';
 
 import type {ItemType} from '../redux';
 import type {ReturnType} from '../editor/types';
@@ -46,8 +46,6 @@ export type ProvidedState = {
     values: ValuesType,
     name: ?string
 };
-
-const {addItem, updateItem} = ItemActionCreators;
 
 type Props = FullDialogComponentProps & {
     defaultLoader: () => Promise<ProvidedState>,

@@ -7,7 +7,7 @@ import {withRouter} from 'react-router-dom';
 import type {AdminScriptType} from './types';
 
 import {makeScriptForm, type SubmitResult} from '../common/script-list/ScriptDialog';
-import {ItemActionCreators} from '../common/redux';
+import {addItem, updateItem} from '../common/redux';
 import {adminScriptService} from '../service/services';
 
 import {RegistryMessages} from '../i18n/registry.i18n';
@@ -16,8 +16,6 @@ import {ScriptForm} from '../common/script-list/ScriptForm';
 import type {ProvidedState} from '../common/script-list/ScriptDialog';
 import type {DialogComponentProps} from '../common/script-list/types';
 
-
-const {addItem, updateItem} = ItemActionCreators;
 
 type Props = DialogComponentProps & {
     history: any,

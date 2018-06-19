@@ -125,26 +125,24 @@ export function wholeObjectReducerFactory<T, Field>(field: Field, defaultValue: 
     };
 }
 
+export const addItem = (item: ItemType): * => ({
+    type: ADD_ITEM,
+    item: item
+});
+export const updateItem =  (item: ItemType): * => ({
+    type: UPDATE_ITEM,
+    item: item
+});
+export const deleteItem = (id: number): * => ({
+    type: DELETE_ITEM,
+    id: id
+});
+
 export const ItemActionCreators = {
     loadItems: (items: ItemListType, watches: WatchesListType, extraFields?: {[string]: any}): LoadAction => {
         return {
             ...extraFields,
             type: LOAD_ITEMS, items, watches
-        };
-    },
-    addItem: (item: ItemType): AddItemAction => {
-        return {
-            type: ADD_ITEM, item
-        };
-    },
-    updateItem: (item: ItemType): UpdateItemAction => {
-        return {
-            type: UPDATE_ITEM, item
-        };
-    },
-    deleteItem: (id: number): DeleteItemAction => {
-        return {
-            type: DELETE_ITEM, id: id
         };
     }
 };

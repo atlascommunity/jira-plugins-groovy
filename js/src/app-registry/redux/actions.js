@@ -26,57 +26,49 @@ export const CLOSE_DIRECTORY = 'CLOSE_DIRECTORY';
 
 export type ActionType = any;
 
-type AddDirectoryAction = {
-    type: typeof ADD_DIRECTORY,
-    directory: RegistryDirectoryType
-};
+export const loadState = (
+    directories: KeyedEntities<RegistryDirectoryType>,
+    scripts: KeyedEntities<RegistryScriptType>,
+    scriptWatches: $ReadOnlyArray<number>,
+    directoryWatches: $ReadOnlyArray<number>
+): * => ({
+    type: LOAD_STATE,
+    directories, scripts,
+    scriptWatches, directoryWatches
+});
+export const loadUsage = (items: ScriptUsageItems): * => ({
+    type: LOAD_USAGE,
+    items
+});
 
-type UpdateDirectoryAction = {
-    type: typeof UPDATE_DIRECTORY,
-    directory: RegistryDirectoryType
-};
+export const addScript = (script: RegistryScriptType): * => ({
+    type: ADD_SCRIPT,
+    script: script
+});
+export const updateScript = (script: RegistryScriptType): * => ({
+    type: UPDATE_SCRIPT,
+    script: script
+});
 
-export const directoryRelatedActions = [
-    LOAD_STATE, ADD_DIRECTORY, UPDATE_DIRECTORY, DELETE_DIRECTORY, DELETE_SCRIPT, MOVE_SCRIPT, UPDATE_SCRIPT, ADD_SCRIPT
-];
+export const addDirectory =  (directory: RegistryDirectoryType): * => ({
+    type: ADD_DIRECTORY,
+    directory: directory
+});
+export const updateDirectory = (directory: RegistryDirectoryType): * => ({
+    type: UPDATE_DIRECTORY,
+    directory: directory
+});
+
+export const addWatch = (kind: 'script' | 'directory', id: number): * => ({
+    type: ADD_WATCH,
+    kind, id
+});
+export const removeWatch =  (kind: 'script' | 'directory', id: number): * => ({
+    type: REMOVE_WATCH,
+    kind, id
+});
 
 export const RegistryActionCreators = {
-    loadState: (
-        directories: KeyedEntities<RegistryDirectoryType>,
-        scripts: KeyedEntities<RegistryScriptType>,
-        scriptWatches: $ReadOnlyArray<number>,
-        directoryWatches: $ReadOnlyArray<number>
-    ): * => {
-        return {
-            type: LOAD_STATE,
-            directories, scripts,
-            scriptWatches, directoryWatches
-        };
-    },
-    addWatch: (kind: 'script' | 'directory', id: number): * => {
-        return {
-            type: ADD_WATCH,
-            kind, id
-        };
-    },
-    removeWatch: (kind: 'script' | 'directory', id: number): * => {
-        return {
-            type: REMOVE_WATCH,
-            kind, id
-        };
-    },
-    addDirectory: (directory: RegistryDirectoryType): AddDirectoryAction => {
-        return {
-            type: ADD_DIRECTORY,
-            directory: directory
-        };
-    },
-    updateDirectory: (directory: RegistryDirectoryType): UpdateDirectoryAction => {
-        return {
-            type: UPDATE_DIRECTORY,
-            directory: directory
-        };
-    },
     deleteDirectory: (id: number): * => {
         return {
             type: DELETE_DIRECTORY,
@@ -84,18 +76,6 @@ export const RegistryActionCreators = {
         };
     },
 
-    addScript: (script: RegistryScriptType): * => {
-        return {
-            type: ADD_SCRIPT,
-            script: script
-        };
-    },
-    updateScript: (script: RegistryScriptType): * => {
-        return {
-            type: UPDATE_SCRIPT,
-            script: script
-        };
-    },
     deleteScript: (id: number): * => {
         return {
             type: DELETE_SCRIPT,
@@ -108,12 +88,6 @@ export const RegistryActionCreators = {
             src, dst, scriptId
         };
     },
-    loadUsage: (items: ScriptUsageItems): * => {
-        return {
-            type: LOAD_USAGE,
-            items
-        };
-    }
 };
 
 export type DirectoryStateAction = {

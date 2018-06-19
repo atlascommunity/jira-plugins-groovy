@@ -22,7 +22,7 @@ import {getMarkers} from '../common/error';
 import {Bindings, ReturnTypes} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
 import {ErrorMessage} from '../common/ak/messages';
-import {ItemActionCreators} from '../common/redux';
+import {addItem, updateItem} from '../common/redux';
 import type {FullDialogComponentProps} from '../common/script-list/types';
 import type {BindingType} from '../common/editor/types';
 import {extractShortClassName} from '../common/classNames';
@@ -42,8 +42,6 @@ import {extractShortClassName} from '../common/classNames';
 
 const issueEventBindings = [Bindings.issueEvent];
 const returnTypes = [ReturnTypes.void];
-
-const {addItem, updateItem} = ItemActionCreators;
 
 type Form = {
     name: string,

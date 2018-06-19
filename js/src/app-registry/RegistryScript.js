@@ -15,7 +15,7 @@ import WatchIcon from '@atlaskit/icon/glyph/watch';
 import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
-import {RegistryActionCreators} from './redux/actions';
+import {addWatch, removeWatch} from './redux/actions';
 
 import {WorkflowsDialog} from './WorkflowsDialog';
 import type {DeleteCallback, EditCallback, RegistryScriptType} from './types';
@@ -30,8 +30,8 @@ import Script from '../common/script';
 
 type RegistryScriptConnectProps = {
     scriptWatches: Array<number>,
-    addWatch: typeof RegistryActionCreators.addWatch,
-    removeWatch: typeof RegistryActionCreators.removeWatch,
+    addWatch: typeof addWatch,
+    removeWatch: typeof removeWatch,
 };
 
 export type PublicRegistryScriptProps = {
@@ -170,8 +170,5 @@ export const RegistryScript =
                 scriptWatches
             };
         }),
-        {
-            addWatch: RegistryActionCreators.addWatch,
-            removeWatch: RegistryActionCreators.removeWatch
-        }
+        { addWatch, removeWatch }
     )(RegistryScriptInternal);

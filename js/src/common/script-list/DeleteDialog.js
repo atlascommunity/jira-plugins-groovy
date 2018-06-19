@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 
-import {ItemActionCreators} from '../redux';
+import {deleteItem} from '../redux';
 import type {VoidCallback} from '../types';
 import {CommonMessages} from '../../i18n/common.i18n';
 
@@ -21,7 +21,7 @@ export type DeleteDialogProps = {
 };
 
 type Props = DeleteDialogProps & {
-    deleteItem: typeof ItemActionCreators.deleteItem,
+    deleteItem: typeof deleteItem,
     onClose: VoidCallback,
     i18n: DeleteI18n
 };
@@ -81,4 +81,4 @@ export class DeleteDialog extends React.PureComponent<Props, State> {
     }
 }
 
-export const ConnectedDeleteDialog = connect(null, {deleteItem: ItemActionCreators.deleteItem})(DeleteDialog);
+export const ConnectedDeleteDialog = connect(() => ({}), { deleteItem })(DeleteDialog);

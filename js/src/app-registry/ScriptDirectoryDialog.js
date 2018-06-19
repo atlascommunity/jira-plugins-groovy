@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 
-import {RegistryActionCreators} from './redux/actions';
+import {addDirectory, updateDirectory} from './redux/actions';
 import type {RegistryDirectoryType} from './types';
 
 import {ErrorMessage} from '../common/ak/messages';
@@ -18,11 +18,11 @@ import {RegistryMessages} from '../i18n/registry.i18n';
 import type {VoidCallback} from '../common/types';
 
 
-export type DialogParams = { isNew: false, id: number, parentId?: null } | { isNew: true, id?: null, parentId: ?number };
+export type DialogParams = { isNew: boolean, id?: number, parentId?: ?number };
 
 type Props = DialogParams & {
-    addDirectory: typeof RegistryActionCreators.addDirectory,
-    updateDirectory: typeof RegistryActionCreators.updateDirectory,
+    addDirectory: typeof addDirectory,
+    updateDirectory: typeof updateDirectory,
     onClose: VoidCallback
 };
 
@@ -157,12 +157,6 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
 }
 
 export const ScriptDirectoryDialog = connect(
-    null,
-    //$FlowFixMe
-    {
-        addDirectory: RegistryActionCreators.addDirectory,
-        updateDirectory: RegistryActionCreators.updateDirectory
-    },
-    null,
-    {withRef: true}
+    () => ({}),
+    { addDirectory, updateDirectory }
 )(ScriptDirectoryDialogInternal);

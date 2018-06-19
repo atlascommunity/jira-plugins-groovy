@@ -15,7 +15,7 @@ import {Field} from '@atlaskit/form';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
-import {RegistryActionCreators} from './redux/actions';
+import {addScript, updateScript} from './redux/actions';
 
 import type {WorkflowScriptType, RegistryScriptType} from './types';
 
@@ -76,8 +76,8 @@ const makeForm: RecordFactory<Form> = Record({
 });
 
 type Props = {
-    addScript: typeof RegistryActionCreators.addScript,
-    updateScript: typeof RegistryActionCreators.updateScript,
+    addScript: typeof addScript,
+    updateScript: typeof updateScript,
     history: any,
     isNew: boolean,
     id: ?number,
@@ -460,9 +460,6 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
 export const ScriptForm = withRouter(
     connect(
         null,
-        //$FlowFixMe
-        RegistryActionCreators,
-        null,
-        {withRef: true}
+        { addScript, updateScript }
     )(ScriptFormInternal)
 );

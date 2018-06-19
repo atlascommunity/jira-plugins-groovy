@@ -34,8 +34,7 @@ const store = createStore(
         items: itemsReducer,
         watches: watchesReducer,
         isReady: readinessReducer
-    }),
-    {items: [], isReady: false}
+    })
 );
 
 AJS.toInit(() => {

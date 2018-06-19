@@ -23,7 +23,7 @@ import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {ErrorMessage} from '../common/ak/messages';
 import {RegistryMessages} from '../i18n/registry.i18n';
-import {ItemActionCreators} from '../common/redux';
+import {addItem, updateItem} from '../common/redux';
 import type {FullDialogComponentProps} from '../common/script-list/types';
 import type {HttpMethod} from '../common/types';
 import type {OldSelectItem, SingleValueType} from '../common/ak/types';
@@ -55,8 +55,6 @@ const httpMethods = ['GET', 'POST', 'PUT', 'DELETE'].map(
 );
 
 const bindings = [ Bindings.method, Bindings.headers, Bindings.uriInfo, Bindings.body, Bindings.currentUser ];
-
-const {updateItem, addItem} = ItemActionCreators;
 
 type Form = {
     name: string,
@@ -334,6 +332,6 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
 }
 
 export const RestScriptDialog = connect(
-    null,
+    () => ({}),
     { addItem, updateItem }
 )(RestScriptDialogInternal);
