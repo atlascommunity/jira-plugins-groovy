@@ -57,8 +57,9 @@ type RegistryPickerState = {
 export class RegistryPicker extends React.Component<RegistryPickerProps, RegistryPickerState> {
     _onChange = (value: ?OldSelectItem<number>) => {
         if (value) {
+            const val = value.value;
             this.setState({
-                script: this.state.scripts.find(el => el.id === value.value)
+                script: this.state.scripts.find(el => el.id === val)
             });
         } else {
             this.setState({ script: null });

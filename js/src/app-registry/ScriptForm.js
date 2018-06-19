@@ -246,10 +246,11 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
     _setDirectory = (value: ?SingleValueType) => {
         if (value) {
             const id = parseInt(value.value, 10);
+            const {label} = value;
             this.setState(({values}: *): * => {
                 return {
                     values: values.set('directoryId', id),
-                    parentName: value.label,
+                    parentName: label,
                     noParent: false
                 };
             });
