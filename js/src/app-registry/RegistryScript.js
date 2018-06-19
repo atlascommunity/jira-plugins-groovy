@@ -6,7 +6,7 @@ import {Link} from 'react-router-dom';
 
 import memoizeOne from 'memoize-one';
 
-import Button from '@atlaskit/button';
+import Button, {defaultProps as defaultButtonProps} from '@atlaskit/button';
 import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
 import Lozenge from '@atlaskit/lozenge';
 
@@ -134,6 +134,7 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
 
                             triggerType="button"
                             triggerButtonProps={{
+                                ...defaultButtonProps,
                                 appearance: 'subtle',
                                 iconBefore: <MoreVerticalIcon label=""/>
                             }}

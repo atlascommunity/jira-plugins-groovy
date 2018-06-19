@@ -1,7 +1,7 @@
 //@flow
 import React, {type Node, type Element} from 'react';
 
-import Button, {ButtonGroup} from '@atlaskit/button';
+import Button, {ButtonGroup, defaultProps as defaultButtonProps} from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
 import Badge from '@atlaskit/badge';
 import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
@@ -306,6 +306,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
 
                     triggerType="button"
                     triggerButtonProps={{
+                        ...defaultButtonProps,
                         appearance: 'subtle',
                         iconBefore: <MoreVerticalIcon label=""/>
                     }}

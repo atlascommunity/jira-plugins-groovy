@@ -8,7 +8,7 @@ import {Link} from 'react-router-dom';
 
 import {Droppable} from 'react-beautiful-dnd';
 
-import Button, {ButtonGroup} from '@atlaskit/button';
+import Button, {ButtonGroup, defaultProps as defaultButtonProps} from '@atlaskit/button';
 import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
 import Badge from '@atlaskit/badge';
 
@@ -290,6 +290,7 @@ export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsP
 
                     triggerType="button"
                     triggerButtonProps={{
+                        ...defaultButtonProps,
                         appearance: 'subtle',
                         iconBefore: <MoreVerticalIcon label=""/>
                     }}
