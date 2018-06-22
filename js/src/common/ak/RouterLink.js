@@ -6,9 +6,9 @@ import {Link} from 'react-router-dom';
 type Props = {
     children: Element<any>,
     className: string,
-    href: Link,
-    onMouseEnter: Event,
-    onMouseLeave: Event,
+    href: string,
+    onMouseEnter: (SyntheticEvent<any>) => void,
+    onMouseLeave: (SyntheticEvent<any>) => void,
 };
 
 export class RouterLink extends React.PureComponent<Props, {}> {
