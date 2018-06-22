@@ -12,6 +12,7 @@ import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 import {Field} from '@atlaskit/form';
+import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
@@ -36,6 +37,7 @@ import type {InputEvent} from '../common/EventTypes';
 import type {SingleValueType} from '../common/ak/types';
 
 import './ScriptForm.less';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
 const returnTypesMap = {
@@ -282,7 +284,26 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
 
         return (
             <Page>
-                <PageHeader>
+                <PageHeader
+                    breadcrumbs={
+                        <Breadcrumbs>
+                            <BreadcrumbsItem
+                                text="Workflow script registry"
+                                href="/"
+
+                                //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
+                                component={RouterLink}
+                            />
+                            {script && <BreadcrumbsItem
+                                text={script.name}
+                                href={`/script/view/${script.id}`}
+
+                                //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
+                                component={RouterLink}
+                            />}
+                        </Breadcrumbs>
+                    }
+                >
                     {this.state.id ? `${RegistryMessages.editScript}: ${script ? script.name : ''}` : RegistryMessages.addScript}
                 </PageHeader>
                 <Prompt when={modified && !waiting} message="Are you sure you want to leave?"/>

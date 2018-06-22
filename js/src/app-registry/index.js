@@ -11,19 +11,19 @@ import keyBy from 'lodash/keyBy';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
-import EmptyState from '@atlaskit/empty-state';
-
 import {ScriptRegistry} from './ScriptRegistry';
 import {ScriptForm} from './ScriptForm';
+import {ViewScript} from './ViewScript';
 import {Loader} from './Loader';
 import {reducer} from './redux/reducer';
 import {loadState, loadUsage} from './redux/actions';
 
 import {registryService, watcherService} from '../service/services';
 import {fixStyle} from '../common/fixStyle';
+import {getBaseUrl} from '../service/ajaxHelper';
 
 import '../flex.less';
-import {getBaseUrl} from '../service/ajaxHelper';
+import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
 
 const store = createStore(reducer);
@@ -78,8 +78,13 @@ AJS.toInit(() => {
                                 <ScriptForm isNew={false} id={parseInt(match.params.id, 10)}/>
                             }
                         </Route>
+                        <Route path="/script/view/:id">
+                            {({match}) =>
+                                <ViewScript id={parseInt(match.params.id, 10)}/>
+                            }
+                        </Route>
                         <Route>
-                            {() => <EmptyState header="Not found" description="¯\_(ツ)_/¯"/>}
+                            {() => <NotFoundPage/>}
                         </Route>
                     </Switch>
                 </Loader>

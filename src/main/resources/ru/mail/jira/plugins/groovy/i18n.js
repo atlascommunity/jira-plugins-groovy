@@ -67,7 +67,8 @@ define('/mailru/groovy/i18n-react', function() {
             confirmDelete: function(...params) {
                 return AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.confirmDelete', ...params);
             },
-            all: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.all')
+            all: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.all'),
+            permalink: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.permalink')
         },
         error: {
             noValue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.error.noValue'),

@@ -6,6 +6,7 @@
     "@atlaskit/avatar": "^11.2.0",
     "@atlaskit/badge": "^8.0.3",
     "@atlaskit/blanket": "^6.0.3",
+    "@atlaskit/breadcrumbs": "^5.1.1",
     "@atlaskit/button": "^8.2.1",
     "@atlaskit/checkbox": "^3.1.0",
     "@atlaskit/css-reset": "^2.0.6",

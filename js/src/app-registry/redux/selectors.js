@@ -137,3 +137,13 @@ export const groupedDirsSelector = createSelector(
     directoriesSelector,
     groupedSelector('parentId')
 );
+
+export const scriptSelectorFactory =
+    () => createSelector(
+        [
+            state => state.scripts,
+            (_state, props) => props.id
+        ],
+        (scripts: KeyedEntities<RegistryScriptType>, id: number) => scripts[id]
+    );
+

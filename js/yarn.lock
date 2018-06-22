@@ -30,7 +30,16 @@
   dependencies:
     "@atlaskit/theme" "^4.0.3"
 
-"@atlaskit/button@8.2.1", "@atlaskit/button@^8.1.2", "@atlaskit/button@^8.2.0", "@atlaskit/button@^8.2.1":
+"@atlaskit/breadcrumbs@^5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/breadcrumbs/-/breadcrumbs-5.1.1.tgz#ab8e5ba2aa76801d5cbe77eb8bfcdac0ce7cfefc"
+  dependencies:
+    "@atlaskit/button" "^8.1.1"
+    "@atlaskit/theme" "^4.0.3"
+    "@atlaskit/tooltip" "^10.2.0"
+    babel-runtime "^6.26.0"
+
+"@atlaskit/button@8.2.1", "@atlaskit/button@^8.1.1", "@atlaskit/button@^8.1.2", "@atlaskit/button@^8.2.0", "@atlaskit/button@^8.2.1":
   version "8.2.1"
   resolved "https://registry.yarnpkg.com/@atlaskit/button/-/button-8.2.1.tgz#b88c508684b09104e38783108b08bbba0499281a"
   dependencies:
@@ -275,7 +284,7 @@
     "@atlaskit/theme" "^4.0.4"
     uuid "^3.1.0"
 
-"@atlaskit/tooltip@10.3.0", "@atlaskit/tooltip@^10.2.1", "@atlaskit/tooltip@^10.3.0":
+"@atlaskit/tooltip@10.3.0", "@atlaskit/tooltip@^10.2.0", "@atlaskit/tooltip@^10.2.1", "@atlaskit/tooltip@^10.3.0":
   version "10.3.0"
   resolved "https://registry.yarnpkg.com/@atlaskit/tooltip/-/tooltip-10.3.0.tgz#06497ad556f09e0950dbe48b79bf521eba809b97"
   dependencies:

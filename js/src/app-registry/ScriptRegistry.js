@@ -15,7 +15,7 @@ import {CheckboxStateless} from '@atlaskit/checkbox';
 
 import {ScriptDirectory} from './ScriptDirectory';
 import {ScriptDirectoryDialog, type DialogParams} from './ScriptDirectoryDialog';
-import {RegistryActionCreators, UpdateActionCreators as FilterActionCreators} from './redux/actions';
+import {deleteDirectory, deleteScript, moveScript, UpdateActionCreators as FilterActionCreators} from './redux/actions';
 import {filteredSelector, filterSelector, groupedDirsSelector} from './redux/selectors';
 import {UsageStatusFlag} from './UsageStatusFlag';
 
@@ -38,9 +38,9 @@ type Props = {
     isScriptUsageReady: boolean,
     isForceOpen: boolean,
     filter: FilterType,
-    deleteDirectory: typeof RegistryActionCreators.deleteDirectory,
-    deleteScript: typeof RegistryActionCreators.deleteScript,
-    moveScript: typeof RegistryActionCreators.moveScript,
+    deleteDirectory: typeof deleteDirectory,
+    deleteScript: typeof deleteScript,
+    moveScript: typeof moveScript,
     updateFilter: typeof FilterActionCreators.updateFilter
 };
 
@@ -254,7 +254,7 @@ export const ScriptRegistry = connect(
         isScriptUsageReady: state.scriptUsage.ready
     }),
     {
-        ...RegistryActionCreators,
+        deleteDirectory, deleteScript, moveScript,
         updateFilter: FilterActionCreators.updateFilter
     }
 )(ScriptRegistryInternal);

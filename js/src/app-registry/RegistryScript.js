@@ -2,7 +2,6 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
-import {Link} from 'react-router-dom';
 
 import memoizeOne from 'memoize-one';
 
@@ -18,7 +17,7 @@ import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 import {addWatch, removeWatch} from './redux/actions';
 
 import {WorkflowsDialog} from './WorkflowsDialog';
-import type {DeleteCallback, EditCallback, RegistryScriptType} from './types';
+import type {DeleteCallback, RegistryScriptType} from './types';
 
 import {CommonMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
@@ -26,6 +25,7 @@ import {RegistryMessages} from '../i18n/registry.i18n';
 import {registryService, watcherService} from '../service/services';
 
 import Script from '../common/script';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
 type RegistryScriptConnectProps = {
@@ -36,7 +36,6 @@ type RegistryScriptConnectProps = {
 
 export type PublicRegistryScriptProps = {
     script: RegistryScriptType,
-    onEdit: EditCallback,
     onDelete: DeleteCallback,
     title?: Node,
     children?: Node,
@@ -94,7 +93,7 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
     _onDelete = () => this.props.onDelete(this.props.script.id, 'script', this.props.script.name);
 
     render() {
-        const {script, scriptWatches, wrapperProps, onEdit, onDelete, ...props} = this.props;
+        const {script, scriptWatches, wrapperProps, onDelete, ...props} = this.props;
         const {showWorkflows, waitingWatch} = this.state;
 
         const isWatching = scriptWatches.includes(script.id);
@@ -116,8 +115,8 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
                             appearance="subtle"
                             iconBefore={<EditFilledIcon label=""/>}
 
-                            component={Link}
-                            to={`/script/edit/${script.id}`}
+                            component={RouterLink}
+                            href={`/script/edit/${script.id}`}
                         />,
                         <Button
                             key="watch"
@@ -140,6 +139,9 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
                             }}
                         >
                             <DropdownItemGroup>
+                                <DropdownItem href={`/script/view/${script.id}`} linkComponent={RouterLink}>
+                                    {CommonMessages.permalink}
+                                </DropdownItem>
                                 <DropdownItem onClick={this._toggleWorkflows}>
                                     {RegistryMessages.findWorkflows}
                                 </DropdownItem>

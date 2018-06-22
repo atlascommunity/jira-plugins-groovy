@@ -49,6 +49,14 @@ export const updateScript = (script: RegistryScriptType): * => ({
     type: UPDATE_SCRIPT,
     script: script
 });
+export const deleteScript = (id: number): * => ({
+    type: DELETE_SCRIPT,
+    id: id
+});
+export const moveScript = (src: number, dst: number, scriptId: number): * => ({
+    type: MOVE_SCRIPT,
+    src, dst, scriptId
+});
 
 export const addDirectory =  (directory: RegistryDirectoryType): * => ({
     type: ADD_DIRECTORY,
@@ -58,6 +66,10 @@ export const updateDirectory = (directory: RegistryDirectoryType): * => ({
     type: UPDATE_DIRECTORY,
     directory: directory
 });
+export const deleteDirectory = (id: number): * => ({
+        type: DELETE_DIRECTORY,
+        id: id
+    });
 
 export const addWatch = (kind: 'script' | 'directory', id: number): * => ({
     type: ADD_WATCH,
@@ -67,28 +79,6 @@ export const removeWatch =  (kind: 'script' | 'directory', id: number): * => ({
     type: REMOVE_WATCH,
     kind, id
 });
-
-export const RegistryActionCreators = {
-    deleteDirectory: (id: number): * => {
-        return {
-            type: DELETE_DIRECTORY,
-            id: id
-        };
-    },
-
-    deleteScript: (id: number): * => {
-        return {
-            type: DELETE_SCRIPT,
-            id: id
-        };
-    },
-    moveScript: (src: number, dst: number, scriptId: number): * => {
-        return {
-            type: MOVE_SCRIPT,
-            src, dst, scriptId
-        };
-    },
-};
 
 export type DirectoryStateAction = {
     type: typeof OPEN_DIRECTORY | typeof CLOSE_DIRECTORY,

@@ -88,7 +88,6 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                         key={script.id}
                         script={script}
 
-                        onEdit={onEdit}
                         onDelete={onDelete}
                     />
                 )
