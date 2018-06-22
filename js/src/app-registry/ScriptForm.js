@@ -2,7 +2,7 @@
 import React from 'react';
 
 import {connect} from 'react-redux';
-import {Link, Prompt, withRouter} from 'react-router-dom';
+import {Prompt, withRouter} from 'react-router-dom';
 
 import Button, {ButtonGroup} from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
@@ -30,14 +30,16 @@ import {EditorField} from '../common/ak/EditorField';
 import {StaticField} from '../common/ak/StaticField';
 import {ErrorMessage} from '../common/ak/messages';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
+import {RouterLink} from '../common/ak/RouterLink';
+import {withRoot} from '../common/script-list/breadcrumbs';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 
 import type {InputEvent} from '../common/EventTypes';
 import type {SingleValueType} from '../common/ak/types';
 
+
 import './ScriptForm.less';
-import {RouterLink} from '../common/ak/RouterLink';
 
 
 const returnTypesMap = {
@@ -196,7 +198,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 .then(
                     (data: RegistryScriptType) => {
                         this.props.updateScript(data);
-                        history.push('/');
+                        history.push('/registry/');
                         //component should be unmounted at this point
                     },
                     this._handleError
@@ -207,7 +209,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 .then(
                     (data: RegistryScriptType) => {
                         this.props.addScript(data);
-                        history.push('/');
+                        history.push('/registry/');
                         //component should be unmounted at this point
                     },
                     this._handleError
@@ -287,20 +289,26 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 <PageHeader
                     breadcrumbs={
                         <Breadcrumbs>
-                            <BreadcrumbsItem
-                                text="Workflow script registry"
-                                href="/"
+                            {withRoot([
+                                <BreadcrumbsItem
+                                    key="registry"
+                                    text="Workflow script registry"
+                                    href="/registry/"
 
-                                //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
-                                component={RouterLink}
-                            />
-                            {script && <BreadcrumbsItem
-                                text={script.name}
-                                href={`/script/view/${script.id}`}
+                                    //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
+                                    component={RouterLink}
+                                />,
+                                script ?
+                                    <BreadcrumbsItem
+                                        key="script"
+                                        text={script.name}
+                                        href={`/registry/script/view/${script.id}`}
 
-                                //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
-                                component={RouterLink}
-                            />}
+                                        //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
+                                        component={RouterLink}
+                                    />
+                                    : null
+                            ])}
                         </Breadcrumbs>
                     }
                 >
@@ -468,7 +476,13 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                             >
                                 {this.state.id ? CommonMessages.update : CommonMessages.create}
                             </Button>
-                            <Button component={Link} to="/" isDisabled={waiting || fetching} appearance="link">
+                            <Button
+                                appearance="link"
+                                isDisabled={waiting || fetching}
+
+                                component={RouterLink}
+                                href="/registry/"
+                            >
                                 {CommonMessages.cancel}
                             </Button>
                         </ButtonGroup>

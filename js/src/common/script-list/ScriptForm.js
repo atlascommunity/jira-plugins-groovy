@@ -1,8 +1,6 @@
 //@flow
 import React, {type Node} from 'react';
 
-import {Link} from 'react-router-dom';
-
 import {Record} from 'immutable';
 import type {RecordOf, RecordFactory} from 'immutable';
 
@@ -12,14 +10,17 @@ import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
+import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 
 import type {DialogComponentProps, ScriptForm as ScriptFormType} from './types';
+import {withRoot} from './breadcrumbs';
 
 import {LoadingSpinner} from '../ak/LoadingSpinner';
 import {EditorField} from '../ak/EditorField';
 
 import {getMarkers} from '../error';
 import {ErrorMessage} from '../ak/messages';
+import {RouterLink} from '../ak/RouterLink';
 import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
 import {Bindings} from '../bindings';
 import {addItem, updateItem} from '../redux';
@@ -62,10 +63,12 @@ type Props = DialogComponentProps & {
     updateItem: typeof updateItem,
     i18n: {
         editTitle: string,
-        createTitle: string
+        createTitle: string,
+        parentName: string,
     },
     valuesTransformer: (values: ValuesType) => DataType,
     history: any,
+    returnTo: string,
     returnTypes?: $ReadOnlyArray<ReturnType>
 };
 
@@ -131,7 +134,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
     };
 
     _onSubmit = () => {
-        const {id, isNew, history, onSubmit, valuesTransformer, addItem, updateItem} = this.props;
+        const {id, isNew, history, onSubmit, valuesTransformer, addItem, updateItem, returnTo} = this.props;
         const {values} = this.state;
 
         this.setState({ isSubmitting: true });
@@ -145,7 +148,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                         } else {
                             updateItem(result.item);
                         }
-                        history.push('/');
+                        history.push(returnTo);
                     } else {
                         this.setState({
                             isSubmitting: false,
@@ -167,7 +170,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
     }
 
     render() {
-        const {i18n, isNew, returnTypes} = this.props;
+        const {i18n, isNew, id, returnTypes, returnTo} = this.props;
         const {values, isLoadingState, isSubmitting, error, name} = this.state;
 
         let content: Node = null;
@@ -282,7 +285,30 @@ export class ScriptForm extends React.PureComponent<Props, State> {
 
         return (
             <Page>
-                <PageHeader>
+                <PageHeader
+                    breadcrumbs={
+                        <Breadcrumbs>
+                            {withRoot([
+                                <BreadcrumbsItem
+                                    key="registry"
+                                    text={i18n.parentName}
+                                    href={returnTo}
+
+                                    //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
+                                    component={RouterLink}
+                                />,
+                                name && id ? <BreadcrumbsItem
+                                    key="script"
+                                    text={name}
+                                    href={`${returnTo}${id}/view`}
+
+                                    //$FlowFixMe
+                                    component={RouterLink}
+                                /> : null
+                            ])}
+                        </Breadcrumbs>
+                    }
+                >
                     {isNew ? i18n.createTitle : `${i18n.editTitle}: ${name || ''}`}
                 </PageHeader>
                 <div className="flex-column">
@@ -301,11 +327,10 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                             </Button>
                             <Button
                                 appearance="link"
-
                                 isDisabled={isSubmitting || isLoadingState}
 
-                                component={Link}
-                                to="/"
+                                component={RouterLink}
+                                href={returnTo}
                             >
                                 {CommonMessages.cancel}
                             </Button>

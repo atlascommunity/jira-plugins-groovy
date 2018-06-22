@@ -1,4 +1,8 @@
 //@flow
+import type {Element} from 'react';
+
+import {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
+
 import type {DeleteI18n} from './DeleteDialog';
 
 import type {VoidCallback} from '../types';
@@ -9,8 +13,9 @@ export type DeleteCallbackType = (id: number, name: string, onConfirm: () => Pro
 
 export type ScriptComponentProps<T> = {
     script: T,
-    onEdit: ScriptCallbackType,
-    onDelete: DeleteCallbackType
+    onEdit?: ScriptCallbackType,
+    onDelete: DeleteCallbackType,
+    collapsible?: boolean
 };
 
 export type DialogComponentProps = {
@@ -35,3 +40,5 @@ export type ScriptForm = {
     scriptBody: string,
     comment: string
 };
+
+export type BreadcrumbsType = Array<?Element<typeof BreadcrumbsItem>>;

@@ -21,14 +21,12 @@ import java.util.Set;
 public class GroovyServlet extends HttpServlet {
     private static final Set<String> ALLOWED_RESOURCES = ImmutableSet.of(
         "console",
-        "registry",
         "listeners",
         "audit",
         "fields",
         "custom-field",
         "rest",
         "scheduled",
-        "admin-scripts",
         "extras"
     );
 
@@ -68,11 +66,7 @@ public class GroovyServlet extends HttpServlet {
                 return;
             }
 
-            Optional<String> matchedResource = ALLOWED_RESOURCES.stream().filter(path::startsWith).findAny();
-            if (!matchedResource.isPresent()) {
-                response.sendError(404);
-                return;
-            }
+            String matchedResource = ALLOWED_RESOURCES.stream().filter(path::startsWith).findAny().orElse("main");
 
             if (!permissionHelper.isAdmin()) {
                 response.sendError(403);
@@ -82,7 +76,7 @@ public class GroovyServlet extends HttpServlet {
             webSudoManager.willExecuteWebSudoRequest(request);
 
             response.setContentType("text/html;charset=utf-8");
-            templateRenderer.render("ru/mail/jira/plugins/groovy/templates/" + matchedResource.get() + ".vm", response.getWriter());
+            templateRenderer.render("ru/mail/jira/plugins/groovy/templates/" + matchedResource + ".vm", response.getWriter());
         } catch (WebSudoSessionException wes) {
             webSudoManager.enforceWebSudoProtection(request, response);
         }

@@ -4,8 +4,6 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {createSelector} from 'reselect';
 
-import {Link} from 'react-router-dom';
-
 import {Droppable} from 'react-beautiful-dnd';
 
 import Button, {ButtonGroup, defaultProps as defaultButtonProps} from '@atlaskit/button';
@@ -31,6 +29,7 @@ import {watcherService} from '../service/services';
 
 import {CommonMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
 type ScriptDirectoryProps = {
@@ -263,8 +262,8 @@ export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsP
                     appearance="subtle"
                     iconBefore={<AddIcon label=""/>}
 
-                    component={Link}
-                    to={`/script/create/${id}`}
+                    component={RouterLink}
+                    href={`/registry/script/create/${id}`}
                 >
                     {RegistryMessages.addScript}
                 </Button>

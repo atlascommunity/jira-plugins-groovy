@@ -1,6 +1,8 @@
 //@flow
 import React from 'react';
 
+import {createSelector} from 'reselect';
+
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
@@ -8,10 +10,10 @@ import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 
-import {addScript, updateScript, deleteScript } from './redux/actions';
-import {scriptSelectorFactory} from './redux/selectors';
-import type {RegistryScriptType} from './types';
-import {RegistryScript} from './RegistryScript';
+import {AdminScript} from './AdminScript';
+import type {AdminScriptType} from './types';
+
+import { deleteItem } from '../common/redux';
 
 import {RouterLink} from '../common/ak/RouterLink';
 import {RegistryMessages} from '../i18n/registry.i18n';
@@ -24,8 +26,8 @@ import {withRoot} from '../common/script-list/breadcrumbs';
 
 type Props = {
     id: number,
-    script?: RegistryScriptType,
-    deleteScript: typeof deleteScript,
+    script?: AdminScriptType,
+    deleteItem: typeof deleteItem,
     history: any
 };
 
@@ -33,7 +35,7 @@ type State = {
     isDeleting: boolean
 };
 
-class ViewScriptInternal extends React.PureComponent<Props, State> {
+class ViewAdminScriptInternal extends React.PureComponent<Props, State> {
     state = {
         isDeleting: false
     };
@@ -45,7 +47,7 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
         .then(() => this.props.history.push('/registry/'));
 
     render() {
-        const {script} = this.props;
+        const {script, deleteItem} = this.props;
         const {isDeleting} = this.state;
 
         return (
@@ -56,8 +58,8 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
                             {withRoot([
                                 <BreadcrumbsItem
                                     key="registry"
-                                    text="Workflow script registry"
-                                    href="/registry/"
+                                    text="Admin scripts"
+                                    href="/admin-scripts/"
 
                                     //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
                                     component={RouterLink}
@@ -69,7 +71,7 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
                     {script ? script.name : 'Unknown script'}
                 </PageHeader>
                 {script ?
-                    <RegistryScript script={script} collapsible={false} onDelete={this._toggleDelete}/> :
+                    <AdminScript script={script} collapsible={false} onDelete={this._toggleDelete}/> :
                     <NotFoundPage/>
                 }
                 {isDeleting && script &&
@@ -77,7 +79,7 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
                         id={script.id}
                         name={script.name}
 
-                        deleteItem={this.props.deleteScript}
+                        deleteItem={deleteItem}
                         onConfirm={this._doDelete}
                         onClose={this._toggleDelete}
 
@@ -92,15 +94,21 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
     }
 }
 
-export const ViewScript = withRouter(
+export const ViewAdminScript = withRouter(
     connect(
         (): * => {
-            const scriptSelector = scriptSelectorFactory();
+            const itemSelector = createSelector(
+                [
+                    state => state.items,
+                    (_state, props) => props.id
+                ],
+                (items, id) => items.find(it => it.id === id)
+            );
             //$FlowFixMe
             return (state, props) => ({
-                script: scriptSelector(state, props)
+                script: itemSelector(state, props)
             });
         },
-        { addScript, updateScript, deleteScript }
-    )(ViewScriptInternal)
+        { deleteItem }
+    )(ViewAdminScriptInternal)
 );

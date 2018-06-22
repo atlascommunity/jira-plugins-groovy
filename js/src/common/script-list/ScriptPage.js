@@ -4,10 +4,11 @@ import React, {type ComponentType, type Element} from 'react';
 import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
+import Breadcrumbs from '@atlaskit/breadcrumbs';
 
 import {ScriptList} from './ScriptList';
 
-import type {FullDialogComponentProps, DialogComponentProps, ScriptComponentProps, I18nType} from './types';
+import type {FullDialogComponentProps, DialogComponentProps, ScriptComponentProps, I18nType, BreadcrumbsType} from './types';
 
 import type {DeleteDialogProps} from './DeleteDialog';
 import {ConnectedDeleteDialog} from './DeleteDialog';
@@ -19,8 +20,10 @@ type Props<T> = {
     i18n: I18nType,
     isReady: boolean,
     items: Array<T>,
+
     ScriptComponent: ComponentType<ScriptComponentProps<T>>,
     DialogComponent?: ComponentType<FullDialogComponentProps>,
+    breadcrumbs?: BreadcrumbsType,
 
     isCreateDisabled: boolean,
 
@@ -53,7 +56,7 @@ export class ScriptPage<T: ItemType> extends React.PureComponent<Props<T>, State
     _closeDelete = () => this.setState({ deleteProps: null });
 
     render() {
-        const {isReady, items, i18n, DialogComponent, ScriptComponent, isCreateDisabled, actions} = this.props;
+        const {isReady, items, i18n, DialogComponent, ScriptComponent, isCreateDisabled, actions, breadcrumbs} = this.props;
         const {editProps, deleteProps} = this.state;
 
         return (
@@ -68,6 +71,7 @@ export class ScriptPage<T: ItemType> extends React.PureComponent<Props<T>, State
                                 undefined
                         )
                     }
+                    breadcrumbs={breadcrumbs && <Breadcrumbs>{breadcrumbs}</Breadcrumbs>}
                 >
                     {i18n.title}
                 </PageHeader>

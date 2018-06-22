@@ -116,7 +116,7 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
                             iconBefore={<EditFilledIcon label=""/>}
 
                             component={RouterLink}
-                            href={`/script/edit/${script.id}`}
+                            href={`/registry/script/edit/${script.id}`}
                         />,
                         <Button
                             key="watch"
@@ -139,7 +139,10 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
                             }}
                         >
                             <DropdownItemGroup>
-                                <DropdownItem href={`/script/view/${script.id}`} linkComponent={RouterLink}>
+                                <DropdownItem
+                                    href={`/registry/script/view/${script.id}`}
+                                    linkComponent={RouterLink}
+                                >
                                     {CommonMessages.permalink}
                                 </DropdownItem>
                                 <DropdownItem onClick={this._toggleWorkflows}>

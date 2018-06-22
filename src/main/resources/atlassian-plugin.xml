@@ -32,6 +32,17 @@
         <resource type="download" name="common.js.smap" location="/ru/mail/jira/plugins/groovy/js/common.js.smap"/>
     </web-resource>
 
+    <web-resource key="react-main" name="groovy workflow main Resources">
+        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
+
+        <resource type="download" name="main.css" location="/ru/mail/jira/plugins/groovy/css/main.css"/>
+        <resource type="download" name="main.css.smap" location="/ru/mail/jira/plugins/groovy/css/main.css.smap"/>
+        <resource type="download" name="main.js" location="/ru/mail/jira/plugins/groovy/js/main.js"/>
+        <resource type="download" name="main.js.smap" location="/ru/mail/jira/plugins/groovy/js/main.js.smap"/>
+
+        <context>ru.mail.jira.plugins.groovy.workflow</context>
+    </web-resource>
+
     <web-resource key="workflow" name="groovy workflow Web Resources">
         <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
 

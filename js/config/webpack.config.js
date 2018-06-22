@@ -86,7 +86,7 @@ module.exports = {
     devtool: shouldUseSourceMap ? devtool : false,
     // In production, we only want to load the polyfills and the app code.
     entry: {
-        repository: [require.resolve('./polyfills'), paths.resolveApp('src/app-registry/index.js')],
+        main: [require.resolve('./polyfills'), paths.resolveApp('src/app-main/index.js')],
         console: [require.resolve('./polyfills'), paths.resolveApp('src/app-console/index.js')],
         workflow: [require.resolve('./polyfills'), paths.resolveApp('src/app-workflow/index.js')],
         listeners: [require.resolve('./polyfills'), paths.resolveApp('src/app-listeners/index.js')],
@@ -95,7 +95,6 @@ module.exports = {
         fields: [require.resolve('./polyfills'), paths.resolveApp('src/app-fields/index.js')],
         extras: [require.resolve('./polyfills'), paths.resolveApp('src/app-extras/index.js')],
         scheduled: [require.resolve('./polyfills'), paths.resolveApp('src/app-scheduled/index.js')],
-        admin: [require.resolve('./polyfills'), paths.resolveApp('src/app-admin/index.js')],
     },
     output: {
         // The build folder.

@@ -12,6 +12,7 @@ import PageHeader from '@atlaskit/page-header';
 import Button from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {CheckboxStateless} from '@atlaskit/checkbox';
+import Breadcrumbs from '@atlaskit/breadcrumbs';
 
 import {ScriptDirectory} from './ScriptDirectory';
 import {ScriptDirectoryDialog, type DialogParams} from './ScriptDirectoryDialog';
@@ -31,6 +32,7 @@ import {RegistryMessages} from '../i18n/registry.i18n';
 import './ScriptRegistry.less';
 import type {DeleteDialogProps} from '../common/script-list/DeleteDialog';
 import {DeleteDialog} from '../common/script-list/DeleteDialog';
+import {withRoot} from '../common/script-list/breadcrumbs';
 
 
 type Props = {
@@ -181,6 +183,7 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                                 </div>
                             </div>
                         }
+                        breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
                     >
                         {TitleMessages.registry}
                     </PageHeader>

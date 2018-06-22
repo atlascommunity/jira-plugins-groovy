@@ -4,6 +4,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
+import {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
+
 import type {AdminScriptType} from './types';
 
 import {makeScriptForm, type SubmitResult} from '../common/script-list/ScriptDialog';
@@ -15,6 +17,8 @@ import {ReturnTypes} from '../common/bindings';
 import {ScriptForm} from '../common/script-list/ScriptForm';
 import type {ProvidedState} from '../common/script-list/ScriptDialog';
 import type {DialogComponentProps} from '../common/script-list/types';
+import {withRoot} from '../common/script-list/breadcrumbs';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
 type Props = DialogComponentProps & {
@@ -88,9 +92,12 @@ class AdminDialogInternal extends React.PureComponent<Props> {
                 onSubmit={onSubmit}
                 i18n={{
                     editTitle: RegistryMessages.editScript,
-                    createTitle: RegistryMessages.addScript
+                    createTitle: RegistryMessages.addScript,
+                    parentName: 'Admin scripts'
                 }}
                 returnTypes={returnTypes}
+                returnTo="/admin-scripts/"
+
                 {...this.props}
             />
         );
