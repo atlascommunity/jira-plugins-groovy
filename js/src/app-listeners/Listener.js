@@ -42,7 +42,7 @@ type ConnectProps = {
 type Props = ScriptComponentProps<ListenerType> & ConnectProps;
 
 class ListenerInternal extends React.PureComponent<Props> {
-    _edit = () => this.props.onEdit(this.props.script.id);
+    _edit = () => this.props.onEdit && this.props.onEdit(this.props.script.id);
 
     _delete = () => this.props.onDelete(
         this.props.script.id,

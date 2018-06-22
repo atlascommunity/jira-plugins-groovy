@@ -76,7 +76,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
         showRunDialog: false
     };
 
-    _edit = () => this.props.onEdit(this.props.script.id);
+    _edit = () => this.props.onEdit && this.props.onEdit(this.props.script.id);
 
     _delete = () => this.props.onDelete(
         this.props.script.id,

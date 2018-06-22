@@ -36,7 +36,7 @@ const ConnectedWatchableScript = connect(
 type Props = ScriptComponentProps<RestScriptType>;
 
 export class RestScript extends React.PureComponent<Props> {
-    _onEdit = () => this.props.onEdit(this.props.script.id);
+    _onEdit = () => this.props.onEdit && this.props.onEdit(this.props.script.id);
 
     _delete = () => this.props.onDelete(
         this.props.script.id,
