@@ -1,0 +1,12 @@
+@import (reference) '~@atlaskit/util-shared-styles/src/grid';
+@import (reference) '../flex';
+
+.MainApp {
+  .flex-row;
+
+  flex-wrap: wrap;
+
+  > * {
+    margin: @ak-grid-size;
+  }
+}

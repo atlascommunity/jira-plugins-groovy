@@ -1,11 +1,12 @@
 //@flow
 import React from 'react';
 
-import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 
-import {RouterLink} from '../common/ak/RouterLink';
+import {PageCard} from './PageCard';
+
+import './MainApp.less';
 
 
 export class MainApp extends React.PureComponent<{}> {
@@ -13,61 +14,43 @@ export class MainApp extends React.PureComponent<{}> {
         return (
             <Page>
                 <PageHeader>Mail.ru Groovy</PageHeader>
-                <div className="flex-row">
-                    <Button
+                <div className="MainApp">
+                    <PageCard
                         href="/console"
-                        component={RouterLink}
-                    >
-                        Console
-                    </Button>
-                    <Button
+                        title="Console"
+                    />
+                    <PageCard
                         href="/admin-scripts"
-                        component={RouterLink}
-                    >
-                        Admin scripts
-                    </Button>
-                    <Button
+                        title="Admin scripts"
+                    />
+                    <PageCard
                         href="/registry"
-                        component={RouterLink}
-                    >
-                        Registry
-                    </Button>
-                    <Button
+                        title="Registry"
+                    />
+                    <PageCard
                         href="/listeners"
-                        component={RouterLink}
-                    >
-                        Listeners
-                    </Button>
-                    <Button
+                        title="Listeners"
+                    />
+                    <PageCard
                         href="/rest"
-                        component={RouterLink}
-                    >
-                        REST scripts
-                    </Button>
-                    <Button
+                        title="REST scripts"
+                    />
+                    <PageCard
                         href="/fields"
-                        component={RouterLink}
-                    >
-                        Scripted fields
-                    </Button>
-                    <Button
+                        title="Scripted fields"
+                    />
+                    <PageCard
                         href="/scheduled"
-                        component={RouterLink}
-                    >
-                        Scheduled tasks
-                    </Button>
-                    <Button
+                        title="Scheduled tasks"
+                    />
+                    <PageCard
                         href="/audit"
-                        component={RouterLink}
-                    >
-                        Audit log
-                    </Button>
-                    <Button
+                        title="Audit log"
+                    />
+                    <PageCard
                         href="/extras"
-                        component={RouterLink}
-                    >
-                        Extras
-                    </Button>
+                        title="Extras"
+                    />
                 </div>
             </Page>
         );
