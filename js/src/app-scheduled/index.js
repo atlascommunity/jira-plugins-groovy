@@ -14,7 +14,6 @@ import {ScheduledTask} from './ScheduledTask';
 import {scheduledTaskService, watcherService} from '../service/services';
 import {fixStyle} from '../common/fixStyle';
 
-import '../flex.less';
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 

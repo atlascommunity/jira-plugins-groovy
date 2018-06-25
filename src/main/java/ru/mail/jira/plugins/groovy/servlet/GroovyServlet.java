@@ -6,7 +6,6 @@ import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.websudo.WebSudoManager;
 import com.atlassian.sal.api.websudo.WebSudoSessionException;
 import com.atlassian.templaterenderer.TemplateRenderer;
-import com.google.common.collect.ImmutableSet;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 
 import javax.servlet.http.HttpServlet;
@@ -14,22 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Optional;
-import java.util.Set;
 
 @Scanned
 public class GroovyServlet extends HttpServlet {
-    private static final Set<String> ALLOWED_RESOURCES = ImmutableSet.of(
-        "console",
-        "listeners",
-        "audit",
-        "fields",
-        "custom-field",
-        "rest",
-        "scheduled",
-        "extras"
-    );
-
     private final TemplateRenderer templateRenderer;
     private final WebSudoManager webSudoManager;
     private final LoginUriProvider loginUriProvider;
@@ -66,8 +52,6 @@ public class GroovyServlet extends HttpServlet {
                 return;
             }
 
-            String matchedResource = ALLOWED_RESOURCES.stream().filter(path::startsWith).findAny().orElse("main");
-
             if (!permissionHelper.isAdmin()) {
                 response.sendError(403);
                 return;
@@ -76,7 +60,7 @@ public class GroovyServlet extends HttpServlet {
             webSudoManager.willExecuteWebSudoRequest(request);
 
             response.setContentType("text/html;charset=utf-8");
-            templateRenderer.render("ru/mail/jira/plugins/groovy/templates/" + matchedResource + ".vm", response.getWriter());
+            templateRenderer.render("ru/mail/jira/plugins/groovy/templates/main.vm", response.getWriter());
         } catch (WebSudoSessionException wes) {
             webSudoManager.enforceWebSudoProtection(request, response);
         }

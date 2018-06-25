@@ -1,8 +1,6 @@
 //@flow
 import React from 'react';
 
-import {createSelector} from 'reselect';
-
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
@@ -18,10 +16,11 @@ import { deleteItem } from '../common/redux';
 import {RouterLink} from '../common/ak/RouterLink';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {CommonMessages} from '../i18n/common.i18n';
-import {registryService} from '../service/services';
+import {adminScriptService} from '../service/services';
 import {DeleteDialog} from '../common/script-list/DeleteDialog';
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 import {withRoot} from '../common/script-list/breadcrumbs';
+import {createItemSelector} from '../common/redux/selectors';
 
 
 type Props = {
@@ -42,9 +41,9 @@ class ViewAdminScriptInternal extends React.PureComponent<Props, State> {
 
     _toggleDelete = () => this.setState(state => ({ isDeleting: !state.isDeleting }));
 
-    _doDelete = () => registryService
+    _doDelete = () => adminScriptService
         .deleteScript(this.props.id)
-        .then(() => this.props.history.push('/registry/'));
+        .then(() => this.props.history.push('/admin-scripts/'));
 
     render() {
         const {script, deleteItem} = this.props;
@@ -97,13 +96,7 @@ class ViewAdminScriptInternal extends React.PureComponent<Props, State> {
 export const ViewAdminScript = withRouter(
     connect(
         (): * => {
-            const itemSelector = createSelector(
-                [
-                    state => state.items,
-                    (_state, props) => props.id
-                ],
-                (items, id) => items.find(it => it.id === id)
-            );
+            const itemSelector = createItemSelector();
             //$FlowFixMe
             return (state, props) => ({
                 script: itemSelector(state, props)

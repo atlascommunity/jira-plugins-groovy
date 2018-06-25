@@ -20,6 +20,7 @@ import {WatchableScript} from '../common/script/WatchableScript';
 import {WatchActionCreators} from '../common/redux';
 
 import type {ScriptComponentProps} from '../common/script-list/types';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
 const ConnectedWatchableScript = connect(
@@ -37,7 +38,7 @@ type Props = ScriptComponentProps<FieldConfigItem>;
 
 export class FieldScript extends React.PureComponent<Props> {
     render() {
-        const {script} = this.props;
+        const {script, collapsible} = this.props;
 
         return (
             <ConnectedWatchableScript
@@ -57,8 +58,14 @@ export class FieldScript extends React.PureComponent<Props> {
                 } : undefined}
 
                 withChangelog={true}
+                collapsible={collapsible}
 
                 dropdownItems={[
+                    {
+                        label: CommonMessages.permalink,
+                        href: `/fields/${script.id}/view`,
+                        linkComponent: RouterLink
+                    },
                     {
                         label: `${JiraMessages.edit} ${FieldMessages.customField}`,
                         href: `${getBaseUrl()}/secure/admin/EditCustomField!default.jspa?id=${script.customFieldId}`
@@ -76,7 +83,7 @@ export class FieldScript extends React.PureComponent<Props> {
                         iconBefore={<EditFilledIcon label=""/>}
 
                         component={Link}
-                        to={`/${script.id}/edit`}
+                        to={`/fields/${script.id}/edit`}
                     />
                 ]}
             >

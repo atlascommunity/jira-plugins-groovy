@@ -9,6 +9,7 @@ import Lozenge from '@atlaskit/lozenge';
 import Button from '@atlaskit/button';
 import {DynamicTableStateless} from '@atlaskit/dynamic-table';
 import Pagination from '@atlaskit/pagination';
+import Breadcrumbs from '@atlaskit/breadcrumbs';
 
 import type {RowType} from '@atlaskit/dynamic-table/dist/cjs/types';
 
@@ -32,6 +33,7 @@ import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 
 import {type EntityType} from '../common/types';
 import {InfoMessage} from '../common/ak/messages';
+import {withRoot} from '../common/script-list/breadcrumbs';
 
 
 const tableHead = {
@@ -240,6 +242,8 @@ export class AuditLog extends React.Component<Props, State> {
                         <AuditLogFilter value={filter} onChange={this._updateFilter}/>
                     </div>
                 }
+
+                breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
             >
                 {TitleMessages.audit}
             </PageHeader>

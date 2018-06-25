@@ -16,7 +16,6 @@ import {loadState, loadUsage} from './redux/actions';
 
 import {registryService, watcherService} from '../service/services';
 
-import '../flex.less';
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
 

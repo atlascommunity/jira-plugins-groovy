@@ -87,14 +87,7 @@ module.exports = {
     // In production, we only want to load the polyfills and the app code.
     entry: {
         main: [require.resolve('./polyfills'), paths.resolveApp('src/app-main/index.js')],
-        console: [require.resolve('./polyfills'), paths.resolveApp('src/app-console/index.js')],
         workflow: [require.resolve('./polyfills'), paths.resolveApp('src/app-workflow/index.js')],
-        listeners: [require.resolve('./polyfills'), paths.resolveApp('src/app-listeners/index.js')],
-        audit: [require.resolve('./polyfills'), paths.resolveApp('src/app-audit/index.js')],
-        rest: [require.resolve('./polyfills'), paths.resolveApp('src/app-rest/index.js')],
-        fields: [require.resolve('./polyfills'), paths.resolveApp('src/app-fields/index.js')],
-        extras: [require.resolve('./polyfills'), paths.resolveApp('src/app-extras/index.js')],
-        scheduled: [require.resolve('./polyfills'), paths.resolveApp('src/app-scheduled/index.js')],
     },
     output: {
         // The build folder.

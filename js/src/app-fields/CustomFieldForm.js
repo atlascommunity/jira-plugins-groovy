@@ -14,6 +14,7 @@ import {FieldTextStateless} from '@atlaskit/field-text';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 import {Field} from '@atlaskit/form';
+import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 
 import {fieldConfigSelectorFactory} from './selectors';
 
@@ -30,6 +31,8 @@ import {extractShortClassName} from '../common/classNames';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
 import {updateItem} from '../common/redux';
 import {ErrorMessage, InfoMessage} from '../common/ak/messages';
+import {withRoot} from '../common/script-list/breadcrumbs';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
 const bindings = [ Bindings.issue ];
@@ -103,7 +106,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
             .then(
                 (data: FieldConfig) => {
                     this.props.updateItem(data);
-                    history.push('/');
+                    history.push('/fields/');
                 },
                 (error: *) => {
                     const {response} = error;
@@ -201,7 +204,28 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
         //todo: header actions
         return (
             <Page>
-                <PageHeader>
+                <PageHeader
+                    breadcrumbs={
+                        <Breadcrumbs>
+                            {withRoot([
+                                <BreadcrumbsItem
+                                    key="fields"
+                                    text="Scripted fields"
+                                    href="/fields"
+                                    //$FlowFixMe
+                                    component={RouterLink}
+                                />,
+                                <BreadcrumbsItem
+                                    key="script"
+                                    text={`${fieldConfig.customFieldName} - ${fieldConfig.contextName}`}
+                                    href={`/fields/${fieldConfig.id}/view`}
+                                    //$FlowFixMe
+                                    component={RouterLink}
+                                />
+                            ])}
+                        </Breadcrumbs>
+                    }
+                >
                     {ScriptFieldMessages.scriptFor(`${fieldConfig.customFieldName} - ${fieldConfig.contextName}`)}
                 </PageHeader>
 
@@ -342,7 +366,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                                 isDisabled={waiting}
 
                                 component={Link}
-                                to="/"
+                                to="/fields/"
                             >
                                 {CommonMessages.cancel}
                             </Button>
