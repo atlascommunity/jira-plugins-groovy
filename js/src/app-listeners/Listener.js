@@ -44,7 +44,7 @@ type Props = ScriptComponentProps<ListenerType> & ConnectProps;
 class ListenerInternal extends React.PureComponent<Props> {
     _edit = () => this.props.onEdit && this.props.onEdit(this.props.script.id);
 
-    _delete = () => this.props.onDelete(
+    _delete = () => this.props.onDelete && this.props.onDelete(
         this.props.script.id,
         this.props.script.name,
         () => listenerService.deleteListener(this.props.script.id)

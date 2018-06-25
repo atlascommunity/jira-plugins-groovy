@@ -38,7 +38,7 @@ type Props = ScriptComponentProps<RestScriptType>;
 export class RestScript extends React.PureComponent<Props> {
     _onEdit = () => this.props.onEdit && this.props.onEdit(this.props.script.id);
 
-    _delete = () => this.props.onDelete(
+    _delete = () => this.props.onDelete && this.props.onDelete(
         this.props.script.id,
         this.props.script.name,
         () => restService.deleteScript(this.props.script.id)

@@ -78,7 +78,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
 
     _edit = () => this.props.onEdit && this.props.onEdit(this.props.script.id);
 
-    _delete = () => this.props.onDelete(
+    _delete = () => this.props.onDelete && this.props.onDelete(
         this.props.script.id,
         this.props.script.name,
         () => scheduledTaskService.doDelete(this.props.script.id)

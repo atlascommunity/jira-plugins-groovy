@@ -60,7 +60,7 @@ export class AdminScript extends React.PureComponent<Props, State> {
         };
     });
 
-    _delete = () => this.props.onDelete(
+    _delete = () => this.props.onDelete && this.props.onDelete(
         this.props.script.id,
         this.props.script.name,
         () => adminScriptService.deleteScript(this.props.script.id)
