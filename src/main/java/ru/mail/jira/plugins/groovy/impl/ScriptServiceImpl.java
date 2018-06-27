@@ -13,6 +13,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.common.collect.ImmutableMap;
 import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.Script;
@@ -80,6 +81,9 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
                 new ParamExtension(parseContextHolder)
             );
         config.setTolerance(10);
+        config.setOptimizationOptions(ImmutableMap.of(
+            CompilerConfiguration.INVOKEDYNAMIC, Boolean.TRUE
+        ));
         this.gcl = new GroovyClassLoader(
             classLoader,
             config
