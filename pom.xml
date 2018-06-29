@@ -147,7 +147,7 @@
                     <productDataVersion>${jira.version}</productDataVersion>
                     <enableQuickReload>true</enableQuickReload>
                     <enableFastdev>false</enableFastdev>
-                    <jvmArgs>-Xmx2048m -Djira.websudo.is.disabled=false -Datlassian.mail.senddisabled=false</jvmArgs>
+                    <jvmArgs>-Xmx2048m -Datlassian.mail.senddisabled=false</jvmArgs>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>

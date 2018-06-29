@@ -15,6 +15,7 @@ const routeMap = {
     'mailru-groovy-rest-link': '/rest',
     'mailru-groovy-fields-link': '/fields',
     'mailru-groovy-scheduled-link': '/scheduled',
+    'mailru-groovy-jql-link': '/jql',
     'mailru-groovy-audit-link': '/audit',
     'mailru-groovy-extras-link': '/extras'
 };

@@ -48,6 +48,10 @@ export class MainApp extends React.PureComponent<{}> {
                         title="Scheduled tasks"
                     />
                     <PageCard
+                        href="/jql"
+                        title="JQL functions"
+                    />
+                    <PageCard
                         href="/audit"
                         title="Audit log"
                     />

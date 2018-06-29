@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.impl.jql.JqlFunctionServiceImpl;
+import ru.mail.jira.plugins.groovy.impl.jql.JqlInitializer;
 import ru.mail.jira.plugins.groovy.impl.listener.EventListenerInvoker;
 import ru.mail.jira.plugins.groovy.impl.scheduled.ScheduledTaskServiceImpl;
 import ru.mail.jira.plugins.groovy.util.Const;
@@ -25,24 +27,30 @@ import java.util.Set;
 //we use approach like in com.atlassian.greenhopper.Launcher
 @Component
 @ExportAsService(LifecycleAware.class)
-public class PluginLauncher implements LifecycleAware {
+public final class PluginLauncher implements LifecycleAware {
     private final Logger logger = LoggerFactory.getLogger(PluginLauncher.class);
     private final EventPublisher eventPublisher;
     private final EventListenerInvoker eventListenerInvoker;
     private final ScheduledTaskServiceImpl scheduledTaskService;
     private final OldExecutionDeletionScheduler executionDeletionScheduler;
+    private final JqlInitializer jqlInitializer;
+    private final JqlFunctionServiceImpl jqlFunctionServiceImpl;
 
     @Autowired
     public PluginLauncher(
         @ComponentImport EventPublisher eventPublisher,
         EventListenerInvoker eventListenerInvoker,
         ScheduledTaskServiceImpl scheduledTaskService,
-        OldExecutionDeletionScheduler executionDeletionScheduler
+        OldExecutionDeletionScheduler executionDeletionScheduler,
+        JqlInitializer jqlInitializer,
+        JqlFunctionServiceImpl jqlFunctionServiceImpl
     ) {
         this.eventPublisher = eventPublisher;
         this.eventListenerInvoker = eventListenerInvoker;
         this.scheduledTaskService = scheduledTaskService;
         this.executionDeletionScheduler = executionDeletionScheduler;
+        this.jqlInitializer = jqlInitializer;
+        this.jqlFunctionServiceImpl = jqlFunctionServiceImpl;
     }
 
     private enum SystemPhase {
@@ -79,7 +87,7 @@ public class PluginLauncher implements LifecycleAware {
     }
 
     @EventListener
-    public final void onPluginStarted(final PluginEnabledEvent pluginEnabledEvent) {
+    public void onPluginStarted(final PluginEnabledEvent pluginEnabledEvent) {
         if (pluginEnabledEvent.getPlugin().getKey().equals(Const.PLUGIN_KEY)) {
             onSystemStartPhase(SystemPhase.PLUGIN_ENABLED);
         }
@@ -104,6 +112,8 @@ public class PluginLauncher implements LifecycleAware {
         eventListenerInvoker.onStop();
         scheduledTaskService.onStop();
         executionDeletionScheduler.onStop();
+        jqlInitializer.onStop();
+        jqlFunctionServiceImpl.onStop();
 
         eventPublisher.unregister(this);
 
@@ -115,6 +125,9 @@ public class PluginLauncher implements LifecycleAware {
             eventListenerInvoker.onStart();
             scheduledTaskService.onStart();
             executionDeletionScheduler.onStart();
+            jqlInitializer.onStart();
+            jqlFunctionServiceImpl.onStart();
+
             logger.info("Plugin initialized");
         }
     }

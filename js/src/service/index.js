@@ -15,6 +15,7 @@ import {FieldConfigService} from './fieldConfig.service';
 import {PreferenceService} from './preference.service';
 import {ScheduledTaskService} from './scheduledTask.service';
 import {AdminScriptService} from './adminScript.service';
+import {JqlScriptService} from './jqlScript.service';
 import {WatcherService} from './watcher.service';
 
 import {ErrorMessages} from '../i18n/common.i18n';
@@ -32,6 +33,7 @@ export const fieldConfigService = new FieldConfigService();
 export const preferenceService = new PreferenceService();
 export const scheduledTaskService = new ScheduledTaskService();
 export const adminScriptService = new AdminScriptService();
+export const jqlScriptService = new JqlScriptService();
 export const watcherService = new WatcherService();
 
 export {getPluginBaseUrl, getBaseUrl, ajaxGet} from './ajaxHelper';
