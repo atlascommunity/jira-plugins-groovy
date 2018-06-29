@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.impl.jql.function;
+package ru.mail.jira.plugins.groovy.api.jql;
 
 import com.atlassian.jira.JiraDataType;
 import com.atlassian.jira.JiraDataTypeImpl;

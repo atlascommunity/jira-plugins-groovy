@@ -9,7 +9,7 @@ import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import ru.mail.jira.plugins.groovy.impl.jql.JqlFunctionCFType;
-import ru.mail.jira.plugins.groovy.impl.jql.function.CustomFunction;
+import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 
 import javax.annotation.Nonnull;
 

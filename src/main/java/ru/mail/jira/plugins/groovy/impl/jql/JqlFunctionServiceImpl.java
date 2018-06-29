@@ -11,7 +11,7 @@ import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionForm;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
 import ru.mail.jira.plugins.groovy.api.repository.JqlFunctionRepository;
 import ru.mail.jira.plugins.groovy.api.service.JqlFunctionService;
-import ru.mail.jira.plugins.groovy.impl.jql.function.CustomFunction;
+import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 
 import java.util.*;
 

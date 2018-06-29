@@ -9,6 +9,8 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
+import ru.mail.jira.plugins.groovy.api.jql.ScriptFunction;
 
 import javax.annotation.Nonnull;
 import java.util.List;
