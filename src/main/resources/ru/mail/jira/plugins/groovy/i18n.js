@@ -155,6 +155,7 @@ define('mailru/groovy/i18n-react', [], function() {
             rest: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.rest'),
             fields: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.fields'),
             scheduled: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.scheduled'),
+            jql: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.jql'),
             extras: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.extras'),
         },
         pageTitles: {

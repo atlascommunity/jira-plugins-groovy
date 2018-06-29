@@ -47,6 +47,8 @@
         <entity>ru.mail.jira.plugins.groovy.api.entity.ScheduledTaskChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.AdminScript</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.AdminScriptChangelog</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.JqlFunctionScript</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.JqlFunctionScriptChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.Watcher</entity>
     </ao>
 
@@ -284,6 +286,16 @@
         </condition>
     </web-item>
 
+    <web-item key="groovy-jql-menu-item" name="Groovy jql menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy JQL page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.jql" />
+        <link linkId="mailru-groovy-jql-link">/plugins/servlet/my-groovy/jql</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
     <web-item key="groovy-audit-menu-item" name="Groovy audit menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy audit page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.audit" />
@@ -399,4 +411,20 @@
         <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="daterange"/>
         <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="userpickergroupsearcher"/>
     </customfield-type>
+
+    <customfield-type
+            key="groovy-jql-field"
+            name="Groovy jql function field"
+            class="ru.mail.jira.plugins.groovy.impl.jql.JqlFunctionCFType"
+
+            managed-access-level="locked"
+    />
+
+    <customfield-searcher
+        key="groovy-jql-searcher"
+        name="Groovy JQL searcher"
+        class="ru.mail.jira.plugins.groovy.impl.jql.JqlFieldSearcher"
+    >
+        <valid-customfield-type package="ru.mail.jira.plugins.groovy" key="groovy-jql-field"/>
+    </customfield-searcher>
 </atlassian-plugin>

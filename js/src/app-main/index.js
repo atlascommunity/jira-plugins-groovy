@@ -26,6 +26,7 @@ import {ExtrasPage} from '../app-extras';
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
 import '../flex.less';
+import {JqlRoute} from '../app-jql/JqlRoute';
 
 
 AJS.toInit(() => {
@@ -50,6 +51,7 @@ AJS.toInit(() => {
                     <Route path="/rest" component={RestRoute}/>
                     <Route path="/fields" component={FieldsRoute}/>
                     <Route path="/scheduled" component={ScheduledRoute}/>
+                    <Route path="/jql" component={JqlRoute}/>
                     <Route path="/audit" component={AuditLogRoute}/>
                     <Route path="/extras" component={ExtrasPage}/>
                     <Route component={NotFoundPage}/>

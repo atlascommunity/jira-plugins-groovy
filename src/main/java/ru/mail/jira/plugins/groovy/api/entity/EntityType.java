@@ -9,7 +9,8 @@ public enum EntityType {
     REST("ru.mail.jira.plugins.groovy.audit.rest", true),
     CUSTOM_FIELD("ru.mail.jira.plugins.groovy.audit.cf", true),
     SCHEDULED_TASK("ru.mail.jira.plugins.groovy.audit.scheduledTask", true),
-    ADMIN_SCRIPT("ru.mail.jira.plugins.groovy.audit.adminScript", true);
+    ADMIN_SCRIPT("ru.mail.jira.plugins.groovy.audit.adminScript", true),
+    JQL_FUNCTION("ru.mail.jira.plugins.groovy.audit.jql", true);
 
     @Getter
     private final String i18nName;

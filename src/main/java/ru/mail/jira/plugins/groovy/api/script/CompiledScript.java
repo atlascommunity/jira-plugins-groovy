@@ -1,14 +1,14 @@
-package ru.mail.jira.plugins.groovy.impl;
+package ru.mail.jira.plugins.groovy.api.script;
 
 import lombok.Getter;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 
 @Getter
-class CompiledScript {
+public class CompiledScript {
     private final Class scriptClass;
     private final ParseContext parseContext;
 
-    CompiledScript(Class scriptClass, ParseContext parseContext) {
+    public CompiledScript(Class scriptClass, ParseContext parseContext) {
         this.scriptClass = scriptClass;
         this.parseContext = parseContext;
     }
