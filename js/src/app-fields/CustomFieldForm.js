@@ -251,17 +251,19 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                                 name="cacheable"
                                 value="true"
                             />
-                            <CheckboxStateless
-                                label="Velocity params"
+                            {fieldConfig.needsTemplate &&
+                                <CheckboxStateless
+                                    label="Velocity params"
 
-                                isDisabled={waiting}
+                                    isDisabled={waiting}
 
-                                onChange={this._setToggleValue('velocityParamsEnabled')}
-                                isChecked={velocityParamsEnabled}
+                                    onChange={this._setToggleValue('velocityParamsEnabled')}
+                                    isChecked={velocityParamsEnabled}
 
-                                name="velocityParamsEnabled"
-                                value="true"
-                            />
+                                    name="velocityParamsEnabled"
+                                    value="true"
+                                />
+                            }
                         </CheckboxGroup>
                     </Field>
                     <Field
