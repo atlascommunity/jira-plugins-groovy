@@ -14,6 +14,7 @@ import com.atlassian.sal.api.message.I18nResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.notification.NotificationDto;
+import ru.mail.jira.plugins.groovy.api.entity.EntityType;
 import ru.mail.jira.plugins.groovy.api.service.NotificationService;
 
 import java.util.HashMap;
@@ -48,6 +49,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendNotifications(NotificationDto notificationDto, List<ApplicationUser> recipients) {
+        String permalink = getPermalink(notificationDto.getEntityType(), notificationDto.getEntityId());
+
         for (ApplicationUser recipient : recipients) {
             if (!permissionHelper.isAdmin(recipient)) {
                 continue;
@@ -71,6 +74,7 @@ public class NotificationServiceImpl implements NotificationService {
             params.put("user", recipient);
             params.put("locale", locale);
             params.put("i18nResolver", i18nResolver);
+            params.put("permalink", permalink);
 
             MailQueueItem email = new EmailBuilder(new Email(recipient.getEmailAddress()), new NotificationRecipient(recipient))
                 .withSubject(subject)
@@ -80,5 +84,24 @@ public class NotificationServiceImpl implements NotificationService {
 
             mailQueue.addItem(email);
         }
+    }
+
+    public String getPermalink(EntityType entityType, Integer id) {
+        if (entityType.isSupportsPermalink() && id != null) {
+            String pluginBaseUrl = "/plugins/servlet/my-groovy/";
+
+            switch (entityType) {
+                case REGISTRY_SCRIPT:
+                    return pluginBaseUrl + "registry/script/view/" + id;
+                case CUSTOM_FIELD:
+                    return pluginBaseUrl + "fields/" + id + "/view";
+                case ADMIN_SCRIPT:
+                    return pluginBaseUrl + "admin-scripts/" + id + "/view";
+            }
+
+            return null;
+        }
+
+        return null;
     }
 }

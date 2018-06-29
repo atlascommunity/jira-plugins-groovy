@@ -20,7 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
+import ru.mail.jira.plugins.groovy.api.dto.notification.NotificationDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
+import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
+import ru.mail.jira.plugins.groovy.api.service.NotificationService;
+import ru.mail.jira.plugins.groovy.api.service.WatcherService;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
 import ru.mail.jira.plugins.groovy.util.RestFieldException;
@@ -55,11 +60,13 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
     private final CustomFieldManager customFieldManager;
     private final ScriptService scriptService;
     private final ChangelogHelper changelogHelper;
-    private final AuditService auditService;
     private final Cache<Long, FieldScript> scriptCache;
     private final ScriptInvalidationService invalidationService;
     private final ExecutionRepository executionRepository;
     private final CustomFieldHelper customFieldHelper;
+    private final WatcherService watcherService;
+    private final AuditLogRepository auditLogRepository;
+    private final NotificationService notificationService;
 
     @Autowired
     public FieldConfigRepositoryImpl(
@@ -69,24 +76,28 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         @ComponentImport FieldConfigSchemeManager fieldConfigSchemeManager,
         @ComponentImport CustomFieldManager customFieldManager,
         @ComponentImport CacheManager cacheManager,
-        AuditService auditService,
         ScriptService scriptService,
         ChangelogHelper changelogHelper,
         ScriptInvalidationService invalidationService,
         ExecutionRepository executionRepository,
-        CustomFieldHelper customFieldHelper
+        CustomFieldHelper customFieldHelper,
+        WatcherService watcherService,
+        AuditLogRepository auditLogRepository,
+        NotificationService notificationService
     ) {
         this.ao = ao;
         this.i18nHelper = i18nHelper;
         this.fieldConfigManager = fieldConfigManager;
         this.fieldConfigSchemeManager = fieldConfigSchemeManager;
         this.customFieldManager = customFieldManager;
-        this.auditService = auditService;
         this.scriptService = scriptService;
         this.changelogHelper = changelogHelper;
         this.invalidationService = invalidationService;
         this.executionRepository = executionRepository;
         this.customFieldHelper = customFieldHelper;
+        this.watcherService = watcherService;
+        this.auditLogRepository = auditLogRepository;
+        this.notificationService = notificationService;
 
         this.scriptCache = cacheManager
             .getCache(
@@ -195,7 +206,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
 
         CustomField cf = jiraFieldConfig.getCustomField();
 
-        addAuditLogAndNotify(user, action, fieldConfig, cf != null ? cf.getName() : "undefined", diff, templateDiff, comment);
+        addAuditLogAndNotify(user, action, fieldConfig, (int) configId, cf != null ? cf.getName() : "undefined", diff, templateDiff, comment);
 
         scriptCache.remove(configId);
         if (cf != null) {
@@ -233,13 +244,31 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         );
     }
 
-    private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, FieldConfig fieldConfig, String fieldName, String diff, String templateDiff, String description) {
-        auditService.addAuditLogAndNotify(
-            user, action,
-            EntityType.CUSTOM_FIELD,
-            fieldConfig.getID(), fieldName,
-            diff, templateDiff,
-            description
+    private void addAuditLogAndNotify(
+        ApplicationUser user, EntityAction action,
+        FieldConfig fieldConfig, int jiraFieldConfigId,
+        String fieldName, String diff, String templateDiff, String description
+    ) {
+        //notifications are related to jira field config id, audit logs to AO config id
+        if (action == EntityAction.CREATED) {
+            watcherService.addWatcher(EntityType.CUSTOM_FIELD, jiraFieldConfigId, user);
+        }
+
+        auditLogRepository.create(
+            user,
+            new AuditLogEntryForm(
+                EntityType.CUSTOM_FIELD,
+                fieldConfig.getID(),
+                action,
+                description
+            )
+        );
+
+        notificationService.sendNotifications(
+            new NotificationDto(
+                user, action, EntityType.CUSTOM_FIELD, fieldName, jiraFieldConfigId, diff, templateDiff, description
+            ),
+            watcherService.getWatchers(EntityType.CUSTOM_FIELD, jiraFieldConfigId)
         );
     }
 
