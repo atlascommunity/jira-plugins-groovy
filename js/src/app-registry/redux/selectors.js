@@ -40,7 +40,9 @@ export const filteredSelector = createSelector(
         scriptUsage: ScriptUsageType,
         filter: FilterType
     ): * => {
-        if (filter.name.length < 2 && !filter.onlyUnused) {
+        const nameFilter = filter.name.toLocaleLowerCase();
+
+        if (nameFilter.length < 2 && !filter.onlyUnused) {
             return {scripts, directories, isForceOpen: false};
         }
         const scriptsResult = {};
@@ -55,8 +57,8 @@ export const filteredSelector = createSelector(
                 if (filter.onlyUnused && scriptUsage.ready) {
                     matchesUnused = (scriptUsage.items[script.id] || 0) === 0;
                 }
-                if (filter.name.length >= 2) {
-                    matchesFilter = script.name.toLocaleLowerCase().includes(filter.name);
+                if (nameFilter.length >= 2) {
+                    matchesFilter = script.name.toLocaleLowerCase().includes(nameFilter);
                 }
                 return matchesUnused && matchesFilter;
             })
@@ -77,14 +79,14 @@ export const filteredSelector = createSelector(
                 }
             });
 
-        if (!filter.onlyUnused && filter.name) {
+        if (!filter.onlyUnused && nameFilter) {
             //$FlowFixMe: Object.values returns mixed type, consider using es6 Map or immutablejs map
             const allDirectories: $ReadOnlyArray<RegistryDirectoryType> = Object.values(directories);
             allDirectories
                 .filter((script: RegistryDirectoryType): boolean => {
                     let matchesFilter: boolean = true;
-                    if (filter.name.length >= 2) {
-                        matchesFilter = script.name.toLocaleLowerCase().includes(filter.name);
+                    if (nameFilter.length >= 2) {
+                        matchesFilter = script.name.toLocaleLowerCase().includes(nameFilter);
                     }
                     return matchesFilter;
                 })
