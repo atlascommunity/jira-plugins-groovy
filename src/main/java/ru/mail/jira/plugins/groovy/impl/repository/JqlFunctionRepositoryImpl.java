@@ -4,6 +4,7 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.google.common.collect.ImmutableSet;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
@@ -12,22 +13,23 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionForm;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
+import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptFunction;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.JqlFunctionRepository;
 import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
+import ru.mail.jira.plugins.groovy.api.service.admin.BuiltInScript;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
+    private final Set<String> builtInNames;
     private final ActiveObjects ao;
     private final I18nHelper i18nHelper;
     private final ScriptService scriptService;
@@ -42,7 +44,8 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         ScriptService scriptService,
         ExecutionRepository executionRepository,
         ChangelogHelper changelogHelper,
-        AuditService auditService
+        AuditService auditService,
+        Optional<List<CustomFunction>> builtInFunctions
     ) {
         this.ao = ao;
         this.i18nHelper = i18nHelper;
@@ -50,6 +53,14 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         this.executionRepository = executionRepository;
         this.changelogHelper = changelogHelper;
         this.auditService = auditService;
+
+        builtInNames = builtInFunctions
+            .map(it -> it
+                .stream()
+                .map(CustomFunction::getFunctionName)
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet())
+            ).orElse(ImmutableSet.of());
     }
 
     @Override
@@ -142,7 +153,11 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
 
     private void validateScriptForm(boolean isNew, JqlFunctionForm form) {
         ValidationUtils.validateForm2(i18nHelper, isNew, form);
-        //todo: also validate for builtIn function names
+
+        if (builtInNames.contains(form.getName().toLowerCase())) {
+            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.jqlNameTaken"), "name");
+        }
+        //todo: also validate for system and other plugin function names
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
