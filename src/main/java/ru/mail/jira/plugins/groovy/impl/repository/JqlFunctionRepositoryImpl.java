@@ -19,7 +19,6 @@ import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.JqlFunctionRepository;
 import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.api.service.admin.BuiltInScript;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
