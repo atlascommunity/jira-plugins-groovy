@@ -22,5 +22,6 @@ export const CategoryNameMessages: I18nMessages = {
     LISTENER: i18n.audit.listener,
     REST: i18n.audit.rest,
     CUSTOM_FIELD: i18n.audit.cf,
-    SCHEDULED_TASK: i18n.audit.scheduledTask
+    SCHEDULED_TASK: i18n.audit.scheduledTask,
+    JQL_FUNCTION: i18n.audit.jqlFunction
 };
