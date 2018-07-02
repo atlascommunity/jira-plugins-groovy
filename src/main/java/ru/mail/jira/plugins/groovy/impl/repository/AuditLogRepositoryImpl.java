@@ -177,6 +177,11 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
                     deleted = task.isDeleted();
                     break;
                 }
+                case JQL_FUNCTION:
+                    JqlFunctionScript function = activeObjects.get(JqlFunctionScript.class, entityId);
+                    name = function.getName();
+                    deleted = function.isDeleted();
+                    break;
             }
             result.setScriptName(name);
             result.setParentName(parentName);

@@ -103,6 +103,8 @@ public class NotificationServiceImpl implements NotificationService {
                     return pluginBaseUrl + "rest/" + id + "/view";
                 case SCHEDULED_TASK:
                     return pluginBaseUrl + "scheduled/" + id + "/view";
+                case JQL_FUNCTION:
+                    return pluginBaseUrl + "jql/" + id + "/view";
             }
 
             return null;

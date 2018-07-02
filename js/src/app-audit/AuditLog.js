@@ -23,6 +23,7 @@ import type {AuditLogEntry, AuditLogData, AuditLogFilterType} from './types';
 import {
     adminScriptService,
     auditLogService,
+    jqlScriptService,
     listenerService,
     registryService,
     restService,
@@ -141,6 +142,9 @@ export class AuditLog extends React.Component<Props, State> {
                 break;
             case 'SCHEDULED_TASK':
                 promise = scheduledTaskService.restore(id);
+                break;
+            case 'JQL_FUNCTION':
+                promise = jqlScriptService.restoreScript(id);
                 break;
             default:
                 console.error('unknown category', category);
