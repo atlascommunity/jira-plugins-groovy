@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionForm;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
+import ru.mail.jira.plugins.groovy.api.jql.ScriptFunction;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.JqlFunctionRepository;
+import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
@@ -146,7 +148,11 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
 
-        scriptService.parseClass(form.getScriptBody(), false); //todo: check that class implements ScriptFunction
+        CompiledScript functionClass = scriptService.parseClass(form.getScriptBody(), false);
+
+        if (!ScriptFunction.class.isAssignableFrom(functionClass.getScriptClass())) {
+            throw new ValidationException("Must implement ru.mail.jira.plugins.groovy.api.jql.ScriptFunction", "scriptBody");
+        }
     }
 
     private JqlFunctionScriptDto buildScriptDto(JqlFunctionScript script, boolean includeChangelogs, boolean includeErrorCount) {
