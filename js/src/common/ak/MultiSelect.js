@@ -2,8 +2,7 @@
 import React from 'react';
 
 import Select from '@atlaskit/select';
-import SelectWrapper from '@atlaskit/select/dist/esm/SelectWrapper';
-import {Label} from '@atlaskit/field-base';
+import {Field} from '@atlaskit/form';
 
 import type {OldSelectItem, OldSelectValue} from './types';
 
@@ -63,30 +62,28 @@ export class MultiSelect<T: OldSelectValue> extends React.PureComponent<Props<T>
         const {lookupMap} = this.state;
 
         return (
-            <div>
-                <Label
-                    label={this.props.label || ''}
-                    isRequired={this.props.isRequired}
+            <Field
+                label={this.props.label || ''}
+                isRequired={this.props.isRequired}
+
+                isInvalid={isInvalid}
+                //$FlowFixMe
+                invalidMessage={invalidMessage}
+
+                validateOnChange={false}
+                validateOnBlur={false}
+            >
+                <Select
+                    shouldFitContainer={true}
+                    isMulti={true}
+
+                    isLoading={this.props.isLoading}
+                    options={this.props.items}
+
+                    value={value ? value.map(key => lookupMap.get(key)).filter(e => e) : []}
+                    onChange={this._onChange}
                 />
-                <SelectWrapper
-                    id={`multi-select-${this.i}`}
-
-                    validationState={isInvalid ? 'error' : 'default'}
-                    //$FlowFixMe
-                    validationMessage={isInvalid ? invalidMessage : undefined}
-                >
-                    <Select
-                        shouldFitContainer={true}
-                        isMulti={true}
-
-                        isLoading={this.props.isLoading}
-                        options={this.props.items}
-
-                        value={value ? value.map(key => lookupMap.get(key)).filter(e => e) : []}
-                        onChange={this._onChange}
-                    />
-                </SelectWrapper>
-            </div>
+            </Field>
         );
     }
 }

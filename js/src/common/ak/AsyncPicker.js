@@ -1,10 +1,9 @@
 //@flow
 import React, {type Node} from 'react';
 
-import SelectWrapper from '@atlaskit/select/dist/esm/SelectWrapper';
 import Avatar from '@atlaskit/avatar';
-import {Label} from '@atlaskit/field-base';
 import {components} from '@atlaskit/select';
+import {Field} from '@atlaskit/form';
 
 import {LargeSelect} from './LargeSelect';
 import type {SingleValueType} from './types';
@@ -152,33 +151,35 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
         }
 
         return (
-            <div>
-                <Label label={label || ''} isRequired={isRequired} isLabelHidden={isLabelHidden}/>
-                <SelectWrapper
-                    id={`async-picker-${this.i}`}
+            <Field
+                label={label || ''}
+                isLabelHidden={isLabelHidden}
+                isRequired={isRequired}
 
-                    validationState={isInvalid ? 'error' : 'default'}
-                    //$FlowFixMe
-                    validationMessage={isInvalid ? invalidMessage : undefined}
-                >
-                    <LargeSelect
-                        {...this.props}
-                        shouldFitContainer={true}
+                isInvalid={isInvalid}
+                //$FlowFixMe
+                invalidMessage={invalidMessage}
 
-                        hasAutocomplete={true}
-                        onInputChange={this._onFilterChange}
+                validateOnChange={false}
+                validateOnBlur={false}
+            >
+                <LargeSelect
+                    {...this.props}
+                    shouldFitContainer={true}
 
-                        isLoading={!!fetching}
-                        options={data.options}
+                    hasAutocomplete={true}
+                    onInputChange={this._onFilterChange}
 
-                        components={{
-                            Option: OptionImpl,
-                            SingleValue: SingleValueImpl,
-                            ...(components || {})
-                        }}
-                    />
-                </SelectWrapper>
-            </div>
+                    isLoading={!!fetching}
+                    options={data.options}
+
+                    components={{
+                        Option: OptionImpl,
+                        SingleValue: SingleValueImpl,
+                        ...(components || {})
+                    }}
+                />
+            </Field>
         );
     }
 }
