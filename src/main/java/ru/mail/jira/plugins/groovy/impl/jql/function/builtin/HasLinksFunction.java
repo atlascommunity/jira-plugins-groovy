@@ -1,6 +1,5 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.fugue.Pair;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.index.indexers.impl.IssueLinkIndexer;
@@ -17,6 +16,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import com.google.common.collect.ImmutableList;
+import io.atlassian.fugue.Pair;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;

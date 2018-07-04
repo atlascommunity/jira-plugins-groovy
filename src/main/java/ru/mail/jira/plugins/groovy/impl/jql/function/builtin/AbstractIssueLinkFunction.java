@@ -1,6 +1,5 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.fugue.Pair;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.index.indexers.impl.IssueLinkIndexer;
@@ -15,6 +14,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.Query;
+import io.atlassian.fugue.Pair;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
