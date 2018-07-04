@@ -153,7 +153,6 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                     value: Object
                         .keys(transitionOptions)
                         .filter(key => transitionOptions[key])
-                        //$FlowFixMe
                         .map(key => ScheduledTaskMessages.transitionOption[key])
                         .join(', ') || 'None'
                 });

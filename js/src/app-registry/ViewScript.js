@@ -58,8 +58,6 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
                                     key="registry"
                                     text="Workflow script registry"
                                     href="/registry/"
-
-                                    //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
                                     component={RouterLink}
                                 />
                             ])}

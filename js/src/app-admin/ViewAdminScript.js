@@ -60,7 +60,6 @@ class ViewAdminScriptInternal extends React.PureComponent<Props, State> {
                                     text="Admin scripts"
                                     href="/admin-scripts/"
 
-                                    //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
                                     component={RouterLink}
                                 />
                             ])}

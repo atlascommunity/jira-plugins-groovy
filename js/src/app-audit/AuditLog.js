@@ -32,7 +32,7 @@ import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n'
 import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 
 import {type EntityType} from '../common/types';
-import {InfoMessage} from '../common/ak/messages';
+import {InfoMessage} from '../common/ak';
 import {withRoot} from '../common/script-list/breadcrumbs';
 
 

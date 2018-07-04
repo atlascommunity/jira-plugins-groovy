@@ -5,7 +5,6 @@ import {Record} from 'immutable';
 import type {RecordOf, RecordFactory} from 'immutable';
 
 import Button, {ButtonGroup} from '@atlaskit/button';
-import {Field} from '@atlaskit/form';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 import {FieldTextStateless} from '@atlaskit/field-text';
@@ -15,15 +14,11 @@ import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 import type {DialogComponentProps, ScriptForm as ScriptFormType} from './types';
 import {withRoot} from './breadcrumbs';
 
-import {LoadingSpinner} from '../ak/LoadingSpinner';
-import {EditorField} from '../ak/EditorField';
-
-import {getMarkers} from '../error';
-import {ErrorMessage} from '../ak/messages';
-import {RouterLink} from '../ak/RouterLink';
-import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
-import {Bindings} from '../bindings';
+import {RouterLink, FormField, EditorField, LoadingSpinner, ErrorMessage} from '../ak';
 import {addItem, updateItem} from '../redux';
+import {getMarkers} from '../error';
+import {Bindings} from '../bindings';
+import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
 
 import type {ItemType} from '../redux';
 import type {ReturnType} from '../editor/types';
@@ -200,15 +195,12 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                 <div className="flex-column">
                     {error && !errorField && errorMessage && <ErrorMessage title={errorMessage}/>}
 
-                    <Field
+                    <FormField
                         label={FieldMessages.name}
                         isRequired={true}
 
                         isInvalid={errorField === 'name'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <FieldTextStateless
                             shouldFitContainer={true}
@@ -217,16 +209,13 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                             value={values.get('name') || ''}
                             onChange={this._setTextValue('name')}
                         />
-                    </Field>
+                    </FormField>
 
-                    <Field
+                    <FormField
                         label={FieldMessages.description}
 
                         isInvalid={errorField === 'description'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
@@ -236,17 +225,14 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                             value={values.get('description') || ''}
                             onChange={this._setTextValue('description')}
                         />
-                    </Field>
+                    </FormField>
 
-                    <Field
+                    <FormField
                         label={FieldMessages.scriptCode}
                         isRequired={true}
 
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <EditorField
                             isDisabled={isSubmitting}
@@ -259,17 +245,14 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                             value={values.get('scriptBody') || ''}
                             onChange={this._setObjectValue('scriptBody')}
                         />
-                    </Field>
+                    </FormField>
 
-                    <Field
+                    <FormField
                         label={FieldMessages.comment}
                         isRequired={!isNew}
 
                         isInvalid={errorField === 'comment'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
@@ -278,7 +261,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}
                         />
-                    </Field>
+                    </FormField>
                 </div>
             );
         }
@@ -293,16 +276,12 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                                     key="registry"
                                     text={i18n.parentName}
                                     href={returnTo}
-
-                                    //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
                                     component={RouterLink}
                                 />,
                                 name && id ? <BreadcrumbsItem
                                     key="script"
                                     text={name}
                                     href={`${returnTo}${id}/view`}
-
-                                    //$FlowFixMe
                                     component={RouterLink}
                                 /> : null
                             ])}

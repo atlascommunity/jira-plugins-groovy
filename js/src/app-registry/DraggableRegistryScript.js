@@ -27,7 +27,6 @@ export class DraggableRegistryScriptInternal extends React.PureComponent<PublicR
             <div className="DraggableScript">
                 <Draggable draggableId={`${this.props.script.id}`} type="script">
                     {(provided) => (
-                        //$FlowFixMe: todo: should be fixed in later flow version
                         <RegistryScript
                             title={
                                 <div className="flex-grow flex-row" {...provided.dragHandleProps}>

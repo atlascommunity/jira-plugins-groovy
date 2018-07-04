@@ -38,8 +38,6 @@ class ViewFieldScriptInternal extends React.PureComponent<Props> {
                                     key="registry"
                                     text="Scripted fields"
                                     href="/fields/"
-
-                                    //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
                                     component={RouterLink}
                                 />
                             ])}

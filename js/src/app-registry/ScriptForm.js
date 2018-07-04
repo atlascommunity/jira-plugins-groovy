@@ -11,7 +11,6 @@ import Spinner from '@atlaskit/spinner';
 import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
-import {Field} from '@atlaskit/form';
 import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
@@ -26,14 +25,10 @@ import {registryService} from '../service/services';
 
 import {getMarkers} from '../common/error';
 import {Bindings, ReturnTypes} from '../common/bindings';
-import {EditorField} from '../common/ak/EditorField';
-import {StaticField} from '../common/ak/StaticField';
-import {ErrorMessage} from '../common/ak/messages';
-import {AsyncPicker} from '../common/ak/AsyncPicker';
-import {RouterLink} from '../common/ak/RouterLink';
 import {withRoot} from '../common/script-list/breadcrumbs';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
+import {EditorField, StaticField, AsyncPicker, ErrorMessage, RouterLink, FormField} from '../common/ak';
 
 import type {InputEvent} from '../common/EventTypes';
 import type {SingleValueType} from '../common/ak/types';
@@ -68,7 +63,7 @@ type Form = {
     scriptBody: string
 };
 
-type FormField = $Keys<Form>;
+type FormFieldType = $Keys<Form>;
 
 const makeForm: RecordFactory<Form> = Record({
     directoryId: 0,
@@ -217,7 +212,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
         }
     };
 
-    mutateValue = (field: FormField, value: any) => {
+    mutateValue = (field: FormFieldType, value: any) => {
         this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value),
@@ -226,9 +221,9 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
         });
     };
 
-    _setTextValue = (field: FormField) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
+    _setTextValue = (field: FormFieldType) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
 
-    _setObjectValue = (field: FormField) => (value: any) => this.mutateValue(field, value);
+    _setObjectValue = (field: FormFieldType) => (value: any) => this.mutateValue(field, value);
 
     _setScript = this._setObjectValue('scriptBody');
 
@@ -294,8 +289,6 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                                     key="registry"
                                     text="Workflow script registry"
                                     href="/registry/"
-
-                                    //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
                                     component={RouterLink}
                                 />,
                                 script ?
@@ -303,8 +296,6 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                                         key="script"
                                         text={script.name}
                                         href={`/registry/script/view/${script.id}`}
-
-                                        //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
                                         component={RouterLink}
                                     />
                                     : null
@@ -319,15 +310,12 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 {!fetching && <div className="ScriptForm">
                     {error && !errorField && <ErrorMessage title={errorMessage}/>}
                     {noParent ?
-                        <Field
+                        <FormField
                             label={FieldMessages.parentName}
                             isRequired={true}
 
                             isInvalid={errorField === 'directoryId'}
                             invalidMessage={errorMessage || ''}
-
-                            validateOnChange={false}
-                            validateOnBlur={false}
                         >
                             <AsyncPicker
                                 src={`${getPluginBaseUrl()}/registry/directory/picker`}
@@ -337,23 +325,20 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
 
                                 label=""
                             />
-                        </Field>:
-                        <Field label={FieldMessages.parentName}>
+                        </FormField>:
+                        <FormField label={FieldMessages.parentName}>
                             <StaticField label="">
                                 {parentName}
                             </StaticField>
-                        </Field>
+                        </FormField>
                     }
 
-                    <Field
+                    <FormField
                         label={FieldMessages.name}
                         isRequired={true}
 
                         isInvalid={errorField === 'name'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <FieldTextStateless
                             shouldFitContainer={true}
@@ -364,16 +349,13 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                             value={values.get('name') || ''}
                             onChange={this._setTextValue('name')}
                         />
-                    </Field>
+                    </FormField>
 
-                    <Field
+                    <FormField
                         label={FieldMessages.description}
 
                         isInvalid={errorField === 'description'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
@@ -384,17 +366,14 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                             value={values.get('description') || ''}
                             onChange={this._setTextValue('description')}
                         />
-                    </Field>
+                    </FormField>
 
-                    <Field
+                    <FormField
                         label={FieldMessages.type}
                         isRequired={true}
 
                         isInvalid={errorField === 'types'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <CheckboxGroup>
                             <CheckboxStateless
@@ -419,17 +398,14 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                                 name="script-type-options"
                             />
                         </CheckboxGroup>
-                    </Field>
+                    </FormField>
 
-                    <Field
+                    <FormField
                         label={FieldMessages.scriptCode}
                         isRequired={true}
 
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <EditorField
                             label=""
@@ -444,17 +420,14 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                             value={values.get('scriptBody') || ''}
                             onChange={this._setScript}
                         />
-                    </Field>
+                    </FormField>
 
-                    <Field
+                    <FormField
                         label={FieldMessages.comment}
                         isRequired={!!this.state.id}
 
                         isInvalid={errorField === 'comment'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
@@ -464,7 +437,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}
                         />
-                    </Field>
+                    </FormField>
 
                     <div className="formButtons">
                         <ButtonGroup>

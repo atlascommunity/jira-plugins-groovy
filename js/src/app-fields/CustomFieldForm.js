@@ -13,7 +13,6 @@ import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
-import {Field} from '@atlaskit/form';
 import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 
 import {fieldConfigSelectorFactory} from './selectors';
@@ -25,12 +24,12 @@ import {CommonMessages, ErrorMessages, FieldMessages} from '../i18n/common.i18n'
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
+import {FormField, ErrorMessage, InfoMessage} from '../common/ak';
 import {ConsoleMessages} from '../i18n/console.i18n';
 import type {InputEvent} from '../common/EventTypes';
 import {extractShortClassName} from '../common/classNames';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
 import {updateItem} from '../common/redux';
-import {ErrorMessage, InfoMessage} from '../common/ak/messages';
 import {withRoot} from '../common/script-list/breadcrumbs';
 import {RouterLink} from '../common/ak/RouterLink';
 
@@ -46,7 +45,7 @@ type Form = {
     velocityParamsEnabled: boolean
 };
 
-type FormField = $Keys<Form>;
+type FormFieldType = $Keys<Form>;
 
 const makeForm: RecordFactory<Form> = Record({
     comment: '',
@@ -147,7 +146,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
             );
     };
 
-    _mutateValue = (field: FormField, value: any) => {
+    _mutateValue = (field: FormFieldType, value: any) => {
         this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
@@ -155,12 +154,11 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
         });
     };
 
-    _setObjectValue = (field: FormField) => (value: any) => this._mutateValue(field, value);
+    _setObjectValue = (field: FormFieldType) => (value: any) => this._mutateValue(field, value);
 
-    _setTextValue = (field: FormField) => (event: InputEvent) => this._mutateValue(field, event.currentTarget.value);
+    _setTextValue = (field: FormFieldType) => (event: InputEvent) => this._mutateValue(field, event.currentTarget.value);
 
-    _setToggleValue = (field: FormField) => (e: SyntheticEvent<HTMLInputElement>) => {
-        //$FlowFixMe
+    _setToggleValue = (field: FormFieldType) => (e: SyntheticEvent<HTMLInputElement>) => {
         this._mutateValue(field, e.currentTarget.checked);
     };
 
@@ -212,14 +210,12 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                                     key="fields"
                                     text="Scripted fields"
                                     href="/fields"
-                                    //$FlowFixMe
                                     component={RouterLink}
                                 />,
                                 <BreadcrumbsItem
                                     key="script"
                                     text={`${fieldConfig.customFieldName} - ${fieldConfig.contextName}`}
                                     href={`/fields/${fieldConfig.id}/view`}
-                                    //$FlowFixMe
                                     component={RouterLink}
                                 />
                             ])}
@@ -230,14 +226,11 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                 </PageHeader>
 
                 <div className="flex-column">
-                    <Field
+                    <FormField
                         label={FieldMessages.options}
 
                         isInvalid={errorField === 'options'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <CheckboxGroup>
                             <CheckboxStateless
@@ -265,16 +258,13 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                                 />
                             }
                         </CheckboxGroup>
-                    </Field>
-                    <Field
+                    </FormField>
+                    <FormField
                         label={FieldMessages.scriptCode}
                         isRequired={true}
 
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <EditorField
                             bindings={velocityParamsEnabled ? bindingsWithVelocity : bindings}
@@ -287,18 +277,15 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
 
                             markers={markers}
                         />
-                    </Field>
+                    </FormField>
 
                     {fieldConfig.needsTemplate &&
-                        <Field
+                        <FormField
                             label={FieldMessages.template}
                             isRequired={true}
 
                             isInvalid={errorField === 'template'}
                             invalidMessage={errorMessage || ''}
-
-                            validateOnChange={false}
-                            validateOnBlur={false}
                         >
                             <EditorField
                                 mode="velocity"
@@ -309,17 +296,14 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                                 value={values.get('template')}
                                 onChange={this._setTemplate}
                             />
-                        </Field>
+                        </FormField>
                     }
-                    <Field
+                    <FormField
                         label={FieldMessages.comment}
                         isRequired={!!fieldConfig.uuid}
 
                         isInvalid={errorField === 'comment'}
                         invalidMessage={errorMessage || ''}
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
@@ -329,19 +313,16 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}
                         />
-                    </Field>
-                    <Field
+                    </FormField>
+                    <FormField
                         label="Preview issue key"
-
-                        validateOnChange={false}
-                        validateOnBlur={false}
                     >
                         <FieldTextStateless
                             value={previewKey || ''}
                             onChange={this._setPreviewKey}
                             shouldFitContainer={true}
                         />
-                    </Field>
+                    </FormField>
                     <div style={{marginTop: '10px'}}>
                         <ButtonGroup>
                             <Button

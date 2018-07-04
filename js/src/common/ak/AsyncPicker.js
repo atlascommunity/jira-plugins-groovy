@@ -3,9 +3,9 @@ import React, {type Node} from 'react';
 
 import Avatar from '@atlaskit/avatar';
 import {components} from '@atlaskit/select';
-import {Field} from '@atlaskit/form';
 
 import {LargeSelect} from './LargeSelect';
+import {FormField} from './FormField';
 import type {SingleValueType} from './types';
 
 import {ajaxGet} from '../../service/ajaxHelper';
@@ -151,17 +151,13 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
         }
 
         return (
-            <Field
+            <FormField
                 label={label || ''}
                 isLabelHidden={isLabelHidden}
                 isRequired={isRequired}
 
                 isInvalid={isInvalid}
-                //$FlowFixMe
                 invalidMessage={invalidMessage}
-
-                validateOnChange={false}
-                validateOnBlur={false}
             >
                 <LargeSelect
                     {...this.props}
@@ -179,7 +175,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
                         ...(components || {})
                     }}
                 />
-            </Field>
+            </FormField>
         );
     }
 }

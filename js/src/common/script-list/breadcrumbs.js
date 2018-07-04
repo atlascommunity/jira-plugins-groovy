@@ -11,7 +11,6 @@ export const withRoot = (breadcrumbs: Array<?Element<typeof BreadcrumbsItem>>): 
         key="root"
         text="Mail.Ru Groovy"
 
-        //$FlowFixMe
         component={RouterLink}
         href="/"
     />,

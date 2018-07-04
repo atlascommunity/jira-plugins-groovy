@@ -74,7 +74,6 @@ export class ListenersRoute extends React.PureComponent<{}> {
                         <Route path="/listeners" exact={true}>
                             {() =>
                                 <ConnectedScriptPage
-                                    //$FlowFixMe
                                     ScriptComponent={Listener}
                                     //$FlowFixMe
                                     DialogComponent={ListenerDialog}

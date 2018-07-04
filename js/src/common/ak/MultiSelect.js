@@ -2,8 +2,8 @@
 import React from 'react';
 
 import Select from '@atlaskit/select';
-import {Field} from '@atlaskit/form';
 
+import {FormField} from './FormField';
 import type {OldSelectItem, OldSelectValue} from './types';
 
 import type {FieldProps, LoadableFieldProps, MutableFieldProps} from '../types';
@@ -62,16 +62,12 @@ export class MultiSelect<T: OldSelectValue> extends React.PureComponent<Props<T>
         const {lookupMap} = this.state;
 
         return (
-            <Field
+            <FormField
                 label={this.props.label || ''}
                 isRequired={this.props.isRequired}
 
                 isInvalid={isInvalid}
-                //$FlowFixMe
                 invalidMessage={invalidMessage}
-
-                validateOnChange={false}
-                validateOnBlur={false}
             >
                 <Select
                     shouldFitContainer={true}
@@ -83,7 +79,7 @@ export class MultiSelect<T: OldSelectValue> extends React.PureComponent<Props<T>
                     value={value ? value.map(key => lookupMap.get(key)).filter(e => e) : []}
                     onChange={this._onChange}
                 />
-            </Field>
+            </FormField>
         );
     }
 }

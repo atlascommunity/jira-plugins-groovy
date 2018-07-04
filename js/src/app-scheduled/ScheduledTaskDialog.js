@@ -168,7 +168,6 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
     _onSubmit = () => {
         const {isNew, id, onClose, updateItem, addItem} = this.props;
 
-        //$FlowFixMe flow issue?
         const jsData = this.state.values.toJS();
         const data = {
             ...jsData,

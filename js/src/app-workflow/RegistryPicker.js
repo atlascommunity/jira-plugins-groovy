@@ -114,7 +114,6 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
 
                     src={`${getPluginBaseUrl()}/jira-api/userPicker`}
                     onChange={this._setValue(paramName)}
-                    //$FlowFixMe
                     value={value}
                 />;
             }

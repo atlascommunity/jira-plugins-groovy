@@ -11,10 +11,10 @@ import {consoleService} from '../service/services';
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 
-import './ScriptConsole.less';
-import {EditorField} from '../common/ak/EditorField';
+import {EditorField, ErrorMessage} from '../common/ak';
 import {CommonMessages} from '../i18n/common.i18n';
-import {ErrorMessage} from '../common/ak/messages';
+
+import './ScriptConsole.less';
 
 
 const bindings = [Bindings.currentUser];

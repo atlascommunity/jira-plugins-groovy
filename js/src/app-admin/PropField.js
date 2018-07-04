@@ -35,6 +35,7 @@ type Props = (CommonProps & {
     value: ?$ReadOnlyArray<SingleValueType>
 });
 
+//todo: fix flow type issues
 export class PropField extends React.PureComponent<Props> {
     _toggleCallback = (e: Event) => {
         //$FlowFixMe todo: use different event type when it's changed in @atlaskit/toggle
