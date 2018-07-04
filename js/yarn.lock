@@ -8,12 +8,10 @@
   dependencies:
     prop-types "^15.5.10"
 
-"@atlaskit/avatar@^11.2.2":
-  version "11.2.2"
-  resolved "https://registry.yarnpkg.com/@atlaskit/avatar/-/avatar-11.2.2.tgz#14038bbc0c64476c7b3d482bd52acfb32790ec2f"
+"@atlaskit/avatar@^12.0.0":
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/avatar/-/avatar-12.0.0.tgz#6bd2c34d963e388b9878685c9330f6aaee2a8f76"
   dependencies:
-    "@atlaskit/dropdown-menu" "^5.2.1"
-    "@atlaskit/item" "^7.0.4"
     "@atlaskit/theme" "^4.0.3"
     "@atlaskit/tooltip" "^10.3.1"
 
@@ -72,14 +70,14 @@
   dependencies:
     "@atlaskit/util-shared-styles" "^2.10.3"
 
-"@atlaskit/dropdown-menu@^5.2.1":
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/@atlaskit/dropdown-menu/-/dropdown-menu-5.2.1.tgz#5e91c130e48b9bd7c5e1acb15d07727f4c663022"
+"@atlaskit/dropdown-menu@^5.2.2":
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/dropdown-menu/-/dropdown-menu-5.2.2.tgz#54a5bfcdd51cfa4206ed26b259e8aa7c01790683"
   dependencies:
     "@atlaskit/button" "^8.2.4"
     "@atlaskit/droplist" "^6.2.2"
     "@atlaskit/icon" "^12.6.1"
-    "@atlaskit/item" "^7.0.5"
+    "@atlaskit/item" "^7.0.7"
     "@atlaskit/theme" "^4.0.4"
     array-find "^1.0.0"
     prop-types "^15.5.10"
@@ -100,9 +98,9 @@
     keycode "^2.1.7"
     prop-types "^15.5.10"
 
-"@atlaskit/dynamic-table@^9.2.4":
-  version "9.2.4"
-  resolved "https://registry.yarnpkg.com/@atlaskit/dynamic-table/-/dynamic-table-9.2.4.tgz#559557eae8d064d1a4edf8789d7da8c8183d3c6c"
+"@atlaskit/dynamic-table@^9.2.5":
+  version "9.2.5"
+  resolved "https://registry.yarnpkg.com/@atlaskit/dynamic-table/-/dynamic-table-9.2.5.tgz#3af9ad138e882d8a210884bc72a13e50bfc89032"
   dependencies:
     "@atlaskit/pagination" "^6.0.5"
     "@atlaskit/spinner" "^8.0.0"
@@ -186,6 +184,14 @@
     babel-runtime "^6.26.0"
     uuid "^3.1.0"
 
+"@atlaskit/icon@^12.7.0":
+  version "12.7.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.7.0.tgz#70451364348f8b0ee6541d9b3a20ea55999304bb"
+  dependencies:
+    "@atlaskit/theme" "^4.0.4"
+    babel-runtime "^6.26.0"
+    uuid "^3.1.0"
+
 "@atlaskit/inline-dialog@^7.1.2", "@atlaskit/inline-dialog@^7.1.3":
   version "7.1.3"
   resolved "https://registry.yarnpkg.com/@atlaskit/inline-dialog/-/inline-dialog-7.1.3.tgz#6eb75f830a4a0ec97e7292673ccc1e1abc175132"
@@ -202,9 +208,18 @@
     "@atlaskit/inline-dialog" "^7.1.2"
     "@atlaskit/theme" "^4.0.4"
 
-"@atlaskit/item@^7.0.4", "@atlaskit/item@^7.0.5":
+"@atlaskit/item@^7.0.5":
   version "7.0.5"
   resolved "https://registry.yarnpkg.com/@atlaskit/item/-/item-7.0.5.tgz#403bdb6ce3b6104e664e7f0d6bf9f07ede64d777"
+  dependencies:
+    "@atlaskit/theme" "^4.0.4"
+    prop-types "^15.5.10"
+    react-addons-text-content "^0.0.4"
+    uuid "^3.1.0"
+
+"@atlaskit/item@^7.0.7":
+  version "7.0.7"
+  resolved "https://registry.yarnpkg.com/@atlaskit/item/-/item-7.0.7.tgz#0b17270ae17ad121b9d6a7af1ee81a0843426fdf"
   dependencies:
     "@atlaskit/theme" "^4.0.4"
     prop-types "^15.5.10"
@@ -234,9 +249,9 @@
     "@atlaskit/util-shared-styles" "^2.10.3"
     babel-runtime "^6.26.0"
 
-"@atlaskit/modal-dialog@^5.2.6":
-  version "5.2.6"
-  resolved "https://registry.yarnpkg.com/@atlaskit/modal-dialog/-/modal-dialog-5.2.6.tgz#fab080e341856c3521a1313f24a8da8a13a660ca"
+"@atlaskit/modal-dialog@^5.2.7":
+  version "5.2.7"
+  resolved "https://registry.yarnpkg.com/@atlaskit/modal-dialog/-/modal-dialog-5.2.7.tgz#bee8213ce3c62212097d2e729d4e6ae6ab4f9089"
   dependencies:
     "@atlaskit/blanket" "^6.0.3"
     "@atlaskit/button" "^8.2.4"
@@ -265,9 +280,9 @@
     "@atlaskit/button" "^8.2.2"
     babel-runtime "^6.26.0"
 
-"@atlaskit/select@^4.3.5":
-  version "4.3.5"
-  resolved "https://registry.yarnpkg.com/@atlaskit/select/-/select-4.3.5.tgz#541216435ed0b5bf34502f82e8a2d9cb6ef32f9f"
+"@atlaskit/select@^4.3.6":
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/@atlaskit/select/-/select-4.3.6.tgz#2b3d01432b9f87409101fed4e0f8da84c5b95b96"
   dependencies:
     "@atlaskit/icon" "^12.6.2"
     "@atlaskit/theme" "^4.0.4"
