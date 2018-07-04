@@ -70,7 +70,7 @@ export type ScheduledTaskType = ScriptEntity & {
     issueJql: ?string,
     issueWorkflow: ?SingleValueType,
     issueWorkflowAction: ?SingleValueType,
-    transitionOptions: TransitionOptionsType,
+    transitionOptions: ?TransitionOptionsType,
     lastRunInfo: ?RunInfoType,
     nextRunDate: ?string
 };

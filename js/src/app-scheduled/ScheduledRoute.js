@@ -1,11 +1,13 @@
 //@flow
 import React, {type ComponentType} from 'react';
-import {Provider} from 'react-redux';
 
 import {combineReducers, createStore} from 'redux';
+import {Provider} from 'react-redux';
+import {Switch, Route} from 'react-router-dom';
 
 import {ScheduledTaskDialog} from './ScheduledTaskDialog';
 import {ScheduledTask} from './ScheduledTask';
+import {ViewScheduledTask} from './ViewScheduledTask';
 
 import {scheduledTaskService, watcherService} from '../service/services';
 
@@ -17,6 +19,8 @@ import {withRoot} from '../common/script-list/breadcrumbs';
 import './ScheduledTaskRegistry.less';
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
+import {NotFoundPage} from '../common/script-list/NotFoundPage';
+import {Loader} from '../common/ak/Loader';
 
 
 export class ScheduledRoute extends React.PureComponent<{}> {
@@ -37,20 +41,34 @@ export class ScheduledRoute extends React.PureComponent<{}> {
     render() {
         return (
             <Provider store={this.store}>
-                <ConnectedScriptPage
-                    DialogComponent={(ScheduledTaskDialog: ComponentType<FullDialogComponentProps>)}
-                    ScriptComponent={ScheduledTask}
-                    breadcrumbs={withRoot([])}
-                    i18n={{
-                        title: TitleMessages.scheduled,
-                        addItem: ScheduledTaskMessages.addTask,
-                        noItems: ScheduledTaskMessages.noTasks,
-                        delete: {
-                            heading: ScheduledTaskMessages.deleteTask,
-                            areYouSure: CommonMessages.confirmDelete
-                        }
-                    }}
-                />
+                <Loader>
+                    <Switch>
+                        <Route path="/scheduled/" exact={true}>
+                            {() =>
+                                <ConnectedScriptPage
+                                    DialogComponent={(ScheduledTaskDialog: ComponentType<FullDialogComponentProps>)}
+                                    ScriptComponent={ScheduledTask}
+                                    breadcrumbs={withRoot([])}
+                                    i18n={{
+                                        title: TitleMessages.scheduled,
+                                        addItem: ScheduledTaskMessages.addTask,
+                                        noItems: ScheduledTaskMessages.noTasks,
+                                        delete: {
+                                            heading: ScheduledTaskMessages.deleteTask,
+                                            areYouSure: CommonMessages.confirmDelete
+                                        }
+                                    }}
+                                />
+                            }
+                        </Route>
+                        <Route path="/scheduled/:id/view" exact={true}>
+                            {({match}) =>
+                                <ViewScheduledTask id={parseInt(match.params.id, 10)}/>
+                            }
+                        </Route>
+                        <Route component={NotFoundPage}/>
+                    </Switch>
+                </Loader>
             </Provider>
         );
     }

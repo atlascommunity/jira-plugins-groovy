@@ -101,6 +101,8 @@ public class NotificationServiceImpl implements NotificationService {
                     return pluginBaseUrl + "listeners/" + id + "/view";
                 case REST:
                     return pluginBaseUrl + "rest/" + id + "/view";
+                case SCHEDULED_TASK:
+                    return pluginBaseUrl + "scheduled/" + id + "/view";
             }
 
             return null;

@@ -26,12 +26,13 @@ import {ScriptParameters} from '../common/script';
 import {scheduledTaskService} from '../service/services';
 
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
-import {FieldMessages} from '../i18n/common.i18n';
+import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {updateItem, WatchActionCreators} from '../common/redux';
 
 import type {ScriptParam} from '../common/script/ScriptParameters';
 import {WatchableScript} from '../common/script/WatchableScript';
 import type {ScriptComponentProps} from '../common/script-list/types';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
 function getOutcomeLozengeAppearance(outcome: RunOutcomeType): Appearances {
@@ -71,6 +72,10 @@ type State = {
 };
 
 export class ScheduledTaskInternal extends React.Component<Props, State> {
+    static defaultProps = {
+        collapsible: true
+    };
+
     state = {
         showStatusInfo: false,
         showRunDialog: false
@@ -158,7 +163,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
     );
 
     render() {
-        const {script} = this.props;
+        const {script, collapsible} = this.props;
         const {showStatusInfo, showRunDialog} = this.state;
         const {lastRunInfo} = script;
 
@@ -238,12 +243,19 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                 entityType="SCHEDULED_TASK"
 
                 withChangelog={true}
+                collapsible={collapsible}
+
                 script={scriptObject}
                 title={titleEl}
                 onEdit={this._edit}
                 onDelete={this._delete}
 
                 dropdownItems={[
+                    {
+                        label: CommonMessages.permalink,
+                        href: `/scheduled/${script.id}/view`,
+                        linkComponent: RouterLink
+                    },
                     {
                         label: ScheduledTaskMessages.runNow,
                         onClick: this._toggleRunNow
