@@ -21,6 +21,7 @@ import type {ScriptComponentProps} from '../common/script-list/types';
 
 import './ListenerRegistry.less';
 import {listenerService} from '../service/services';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
 const ConnectedWatchableScript = connect(
@@ -39,9 +40,15 @@ type ConnectProps = {
     eventTypes: ObjectMap
 };
 
-type Props = ScriptComponentProps<ListenerType> & ConnectProps;
+type Props = ScriptComponentProps<ListenerType> & ConnectProps & {
+    collapsible: boolean
+};
 
 class ListenerInternal extends React.PureComponent<Props> {
+    defaultProps = {
+        collapsible: true
+    };
+
     _edit = () => this.props.onEdit && this.props.onEdit(this.props.script.id);
 
     _delete = () => this.props.onDelete && this.props.onDelete(
@@ -89,7 +96,7 @@ class ListenerInternal extends React.PureComponent<Props> {
     );
 
     render() {
-        const {script, projects, eventTypes} = this.props;
+        const {script, collapsible, projects, eventTypes} = this.props;
 
         return (
             <ConnectedWatchableScript
@@ -107,8 +114,18 @@ class ListenerInternal extends React.PureComponent<Props> {
                 }}
 
                 withChangelog={true}
+                collapsible={collapsible}
+
                 onEdit={this._edit}
                 onDelete={this._delete}
+
+                dropdownItems={[
+                    {
+                        label: CommonMessages.permalink,
+                        href: `/listeners/${script.id}/view`,
+                        linkComponent: RouterLink
+                    }
+                ]}
             >
                 <ScriptParameters params={this._getParams(projects, eventTypes, script.condition)}/>
             </ConnectedWatchableScript>

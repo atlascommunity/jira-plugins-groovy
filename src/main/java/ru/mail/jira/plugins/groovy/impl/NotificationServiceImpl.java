@@ -97,6 +97,8 @@ public class NotificationServiceImpl implements NotificationService {
                     return pluginBaseUrl + "fields/" + id + "/view";
                 case ADMIN_SCRIPT:
                     return pluginBaseUrl + "admin-scripts/" + id + "/view";
+                case LISTENER:
+                    return pluginBaseUrl + "listeners/" + id + "/view";
             }
 
             return null;
