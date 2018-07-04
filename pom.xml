@@ -39,6 +39,10 @@
                     <groupId>jta</groupId>
                     <artifactId>jta</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>antlr4-runtime</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -123,9 +127,9 @@
             <version>4.4.1</version>
         </dependency>
         <dependency>
-            <groupId>com.atlassian.pocketknife</groupId>
-            <artifactId>atlassian-pocketknife-dynamic-modules</artifactId>
-            <version>1.0</version>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.7.1</version>
         </dependency>
         <!-- explicitly set as provided, so it won't be bundled with plugin (not sure where compile dependency comes from) -->
         <dependency>
@@ -210,6 +214,18 @@
                     </scannedDependencies>
                     <verbose>false</verbose>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>4.7.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
