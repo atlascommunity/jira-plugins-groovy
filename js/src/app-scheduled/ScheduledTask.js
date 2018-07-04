@@ -146,12 +146,13 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                 });
             }
 
-            if ((task.type === 'ISSUE_JQL_TRANSITION') && task.transitionOptions) {
+            const {transitionOptions} = task;
+            if ((task.type === 'ISSUE_JQL_TRANSITION') && transitionOptions) {
                 params.push({
                     label: ScheduledTaskMessages.transitionOptions,
                     value: Object
-                        .keys(task.transitionOptions)
-                        .filter(key => task.transitionOptions[key])
+                        .keys(transitionOptions)
+                        .filter(key => transitionOptions[key])
                         //$FlowFixMe
                         .map(key => ScheduledTaskMessages.transitionOption[key])
                         .join(', ') || 'None'
