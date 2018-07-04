@@ -39,7 +39,6 @@ class ViewListenerInternal extends React.PureComponent<Props> {
                                     text="Listeners"
                                     href="/listeners/"
 
-                                    //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
                                     component={RouterLink}
                                 />
                             ])}

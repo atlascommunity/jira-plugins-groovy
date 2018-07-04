@@ -40,12 +40,10 @@ type ConnectProps = {
     eventTypes: ObjectMap
 };
 
-type Props = ScriptComponentProps<ListenerType> & ConnectProps & {
-    collapsible: boolean
-};
+type Props = ScriptComponentProps<ListenerType> & ConnectProps;
 
 class ListenerInternal extends React.PureComponent<Props> {
-    defaultProps = {
+    static defaultProps = {
         collapsible: true
     };
 
