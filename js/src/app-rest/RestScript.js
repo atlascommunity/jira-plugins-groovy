@@ -20,6 +20,7 @@ import {restService} from '../service/services';
 import {WatchableScript} from '../common/script/WatchableScript';
 
 import type {ScriptComponentProps} from '../common/script-list/types';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
 const ConnectedWatchableScript = connect(
@@ -36,6 +37,10 @@ const ConnectedWatchableScript = connect(
 type Props = ScriptComponentProps<RestScriptType>;
 
 export class RestScript extends React.PureComponent<Props> {
+    static defaultProps = {
+        collapsible: true
+    };
+
     _onEdit = () => this.props.onEdit && this.props.onEdit(this.props.script.id);
 
     _delete = () => this.props.onDelete && this.props.onDelete(
@@ -45,7 +50,7 @@ export class RestScript extends React.PureComponent<Props> {
     );
 
     render() {
-        const {script} = this.props;
+        const {script, collapsible} = this.props;
 
         const url = `${getPluginBaseUrl()}/custom/${script.name}`;
 
@@ -65,9 +70,18 @@ export class RestScript extends React.PureComponent<Props> {
                 }}
 
                 withChangelog={true}
+                collapsible={collapsible}
 
                 onEdit={this._onEdit}
                 onDelete={this._delete}
+
+                dropdownItems={[
+                    {
+                        label: CommonMessages.permalink,
+                        href: `/rest/${script.id}/view`,
+                        linkComponent: RouterLink
+                    }
+                ]}
             >
                 <ScriptParameters
                     params={[

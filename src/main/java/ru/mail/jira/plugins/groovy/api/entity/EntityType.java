@@ -6,7 +6,7 @@ public enum EntityType {
     REGISTRY_SCRIPT("ru.mail.jira.plugins.groovy.audit.registryScript", true),
     REGISTRY_DIRECTORY("ru.mail.jira.plugins.groovy.audit.registryDirectory", false),
     LISTENER("ru.mail.jira.plugins.groovy.audit.listener", true),
-    REST("ru.mail.jira.plugins.groovy.audit.rest", false),
+    REST("ru.mail.jira.plugins.groovy.audit.rest", true),
     CUSTOM_FIELD("ru.mail.jira.plugins.groovy.audit.cf", true),
     SCHEDULED_TASK("ru.mail.jira.plugins.groovy.audit.scheduledTask", false),
     ADMIN_SCRIPT("ru.mail.jira.plugins.groovy.audit.adminScript", true);
