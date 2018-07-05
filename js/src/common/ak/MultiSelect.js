@@ -58,13 +58,13 @@ export class MultiSelect<T: OldSelectValue> extends React.PureComponent<Props<T>
     }
 
     render() {
-        const {isInvalid, invalidMessage, value} = this.props;
+        const {label, isInvalid, isRequired, isDisabled, invalidMessage, value} = this.props;
         const {lookupMap} = this.state;
 
         return (
             <FormField
-                label={this.props.label || ''}
-                isRequired={this.props.isRequired}
+                label={label || ''}
+                isRequired={isRequired}
 
                 isInvalid={isInvalid}
                 invalidMessage={invalidMessage}
@@ -72,6 +72,7 @@ export class MultiSelect<T: OldSelectValue> extends React.PureComponent<Props<T>
                 <Select
                     shouldFitContainer={true}
                     isMulti={true}
+                    isDisabled={isDisabled}
 
                     isLoading={this.props.isLoading}
                     options={this.props.items}

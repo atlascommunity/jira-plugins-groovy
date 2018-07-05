@@ -41,7 +41,8 @@ const eventTypeLoader = () => jiraService
 type Props = {
     value: ConditionInputType,
     onChange: (value: ConditionInputType) => void,
-    error: any
+    error: any,
+    isDisabled?: boolean
 };
 
 export class ConditionPicker extends React.Component<Props> {
@@ -78,7 +79,7 @@ export class ConditionPicker extends React.Component<Props> {
     };
 
     render() {
-        const {value, error} = this.props;
+        const {value, error, isDisabled} = this.props;
 
         let errorField: * = null;
         let errorMessage: * = null;
@@ -104,6 +105,7 @@ export class ConditionPicker extends React.Component<Props> {
                             <FieldTextStateless
                                 key="className"
                                 shouldFitContainer={true}
+                                disabled={isDisabled}
 
                                 value={value.className || ''}
                                 onChange={this._onInputChange('className')}
@@ -116,6 +118,7 @@ export class ConditionPicker extends React.Component<Props> {
                         <AsyncLoadingMultiSelect
                             key="project"
                             label={FieldMessages.projects}
+                            isDisabled={isDisabled}
 
                             value={value.projectIds || []}
                             onChange={this._onChange('projectIds')}
@@ -124,6 +127,7 @@ export class ConditionPicker extends React.Component<Props> {
                         <AsyncLoadingMultiSelect
                             key="type"
                             label={FieldMessages.eventTypes}
+                            isDisabled={isDisabled}
 
                             value={value.typeIds || []}
                             onChange={this._onChange('typeIds')}
@@ -146,12 +150,14 @@ export class ConditionPicker extends React.Component<Props> {
                         {
                             label: ListenerTypeMessages.ISSUE,
                             value: 'ISSUE',
-                            isSelected: value.type === 'ISSUE'
+                            isSelected: value.type === 'ISSUE',
+                            isDisabled
                         },
                         {
                             label: ListenerTypeMessages.CLASS_NAME,
                             value: 'CLASS_NAME',
-                            isSelected: value.type === 'CLASS_NAME'
+                            isSelected: value.type === 'CLASS_NAME',
+                            isDisabled
                         }
                     ]}
                     value={value.type}

@@ -139,8 +139,9 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
         const {response} = error;
 
         if (response.status === 400) {
-            this.setState({ error: response.data });
+            this.setState({ error: response.data, waiting: false });
         } else {
+            this.setState({ waiting: false });
             throw error;
         }
     };
@@ -148,6 +149,8 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
     _onSubmit = () => {
         const {isNew, id, addItem, updateItem, history} = this.props;
         const data = this.state.values.toJS();
+
+        this.setState({waiting: true});
 
         if (!isNew && id) {
             listenerService
@@ -244,6 +247,7 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                     >
                         <FieldTextStateless
                             shouldFitContainer={true}
+                            disabled={waiting}
 
                             value={values.get('name') || ''}
                             onChange={this._setTextValue('name')}
@@ -259,13 +263,20 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
                             minimumRows={5}
+                            disabled={waiting}
 
                             value={values.get('description') || ''}
                             onChange={this._setTextValue('description')}
                         />
                     </FormField>
 
-                    <ConditionPicker value={condition} onChange={this._setObjectValue('condition')} error={error}/>
+                    <ConditionPicker
+                        value={condition}
+                        onChange={this._setObjectValue('condition')}
+
+                        error={error}
+                        isDisabled={waiting}
+                    />
 
                     <FormField
                         label={FieldMessages.scriptCode}
@@ -276,6 +287,7 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                     >
                         <EditorField
                             markers={markers}
+                            isDisabled={waiting}
 
                             bindings={bindings || undefined}
                             returnTypes={returnTypes}
@@ -293,6 +305,7 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                     >
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
+                            disabled={waiting}
 
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}
