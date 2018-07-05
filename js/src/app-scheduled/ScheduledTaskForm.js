@@ -120,6 +120,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
         if (!isNew && id) {
             this.setState({
                 ready: false,
+                waiting: false,
                 values: makeForm(),
                 error: null
             });
@@ -164,14 +165,17 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
         const {response} = error;
 
         if (response.status === 400) {
-            this.setState({error: response.data});
+            this.setState({ error: response.data, waiting: false });
         } else {
+            this.setState({ waiting: false });
             throw error;
         }
     };
 
     _onSubmit = () => {
         const {isNew, id, updateItem, addItem, history} = this.props;
+
+        this.setState({ waiting: true });
 
         const jsData = this.state.values.toJS();
         const data = {
@@ -234,7 +238,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
     };
 
     _renderField = (fieldName: (FormFieldKey | 'workflowAction'), e: *): Node => {
-        const {values} = this.state;
+        const {values, waiting} = this.state;
         let error: * = e;
 
         let errorMessage: * = null;
@@ -279,6 +283,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
 
                         label={FieldMessages.scriptCode}
                         isRequired={true}
+                        isDisabled={waiting}
 
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
@@ -298,6 +303,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                         <JqlInput
                             label={FieldMessages.issueJql}
                             isRequired={true}
+                            isDisabled={waiting}
 
                             isInvalid={errorField === fieldName}
                             invalidMessage={errorField === fieldName ? errorMessage : ''}
@@ -329,6 +335,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                         <AsyncPicker
                             label={FieldMessages.workflow}
                             isRequired={true}
+                            isDisabled={waiting}
 
                             src={`${getPluginBaseUrl()}/jira-api/workflowPicker`}
                             value={workflow}
@@ -341,6 +348,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                         <AsyncPicker
                             label={FieldMessages.workflowAction}
                             isRequired={true}
+                            isDisabled={waiting}
 
                             src={`${getPluginBaseUrl()}/jira-api/workflowActionPicker/${workflow.value}`}
                             value={values.get('issueWorkflowActionId')}
@@ -362,6 +370,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                         <CheckboxGroup>
                             <CheckboxStateless
                                 isChecked={value.skipConditions || false}
+                                isDisabled={waiting}
                                 onChange={this._toggleTransitionOption2}
                                 label={ScheduledTaskMessages.transitionOption.skipConditions}
                                 value="skipConditions"
@@ -369,6 +378,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                             />
                             <CheckboxStateless
                                 isChecked={value.skipValidators || false}
+                                isDisabled={waiting}
                                 onChange={this._toggleTransitionOption2}
                                 label={ScheduledTaskMessages.transitionOption.skipValidators}
                                 value="skipValidators"
@@ -376,6 +386,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                             />
                             <CheckboxStateless
                                 isChecked={value.skipPermissions || false}
+                                isDisabled={waiting}
                                 onChange={this._toggleTransitionOption2}
                                 label={ScheduledTaskMessages.transitionOption.skipPermissions}
                                 value="skipPermissions"
@@ -422,6 +433,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                     >
                         <FieldTextStateless
                             shouldFitContainer={true}
+                            disabled={waiting}
 
                             value={values.get('name') || ''}
                             onChange={this._setTextValue('name')}
@@ -437,6 +449,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
                             minimumRows={5}
+                            disabled={waiting}
 
                             value={values.get('description') || ''}
                             onChange={this._setTextValue('description')}
@@ -455,7 +468,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                         <FieldTextStateless
                             shouldFitContainer={true}
                             required={true}
-
+                            disabled={waiting}
 
                             value={values.get('scheduleExpression') || ''}
                             onChange={this._setTextValue('scheduleExpression')}
@@ -465,6 +478,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                     <AsyncPicker
                         label={ScheduledTaskMessages.runAs}
                         isRequired={true}
+                        isDisabled={waiting}
 
                         src={`${getPluginBaseUrl()}/jira-api/userPicker`}
                         onChange={this._setObjectValue('userKey')}
@@ -482,7 +496,8 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                             return {
                                 label: type.name,
                                 value: type.key,
-                                isSelected: values.get('type') === type.key
+                                isSelected: values.get('type') === type.key,
+                                isDisabled: waiting
                             };
                         })}
                         value={values.get('type')}
@@ -501,7 +516,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                     >
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
-
+                            disabled={waiting}
 
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}
