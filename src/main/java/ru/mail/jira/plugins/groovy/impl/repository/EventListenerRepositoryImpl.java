@@ -227,6 +227,12 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         }
 
         if (condition.getType() == ConditionType.CLASS_NAME) {
+            condition.setClassName(StringUtils.trimToNull(condition.getClassName()));
+
+            if (condition.getClassName() == null) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "condition.className");
+            }
+
             try {
                 classLoader.getJiraClassLoader().loadClass(condition.getClassName());
             } catch (ClassNotFoundException e) {
