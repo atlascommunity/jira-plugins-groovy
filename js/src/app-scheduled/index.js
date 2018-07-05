@@ -1,6 +1,6 @@
 //@flow
 import ReactDOM from 'react-dom';
-import React, {type ComponentType} from 'react';
+import React from 'react';
 import {Provider} from 'react-redux';
 
 import {combineReducers, createStore} from 'redux';
@@ -8,7 +8,6 @@ import {combineReducers, createStore} from 'redux';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
 
-import {ScheduledTaskForm} from './ScheduledTaskDialog';
 import {ScheduledTask} from './ScheduledTask';
 
 import {scheduledTaskService, watcherService} from '../service/services';
@@ -20,7 +19,6 @@ import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 import './ScheduledTaskRegistry.less';
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
-import type {FullDialogComponentProps} from '../common/script-list/types';
 
 
 const store = createStore(
@@ -48,7 +46,6 @@ AJS.toInit(() => {
     ReactDOM.render(
         <Provider store={store}>
             <ConnectedScriptPage
-                DialogComponent={(ScheduledTaskForm: ComponentType<FullDialogComponentProps>)}
                 ScriptComponent={ScheduledTask}
                 i18n={{
                     title: TitleMessages.rest,
