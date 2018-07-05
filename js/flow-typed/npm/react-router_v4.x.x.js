@@ -1,43 +1,10 @@
-// flow-typed signature: 1b2e974f9f683ce53055f7c3d60c59c5
-// flow-typed version: e94381d642/react-router-dom_v4.x.x/flow_>=v0.63.x
+// flow-typed signature: e15aeed0d3686f71822b54cde7b71c83
+// flow-typed version: fbf3e77efa/react-router_v4.x.x/flow_>=v0.63.x
 
-declare module "react-router-dom" {
-  declare export class BrowserRouter extends React$Component<{|
-    basename?: string,
-    forceRefresh?: boolean,
-    getUserConfirmation?: GetUserConfirmation,
-    keyLength?: number,
-    children?: React$Node
-  |}> {}
-
-  declare export class HashRouter extends React$Component<{|
-    basename?: string,
-    getUserConfirmation?: GetUserConfirmation,
-    hashType?: "slash" | "noslash" | "hashbang",
-    children?: React$Node
-  |}> {}
-
-  declare export class Link extends React$Component<{
-    className?: string,
-    to: string | LocationShape,
-    replace?: boolean,
-    children?: React$Node
-  }> {}
-
-  declare export class NavLink extends React$Component<{
-    to: string | LocationShape,
-    activeClassName?: string,
-    className?: string,
-    activeStyle?: Object,
-    style?: Object,
-    isActive?: (match: Match, location: Location) => boolean,
-    children?: React$Node,
-    exact?: boolean,
-    strict?: boolean
-  }> {}
-
-  // NOTE: Below are duplicated from react-router. If updating these, please
-  // update the react-router and react-router-native types as well.
+declare module "react-router" {
+  // NOTE: many of these are re-exported by react-router-dom and
+  // react-router-native, so when making changes, please be sure to update those
+  // as well.
   declare export type Location = {
     pathname: string,
     search: string,
@@ -90,46 +57,39 @@ declare module "react-router-dom" {
     staticContext?: StaticRouterContext
   |};
 
-  declare type ContextRouterVoid = {
-    history: RouterHistory | void,
-    location: Location | void,
-    match: Match | void,
-    staticContext?: StaticRouterContext | void
-  };
-
   declare export type GetUserConfirmation = (
     message: string,
     callback: (confirmed: boolean) => void
   ) => void;
 
-  declare export type StaticRouterContext = {
+  declare type StaticRouterContext = {
     url?: string
   };
 
-  declare export class StaticRouter extends React$Component<{|
+  declare export class StaticRouter extends React$Component<{
     basename?: string,
     location?: string | Location,
     context: StaticRouterContext,
     children?: React$Node
-  |}> {}
+  }> {}
 
-  declare export class MemoryRouter extends React$Component<{|
+  declare export class MemoryRouter extends React$Component<{
     initialEntries?: Array<LocationShape | string>,
     initialIndex?: number,
     getUserConfirmation?: GetUserConfirmation,
     keyLength?: number,
     children?: React$Node
-  |}> {}
+  }> {}
 
-  declare export class Router extends React$Component<{|
+  declare export class Router extends React$Component<{
     history: RouterHistory,
     children?: React$Node
-  |}> {}
+  }> {}
 
-  declare export class Prompt extends React$Component<{|
-    message: string | ((location: Location) => string | boolean),
+  declare export class Prompt extends React$Component<{
+    message: string | ((location: Location) => string | true),
     when?: boolean
-  |}> {}
+  }> {}
 
   declare export class Redirect extends React$Component<{|
     to: string | LocationShape,
@@ -138,6 +98,7 @@ declare module "react-router-dom" {
     exact?: boolean,
     strict?: boolean
   |}> {}
+
 
   declare export class Route extends React$Component<{|
     component?: React$ComponentType<*>,
@@ -155,17 +116,15 @@ declare module "react-router-dom" {
     location?: Location
   |}> {}
 
-  declare export function withRouter<P: {}, Component: React$ComponentType<P>>(
-    WrappedComponent: Component
-  ): React$ComponentType<
-    $Diff<React$ElementConfig<Component>, ContextRouterVoid>
-  >;
+  declare export function withRouter<P>(
+    Component: React$ComponentType<{| ...ContextRouter, ...P |}>
+  ): React$ComponentType<P>;
 
   declare type MatchPathOptions = {
     path?: string,
     exact?: boolean,
-    sensitive?: boolean,
-    strict?: boolean
+    strict?: boolean,
+    sensitive?: boolean
   };
 
   declare export function matchPath(
