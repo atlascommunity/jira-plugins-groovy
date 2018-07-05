@@ -40,10 +40,24 @@ export class ScriptConsole extends React.Component<Props, State> {
         modified: false
     };
 
-    _scriptChange = (script: ?string) => this.setState({
-        script: script,
-        modified: true
-    });
+    _scriptChange = (script: ?string) => {
+        this.setState({
+            script: script,
+            modified: true
+        });
+
+        try {
+            if (sessionStorage) {
+                if (script) {
+                    sessionStorage.setItem('my-groovy-console-script', script);
+                } else {
+                    sessionStorage.removeItem('my-groovy-console-script');
+                }
+            }
+        } catch (e) {
+            console.error('unable to save script', e);
+        }
+    };
 
     _submit = () => {
         this.setState({ waiting: true });
@@ -79,6 +93,16 @@ export class ScriptConsole extends React.Component<Props, State> {
                 }
             );
     };
+
+    componentDidMount() {
+        if (sessionStorage) {
+            const script = sessionStorage.getItem('my-groovy-console-script');
+
+            if (script) {
+                this.setState({ script });
+            }
+        }
+    }
 
     render() {
         const {script, output, error, waiting, modified} = this.state;
