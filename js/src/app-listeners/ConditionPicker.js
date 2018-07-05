@@ -11,8 +11,7 @@ import {jiraService} from '../service/services';
 import {FieldMessages} from '../i18n/common.i18n';
 import {ListenerTypeMessages} from '../i18n/listener.i18n';
 
-import {AsyncLoadingMultiSelect} from '../common/ak/AsyncLoadingMultiSelect';
-import {FieldError} from '../common/ak/FieldError';
+import {AsyncLoadingMultiSelect, FormField, FieldError} from '../common/ak';
 
 import type {LoaderOptionType} from '../common/ak/AsyncLoadingMultiSelect';
 
@@ -94,19 +93,23 @@ export class ConditionPicker extends React.Component<Props> {
         if (value.type) {
             switch (value.type) {
                 case 'CLASS_NAME':
-                    paramEl = <FieldTextStateless
-                        key="className"
+                    paramEl = (
+                        <FormField
+                            label={ListenerTypeMessages.CLASS_NAME}
+                            isRequired={true}
 
-                        shouldFitContainer={true}
-                        required={true}
+                            isInvalid={errorField === 'condition.className'}
+                            invalidMessage={errorField === 'condition.className' ? errorMessage : null}
+                        >
+                            <FieldTextStateless
+                                key="className"
+                                shouldFitContainer={true}
 
-                        isInvalid={errorField === 'condition.className'}
-                        invalidMessage={errorField === 'condition.className' ? errorMessage : null}
-
-                        label={FieldMessages.name}
-                        value={value.className || ''}
-                        onChange={this._onInputChange('className')}
-                    />;
+                                value={value.className || ''}
+                                onChange={this._onInputChange('className')}
+                            />
+                        </FormField>
+                    );
                     break;
                 case 'ISSUE':
                     paramEl = [
@@ -134,7 +137,7 @@ export class ConditionPicker extends React.Component<Props> {
         }
 
         return (
-            <div className="flex-column">
+            <div className="flex-column" style={{zIndex: 100}}>
                 <AkFieldRadioGroup
                     label={FieldMessages.type}
                     isRequired={true}

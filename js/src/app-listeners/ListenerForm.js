@@ -2,11 +2,15 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
+import {withRouter} from 'react-router-dom';
 
 import {Record} from 'immutable';
 import type {RecordOf, RecordFactory} from 'immutable';
 
-import ModalDialog from '@atlaskit/modal-dialog';
+import Button, {ButtonGroup} from '@atlaskit/button';
+import Page from '@atlaskit/page';
+import PageHeader from '@atlaskit/page-header';
+import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 
@@ -17,15 +21,18 @@ import type {ListenerType, ConditionInputType} from './types';
 import {ListenerMessages} from '../i18n/listener.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 
+import {RouterLink, FormField} from '../common/ak';
+
 import {listenerService} from '../service/services';
 import {getMarkers} from '../common/error';
 import {Bindings, ReturnTypes} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
 import {ErrorMessage} from '../common/ak/messages';
 import {addItem, updateItem} from '../common/redux';
-import type {FullDialogComponentProps} from '../common/script-list/types';
+import type {DialogComponentProps} from '../common/script-list/types';
 import type {BindingType} from '../common/editor/types';
 import {extractShortClassName} from '../common/classNames';
+import {withRoot} from '../common/script-list/breadcrumbs';
 
 
 //AbstractProjectEvent
@@ -51,7 +58,7 @@ type Form = {
     condition: ConditionInputType
 };
 
-type FormField = $Keys<Form>;
+type FormFieldKey = $Keys<Form>;
 
 const makeForm: RecordFactory<Form> = Record({
     name: '',
@@ -66,21 +73,24 @@ const makeForm: RecordFactory<Form> = Record({
     }
 });
 
-type Props = FullDialogComponentProps & {
+type Props = DialogComponentProps & {
     addItem: typeof addItem,
-    updateItem: typeof updateItem
+    updateItem: typeof updateItem,
+    history: any
 };
 
 type State = {
     ready: boolean,
+    waiting: boolean,
     values: RecordOf<Form>,
     listener: ?ListenerType,
     error: *
 };
 
-class ListenerDialogInternal extends React.PureComponent<Props, State> {
+class ListenerFormInternal extends React.PureComponent<Props, State> {
     state = {
         ready: false,
+        waiting: false,
         values: makeForm(),
         listener: null,
         error: null
@@ -136,7 +146,7 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
     };
 
     _onSubmit = () => {
-        const {isNew, id, onClose, addItem, updateItem} = this.props;
+        const {isNew, id, addItem, updateItem, history} = this.props;
         const data = this.state.values.toJS();
 
         if (!isNew && id) {
@@ -144,7 +154,7 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
                 .updateListener(id, data)
                 .then(
                     (listener: ListenerType) => {
-                        onClose();
+                        history.push('/listeners/');
                         updateItem(listener);
                     },
                     this._handleError
@@ -154,7 +164,7 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
                 .createListener(data)
                 .then(
                     (listener: ListenerType) => {
-                        onClose();
+                        history.push('/listeners/');
                         addItem(listener);
                     },
                     this._handleError
@@ -162,7 +172,7 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
         }
     };
 
-    mutateValue = (field: FormField, value: any) =>
+    mutateValue = (field: FormFieldKey, value: any) =>
         this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
@@ -174,8 +184,8 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
 
     render() {
-        const {onClose, isNew} = this.props;
-        const {ready, values, listener, error} = this.state;
+        const {isNew} = this.props;
+        const {ready, waiting, values, listener, error} = this.state;
 
         let body: ?Node = null;
 
@@ -221,89 +231,136 @@ class ListenerDialogInternal extends React.PureComponent<Props, State> {
                 }
             }
 
-            body =
+            body = (
                 <div className="flex-column">
                     {error && !errorField && <ErrorMessage title={errorMessage}/>}
 
-                    <FieldTextStateless
-                        shouldFitContainer={true}
-                        required={true}
+                    <FormField
+                        label={FieldMessages.name}
+                        isRequired={true}
 
                         isInvalid={errorField === 'name'}
                         invalidMessage={errorField === 'name' ? errorMessage : null}
+                    >
+                        <FieldTextStateless
+                            shouldFitContainer={true}
 
-                        label={FieldMessages.name}
-                        value={values.get('name') || ''}
-                        onChange={this._setTextValue('name')}
-                    />
+                            value={values.get('name') || ''}
+                            onChange={this._setTextValue('name')}
+                        />
+                    </FormField>
 
-                    <FieldTextAreaStateless
-                        shouldFitContainer={true}
-                        minimumRows={5}
+                    <FormField
+                        label={FieldMessages.description}
 
                         isInvalid={errorField === 'description'}
                         invalidMessage={errorField === 'description' ? errorMessage : null}
+                    >
+                        <FieldTextAreaStateless
+                            shouldFitContainer={true}
+                            minimumRows={5}
 
-                        label={FieldMessages.description}
-                        value={values.get('description') || ''}
-                        onChange={this._setTextValue('description')}
-                    />
+                            value={values.get('description') || ''}
+                            onChange={this._setTextValue('description')}
+                        />
+                    </FormField>
 
                     <ConditionPicker value={condition} onChange={this._setObjectValue('condition')} error={error}/>
-                    <EditorField
+
+                    <FormField
                         label={FieldMessages.scriptCode}
                         isRequired={true}
 
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
-                        markers={markers}
+                    >
+                        <EditorField
+                            markers={markers}
 
-                        bindings={bindings || undefined}
-                        returnTypes={returnTypes}
+                            bindings={bindings || undefined}
+                            returnTypes={returnTypes}
 
-                        value={values.get('scriptBody') || ''}
-                        onChange={this._setObjectValue('scriptBody')}
-                    />
-                    <FieldTextAreaStateless
-                        shouldFitContainer={true}
-                        required={!isNew}
+                            value={values.get('scriptBody') || ''}
+                            onChange={this._setObjectValue('scriptBody')}
+                        />
+                    </FormField>
+                    <FormField
+                        label={FieldMessages.comment}
+                        isRequired={!isNew}
 
                         isInvalid={errorField === 'comment'}
                         invalidMessage={errorField === 'comment' ? errorMessage : null}
+                    >
+                        <FieldTextAreaStateless
+                            shouldFitContainer={true}
 
-                        label={FieldMessages.comment}
-                        value={values.get('comment') || ''}
-                        onChange={this._setTextValue('comment')}
-                    />
-                </div>;
+                            value={values.get('comment') || ''}
+                            onChange={this._setTextValue('comment')}
+                        />
+                    </FormField>
+
+                    <div style={{marginTop: '10px'}}>
+                        <ButtonGroup>
+                            <Button
+                                appearance="primary"
+                                isLoading={waiting}
+
+                                onClick={this._onSubmit}
+                            >
+                                {isNew ? CommonMessages.create : CommonMessages.update}
+                            </Button>
+                            <Button
+                                appearance="link"
+
+                                isDisabled={waiting}
+
+                                component={RouterLink}
+                                href="/listeners/"
+                            >
+                                {CommonMessages.cancel}
+                            </Button>
+                        </ButtonGroup>
+                    </div>
+                </div>
+            );
         }
 
-        return <ModalDialog
-            width="x-large"
-            scrollBehavior="outside"
-
-            isHeadingMultiline={false}
-            heading={isNew ? ListenerMessages.addListener : `${ListenerMessages.editListener}: ${listener ? listener.name : ''}`}
-
-            onClose={onClose}
-
-            actions={[
-                {
-                    text: isNew ? CommonMessages.create : CommonMessages.update,
-                    onClick: this._onSubmit
-                },
-                {
-                    text: CommonMessages.cancel,
-                    onClick: onClose
-                }
-            ]}
-        >
-            {body}
-        </ModalDialog>;
+        return (
+            <Page>
+                <PageHeader
+                    breadcrumbs={
+                        <Breadcrumbs>
+                            {withRoot([
+                                <BreadcrumbsItem
+                                    key="fields"
+                                    text="Listeners"
+                                    href="/listeners"
+                                    component={RouterLink}
+                                />,
+                                !isNew && listener ? <BreadcrumbsItem
+                                    key="script"
+                                    text={listener.name}
+                                    href={`/listeners/${listener.id}/view`}
+                                    component={RouterLink}
+                                /> : null
+                            ])}
+                        </Breadcrumbs>
+                    }
+                >
+                    {isNew ?
+                        ListenerMessages.addListener :
+                        `${ListenerMessages.editListener}: ${listener ? listener.name : ''}`
+                    }
+                </PageHeader>
+                {body}
+            </Page>
+        );
     }
 }
 
-export const ListenerDialog = connect(
-    null,
-    { addItem, updateItem }
-)(ListenerDialogInternal);
+export const ListenerForm = withRouter(
+    connect(
+        null,
+        { addItem, updateItem }
+    )(ListenerFormInternal)
+);

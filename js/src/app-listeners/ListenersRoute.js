@@ -5,9 +5,10 @@ import {createStore} from 'redux';
 import {Provider} from 'react-redux';
 import {Route, Switch} from 'react-router-dom';
 
+import Button from '@atlaskit/button';
+
 import {Listener} from './Listener';
-import {ListenerDialog} from './ListenerDialog';
-import {ViewListener} from './ViewListener';
+import {ListenerForm} from './ListenerForm';
 
 import {listenersReducer} from './listeners.reducer';
 
@@ -18,10 +19,11 @@ import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 import {withRoot} from '../common/script-list/breadcrumbs';
 import {ItemActionCreators} from '../common/redux';
 
+import {NotFoundPage, ItemViewPage} from '../common/script-list';
+import {Loader, RouterLink} from '../common/ak';
+
 import {jiraService, listenerService, watcherService} from '../service/services';
 import type {ObjectMap} from '../common/types';
-import {Loader} from '../common/ak/Loader';
-import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
 
 function transformEventTypes(eventTypes: *): ObjectMap {
@@ -69,14 +71,13 @@ export class ListenersRoute extends React.PureComponent<{}> {
     render() {
         return (
             <Provider store={this.store}>
+                {/* $FlowFixMe */}
                 <Loader>
                     <Switch>
                         <Route path="/listeners" exact={true}>
                             {() =>
                                 <ConnectedScriptPage
                                     ScriptComponent={Listener}
-                                    //$FlowFixMe
-                                    DialogComponent={ListenerDialog}
                                     breadcrumbs={withRoot([])}
                                     i18n={{
                                         addItem: ListenerMessages.addListener,
@@ -87,12 +88,42 @@ export class ListenersRoute extends React.PureComponent<{}> {
                                             areYouSure: CommonMessages.confirmDelete
                                         }
                                     }}
+                                    actions={
+                                        <Button
+                                            appearance="primary"
+
+                                            component={RouterLink}
+                                            href="/listeners/create"
+                                        >
+                                            {ListenerMessages.addListener}
+                                        </Button>
+                                    }
                                 />
+                            }
+                        </Route>
+                        <Route path="/listeners/create">
+                            {() =>
+                                <ListenerForm isNew={true} id={null}/>
+                            }
+                        </Route>
+                        <Route path="/listeners/:id/edit" exact={true}>
+                            {({match}) =>
+                                <ListenerForm isNew={false} id={parseInt(match.params.id, 10)}/>
                             }
                         </Route>
                         <Route path="/listeners/:id/view" exact={true}>
                             {({match}) =>
-                                <ViewListener id={parseInt(match.params.id, 10)}/>
+                                <ItemViewPage
+                                    id={parseInt(match.params.id, 10)}
+
+                                    ScriptComponent={Listener}
+                                    deleteCallback={listenerService.deleteListener}
+                                    i18n={{
+                                        deleteDialogTitle: ListenerMessages.deleteListener,
+                                        parentName: 'Listeners'
+                                    }}
+                                    parentLocation="/listeners/"
+                                />
                             }
                         </Route>
                         <Route component={NotFoundPage}/>

@@ -5,12 +5,17 @@ import {connect} from 'react-redux';
 
 import memoizeOne from 'memoize-one';
 
+import Button from '@atlaskit/button';
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
+
 import type {ConditionType, ListenerType} from './types';
 
 import {WatchActionCreators} from '../common/redux';
 
 import {ListenerTypeMessages} from '../i18n/listener.i18n';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
+
+import {RouterLink} from '../common/ak';
 
 import {ScriptParameters} from '../common/script';
 import {WatchableScript} from '../common/script/WatchableScript';
@@ -21,7 +26,6 @@ import type {ScriptComponentProps} from '../common/script-list/types';
 
 import './ListenerRegistry.less';
 import {listenerService} from '../service/services';
-import {RouterLink} from '../common/ak/RouterLink';
 
 
 const ConnectedWatchableScript = connect(
@@ -114,7 +118,6 @@ class ListenerInternal extends React.PureComponent<Props> {
                 withChangelog={true}
                 collapsible={collapsible}
 
-                onEdit={this._edit}
                 onDelete={this._delete}
 
                 dropdownItems={[
@@ -123,6 +126,17 @@ class ListenerInternal extends React.PureComponent<Props> {
                         href: `/listeners/${script.id}/view`,
                         linkComponent: RouterLink
                     }
+                ]}
+
+                additionalButtons={[
+                    <Button
+                        key="edit"
+                        appearance="subtle"
+                        iconBefore={<EditFilledIcon label=""/>}
+
+                        component={RouterLink}
+                        href={`/listeners/${script.id}/edit`}
+                    />
                 ]}
             >
                 <ScriptParameters params={this._getParams(projects, eventTypes, script.condition)}/>

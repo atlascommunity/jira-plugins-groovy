@@ -1,5 +1,5 @@
 //@flow
-import React, {Fragment} from 'react';
+import React, {Fragment, type Element} from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
@@ -10,7 +10,7 @@ import {LoadingSpinner} from './LoadingSpinner';
 
 type Props = {
     isReady: boolean,
-    children: Node
+    children: Element<any>
 };
 
 export class LoaderInternal extends React.PureComponent<Props> {
@@ -25,4 +25,8 @@ export class LoaderInternal extends React.PureComponent<Props> {
     }
 }
 
-export const Loader = withRouter(connect(memoizeOne(({isReady}) => ({isReady})))(LoaderInternal));
+export const Loader = withRouter(connect(
+    memoizeOne(
+        ({isReady}): {isReady: boolean} => ({isReady}),
+    )
+)(LoaderInternal));

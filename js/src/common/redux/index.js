@@ -13,6 +13,10 @@ export type ItemType = {
     id: number
 };
 
+export type NamedItemType = ItemType & {
+    name: string
+};
+
 export type ItemListType = $ReadOnlyArray<ItemType>;
 export type WatchesListType = $ReadOnlyArray<number>;
 
