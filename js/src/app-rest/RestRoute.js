@@ -7,19 +7,16 @@ import {Switch, Route} from 'react-router-dom';
 
 import {RestScript} from './RestScript';
 import {RestScriptDialog} from './RestScriptDialog';
-import {ViewRestScript} from './ViewRestScript';
 
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RestMessages} from '../i18n/rest.i18n';
 
+import {withRoot, NotFoundPage, ConnectedScriptPage, ItemViewPage} from '../common/script-list';
 import type {FullDialogComponentProps} from '../common/script-list/types';
-import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {watcherService, restService} from '../service/services';
-import {withRoot} from '../common/script-list/breadcrumbs';
 import {Loader} from '../common/ak/Loader';
-import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
 
 export class RestRoute extends React.PureComponent<{}> {
@@ -40,6 +37,7 @@ export class RestRoute extends React.PureComponent<{}> {
     render() {
         return (
             <Provider store={this.store}>
+                {/* $FlowFixMe */}
                 <Loader>
                     <Switch>
                         <Route path="/rest/" exact={true}>
@@ -62,7 +60,17 @@ export class RestRoute extends React.PureComponent<{}> {
                         </Route>
                         <Route path="/rest/:id/view" exact={true}>
                             {({match}) =>
-                                <ViewRestScript id={parseInt(match.params.id, 10)}/>
+                                <ItemViewPage
+                                    id={parseInt(match.params.id, 10)}
+
+                                    ScriptComponent={RestScript}
+                                    deleteCallback={restService.deleteScript}
+                                    i18n={{
+                                        deleteDialogTitle: RestMessages.deleteScript,
+                                        parentName: 'REST scripts'
+                                    }}
+                                    parentLocation="/rest/"
+                                />
                             }
                         </Route>
                         <Route component={NotFoundPage}/>
