@@ -56,8 +56,6 @@ export class FieldsRoute extends React.PureComponent<{}> {
                                         }
                                     }}
                                     breadcrumbs={withRoot([])}
-
-                                    isCreateDisabled={true}
                                 />
                             }
                         </Route>

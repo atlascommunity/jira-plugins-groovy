@@ -61,7 +61,7 @@ export class RegistryRoute extends React.PureComponent<{}> {
                         </Route>
                         <Route path="/registry/script/edit/:id">
                             {({match}) =>
-                                <ScriptForm isNew={false} id={parseInt(match.params.id, 10)}/>
+                                <ScriptForm isNew={false} id={parseInt(match.params.id, 10)} directoryId={null}/>
                             }
                         </Route>
                         <Route path="/registry/script/view/:id">
