@@ -1,5 +1,5 @@
 //@flow
-import React, {Fragment} from 'react';
+import React, {Fragment, type ComponentType, type Element} from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
@@ -25,4 +25,5 @@ export class LoaderInternal extends React.PureComponent<Props> {
     }
 }
 
-export const Loader = withRouter(connect(memoizeOne(({ready}) => ({ready})))(LoaderInternal));
+export const Loader: ComponentType<{children: Element<any>}> =
+    withRouter(connect(memoizeOne(({ready}) => ({ready})))(LoaderInternal));

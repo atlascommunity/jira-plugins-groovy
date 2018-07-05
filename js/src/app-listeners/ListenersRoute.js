@@ -71,7 +71,6 @@ export class ListenersRoute extends React.PureComponent<{}> {
     render() {
         return (
             <Provider store={this.store}>
-                {/* $FlowFixMe */}
                 <Loader>
                     <Switch>
                         <Route path="/listeners" exact={true}>

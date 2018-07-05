@@ -21,12 +21,9 @@ import {CommonMessages} from '../../i18n/common.i18n';
 import type {NamedItemType} from '../redux';
 
 
-type Props<T: NamedItemType> = {
+type PublicProps<T: NamedItemType> = {|
     id: number,
 
-    history: any,
-
-    script?: T,
     ScriptComponent: ComponentType<ScriptComponentProps<T>>,
     deleteCallback: (number) => Promise<void>,
     i18n: {
@@ -34,6 +31,11 @@ type Props<T: NamedItemType> = {
         parentName: string
     },
     parentLocation: string
+|};
+
+type Props<T: NamedItemType> = PublicProps<T> & {
+    script?: T,
+    history: any
 };
 
 type State = {
@@ -100,7 +102,7 @@ class ItemViewPageInternal<T: NamedItemType> extends React.PureComponent<Props<T
 
 const itemSelector = createItemSelector();
 
-export const ItemViewPage = withRouter(
+export const ItemViewPage: ComponentType<PublicProps<NamedItemType>> = withRouter(
     connect(
         (state, props): {script: ?NamedItemType} => ({
             script: itemSelector(state, props)

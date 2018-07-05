@@ -80,7 +80,7 @@ export class AdminRoute extends React.PureComponent<{}> {
                         </Route>
                         <Route path="/admin-scripts/create" exact={true}>
                             {() =>
-                                <AdminForm isNew={true}/>
+                                <AdminForm isNew={true} id={null}/>
                             }
                         </Route>
                         <Route component={NotFoundPage}/>

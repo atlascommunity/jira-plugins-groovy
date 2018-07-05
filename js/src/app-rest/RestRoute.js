@@ -40,7 +40,6 @@ export class RestRoute extends React.PureComponent<{}> {
     render() {
         return (
             <Provider store={this.store}>
-                {/* $FlowFixMe */}
                 <Loader>
                     <Switch>
                         <Route path="/rest/" exact={true}>
@@ -79,6 +78,7 @@ export class RestRoute extends React.PureComponent<{}> {
                                 <ItemViewPage
                                     id={parseInt(match.params.id, 10)}
 
+                                    //$FlowFixMe
                                     ScriptComponent={RestScript}
                                     deleteCallback={restService.deleteScript}
                                     i18n={{
