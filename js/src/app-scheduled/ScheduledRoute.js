@@ -5,6 +5,8 @@ import {combineReducers, createStore} from 'redux';
 import {Provider} from 'react-redux';
 import {Switch, Route} from 'react-router-dom';
 
+import Button from '@atlaskit/button';
+
 import {ScheduledTask} from './ScheduledTask';
 import {ScheduledTaskForm} from './ScheduledTaskForm';
 
@@ -18,6 +20,7 @@ import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 
 import './ScheduledTaskRegistry.less';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
 export class ScheduledRoute extends React.PureComponent<{}> {
@@ -53,6 +56,16 @@ export class ScheduledRoute extends React.PureComponent<{}> {
                                             areYouSure: CommonMessages.confirmDelete
                                         }
                                     }}
+                                    actions={
+                                        <Button
+                                            appearance="primary"
+
+                                            component={RouterLink}
+                                            href="/scheduled/create"
+                                        >
+                                            {ScheduledTaskMessages.addTask}
+                                        </Button>
+                                    }
                                 />
                             }
                         </Route>

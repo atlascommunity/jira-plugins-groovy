@@ -5,17 +5,21 @@ import {combineReducers, createStore} from 'redux';
 import {Provider} from 'react-redux';
 import {Switch, Route} from 'react-router-dom';
 
+import Button from '@atlaskit/button';
+
 import {RestScript} from './RestScript';
 import {RestForm} from './RestForm';
 
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RestMessages} from '../i18n/rest.i18n';
 
-import {withRoot, NotFoundPage, ConnectedScriptPage, ItemViewPage} from '../common/script-list';
+import {NotFoundPage, ConnectedScriptPage, ItemViewPage} from '../common/script-list';
 
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {watcherService, restService} from '../service/services';
 import {Loader} from '../common/ak/Loader';
+import {RouterLink} from '../common/ak/RouterLink';
+import {RegistryMessages} from '../i18n/registry.i18n';
 
 
 export class RestRoute extends React.PureComponent<{}> {
@@ -52,6 +56,16 @@ export class RestRoute extends React.PureComponent<{}> {
                                             areYouSure: CommonMessages.confirmDelete
                                         }
                                     }}
+                                    actions={
+                                        <Button
+                                            appearance="primary"
+
+                                            component={RouterLink}
+                                            href="/rest/create"
+                                        >
+                                            {RegistryMessages.addScript}
+                                        </Button>
+                                    }
                                 />
                             }
                         </Route>
