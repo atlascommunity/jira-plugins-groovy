@@ -302,7 +302,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
 
                                 onClick={this._onSubmit}
                             >
-                                {CommonMessages.update}
+                                {isNew ? CommonMessages.create : CommonMessages.update}
                             </Button>
                             <Button
                                 appearance="link"
