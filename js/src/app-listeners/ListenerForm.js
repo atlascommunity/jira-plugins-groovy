@@ -107,6 +107,7 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
     _init = ({isNew, id}: Props) => {
         if (!isNew && id) {
             this.setState({
+                waiting: false,
                 ready: false,
                 values: makeForm()
             });

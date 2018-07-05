@@ -113,6 +113,7 @@ export class RestFormInternal extends React.Component<Props, State> {
     _init = ({isNew, id}: Props) => {
         if (!isNew && id) {
             this.setState({
+                waiting: false,
                 ready: false,
                 values: makeForm(),
                 error: null
@@ -158,14 +159,17 @@ export class RestFormInternal extends React.Component<Props, State> {
         const {response} = error;
 
         if (response.status === 400) {
-            this.setState({error: response.data});
+            this.setState({ error: response.data, waiting: false });
         } else {
+            this.setState({ waiting: false });
             throw error;
         }
     };
 
     _onSubmit = () => {
         const {isNew, id, history} = this.props;
+
+        this.setState({ waiting: true });
 
         const {groups, ...data}: any = this.state.values.toJS();
         data.groups = groups ? groups.map(group => group.value) : [];
@@ -247,6 +251,7 @@ export class RestFormInternal extends React.Component<Props, State> {
                     >
                         <FieldTextStateless
                             shouldFitContainer={true}
+                            disabled={waiting}
 
                             value={values.get('name') || ''}
                             onChange={this._setTextValue('name')}
@@ -262,6 +267,7 @@ export class RestFormInternal extends React.Component<Props, State> {
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
                             minimumRows={5}
+                            disabled={waiting}
 
                             value={values.get('description') || ''}
                             onChange={this._setTextValue('description')}
@@ -271,6 +277,7 @@ export class RestFormInternal extends React.Component<Props, State> {
                     <MultiSelect
                         label={FieldMessages.httpMethods}
                         isRequired={true}
+                        isDisabled={waiting}
 
                         isInvalid={errorField === 'methods'}
                         invalidMessage={errorField === 'methods' ? <div className="error">{errorMessage}</div> : ''}
@@ -282,6 +289,7 @@ export class RestFormInternal extends React.Component<Props, State> {
                     <AsyncPicker
                         label={FieldMessages.groups}
                         isMulti={true}
+                        isDisabled={waiting}
 
                         src={`${getPluginBaseUrl()}/jira-api/groupPicker`}
 
@@ -303,6 +311,7 @@ export class RestFormInternal extends React.Component<Props, State> {
                             markers={markers}
                             bindings={bindings}
                             returnTypes={returnTypes}
+                            isDisabled={waiting}
 
                             value={values.get('scriptBody') || ''}
                             onChange={this._setObjectValue('scriptBody')}
@@ -318,6 +327,7 @@ export class RestFormInternal extends React.Component<Props, State> {
                     >
                         <FieldTextAreaStateless
                             shouldFitContainer={true}
+                            disabled={waiting}
 
                             value={values.get('comment') || ''}
                             onChange={this._setTextValue('comment')}
