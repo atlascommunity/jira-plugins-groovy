@@ -2,10 +2,14 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
+import {withRouter} from 'react-router-dom';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
-import ModalDialog from '@atlaskit/modal-dialog';
+import Button, {ButtonGroup} from '@atlaskit/button';
+import Page from '@atlaskit/page';
+import PageHeader from '@atlaskit/page-header';
+import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import {AkFieldRadioGroup} from '@atlaskit/field-radio-group';
@@ -28,18 +32,16 @@ import type {
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 
-import {AsyncPicker} from '../common/ak/AsyncPicker';
-import {EditorField} from '../common/ak/EditorField';
-import {JqlInput} from '../common/ak/JqlInput';
-import {FieldError} from '../common/ak/FieldError';
-import {ErrorMessage} from '../common/ak/messages';
+import {AsyncPicker, EditorField, JqlInput, FormField, FieldError, ErrorMessage, RouterLink} from '../common/ak';
+import {withRoot} from '../common/script-list';
 
 import {scheduledTaskService} from '../service/services';
 import {getMarkers} from '../common/error';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {Bindings, ReturnTypes} from '../common/bindings';
 import {addItem, updateItem} from '../common/redux';
-import type {FullDialogComponentProps} from '../common/script-list/types';
+
+import type {DialogComponentProps} from '../common/script-list/types';
 import type {InputEvent} from '../common/EventTypes';
 import type {BindingType} from '../common/editor/types';
 import type {SingleValueType} from '../common/ak/types';
@@ -67,7 +69,7 @@ type Form = {
     comment: ?string,
 };
 
-type FormField = $Keys<Form>;
+type FormFieldKey = $Keys<Form>;
 
 const makeForm: RecordFactory<Form> = Record({
     name: '',
@@ -83,21 +85,24 @@ const makeForm: RecordFactory<Form> = Record({
     description: null
 });
 
-type Props = FullDialogComponentProps & {
+type Props = DialogComponentProps & {
     updateItem: typeof updateItem,
-    addItem: typeof addItem
+    addItem: typeof addItem,
+    history: any
 };
 
 type State = {
     ready: boolean,
+    waiting: boolean,
     values: RecordOf<Form>,
     task: ?ScheduledTaskType,
     error: *
 };
 
-export class ScheduledTaskDialogInternal extends React.PureComponent<Props, State> {
+export class ScheduledTaskFormInternal extends React.PureComponent<Props, State> {
     state = {
         ready: false,
+        waiting: false,
         values: makeForm(),
         task: null,
         error: null
@@ -166,7 +171,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
     };
 
     _onSubmit = () => {
-        const {isNew, id, onClose, updateItem, addItem} = this.props;
+        const {isNew, id, updateItem, addItem, history} = this.props;
 
         const jsData = this.state.values.toJS();
         const data = {
@@ -181,7 +186,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
                 .update(id, data)
                 .then(
                     (script: ScheduledTaskType) => {
-                        onClose();
+                        history.push('/scheduled');
                         updateItem(script);
                     },
                     this._handleError
@@ -191,7 +196,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
                 .create(data)
                 .then(
                     (script: ScheduledTaskType) => {
-                        onClose();
+                        history.push('/scheduled');
                         addItem(script);
                     },
                     this._handleError
@@ -199,7 +204,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
         }
     };
 
-    mutateValue = (field: FormField, value: any) => {
+    mutateValue = (field: FormFieldKey, value: any) => {
         this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
@@ -207,9 +212,9 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
         });
     };
 
-    _setTextValue = (field: FormField) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
+    _setTextValue = (field: FormFieldKey) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
 
-    _setObjectValue = (field: FormField) => (value: any) => this.mutateValue(field, value);
+    _setObjectValue = (field: FormFieldKey) => (value: any) => this.mutateValue(field, value);
 
     _toggleTransitionOption2 = (e: SyntheticEvent<HTMLInputElement>) => {
         const option = e.currentTarget.value;
@@ -228,7 +233,7 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
         }
     };
 
-    _renderField = (fieldName: (FormField | 'workflowAction'), e: *): Node => {
+    _renderField = (fieldName: (FormFieldKey | 'workflowAction'), e: *): Node => {
         const {values} = this.state;
         let error: * = e;
 
@@ -294,13 +299,13 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
                             label={FieldMessages.issueJql}
                             isRequired={true}
 
+                            isInvalid={errorField === fieldName}
+                            invalidMessage={errorField === fieldName ? errorMessage : ''}
+
                             shouldFitContainer={true}
 
                             value={values.get(fieldName) || ''}
                             onChange={this._setTextValue(fieldName)}
-
-                            isInvalid={errorField === fieldName}
-                            invalidMessage={errorField === fieldName ? errorMessage : ''}
                         />
                         <div className="ak-description">
                             <WarningIcon size="small" label="" primaryColor={colors.Y300}/>
@@ -308,13 +313,12 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
                             {ScheduledTaskMessages.jqlLimitDescription('1000') /*todo: insert value from config when its configurable*/}
                         </div>
                         {['ISSUE_JQL_SCRIPT', 'DOCUMENT_ISSUE_JQL_SCRIPT'].includes(values.get('type')) &&
-                        <div className="ak-description">
-                            <WarningIcon size="small" label="" primaryColor={colors.Y300}/>
-                            {' '}
-                            {ScheduledTaskMessages.jqlScriptDescription}
-                        </div>
+                            <div className="ak-description">
+                                <WarningIcon size="small" label="" primaryColor={colors.Y300}/>
+                                {' '}
+                                {ScheduledTaskMessages.jqlScriptDescription}
+                            </div>
                         }
-                        {errorField === fieldName && <FieldError error={errorMessage}/>}
                     </div>
                 );
             }
@@ -387,8 +391,8 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
     };
 
     render() {
-        const {onClose, isNew} = this.props;
-        const {ready, values, task, error} = this.state;
+        const {isNew} = this.props;
+        const {ready, waiting, values, task, error} = this.state;
 
         let body: Node = null;
 
@@ -409,44 +413,54 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
                 <div className="flex-column">
                     {error && !errorField && <ErrorMessage title={errorMessage}/>}
 
-                    <FieldTextStateless
-                        shouldFitContainer={true}
-                        required={true}
+                    <FormField
+                        label={FieldMessages.name}
+                        isRequired={true}
 
                         isInvalid={errorField === 'name'}
                         invalidMessage={errorField === 'name' ? errorMessage : null}
+                    >
+                        <FieldTextStateless
+                            shouldFitContainer={true}
 
-                        label={FieldMessages.name}
-                        value={values.get('name') || ''}
-                        onChange={this._setTextValue('name')}
-                    />
+                            value={values.get('name') || ''}
+                            onChange={this._setTextValue('name')}
+                        />
+                    </FormField>
 
-                    <FieldTextAreaStateless
-                        shouldFitContainer={true}
-                        minimumRows={5}
+                    <FormField
+                        label={FieldMessages.description}
 
                         isInvalid={errorField === 'description'}
                         invalidMessage={errorField === 'description' ? errorMessage : null}
+                    >
+                        <FieldTextAreaStateless
+                            shouldFitContainer={true}
+                            minimumRows={5}
 
-                        label={FieldMessages.description}
-                        value={values.get('description') || ''}
-                        onChange={this._setTextValue('description')}
-                    />
+                            value={values.get('description') || ''}
+                            onChange={this._setTextValue('description')}
+                        />
+                    </FormField>
 
-                    <FieldTextStateless
-                        shouldFitContainer={true}
-                        required={true}
+                    <FormField
+                        label={FieldMessages.schedule}
+                        isRequired={true}
 
                         isInvalid={errorField === 'scheduleExpression'}
                         invalidMessage={errorField === 'scheduleExpression' ? errorMessage : null}
 
-                        label={FieldMessages.schedule}
-                        value={values.get('scheduleExpression') || ''}
-                        onChange={this._setTextValue('scheduleExpression')}
-                    />
-                    <div className="ak-description">
-                        {ScheduledTaskMessages.scheduleDescription}
-                    </div>
+                        helperText={ScheduledTaskMessages.scheduleDescription}
+                    >
+                        <FieldTextStateless
+                            shouldFitContainer={true}
+                            required={true}
+
+
+                            value={values.get('scheduleExpression') || ''}
+                            onChange={this._setTextValue('scheduleExpression')}
+                        />
+                    </FormField>
 
                     <AsyncPicker
                         label={ScheduledTaskMessages.runAs}
@@ -477,42 +491,76 @@ export class ScheduledTaskDialogInternal extends React.PureComponent<Props, Stat
                     {errorField === 'type' && <FieldError error={errorMessage}/>}
 
                     {currentType && types[currentType].fields.map(field => this._renderField(field, error))}
-                    <FieldTextAreaStateless
-                        shouldFitContainer={true}
-                        required={!isNew}
+
+                    <FormField
+                        label={FieldMessages.comment}
+                        isRequired={!isNew}
 
                         isInvalid={errorField === 'comment'}
                         invalidMessage={errorField === 'comment' ? errorMessage : null}
+                    >
+                        <FieldTextAreaStateless
+                            shouldFitContainer={true}
 
-                        label={FieldMessages.comment}
-                        value={values.get('comment') || ''}
-                        onChange={this._setTextValue('comment')}
-                    />
+
+                            value={values.get('comment') || ''}
+                            onChange={this._setTextValue('comment')}
+                        />
+                    </FormField>
+
+                    <div style={{marginTop: '10px'}}>
+                        <ButtonGroup>
+                            <Button
+                                appearance="primary"
+                                isLoading={waiting}
+
+                                onClick={this._onSubmit}
+                            >
+                                {isNew ? CommonMessages.create : CommonMessages.update}
+                            </Button>
+                            <Button
+                                appearance="link"
+
+                                isDisabled={waiting}
+
+                                component={RouterLink}
+                                href="/scheduled/"
+                            >
+                                {CommonMessages.cancel}
+                            </Button>
+                        </ButtonGroup>
+                    </div>
                 </div>;
         }
 
-        return <ModalDialog
-            width="x-large"
-            scrollBehavior="outside"
-
-            isHeadingMultiline={false}
-            heading={isNew ? ScheduledTaskMessages.addTask : `${ScheduledTaskMessages.editTask}: ${task ? task.name : ''}`}
-
-            onClose={onClose}
-            actions={[
-                {
-                    text: isNew ? CommonMessages.create : CommonMessages.update,
-                    onClick: this._onSubmit,
-                },
-                {
-                    text: CommonMessages.cancel,
-                    onClick: onClose,
-                }
-            ]}
-        >
-            {body}
-        </ModalDialog>;
+        return (
+            <Page>
+                <PageHeader
+                    breadcrumbs={
+                        <Breadcrumbs>
+                            {withRoot([
+                                <BreadcrumbsItem
+                                    key="parent"
+                                    text="Scheduled tasks"
+                                    href="/scheduled"
+                                    component={RouterLink}
+                                />,
+                                !isNew && task ? <BreadcrumbsItem
+                                    key="task"
+                                    text={task.name}
+                                    href={`/scheduled/${task.id}/view`}
+                                    component={RouterLink}
+                                /> : null
+                            ])}
+                        </Breadcrumbs>
+                    }
+                >
+                    {isNew ? ScheduledTaskMessages.addTask : `${ScheduledTaskMessages.editTask}: ${task ? task.name : ''}`}
+                </PageHeader>
+                {body}
+            </Page>
+        );
     }
 }
 
-export const ScheduledTaskDialog = connect(() => ({}), { updateItem, addItem })(ScheduledTaskDialogInternal);
+export const ScheduledTaskForm = withRouter(connect(() => ({}), { updateItem, addItem })(ScheduledTaskFormInternal));

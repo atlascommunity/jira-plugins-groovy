@@ -6,6 +6,7 @@ import {Provider} from 'react-redux';
 import {Switch, Route} from 'react-router-dom';
 
 import {ScheduledTask} from './ScheduledTask';
+import {ScheduledTaskForm} from './ScheduledTaskForm';
 
 import {scheduledTaskService, watcherService} from '../service/services';
 
@@ -53,6 +54,16 @@ export class ScheduledRoute extends React.PureComponent<{}> {
                                         }
                                     }}
                                 />
+                            }
+                        </Route>
+                        <Route path="/scheduled/create" exact={true}>
+                            {() =>
+                                <ScheduledTaskForm id={null} isNew={true}/>
+                            }
+                        </Route>
+                        <Route path="/scheduled/:id/edit" exact={true}>
+                            {({match}) =>
+                                <ScheduledTaskForm id={parseInt(match.params.id, 10)} isNew={false}/>
                             }
                         </Route>
                         <Route path="/scheduled/:id/view" exact={true}>

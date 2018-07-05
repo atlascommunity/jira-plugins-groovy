@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import memoizeOne from 'memoize-one';
 
 import Avatar from '@atlaskit/avatar';
+import Button from '@atlaskit/button';
 import Lozenge from '@atlaskit/lozenge';
 import InlineDialog from '@atlaskit/inline-dialog';
 import {ToggleStateless} from '@atlaskit/toggle';
@@ -15,6 +16,7 @@ import type {Appearances} from '@atlaskit/lozenge/dist/cjs/Lozenge/index';
 
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 import InfoIcon from '@atlaskit/icon/glyph/info';
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import {RunNowDialog} from './RunNowDialog';
 import {types} from './types';
@@ -80,8 +82,6 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
         showStatusInfo: false,
         showRunDialog: false
     };
-
-    _edit = () => this.props.onEdit && this.props.onEdit(this.props.script.id);
 
     _delete = () => this.props.onDelete && this.props.onDelete(
         this.props.script.id,
@@ -247,7 +247,6 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
 
                 script={scriptObject}
                 title={titleEl}
-                onEdit={this._edit}
                 onDelete={this._delete}
 
                 dropdownItems={[
@@ -260,6 +259,17 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                         label: ScheduledTaskMessages.runNow,
                         onClick: this._toggleRunNow
                     }
+                ]}
+
+                additionalButtons={[
+                    <Button
+                        key="edit"
+                        appearance="subtle"
+                        iconBefore={<EditFilledIcon label=""/>}
+
+                        component={RouterLink}
+                        href={`/scheduled/${script.id}/edit`}
+                    />
                 ]}
             >
                 {script.type === 'ISSUE_JQL_TRANSITION' && script.description &&

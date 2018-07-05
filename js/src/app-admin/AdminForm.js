@@ -6,14 +6,14 @@ import {withRouter} from 'react-router-dom';
 
 import type {AdminScriptType} from './types';
 
-import {makeScriptForm, type SubmitResult} from '../common/script-list/ScriptDialog';
 import {addItem, updateItem} from '../common/redux';
 import {adminScriptService} from '../service/services';
 
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {ReturnTypes} from '../common/bindings';
-import {ScriptForm} from '../common/script-list/ScriptForm';
-import type {ProvidedState} from '../common/script-list/ScriptDialog';
+import {ScriptForm, makeScriptForm, type SubmitResult} from '../common/script-list/ScriptForm';
+
+import type {ProvidedState} from '../common/script-list/ScriptForm';
 import type {DialogComponentProps} from '../common/script-list/types';
 
 

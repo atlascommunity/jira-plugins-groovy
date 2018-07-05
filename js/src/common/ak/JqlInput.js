@@ -9,6 +9,8 @@ import {colors} from '@atlaskit/theme';
 
 import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
 
+import {FormField} from './FormField';
+
 import {jiraService} from '../../service/services';
 import {CommonMessages} from '../../i18n/common.i18n';
 
@@ -83,28 +85,33 @@ export class JqlInput extends React.Component<JqlInputProps, JqlInputState> {
     }
 
     render() {
-        const {value, onChange, isInvalid, invalidMessage, ...props} = this.props;
+        const {label, isRequired, value, onChange, isInvalid, invalidMessage, ...props} = this.props;
         const {issues, validating} = this.state;
 
         let invalid: boolean = isInvalid || false;
         let invalidMsg: ?Node = invalidMessage;
 
-        if (this.state.isInvalid !== null && this.state.isInvalid !== undefined) {
+        if (this.state.isInvalid) {
             invalid = this.state.isInvalid;
             invalidMsg = this.state.invalidMessage;
         }
 
         return (
             <div>
-                <FieldTextAreaStateless
-                    {...props}
+                <FormField
+                    label={label || ''}
+                    isRequired={isRequired}
 
                     isInvalid={invalid}
                     invalidMessage={invalidMsg}
+                >
+                    <FieldTextAreaStateless
+                        {...props}
 
-                    value={value}
-                    onChange={onChange}
-                />
+                        value={value}
+                        onChange={onChange}
+                    />
+                </FormField>
                 {validating &&
                     <div className="ak-description">
                         <Spinner size="small"/>

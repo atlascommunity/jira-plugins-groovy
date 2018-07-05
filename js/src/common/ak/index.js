@@ -8,6 +8,7 @@ export {FieldError} from './FieldError';
 export {RouterLink} from './RouterLink';
 export {StaticField} from './StaticField';
 export {ErrorMessage, InfoMessage, SuccessMessage} from './messages';
+export {JqlInput} from './JqlInput';
 
 export {AsyncPicker} from './AsyncPicker';
 export {MultiSelect} from './MultiSelect';
