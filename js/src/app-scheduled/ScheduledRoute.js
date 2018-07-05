@@ -1,5 +1,5 @@
 //@flow
-import React, {type ComponentType} from 'react';
+import React from 'react';
 
 import {combineReducers, createStore} from 'redux';
 import {Provider} from 'react-redux';
@@ -10,14 +10,13 @@ import {ScheduledTask} from './ScheduledTask';
 import {scheduledTaskService, watcherService} from '../service/services';
 
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
-import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
-import {withRoot} from '../common/script-list/breadcrumbs';
+import {ConnectedScriptPage, NotFoundPage, ItemViewPage} from '../common/script-list';
+import {Loader} from '../common/ak';
 
-import './ScheduledTaskRegistry.less';
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
-import {NotFoundPage} from '../common/script-list/NotFoundPage';
-import {Loader} from '../common/ak/Loader';
+
+import './ScheduledTaskRegistry.less';
 
 
 export class ScheduledRoute extends React.PureComponent<{}> {
@@ -43,9 +42,7 @@ export class ScheduledRoute extends React.PureComponent<{}> {
                         <Route path="/scheduled/" exact={true}>
                             {() =>
                                 <ConnectedScriptPage
-                                    DialogComponent={(ScheduledTaskDialog: ComponentType<FullDialogComponentProps>)}
                                     ScriptComponent={ScheduledTask}
-                                    breadcrumbs={withRoot([])}
                                     i18n={{
                                         title: TitleMessages.scheduled,
                                         addItem: ScheduledTaskMessages.addTask,

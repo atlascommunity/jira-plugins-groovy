@@ -65,7 +65,6 @@ export class AdminRoute extends React.PureComponent<{}> {
                                             {RegistryMessages.addScript}
                                         </Button>
                                     }
-                                    breadcrumbs={withRoot([])}
                                 />
                             }
                         </Route>

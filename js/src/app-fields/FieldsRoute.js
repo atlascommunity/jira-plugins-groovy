@@ -55,7 +55,6 @@ export class FieldsRoute extends React.PureComponent<{}> {
                                             areYouSure: () => ''
                                         }
                                     }}
-                                    breadcrumbs={withRoot([])}
                                 />
                             }
                         </Route>

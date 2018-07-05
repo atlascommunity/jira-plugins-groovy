@@ -78,7 +78,6 @@ export class ListenersRoute extends React.PureComponent<{}> {
                             {() =>
                                 <ConnectedScriptPage
                                     ScriptComponent={Listener}
-                                    breadcrumbs={withRoot([])}
                                     i18n={{
                                         addItem: ListenerMessages.addListener,
                                         noItems: ListenerMessages.noListeners,

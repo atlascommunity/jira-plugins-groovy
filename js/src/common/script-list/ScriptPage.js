@@ -7,10 +7,11 @@ import Breadcrumbs from '@atlaskit/breadcrumbs';
 
 import {ScriptList} from './ScriptList';
 
-import type {ScriptComponentProps, I18nType, BreadcrumbsType} from './types';
-
-import type {DeleteDialogProps} from './DeleteDialog';
+import {withRoot} from './breadcrumbs';
 import {ConnectedDeleteDialog} from './DeleteDialog';
+
+import type {ScriptComponentProps, I18nType} from './types';
+import type {DeleteDialogProps} from './DeleteDialog';
 
 import type {ItemType} from '../redux';
 
@@ -21,7 +22,6 @@ type Props<T> = {|
     items: Array<T>,
 
     ScriptComponent: ComponentType<ScriptComponentProps<T>>,
-    breadcrumbs?: BreadcrumbsType,
 
     actions?: Element<any>,
 |};
@@ -41,14 +41,14 @@ export class ScriptPage<T: ItemType> extends React.PureComponent<Props<T>, State
     _closeDelete = () => this.setState({ deleteProps: null });
 
     render() {
-        const {isReady, items, i18n, ScriptComponent, actions, breadcrumbs} = this.props;
+        const {isReady, items, i18n, ScriptComponent, actions} = this.props;
         const {deleteProps} = this.state;
 
         return (
             <Page>
                 <PageHeader
                     actions={actions}
-                    breadcrumbs={breadcrumbs && <Breadcrumbs>{breadcrumbs}</Breadcrumbs>}
+                    breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
                 >
                     {i18n.title}
                 </PageHeader>

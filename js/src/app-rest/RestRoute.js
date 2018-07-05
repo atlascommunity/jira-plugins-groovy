@@ -43,7 +43,6 @@ export class RestRoute extends React.PureComponent<{}> {
                             {() =>
                                 <ConnectedScriptPage
                                     ScriptComponent={RestScript}
-                                    breadcrumbs={withRoot([])}
                                     i18n={{
                                         title: TitleMessages.rest,
                                         addItem: RestMessages.addScript,
