@@ -5,15 +5,12 @@ import {combineReducers, createStore} from 'redux';
 import {Provider} from 'react-redux';
 import {Switch, Route} from 'react-router-dom';
 
-import {ScheduledTaskDialog} from './ScheduledTaskDialog';
 import {ScheduledTask} from './ScheduledTask';
-import {ViewScheduledTask} from './ViewScheduledTask';
 
 import {scheduledTaskService, watcherService} from '../service/services';
 
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
-import type {FullDialogComponentProps} from '../common/script-list/types';
 import {withRoot} from '../common/script-list/breadcrumbs';
 
 import './ScheduledTaskRegistry.less';
@@ -63,7 +60,17 @@ export class ScheduledRoute extends React.PureComponent<{}> {
                         </Route>
                         <Route path="/scheduled/:id/view" exact={true}>
                             {({match}) =>
-                                <ViewScheduledTask id={parseInt(match.params.id, 10)}/>
+                                <ItemViewPage
+                                    id={parseInt(match.params.id, 10)}
+
+                                    ScriptComponent={ScheduledTask}
+                                    deleteCallback={scheduledTaskService.doDelete}
+                                    i18n={{
+                                        deleteDialogTitle: ScheduledTaskMessages.deleteTask,
+                                        parentName: 'Scheduled tasks'
+                                    }}
+                                    parentLocation="/scheduled/"
+                                />
                             }
                         </Route>
                         <Route component={NotFoundPage}/>
