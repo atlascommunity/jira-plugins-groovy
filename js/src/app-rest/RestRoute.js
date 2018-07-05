@@ -1,18 +1,17 @@
 //@flow
-import React, {type ComponentType} from 'react';
+import React from 'react';
 
 import {combineReducers, createStore} from 'redux';
 import {Provider} from 'react-redux';
 import {Switch, Route} from 'react-router-dom';
 
 import {RestScript} from './RestScript';
-import {RestScriptDialog} from './RestScriptDialog';
+import {RestForm} from './RestForm';
 
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RestMessages} from '../i18n/rest.i18n';
 
 import {withRoot, NotFoundPage, ConnectedScriptPage, ItemViewPage} from '../common/script-list';
-import type {FullDialogComponentProps} from '../common/script-list/types';
 
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {watcherService, restService} from '../service/services';
@@ -43,7 +42,6 @@ export class RestRoute extends React.PureComponent<{}> {
                         <Route path="/rest/" exact={true}>
                             {() =>
                                 <ConnectedScriptPage
-                                    DialogComponent={(RestScriptDialog: ComponentType<FullDialogComponentProps>)}
                                     ScriptComponent={RestScript}
                                     breadcrumbs={withRoot([])}
                                     i18n={{
@@ -56,6 +54,11 @@ export class RestRoute extends React.PureComponent<{}> {
                                         }
                                     }}
                                 />
+                            }
+                        </Route>
+                        <Route path="/rest/:id/edit" exact={true}>
+                            {({match}) =>
+                                <RestForm isNew={false} id={parseInt(match.params.id, 10)}/>
                             }
                         </Route>
                         <Route path="/rest/:id/view" exact={true}>

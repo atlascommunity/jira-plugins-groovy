@@ -2,10 +2,14 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
+import {withRouter} from 'react-router-dom';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
-import ModalDialog from '@atlaskit/modal-dialog';
+import Button, {ButtonGroup} from '@atlaskit/button';
+import Page from '@atlaskit/page';
+import PageHeader from '@atlaskit/page-header';
+import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 
@@ -14,17 +18,16 @@ import type {RestScriptType} from './types';
 import {RestMessages} from '../i18n/rest.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 
+import {MultiSelect, AsyncPicker, EditorField, FormField, ErrorMessage, RouterLink} from '../common/ak';
+import {withRoot} from '../common/script-list';
+
 import {restService} from '../service/services';
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
-import {MultiSelect} from '../common/ak/MultiSelect';
-import {EditorField} from '../common/ak/EditorField';
-import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
-import {ErrorMessage} from '../common/ak/messages';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {addItem, updateItem} from '../common/redux';
-import type {FullDialogComponentProps} from '../common/script-list/types';
+import type {DialogComponentProps} from '../common/script-list/types';
 import type {HttpMethod} from '../common/types';
 import type {OldSelectItem, SingleValueType} from '../common/ak/types';
 import type {InputEvent} from '../common/EventTypes';
@@ -65,7 +68,7 @@ type Form = {
     groups: $ReadOnlyArray<SingleValueType>
 };
 
-type FormField = $Keys<Form>;
+type FormFieldKey = $Keys<Form>;
 
 const makeForm: RecordFactory<Form> = Record({
     name: '',
@@ -76,21 +79,24 @@ const makeForm: RecordFactory<Form> = Record({
     groups: []
 });
 
-type Props = FullDialogComponentProps & {
+type Props = DialogComponentProps & {
     updateItem: typeof updateItem,
-    addItem: typeof addItem
+    addItem: typeof addItem,
+    history: any
 };
 
 type State = {
     ready: boolean,
+    waiting: boolean,
     values: RecordOf<Form>,
     error: *,
     script: ?RestScriptType
 };
 
-export class RestScriptDialogInternal extends React.Component<Props, State> {
+export class RestFormInternal extends React.Component<Props, State> {
     state = {
         ready: false,
+        waiting: false,
         values: makeForm(),
         error: null,
         script: null
@@ -159,7 +165,7 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
     };
 
     _onSubmit = () => {
-        const {isNew, id, onClose} = this.props;
+        const {isNew, id, history} = this.props;
 
         const {groups, ...data}: any = this.state.values.toJS();
         data.groups = groups ? groups.map(group => group.value) : [];
@@ -169,7 +175,7 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
                 .updateScript(id, data)
                 .then(
                     (script: RestScriptType) => {
-                        onClose();
+                        history.push('/rest/');
                         this.props.updateItem(script);
                     },
                     this._handleError
@@ -179,7 +185,7 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
                 .createScript(data)
                 .then(
                     (script: RestScriptType) => {
-                        onClose();
+                        history.push('/rest/');
                         this.props.addItem(script);
                     },
                     this._handleError
@@ -187,7 +193,7 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
         }
     };
 
-    mutateValue = (field: FormField, value: any) => {
+    mutateValue = (field: FormFieldKey, value: any) => {
         this.setState((state: State): * => {
             return {
                 values: state.values.set(field, value)
@@ -195,13 +201,13 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
         });
     };
 
-    _setTextValue = (field: FormField) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
+    _setTextValue = (field: FormFieldKey) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
 
-    _setObjectValue = (field: FormField) => (value: any) => this.mutateValue(field, value);
+    _setObjectValue = (field: FormFieldKey) => (value: any) => this.mutateValue(field, value);
 
     render() {
-        const {onClose, isNew} = this.props;
-        const {ready, values, script, error} = this.state;
+        const {isNew} = this.props;
+        const {ready, waiting, values, script, error} = this.state;
 
         let body: ?Node = null;
 
@@ -226,34 +232,41 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
                 errorField = error.field;
             }
 
-            body =
+            body = (
                 <div className="flex-column">
                     {error && !errorField && <ErrorMessage title={errorMessage}/>}
 
-                    <FieldTextStateless
-                        shouldFitContainer={true}
-                        required={true}
+                    <FormField
+                        label={FieldMessages.name}
+                        isRequired={true}
 
                         isInvalid={errorField === 'name'}
                         invalidMessage={errorField === 'name' ? errorMessage : null}
 
-                        label={FieldMessages.name}
-                        value={values.get('name') || ''}
-                        onChange={this._setTextValue('name')}
-                    />
-                    <div className="ak-description">{RestMessages.nameDescription}</div>
+                        helperText={RestMessages.nameDescription}
+                    >
+                        <FieldTextStateless
+                            shouldFitContainer={true}
 
-                    <FieldTextAreaStateless
-                        shouldFitContainer={true}
-                        minimumRows={5}
+                            value={values.get('name') || ''}
+                            onChange={this._setTextValue('name')}
+                        />
+                    </FormField>
+
+                    <FormField
+                        label={FieldMessages.description}
 
                         isInvalid={errorField === 'description'}
                         invalidMessage={errorField === 'description' ? errorMessage : null}
+                    >
+                        <FieldTextAreaStateless
+                            shouldFitContainer={true}
+                            minimumRows={5}
 
-                        label={FieldMessages.description}
-                        value={values.get('description') || ''}
-                        onChange={this._setTextValue('description')}
-                    />
+                            value={values.get('description') || ''}
+                            onChange={this._setTextValue('description')}
+                        />
+                    </FormField>
 
                     <MultiSelect
                         label={FieldMessages.httpMethods}
@@ -279,59 +292,101 @@ export class RestScriptDialogInternal extends React.Component<Props, State> {
                         invalidMessage={errorField === 'groups' ? errorMessage : ''}
                     />
 
-                    <EditorField
+                    <FormField
                         label={FieldMessages.scriptCode}
                         isRequired={true}
 
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
-                        markers={markers}
+                    >
+                        <EditorField
+                            markers={markers}
+                            bindings={bindings}
+                            returnTypes={returnTypes}
 
-                        bindings={bindings}
-                        returnTypes={returnTypes}
+                            value={values.get('scriptBody') || ''}
+                            onChange={this._setObjectValue('scriptBody')}
+                        />
+                    </FormField>
 
-                        value={values.get('scriptBody') || ''}
-                        onChange={this._setObjectValue('scriptBody')}
-                    />
-                    <FieldTextAreaStateless
-                        shouldFitContainer={true}
-                        required={!isNew}
+                    <FormField
+                        label={FieldMessages.comment}
+                        isRequired={!isNew}
 
                         isInvalid={errorField === 'comment'}
                         invalidMessage={errorField === 'comment' ? errorMessage : null}
+                    >
+                        <FieldTextAreaStateless
+                            shouldFitContainer={true}
 
-                        label={FieldMessages.comment}
-                        value={values.get('comment') || ''}
-                        onChange={this._setTextValue('comment')}
-                    />
-                </div>;
+                            value={values.get('comment') || ''}
+                            onChange={this._setTextValue('comment')}
+                        />
+                    </FormField>
+
+                    <div style={{marginTop: '10px'}}>
+                        <ButtonGroup>
+                            <Button
+                                appearance="primary"
+                                isLoading={waiting}
+
+                                onClick={this._onSubmit}
+                            >
+                                {isNew ? CommonMessages.create : CommonMessages.update}
+                            </Button>
+                            <Button
+                                appearance="link"
+
+                                isDisabled={waiting}
+
+                                component={RouterLink}
+                                href="/rest/"
+                            >
+                                {CommonMessages.cancel}
+                            </Button>
+                        </ButtonGroup>
+                    </div>
+                </div>
+            );
         }
 
-        return <ModalDialog
-            width="x-large"
-            scrollBehavior="outside"
-
-            isHeadingMultiline={false}
-            heading={isNew ? RegistryMessages.addScript : `${RegistryMessages.editScript}: ${script ? script.name : ''}`}
-
-            onClose={onClose}
-            actions={[
-                {
-                    text: isNew ? CommonMessages.create : CommonMessages.update,
-                    onClick: this._onSubmit,
-                },
-                {
-                    text: CommonMessages.cancel,
-                    onClick: onClose,
-                }
-            ]}
-        >
-            {body}
-        </ModalDialog>;
+        return (
+            <Page>
+                <PageHeader
+                    breadcrumbs={
+                        <Breadcrumbs>
+                            {withRoot([
+                                <BreadcrumbsItem
+                                    key="parent"
+                                    text="REST scripts"
+                                    href="/rest"
+                                    component={RouterLink}
+                                />,
+                                !isNew && script ? <BreadcrumbsItem
+                                    key="script"
+                                    text={script.name}
+                                    href={`/rest/${script.id}/view`}
+                                    component={RouterLink}
+                                /> : null
+                            ])}
+                        </Breadcrumbs>
+                    }
+                >
+                    {isNew ?
+                        RegistryMessages.addScript:
+                        `${RegistryMessages.editScript}: ${script ? script.name : ''}`
+                    }
+                </PageHeader>
+                {body}
+            </Page>
+        );
     }
 }
 
-export const RestScriptDialog = connect(
-    () => ({}),
-    { addItem, updateItem }
-)(RestScriptDialogInternal);
+export const RestForm = withRouter(
+    connect(
+        null,
+        { addItem, updateItem }
+    )(RestFormInternal)
+);
+

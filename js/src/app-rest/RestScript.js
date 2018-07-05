@@ -5,6 +5,10 @@ import {connect} from 'react-redux';
 
 import memoizeOne from 'memoize-one';
 
+import Button from '@atlaskit/button';
+
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
+
 import type {RestScriptType} from './types';
 
 import {ScriptParameters} from '../common/script';
@@ -18,9 +22,9 @@ import {WatchActionCreators} from '../common/redux';
 import {restService} from '../service/services';
 
 import {WatchableScript} from '../common/script/WatchableScript';
+import {RouterLink} from '../common/ak/RouterLink';
 
 import type {ScriptComponentProps} from '../common/script-list/types';
-import {RouterLink} from '../common/ak/RouterLink';
 
 
 const ConnectedWatchableScript = connect(
@@ -40,8 +44,6 @@ export class RestScript extends React.PureComponent<Props> {
     static defaultProps = {
         collapsible: true
     };
-
-    _onEdit = () => this.props.onEdit && this.props.onEdit(this.props.script.id);
 
     _delete = () => this.props.onDelete && this.props.onDelete(
         this.props.script.id,
@@ -72,7 +74,6 @@ export class RestScript extends React.PureComponent<Props> {
                 withChangelog={true}
                 collapsible={collapsible}
 
-                onEdit={this._onEdit}
                 onDelete={this._delete}
 
                 dropdownItems={[
@@ -81,6 +82,17 @@ export class RestScript extends React.PureComponent<Props> {
                         href: `/rest/${script.id}/view`,
                         linkComponent: RouterLink
                     }
+                ]}
+
+                additionalButtons={[
+                    <Button
+                        key="edit"
+                        appearance="subtle"
+                        iconBefore={<EditFilledIcon label=""/>}
+
+                        component={RouterLink}
+                        href={`/rest/${script.id}/edit`}
+                    />
                 ]}
             >
                 <ScriptParameters

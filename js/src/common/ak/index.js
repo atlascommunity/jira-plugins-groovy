@@ -10,4 +10,5 @@ export {StaticField} from './StaticField';
 export {ErrorMessage, InfoMessage, SuccessMessage} from './messages';
 
 export {AsyncPicker} from './AsyncPicker';
+export {MultiSelect} from './MultiSelect';
 export {AsyncLoadingMultiSelect} from './AsyncLoadingMultiSelect';

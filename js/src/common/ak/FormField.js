@@ -12,7 +12,9 @@ type Props = {|
     isInvalid?: boolean,
     invalidMessage?: Node,
 
-    children: Node
+    children: Node,
+
+    helperText?: string
 |};
 
 export class FormField extends React.PureComponent<Props> {
