@@ -92,7 +92,8 @@ export class AuditLog extends React.Component<Props, State> {
         },
         filter: {
             users: [],
-            categories: []
+            categories: [],
+            actions: []
         }
     };
 
@@ -141,7 +142,7 @@ export class AuditLog extends React.Component<Props, State> {
         });
 
         auditLogService
-            .getAuditLogPage(offset, filter.users.map(it => it.value), filter.categories)
+            .getAuditLogPage(offset, filter.users.map(it => it.value), filter.categories, filter.actions)
             .then(data => this.setState({
                 data,
                 rows: data.values.map((value: AuditLogEntry): RowType => {

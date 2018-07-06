@@ -12,7 +12,7 @@ import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 import ArrowRightCircleIcon from '@atlaskit/icon/glyph/arrow-right-circle';
 import UndoIcon from '@atlaskit/icon/glyph/undo';
 
-import type {EntityAction} from './types';
+import type {EntityAction} from '../common/types';
 
 
 type Props = {

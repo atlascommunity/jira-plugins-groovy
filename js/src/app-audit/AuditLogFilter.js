@@ -14,12 +14,12 @@ import type {AuditLogFilterType} from './types';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
-import {entityTypes} from '../common/types';
+import {entityTypes, entityActions} from '../common/types';
 import {CommonMessages} from '../i18n/common.i18n';
 
 
 type State = {
-    activeEl: null | 'users' | 'categories'
+    activeEl: null | 'users' | 'categories' | 'actions'
 };
 
 type Props = {
@@ -41,6 +41,16 @@ export class AuditLogFilter extends React.PureComponent<Props, State> {
             this._updateField('categories', [])(categories.filter(it => it !== type));
         } else {
             this._updateField('categories', [])([...categories, type]);
+        }
+    });
+
+    _toggleAction = memoize(action => () => {
+        const {actions} = this.props.value;
+
+        if (actions.includes(action)) {
+            this._updateField('actions', [])(actions.filter(it => it !== action));
+        } else {
+            this._updateField('actions', [])([...actions, action]);
         }
     });
 
@@ -102,6 +112,30 @@ export class AuditLogFilter extends React.PureComponent<Props, State> {
                                 isSelected={value.categories.includes(type)}
                             >
                                 {CategoryNameMessages[type]}
+                            </DropdownItemCheckbox>
+                        )}
+                    </DropdownItemGroupCheckbox>
+                </DropdownMenuStateless>
+                <DropdownMenuStateless
+                    trigger={
+                        <Fragment>
+                            {AuditMessages.action}{' '}
+                            {value.actions.length ? <strong>{'('}{value.actions.length}{')'}</strong> : `(${CommonMessages.all})`}
+                        </Fragment>
+                    }
+                    triggerType="button"
+
+                    isOpen={activeEl === 'actions'}
+                    onOpenChange={this._toggleOpen('actions')}
+                >
+                    <DropdownItemGroupCheckbox id="categories">
+                        {entityActions.map(action =>
+                            <DropdownItemCheckbox
+                                id={action} key={action}
+                                onClick={this._toggleAction(action)}
+                                isSelected={value.actions.includes(action)}
+                            >
+                                {action}
                             </DropdownItemCheckbox>
                         )}
                     </DropdownItemGroupCheckbox>

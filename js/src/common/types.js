@@ -12,6 +12,11 @@ export const entityTypes = [
 
 export type EntityType = 'REGISTRY_SCRIPT' | 'REGISTRY_DIRECTORY' | 'LISTENER' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK' | 'ADMIN_SCRIPT';
 
+export const entityActions = ['CREATED', 'UPDATED', 'DELETED', 'RESTORED', 'ENABLED', 'DISABLED', 'MOVED'];
+
+export type EntityAction = 'CREATED' | 'UPDATED' | 'DELETED' | 'RESTORED' | 'ENABLED' | 'DISABLED' | 'MOVED';
+
+
 export type IssueEventType = {
     id: number,
     name: string

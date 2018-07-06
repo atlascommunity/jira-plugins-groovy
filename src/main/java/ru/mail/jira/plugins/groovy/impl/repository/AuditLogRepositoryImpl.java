@@ -65,7 +65,7 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
     }
 
     @Override
-    public Page<AuditLogEntryDto> getPagedEntries(int offset, int limit, Set<String> users, Set<EntityType> categories) {
+    public Page<AuditLogEntryDto> getPagedEntries(int offset, int limit, Set<String> users, Set<EntityType> categories, Set<EntityAction> actions) {
         return databaseAccessor.run(connection -> {
             List<Predicate> conditions = new ArrayList<>();
 
@@ -75,6 +75,10 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
 
             if (categories.size() > 0) {
                 conditions.add(AUDIT_LOG_ENTRY.CATEGORY.in(categories.stream().map(EntityType::name).collect(Collectors.toList())));
+            }
+
+            if (actions.size() > 0) {
+                conditions.add(AUDIT_LOG_ENTRY.ACTION.in(actions.stream().map(EntityAction::name).collect(Collectors.toList())));
             }
 
             Predicate[] conditionsArray = conditions.toArray(new Predicate[0]);
