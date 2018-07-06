@@ -32,7 +32,7 @@ import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n'
 import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 
 import {type EntityType} from '../common/types';
-import {InfoMessage} from '../common/ak';
+import {InfoMessage, RouterLink} from '../common/ak';
 import {withRoot} from '../common/script-list/breadcrumbs';
 
 
@@ -76,6 +76,29 @@ type State = {
     rows: Array<RowType>,
     data: AuditLogData
 };
+
+function getScriptLink(type: EntityType, id: ?number): ?string {
+    if (!id) {
+        return null;
+    }
+
+    switch(type) {
+        case 'REGISTRY_SCRIPT':
+            return `/registry/script/view/${id}`;
+        case 'CUSTOM_FIELD':
+            return `fields/${id}/view`;
+        case 'ADMIN_SCRIPT':
+            return `admin-scripts/${id}/view`;
+        case 'LISTENER':
+            return `listeners/${id}/view`;
+        case 'REST':
+            return `rest/${id}/view`;
+        case 'SCHEDULED_TASK':
+            return `scheduled/${id}/view`;
+        default:
+            return null;
+    }
+}
 
 export class AuditLog extends React.Component<Props, State> {
     state = {
@@ -146,6 +169,8 @@ export class AuditLog extends React.Component<Props, State> {
             .then(data => this.setState({
                 data,
                 rows: data.values.map((value: AuditLogEntry): RowType => {
+                    const link = getScriptLink(value.category, value.scriptId);
+
                     return {
                         key: value.id.toString(10),
                         cells: [
@@ -180,7 +205,7 @@ export class AuditLog extends React.Component<Props, State> {
                                             </div>
                                         }
                                         <div className={value.deleted ? 'crossed-text' : ''}>
-                                            {value.scriptName}
+                                            {link && !value.deleted ? <RouterLink href={link}>{value.scriptName}</RouterLink> : value.scriptName}
                                         </div>
                                     </div>
                                 )

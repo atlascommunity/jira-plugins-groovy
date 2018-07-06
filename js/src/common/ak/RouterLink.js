@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 
 type Props = {
     children: Node,
-    className: string,
+    className?: string,
     href: string,
     onMouseEnter?: (SyntheticEvent<any>) => void,
     onMouseLeave?: (SyntheticEvent<any>) => void,
