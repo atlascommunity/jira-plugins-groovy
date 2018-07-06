@@ -142,9 +142,9 @@
     babel-runtime "^6.26.0"
     prop-types "^15.5.10"
 
-"@atlaskit/field-text@^6.1.1":
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/@atlaskit/field-text/-/field-text-6.1.1.tgz#41d0cbe0e399f4d10e791555cfa0367bbb1ea2ec"
+"@atlaskit/field-text@^6.1.2":
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/field-text/-/field-text-6.1.2.tgz#01f7f43e833df939f86e08137eb516a328b70a06"
   dependencies:
     "@atlaskit/field-base" "^10.2.0"
     "@atlaskit/theme" "^4.0.4"
@@ -3136,7 +3136,7 @@ flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
 
-flow-bin@0.75.0:
+flow-bin@^0.75.0:
   version "0.75.0"
   resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.75.0.tgz#b96d1ee99d3b446a3226be66b4013224ce9df260"
 
