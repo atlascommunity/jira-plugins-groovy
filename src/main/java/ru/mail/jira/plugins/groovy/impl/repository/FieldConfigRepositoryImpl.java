@@ -26,7 +26,7 @@ import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.service.NotificationService;
 import ru.mail.jira.plugins.groovy.api.service.WatcherService;
-import ru.mail.jira.plugins.groovy.impl.AuditService;
+import ru.mail.jira.plugins.groovy.impl.groovy.statik.TypeUtil;
 import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
 import ru.mail.jira.plugins.groovy.util.RestFieldException;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
@@ -273,7 +273,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
     }
 
     private void validate(boolean isNew, boolean template, FieldConfigForm form) {
-        scriptService.parseScript(form.getScriptBody());
+        scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getFieldConfigTypes(form.isVelocityParamsEnabled()));
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");

@@ -17,6 +17,11 @@ public class TemplateEngineGlobalVariable implements GlobalVariable<TemplateEngi
     }
 
     @Override
+    public Class<TemplateEngine> getType() {
+        return TemplateEngine.class;
+    }
+
+    @Override
     public void dispose() throws Exception {
     }
 }

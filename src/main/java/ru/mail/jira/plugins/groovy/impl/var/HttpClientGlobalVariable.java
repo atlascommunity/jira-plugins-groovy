@@ -46,6 +46,11 @@ public class HttpClientGlobalVariable implements GlobalVariable<HttpClient> {
     }
 
     @Override
+    public Class<HttpClient> getType() {
+        return HttpClient.class;
+    }
+
+    @Override
     public void dispose() throws Exception {
         this.httpClient.close();
     }

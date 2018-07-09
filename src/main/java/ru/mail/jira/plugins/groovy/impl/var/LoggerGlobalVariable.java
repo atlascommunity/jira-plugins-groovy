@@ -12,5 +12,10 @@ public class LoggerGlobalVariable implements GlobalVariable<Logger> {
     }
 
     @Override
+    public Class<Logger> getType() {
+        return Logger.class;
+    }
+
+    @Override
     public void dispose() {}
 }

@@ -14,6 +14,7 @@ import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScript;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
+import ru.mail.jira.plugins.groovy.impl.groovy.statik.TypeUtil;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
@@ -160,11 +161,12 @@ public class FieldValueExtractor {
             Map<String, Object> bindings = new HashMap<>();
             bindings.put("issue", issue);
             bindings.put("velocityParams", velocityParams);
-            Object result = scriptService.executeScript(
+            Object result = scriptService.executeScriptStatic(
                 script.getId(),
                 script.getScriptBody(),
                 ScriptType.CUSTOM_FIELD,
-                bindings
+                bindings,
+                TypeUtil.getFieldConfigTypes(script.isWithVelocityParams())
             );
 
             if (result == null) {

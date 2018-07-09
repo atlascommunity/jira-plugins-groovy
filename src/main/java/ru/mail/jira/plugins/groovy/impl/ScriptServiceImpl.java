@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.groovy.*;
+import ru.mail.jira.plugins.groovy.impl.groovy.statik.CompileStaticExtension;
 import ru.mail.jira.plugins.groovy.impl.var.GlobalVariable;
 import ru.mail.jira.plugins.groovy.impl.var.HttpClientGlobalVariable;
 import ru.mail.jira.plugins.groovy.impl.var.LoggerGlobalVariable;
@@ -47,6 +48,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock(); //todo: remove?
     private final Map<String, ScriptClosure> globalFunctions = new HashMap<>();
     private final Map<String, GlobalVariable> globalVariables = new HashMap<>();
+    private final Map<String, Class> globalVariableTypes = new HashMap<>();
     private final ParseContextHolder parseContextHolder = new ParseContextHolder();
     private final Cache<String, CompiledScript> scriptCache = Caffeine
         .newBuilder()
@@ -73,7 +75,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         this.classLoader = classLoader;
         CompilerConfiguration config = new CompilerConfiguration()
             .addCompilationCustomizers(
-                //todo: later new ASTTransformationCustomizer(CompileStatic.class),
+                new CompileStaticExtension(parseContextHolder, this),
                 new ImportCustomizer().addStarImports("ru.mail.jira.plugins.groovy.api.script"),
                 new WithPluginGroovyExtension(parseContextHolder),
                 new LoadClassesExtension(parseContextHolder, pluginAccessor, classLoader),
@@ -92,12 +94,27 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
     @Override
     public Object executeScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> bindings) throws Exception {
-        return doExecuteScript(scriptId, scriptString, type, bindings);
+        return doExecuteScript(scriptId, scriptString, type, bindings, false, null);
+    }
+
+    @Override
+    public Object executeScriptStatic(String scriptId, String scriptString, ScriptType type, Map<String, Object> bindings, Map<String, Class> types) throws Exception {
+        return doExecuteScript(scriptId, scriptString, type, bindings, true, types);
     }
 
     @Override
     public ParseContext parseScript(String script) {
-        return parseClass(script, true).getParseContext();
+        return parseClass(script, true, false, null).getParseContext();
+    }
+
+    @Override
+    public ParseContext parseScriptStatic(String script, Map<String, Class> types) {
+        return parseClass(script, true, true, types).getParseContext();
+    }
+
+    @Override
+    public Map<String, Class> getGlobalVariableTypes() {
+        return globalVariableTypes;
     }
 
     @Override
@@ -111,7 +128,10 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         gcl.clearCache();
     }
 
-    private Object doExecuteScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> externalBindings) throws Exception {
+    private Object doExecuteScript(
+        String scriptId, String scriptString, ScriptType type, Map<String, Object> externalBindings,
+        boolean compileStatic, Map<String, Class> types
+    ) throws Exception {
         //todo: r lock
 
         logger.debug("started execution");
@@ -124,7 +144,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         }
 
         if (compiledScript == null) {
-            compiledScript = parseClass(scriptString, false);
+            compiledScript = parseClass(scriptString, false, compileStatic, types);
 
             if (scriptIdPresent) {
                 scriptCache.put(scriptId, compiledScript);
@@ -218,10 +238,12 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         }
     }
 
-    private CompiledScript parseClass(String script, boolean extended) {
+    private CompiledScript parseClass(String script, boolean extended, boolean compileStatic, Map<String, Class> types) {
         logger.debug("parsing script");
         try {
             parseContextHolder.get().setExtended(extended);
+            parseContextHolder.get().setCompileStatic(compileStatic);
+            parseContextHolder.get().setTypes(types);
 
             Class scriptClass = gcl.parseClass(script);
 
@@ -241,13 +263,17 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         pluginEventManager.register(this);
 
         for (Map.Entry<String, String> entry : globalFunctionManager.getGlobalFunctions().entrySet()) {
-            globalFunctions.put(entry.getKey(), new ScriptClosure(parseClass(entry.getValue(), false).getScriptClass()));
+            globalFunctions.put(entry.getKey(), new ScriptClosure(parseClass(entry.getValue(), false, false, null).getScriptClass()));
         }
 
         globalVariables.put("httpClient", new HttpClientGlobalVariable());
         globalVariables.put("logger", new LoggerGlobalVariable());
         globalVariables.put("log", new LoggerGlobalVariable());
         globalVariables.put("templateEngine", new TemplateEngineGlobalVariable(gcl));
+
+        globalVariables.forEach((key, var) -> {
+            globalVariableTypes.put(key, var.getType());
+        });
     }
 
     @Override
@@ -278,5 +304,6 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         }
 
         globalVariables.clear();
+        globalVariableTypes.clear();
     }
 }
