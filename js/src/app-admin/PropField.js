@@ -3,8 +3,7 @@ import React from 'react';
 
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
-import {ToggleStateless} from '@atlaskit/toggle';
-import {Label} from '@atlaskit/field-base';
+import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
 
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {EditorField} from '../common/ak/EditorField';
@@ -12,6 +11,7 @@ import {EditorField} from '../common/ak/EditorField';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 
 import type {SingleValueType} from '../common/ak/types';
+import {gridSize} from '@atlaskit/theme/dist/cjs/index';
 
 
 type SingleValueTypesEnum = 'USER' | 'GROUP' | 'CUSTOM_FIELD' | 'RESOLUTION';
@@ -37,10 +37,7 @@ type Props = (CommonProps & {
 
 //todo: fix flow type issues
 export class PropField extends React.PureComponent<Props> {
-    _toggleCallback = (e: Event) => {
-        //$FlowFixMe todo: use different event type when it's changed in @atlaskit/toggle
-        this.props.onChange(e.currentTarget.checked);
-    };
+    _toggleCallback = (e: SyntheticEvent<HTMLInputElement>) => this.props.onChange(e.currentTarget.checked);
 
     _textCallback = (e: SyntheticEvent<HTMLInputElement|HTMLTextAreaElement>) => this.props.onChange(e.currentTarget.value);
 
@@ -146,19 +143,22 @@ export class PropField extends React.PureComponent<Props> {
                     onChange={this._textCallback}
                 />;
             case 'BOOLEAN':
-                return <div>
-                    <Label label={label}/>
-                    <ToggleStateless
-                        label={label}
-                        size="large"
+                return (
+                    <div style={{marginTop: `${gridSize()}px`}}>
+                        <CheckboxGroup>
+                            <CheckboxStateless
+                                label={label}
+                                name={label}
 
-                        //$FlowFixMe
-                        isChecked={value || false}
-                        onChange={this._toggleCallback}
+                                //$FlowFixMe
+                                isChecked={value || false}
+                                onChange={this._toggleCallback}
 
-                        value="true"
-                    />
-                </div>;
+                                value="true"
+                            />
+                        </CheckboxGroup>
+                    </div>
+                );
             case 'SCRIPT':
                 return (
                     <EditorField

@@ -7,8 +7,9 @@ import type {Map as MapType} from 'immutable';
 import Button from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
-import {ToggleStateless} from '@atlaskit/toggle';
+import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
 import {Label} from '@atlaskit/field-base';
+import {gridSize} from '@atlaskit/theme';
 
 import AddIcon from '@atlaskit/icon/glyph/add';
 
@@ -72,10 +73,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
 
     _setValue = (field: string) => (value: any) => this._mutateValue(field, value);
 
-    _setToggleValue = (field: string) => (e: Event) => {
-        //$FlowFixMe
-        this._mutateValue(field, e.target.checked);
-    };
+    _setToggleValue = (field: string) => (e: SyntheticEvent<HTMLInputElement>) => this._mutateValue(field, e.currentTarget.checked);
 
     _mutateValue = (field: string, value: any) => this.setState((state: RegistryPickerState): any => {
         return {
@@ -192,19 +190,21 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                     onChange={this._setInputValue(paramName)}
                 />;
             case 'BOOLEAN':
-                return <div>
-                    <Label label={label} isRequired={isRequired}/>
-                    <ToggleStateless
-                        label={label}
-                        size="large"
+                return (
+                    <div style={{marginTop: `${gridSize()}px`}}>
+                        <CheckboxGroup>
+                            <CheckboxStateless
+                                label={label}
 
-                        isChecked={value || false}
-                        onChange={this._setToggleValue(paramName)}
+                                isChecked={value || false}
+                                onChange={this._setToggleValue(paramName)}
 
-                        name={inputName}
-                        value="true"
-                    />
-                </div>;
+                                name={inputName}
+                                value="true"
+                            />
+                        </CheckboxGroup>
+                    </div>
+                );
             case 'SCRIPT':
                 return (
                     <div>
