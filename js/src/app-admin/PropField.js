@@ -4,14 +4,13 @@ import React from 'react';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
+import {gridSize} from '@atlaskit/theme/dist/cjs/index';
 
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {EditorField} from '../common/ak/EditorField';
+import type {SingleValueType} from '../common/ak/types';
 
 import {getPluginBaseUrl} from '../service/ajaxHelper';
-
-import type {SingleValueType} from '../common/ak/types';
-import {gridSize} from '@atlaskit/theme/dist/cjs/index';
 
 
 type SingleValueTypesEnum = 'USER' | 'GROUP' | 'CUSTOM_FIELD' | 'RESOLUTION';
