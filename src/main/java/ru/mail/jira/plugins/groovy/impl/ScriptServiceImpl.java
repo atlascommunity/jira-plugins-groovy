@@ -52,7 +52,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     private final ParseContextHolder parseContextHolder = new ParseContextHolder();
     private final Cache<String, CompiledScript> scriptCache = Caffeine
         .newBuilder()
-        .maximumSize(500)
+        .maximumSize(1000)
         .expireAfterAccess(1, TimeUnit.HOURS)
         .build();
 
