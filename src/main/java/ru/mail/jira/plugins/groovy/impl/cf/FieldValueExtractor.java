@@ -216,4 +216,8 @@ public class FieldValueExtractor {
 
         return value;
     }
+
+    public void clearCache() {
+        cache.invalidateAll();
+    }
 }

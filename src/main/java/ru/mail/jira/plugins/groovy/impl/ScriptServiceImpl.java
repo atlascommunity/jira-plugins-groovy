@@ -13,6 +13,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.google.common.collect.ImmutableMap;
 import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.groovy.*;
@@ -54,6 +56,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         .newBuilder()
         .maximumSize(1000)
         .expireAfterAccess(1, TimeUnit.HOURS)
+        .recordStats()
         .build();
 
     private final PluginAccessor pluginAccessor;
@@ -110,6 +113,22 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     @Override
     public ParseContext parseScriptStatic(String script, Map<String, Class> types) {
         return parseClass(script, true, true, types).getParseContext();
+    }
+
+    @Override
+    public CacheStatsDto getCacheStats() {
+        CacheStats stats = scriptCache.stats();
+
+        return new CacheStatsDto(
+            stats.hitCount(),
+            stats.missCount(),
+            stats.loadSuccessCount(),
+            stats.loadFailureCount(),
+            stats.totalLoadTime(),
+            stats.evictionCount(),
+            stats.evictionWeight(),
+            scriptCache.estimatedSize()
+        );
     }
 
     @Override

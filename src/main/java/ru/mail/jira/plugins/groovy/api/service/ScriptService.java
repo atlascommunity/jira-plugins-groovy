@@ -1,5 +1,6 @@
 package ru.mail.jira.plugins.groovy.api.service;
 
+import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 
@@ -13,6 +14,8 @@ public interface ScriptService {
     ParseContext parseScript(String script);
 
     ParseContext parseScriptStatic(String script, Map<String, Class> types);
+
+    CacheStatsDto getCacheStats();
 
     Map<String, Class> getGlobalVariableTypes();
 
