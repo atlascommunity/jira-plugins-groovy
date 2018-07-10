@@ -32,6 +32,9 @@ public interface FieldConfig extends Entity {
     Boolean getCacheable();
     void setCacheable(Boolean cacheable);
 
+    Boolean getCompileStatic();
+    void setCompileStatic(boolean compileStatic);
+
     @OneToMany(reverse = "getFieldConfig")
     FieldConfigChangelog[] getChangelogs();
 }

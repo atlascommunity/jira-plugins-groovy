@@ -10,6 +10,7 @@ export type FieldConfig = {
     scriptBody: string,
     changelogs: Array<ChangelogType>,
     cacheable: boolean,
+    compileStatic: boolean,
     velocityParamsEnabled: boolean,
     needsTemplate: boolean,
     type: string,

@@ -18,5 +18,7 @@ public class FieldConfigForm {
     @XmlElement
     private boolean cacheable;
     @XmlElement
+    private boolean compileStatic;
+    @XmlElement
     private boolean velocityParamsEnabled;
 }

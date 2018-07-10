@@ -161,13 +161,23 @@ public class FieldValueExtractor {
             Map<String, Object> bindings = new HashMap<>();
             bindings.put("issue", issue);
             bindings.put("velocityParams", velocityParams);
-            Object result = scriptService.executeScriptStatic(
-                script.getId(),
-                script.getScriptBody(),
-                ScriptType.CUSTOM_FIELD,
-                bindings,
-                TypeUtil.getFieldConfigTypes(script.isWithVelocityParams())
-            );
+            Object result;
+            if (script.isCompileStatic()) {
+                result = scriptService.executeScriptStatic(
+                    script.getId(),
+                    script.getScriptBody(),
+                    ScriptType.CUSTOM_FIELD,
+                    bindings,
+                    TypeUtil.getFieldConfigTypes(script.isWithVelocityParams())
+                );
+            } else {
+                result = scriptService.executeScript(
+                    script.getId(),
+                    script.getScriptBody(),
+                    ScriptType.CUSTOM_FIELD,
+                    bindings
+                );
+            }
 
             if (result == null) {
                 return null;
