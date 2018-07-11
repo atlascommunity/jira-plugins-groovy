@@ -74,7 +74,8 @@ export class AdminScript extends React.PureComponent<Props, State> {
             inline: true,
             scriptBody: script.scriptBody,
             changelogs: script.changelogs,
-            errorCount: script.errorCount
+            errorCount: script.errorCount,
+            warningCount: script.warningCount
         }
     );
 

@@ -27,6 +27,7 @@ export type ExecutionType = {
     scriptId: string,
     time: number,
     success: boolean,
+    slow: boolean,
     date: string,
     extraParams: {[string]: string},
     error?: string
@@ -34,7 +35,7 @@ export type ExecutionType = {
 
 export type ScriptId = number | string;
 
-export type ScriptType = {
+export type ScriptType = {|
     id: ScriptId,
     name: string,
     description?: ?string,
@@ -42,4 +43,5 @@ export type ScriptType = {
     inline?: boolean,
     changelogs?: Array<ChangelogType>,
     errorCount?: number,
-};
+    warningCount?: number
+|};

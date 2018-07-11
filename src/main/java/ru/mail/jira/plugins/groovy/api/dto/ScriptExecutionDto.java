@@ -19,6 +19,8 @@ public class ScriptExecutionDto {
     @XmlElement
     private boolean success;
     @XmlElement
+    private boolean slow;
+    @XmlElement
     private String date;
     @XmlElement
     private String error;

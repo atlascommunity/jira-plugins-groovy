@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import {Draggable} from 'react-beautiful-dnd';
 
 import Badge from '@atlaskit/badge';
+import {colors} from '@atlaskit/theme';
 
 import CodeIcon from '@atlaskit/icon/glyph/code';
 
@@ -39,6 +40,17 @@ export class DraggableRegistryScriptInternal extends React.PureComponent<PublicR
                                             {script.name}
                                         </h3>
                                     </div>
+                                    {!!script.warningCount &&
+                                        <div className="flex-vertical-middle flex-none errorCount">
+                                            <div>
+                                                <Badge
+                                                    max={99}
+                                                    value={script.warningCount}
+                                                    appearance={{ backgroundColor: colors.Y400, textColor: colors.N0 }}
+                                                />
+                                            </div>
+                                        </div>
+                                    }
                                     {!!script.errorCount &&
                                         <div className="flex-vertical-middle flex-none errorCount">
                                             <div>

@@ -34,6 +34,8 @@ public class FieldConfigDto extends FieldConfigForm {
     private List<ChangelogDto> changelogs;
     @XmlElement
     private Integer errorCount;
+    @XmlElement
+    private Integer warningCount;
 
     @Override
     public boolean equals(Object o) {

@@ -51,7 +51,8 @@ export class FieldScript extends React.PureComponent<Props> {
                     inline: true,
                     scriptBody: script.scriptBody,
                     changelogs: script.changelogs,
-                    errorCount: script.errorCount
+                    errorCount: script.errorCount,
+                    warningCount: script.warningCount
                 }}
                 template={script.needsTemplate ? {
                     body: script.template || ''

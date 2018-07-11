@@ -204,11 +204,13 @@ public class FieldValueExtractor {
             );
             successful = false;
             error = ExceptionHelper.writeExceptionToString(e);
+        } finally {
+            t = System.currentTimeMillis() - t;
         }
 
         //todo: make an option?
-        if (!successful) {
-            executionRepository.trackInline(uuid, System.currentTimeMillis() - t, successful, error, ImmutableMap.of(
+        if (!successful || t >= ExecutionRepository.WARNING_THRESHOLD) {
+            executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
                 "issue", issue.getKey(),
                 "type", ScriptType.CUSTOM_FIELD.name()
             ));

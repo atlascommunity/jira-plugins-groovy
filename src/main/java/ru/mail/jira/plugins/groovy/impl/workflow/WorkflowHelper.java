@@ -137,7 +137,13 @@ public class WorkflowHelper {
             t = System.currentTimeMillis() - t;
         }
 
-        if (!success || type != ScriptType.WORKFLOW_CONDITION) {
+        boolean trackExecution = true;
+
+        if (type == ScriptType.WORKFLOW_CONDITION && success && t < ExecutionRepository.WARNING_THRESHOLD) {
+            trackExecution = false;
+        }
+
+        if (trackExecution) {
             ImmutableMap<String, String> params = ImmutableMap.of(
                 "issue", Objects.toString(issue, ""),
                 "currentUser", Objects.toString(user, ""),

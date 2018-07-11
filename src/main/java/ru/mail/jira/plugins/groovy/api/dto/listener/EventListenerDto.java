@@ -19,4 +19,6 @@ public class EventListenerDto extends EventListenerForm {
     private List<ChangelogDto> changelogs;
     @XmlElement
     private Integer errorCount;
+    @XmlElement
+    private Integer warningCount;
 }

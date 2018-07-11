@@ -47,6 +47,7 @@ public abstract class InlineScriptWorkflowPluginFactory extends AbstractWorkflow
         map.put("inlineScriptName", args.getOrDefault(Const.WF_INLINE_SCRIPT_NAME, ""));
         map.put("uuid", uuid);
         map.put("errorCount", executionRepository.getErrorCount(uuid));
+        map.put("warningCount", executionRepository.getWarningCount(uuid));
         map.put("escapeJs", (Function<String, String>) JavaScriptEscaper::escape);
     }
 

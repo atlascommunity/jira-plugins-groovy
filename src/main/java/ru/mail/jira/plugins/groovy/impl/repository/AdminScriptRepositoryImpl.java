@@ -170,6 +170,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
 
         if (includeErrorCount) {
             result.setErrorCount(executionRepository.getErrorCount(script.getUuid()));
+            result.setWarningCount(executionRepository.getWarningCount(script.getUuid()));
         }
 
         return result;

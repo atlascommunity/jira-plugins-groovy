@@ -118,7 +118,7 @@ public class EventListenerInvoker {
             t = System.currentTimeMillis() - t;
         }
 
-        if (!successful) {
+        if (!successful || t >= ExecutionRepository.WARNING_THRESHOLD) {
             executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
                 "event", event.toString(),
                 "type", ScriptType.LISTENER.name()

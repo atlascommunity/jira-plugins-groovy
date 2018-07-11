@@ -203,6 +203,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         if (includeErrorCount) {
             result.setErrorCount(executionRepository.getErrorCount(listener.getUuid()));
+            result.setWarningCount(executionRepository.getWarningCount(listener.getUuid()));
         }
 
         return result;

@@ -29,6 +29,7 @@ export type ScriptEntityWithoutChangelogs = {
     name: string,
     description: ?string,
     errorCount?: number,
+    warningCount?: number,
     scriptBody: string
 };
 

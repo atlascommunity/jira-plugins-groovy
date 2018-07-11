@@ -26,5 +26,6 @@ export type FieldConfigPreviewResult = {
 
 export type FieldConfigItem = FieldConfig & {
     customFieldId: number,
-    errorCount: number
+    errorCount: number,
+    warningCount: number
 };

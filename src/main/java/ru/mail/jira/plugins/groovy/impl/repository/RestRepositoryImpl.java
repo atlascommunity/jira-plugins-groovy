@@ -234,6 +234,7 @@ public class RestRepositoryImpl implements RestRepository {
 
         if (includeErrorCount) {
             result.setErrorCount(executionRepository.getErrorCount(script.getUuid()));
+            result.setWarningCount(executionRepository.getWarningCount(script.getUuid()));
         }
 
         return result;

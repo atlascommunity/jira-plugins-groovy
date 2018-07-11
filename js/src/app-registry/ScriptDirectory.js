@@ -9,6 +9,7 @@ import {Droppable} from 'react-beautiful-dnd';
 import Button, {ButtonGroup, defaultProps as defaultButtonProps} from '@atlaskit/button';
 import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
 import Badge from '@atlaskit/badge';
+import {colors} from '@atlaskit/theme';
 
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 import AddIcon from '@atlaskit/icon/glyph/add';
@@ -37,6 +38,7 @@ type ScriptDirectoryProps = {
     children: $ReadOnlyArray<RegistryDirectoryType>,
     scripts: $ReadOnlyArray<RegistryScriptType>,
     errorCount: number,
+    warningCount: number,
     onCreate: CreateCallback,
     onEdit: EditCallback,
     onDelete: DeleteCallback,
@@ -58,7 +60,7 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
     };
 
     render() {
-        const {forceOpen, isOpen, directory, children, scripts, errorCount, onCreate, onEdit, onDelete} = this.props;
+        const {forceOpen, isOpen, directory, children, scripts, errorCount, warningCount, onCreate, onEdit, onDelete} = this.props;
 
         let directories: * = null;
         let scriptsEl: * = null;
@@ -111,6 +113,13 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                             </h3>
                         </Button>
                     </div>
+                    {warningCount > 0 &&
+                        <div className="flex-vertical-middle flex-none errorCount">
+                            <div>
+                                <Badge max={99} value={warningCount} appearance={{ backgroundColor: colors.Y400, textColor: colors.N0 }}/>
+                            </div>
+                        </div>
+                    }
                     {errorCount > 0 &&
                         <div className="flex-vertical-middle flex-none errorCount">
                             <div>
@@ -151,13 +160,18 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
     }
 }
 
-const countErrors = (dirId: number, scripts: {[?number]: ?$ReadOnlyArray<RegistryScriptType>}, dirs: {[?number]: ?$ReadOnlyArray<RegistryDirectoryType>}): number => {
+const countExecutions = (
+    field: 'errorCount' | 'warningCount',
+    dirId: number,
+    scripts: {[?number]: ?$ReadOnlyArray<RegistryScriptType>},
+    dirs: {[?number]: ?$ReadOnlyArray<RegistryDirectoryType>}
+): number => {
     let errors: * = 0;
     if (scripts[dirId]) {
-        errors += scripts[dirId].map(script => script.errorCount || 0).reduce((a, b) => a + b, 0);
+        errors += scripts[dirId].map(script => script[field] || 0).reduce((a, b) => a + b, 0);
     }
     if (dirs[dirId]) {
-        errors += dirs[dirId].map(child => countErrors(child.id, scripts, dirs)).reduce((a, b) => a + b, 0);
+        errors += dirs[dirId].map(child => countExecutions(field, child.id, scripts, dirs)).reduce((a, b) => a + b, 0);
     }
     return errors;
 };
@@ -182,13 +196,19 @@ export const ScriptDirectory = connect(
 
         const errorsSelector = createSelector(
             [groupedDirsSelector, groupedScriptsSelector, idSelector],
-            (dirs, scripts, id) => countErrors(id, scripts, dirs)
+            (dirs, scripts, id) => countExecutions('errorCount', id, scripts, dirs)
+        );
+
+        const warningsSelector = createSelector(
+            [groupedDirsSelector, groupedScriptsSelector, idSelector],
+            (dirs, scripts, id) => countExecutions('warningCount', id, scripts, dirs)
         );
 
         //$FlowFixMe
         return (state, props): * => ({
             isOpen: isOpenSelector(state, props),
             errorCount: errorsSelector(state, props),
+            warningCount: warningsSelector(state, props),
             children: childrenSelector(state, props),
             scripts: scriptsSelector(state, props)
         });

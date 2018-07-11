@@ -102,6 +102,29 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
     }
 
     @Override
+    public Map<Integer, Long> getRegistryWarningCount() {
+        return databaseAccessor.run(connection ->
+                connection
+                    .select(SCRIPT_EXECUTION.SCRIPT_ID, SCRIPT_EXECUTION.ID.count())
+                    .from(SCRIPT_EXECUTION)
+                    .where(
+                        SCRIPT_EXECUTION.SCRIPT_ID.isNotNull(),
+                        SCRIPT_EXECUTION.SUCCESSFUL.isTrue(),
+                        SCRIPT_EXECUTION.TIME.goe(WARNING_THRESHOLD)
+                    )
+                    .groupBy(SCRIPT_EXECUTION.SCRIPT_ID)
+                    .fetch()
+                    .stream()
+                    .collect(Collectors.toMap(
+                        tuple -> tuple.get(0, Integer.class),
+                        tuple -> tuple.get(1, Long.class),
+                        (a, b) -> a + b
+                    )),
+            OnRollback.NOOP
+        );
+    }
+
+    @Override
     public List<ScriptExecutionDto> getRegistryExecutions(int scriptId) {
         return Arrays
             .stream(ao.find(ScriptExecution.class, Query.select().where("SCRIPT_ID = ?", scriptId)))
@@ -157,6 +180,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
 
         result.setTime(execution.getTime());
         result.setSuccess(execution.isSuccessful());
+        result.setSlow(execution.getTime() >= WARNING_THRESHOLD);
         result.setError(execution.getError());
         result.setExtraParams(execution.getExtraParams());
         result.setId(execution.getID());
@@ -196,6 +220,16 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
     @Override
     public int getErrorCount(String id) {
         return ao.count(ScriptExecution.class, Query.select().where("INLINE_ID = ? AND SUCCESSFUL = ?", id, Boolean.FALSE));
+    }
+
+    @Override
+    public int getWarningCount(int id) {
+        return ao.count(ScriptExecution.class, Query.select().where("SCRIPT_ID = ? AND TIME >= ?", id, WARNING_THRESHOLD));
+    }
+
+    @Override
+    public int getWarningCount(String id) {
+        return ao.count(ScriptExecution.class, Query.select().where("INLINE_ID = ? AND TIME >= ?", id, WARNING_THRESHOLD));
     }
 
     @Override

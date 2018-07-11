@@ -12,6 +12,7 @@ public class QScriptExecution extends EnhancedRelationalPathBase<QScriptExecutio
     public final NumberPath<Integer> SCRIPT_ID = createIntegerCol("SCRIPT_ID").build();
     public final BooleanPath SUCCESSFUL = createBooleanCol("SUCCESSFUL").notNull().build();
     public final DateTimePath<Timestamp> DATE = createDateTimeCol("DATE", Timestamp.class).notNull().build();
+    public final NumberPath<Long> TIME = createLongCol("TIME").notNull().build();
 
     public QScriptExecution() {
         super(QScriptExecution.class, "AO_2FC5DA_SCRIPT_EXECUTION");

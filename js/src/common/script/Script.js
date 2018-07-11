@@ -5,6 +5,7 @@ import Button, {ButtonGroup, defaultProps as defaultButtonProps} from '@atlaskit
 import Spinner from '@atlaskit/spinner';
 import Badge from '@atlaskit/badge';
 import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
+import {colors} from '@atlaskit/theme';
 
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
@@ -341,6 +342,17 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                                     {script && script.name}
                                 </h3>
                             </div>
+                            {script && !!script.warningCount &&
+                                <div className="flex-vertical-middle flex-none errorCount">
+                                    <div>
+                                        <Badge
+                                            max={99}
+                                            value={script.warningCount}
+                                            appearance={{ backgroundColor: colors.Y400, textColor: colors.N0 }}
+                                        />
+                                    </div>
+                                </div>
+                            }
                             {script && !!script.errorCount &&
                                 <div className="flex-vertical-middle flex-none errorCount">
                                     <div>

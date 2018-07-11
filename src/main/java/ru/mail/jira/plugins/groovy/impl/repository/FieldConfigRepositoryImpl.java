@@ -355,6 +355,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
 
             if (includeErrorCount) {
                 result.setErrorCount(executionRepository.getErrorCount(fieldConfig.getUuid()));
+                result.setWarningCount(executionRepository.getWarningCount(fieldConfig.getUuid()));
             }
         }
 

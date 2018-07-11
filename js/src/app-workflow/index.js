@@ -68,7 +68,7 @@ function ScriptParamValue({value, param}: ScriptParamValueProps): Node {
 }
 
 define('mailru/groovy/renderRegistryScript', (): any => {
-    return (element: Element, id: number, name: string, source: string, description: string, errorCount?: number, params: Array<ParamType>, paramValues: {[string]: any}) => {
+    return (element: Element, id: number, name: string, source: string, description: string, errorCount?: number, warningCount?: number, params: Array<ParamType>, paramValues: {[string]: any}) => {
         ReactDOM.render(
             <Script
                 withChangelog={true}
@@ -78,7 +78,7 @@ define('mailru/groovy/renderRegistryScript', (): any => {
                     id: id,
                     name: name,
                     scriptBody: source,
-                    description, errorCount
+                    description, errorCount, warningCount
                 }}
 
                 additionalButtons={[

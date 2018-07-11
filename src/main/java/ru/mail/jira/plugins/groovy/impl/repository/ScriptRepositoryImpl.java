@@ -108,6 +108,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     @Override
     public List<RegistryScriptDto> getAllScripts() {
         Map<Integer, Long> errors = executionRepository.getRegistryErrorCount();
+        Map<Integer, Long> warnings = executionRepository.getRegistryWarningCount();
 
         List<RegistryScriptDto> scripts = Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
@@ -116,6 +117,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
         for (RegistryScriptDto scriptDto : scripts) {
             scriptDto.setErrorCount(errors.get(scriptDto.getId()));
+            scriptDto.setWarningCount(warnings.get(scriptDto.getId()));
         }
 
         return scripts;
@@ -407,11 +409,14 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         } else {
             result.setName(script.getName());
         }
+
         if (includeChangelogs) {
             result.setChangelogs(changelogHelper.collect(script.getChangelogs()));
         }
+
         if (includeErrorCount) {
             result.setErrorCount((long) executionRepository.getErrorCount(script.getID()));
+            result.setWarningCount((long) executionRepository.getWarningCount(script.getID()));
         }
 
         if (script.getParameters() != null) {
