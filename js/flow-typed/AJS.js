@@ -7,6 +7,10 @@ declare module 'AJS' {
         close?: 'auto' | 'manual' | 'never'
     };
 
+    declare interface Meta {
+        get(string): string
+    }
+
     declare type FlagType = {
         close(): void
     };
@@ -16,5 +20,6 @@ declare module 'AJS' {
         flag(FlagParameters): FlagType;
         toInit: (() => void) => void;
         $: JQueryStatic;
+        Meta: Meta;
     };
 }

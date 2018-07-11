@@ -2,6 +2,10 @@
 import React from 'react';
 import withRouter from 'react-router-dom/es/withRouter';
 
+import AJS from 'AJS';
+
+import {TitleMessages} from '../i18n/common.i18n';
+
 
 const routeMap = {
     'mailru-groovy-console-link': '/console',
@@ -13,6 +17,18 @@ const routeMap = {
     'mailru-groovy-scheduled-link': '/scheduled',
     'mailru-groovy-audit-link': '/audit',
     'mailru-groovy-extras-link': '/extras'
+};
+
+const titleMap = {
+    '/console': TitleMessages.console,
+    '/admin-scripts': TitleMessages.adminScripts,
+    '/registry': TitleMessages.registry,
+    '/listeners': TitleMessages.listeners,
+    '/rest': TitleMessages.rest,
+    '/fields': TitleMessages.fields,
+    '/scheduled': TitleMessages.scheduled,
+    '/audit': TitleMessages.audit,
+    '/extras': TitleMessages.extras
 };
 
 type Props = {
@@ -76,6 +92,8 @@ export class NavigationControllerInternal extends React.PureComponent<Props> {
             return;
         }
 
+        let updatedTitle: boolean = false;
+
         for (const el of parent.children) {
             const link = el.children[0];
             if (link) {
@@ -85,11 +103,17 @@ export class NavigationControllerInternal extends React.PureComponent<Props> {
                 if (parent) {
                     if (route && location.pathname.startsWith(route)) {
                         parent.classList.add('aui-nav-selected');
+                        document.title = `${titleMap[route]} - ${AJS.Meta.get('app-title')}`;
+                        updatedTitle = true;
                     } else {
                         parent.classList.remove('aui-nav-selected');
                     }
                 }
             }
+        }
+
+        if (!updatedTitle) {
+            document.title = `Mail.Ru groovy - ${AJS.Meta.get('app-title')}`;
         }
     };
 
