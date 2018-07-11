@@ -3,6 +3,9 @@
 .*/node_modules/jsonlint/.*
 .*/node_modules/react-beautiful-dnd/.*
 
+[untyped]
+#todo: remove when select flow issues are resolved in atlaskit
+.*/node_modules/react-select
 
 [include]
 
