@@ -136,7 +136,7 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
                     }
                 ]}
             >
-                {error && !errorField && <ErrorMessage title={errorMessage}/>}
+                {error && !errorField && <ErrorMessage title={errorMessage || undefined}/>}
                 <div className="flex-column">
                     <FieldTextStateless
                         shouldFitContainer={true}

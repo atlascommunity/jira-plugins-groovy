@@ -148,7 +148,7 @@ export class ScriptConsole extends React.Component<Props, State> {
                         </Button>
                 </div>
                 <br/>
-                {!waiting && <div className="result">
+                {!waiting && <div className="result" style={{maxWidth: '100%', overflow: 'hidden'}}>
                     {output ?
                         <div>
                             <strong>{ConsoleMessages.executedIn(output.time.toString())}</strong>
@@ -156,7 +156,7 @@ export class ScriptConsole extends React.Component<Props, State> {
                         </div>
                     : null}
                     {error ?
-                        <ErrorMessage title={errorMessage}>
+                        <ErrorMessage title={errorMessage || undefined}>
                             <pre style={{overflowX: 'auto'}}>
                                 {error['stack-trace']}
                             </pre>

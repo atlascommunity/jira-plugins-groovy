@@ -422,7 +422,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
 
             body =
                 <div className="flex-column">
-                    {error && !errorField && <ErrorMessage title={errorMessage}/>}
+                    {error && !errorField && <ErrorMessage title={errorMessage || undefined}/>}
 
                     <FormField
                         label={FieldMessages.name}

@@ -308,7 +308,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 <Prompt when={modified && !waiting} message="Are you sure you want to leave?"/>
                 {fetching && <div className="flex-horizontal-middle"><div className="flex-vertical-middle"><Spinner size="medium"/></div></div>}
                 {!fetching && <div className="ScriptForm">
-                    {error && !errorField && <ErrorMessage title={errorMessage}/>}
+                    {error && !errorField && <ErrorMessage title={errorMessage || undefined}/>}
                     {noParent ?
                         <FormField
                             label={FieldMessages.parentName}

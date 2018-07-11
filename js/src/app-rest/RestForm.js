@@ -238,7 +238,7 @@ export class RestFormInternal extends React.Component<Props, State> {
 
             body = (
                 <div className="flex-column">
-                    {error && !errorField && <ErrorMessage title={errorMessage}/>}
+                    {error && !errorField && <ErrorMessage title={errorMessage || undefined}/>}
 
                     <FormField
                         label={FieldMessages.name}

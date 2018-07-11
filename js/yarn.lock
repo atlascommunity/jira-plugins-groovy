@@ -185,17 +185,17 @@
     babel-runtime "^6.26.0"
     uuid "^3.1.0"
 
-"@atlaskit/icon@^12.6.1", "@atlaskit/icon@^12.6.2":
-  version "12.6.2"
-  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.6.2.tgz#b8725ac5e1a9197ba97bbabb8a122b3d31dcf8fa"
+"@atlaskit/icon@^12.5.0", "@atlaskit/icon@^12.7.0":
+  version "12.7.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.7.0.tgz#70451364348f8b0ee6541d9b3a20ea55999304bb"
   dependencies:
     "@atlaskit/theme" "^4.0.4"
     babel-runtime "^6.26.0"
     uuid "^3.1.0"
 
-"@atlaskit/icon@^12.7.0":
-  version "12.7.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.7.0.tgz#70451364348f8b0ee6541d9b3a20ea55999304bb"
+"@atlaskit/icon@^12.6.1", "@atlaskit/icon@^12.6.2":
+  version "12.6.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.6.2.tgz#b8725ac5e1a9197ba97bbabb8a122b3d31dcf8fa"
   dependencies:
     "@atlaskit/theme" "^4.0.4"
     babel-runtime "^6.26.0"
@@ -288,6 +288,14 @@
   dependencies:
     "@atlaskit/button" "^8.2.2"
     babel-runtime "^6.26.0"
+
+"@atlaskit/section-message@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/section-message/-/section-message-0.1.0.tgz#5acb70f37e22bf9ecb24e3ad90ed4017824b49fe"
+  dependencies:
+    "@atlaskit/button" "^8.2.4"
+    "@atlaskit/icon" "^12.5.0"
+    "@atlaskit/theme" "^4.1.0"
 
 "@atlaskit/select@^4.5.1":
   version "4.5.1"

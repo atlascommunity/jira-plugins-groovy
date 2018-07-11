@@ -28,6 +28,7 @@
     "@atlaskit/page": "^7.2.1",
     "@atlaskit/page-header": "^5.1.4",
     "@atlaskit/pagination": "^6.0.6",
+    "@atlaskit/section-message": "^0.1.0",
     "@atlaskit/select": "^4.5.1",
     "@atlaskit/spinner": "^8.0.0",
     "@atlaskit/theme": "^4.1.0",

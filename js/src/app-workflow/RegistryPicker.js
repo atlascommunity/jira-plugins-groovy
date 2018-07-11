@@ -287,7 +287,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
 
             {script && script.description &&
                 <div style={{marginTop: '8px'}}>
-                    <InfoMessage title={null}>
+                    <InfoMessage>
                         {script.description}
                     </InfoMessage>
                 </div>
