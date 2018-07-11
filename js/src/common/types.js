@@ -1,8 +1,6 @@
 //@flow
 import type {Node} from 'react';
 
-import {components} from '@atlaskit/select';
-
 import type {ChangelogType} from './script/types';
 
 
@@ -37,9 +35,7 @@ export type ScriptEntity = ScriptEntityWithoutChangelogs & {
     changelogs: Array<ChangelogType>,
 };
 
-export type SelectProps = {
-    components?: typeof components
-};
+export type SelectProps = {};
 
 export type AkFormFieldProps = {
     isValidationHidden: boolean

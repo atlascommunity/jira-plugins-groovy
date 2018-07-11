@@ -2,7 +2,6 @@
 import React, {type Node} from 'react';
 
 import Avatar from '@atlaskit/avatar';
-import {components} from '@atlaskit/select';
 
 import {LargeSelect} from './LargeSelect';
 import {FormField} from './FormField';
@@ -12,32 +11,14 @@ import {ajaxGet} from '../../service/ajaxHelper';
 import type {OptMutableFieldProps, FieldProps, FormFieldProps, SelectProps, AkFormFieldProps} from '../types';
 
 
-function ValueImpl({data, children}: any): Node {
+function formatValue(data: SingleValueType): Node {
     return (
         <div className="flex-row">
             {data.imgSrc && <Avatar size="xsmall" src={data.imgSrc}/>}
             <span className="flex-vertical-middle" style={{marginLeft: data.imgSrc ? '5px' : ''}}>
-                {children}
+                {data.label}
             </span>
         </div>
-    );
-}
-
-function OptionImpl({data, children, ...props}: any): Node {
-    return (
-        <components.Option
-            {...props}
-        >
-            <ValueImpl data={data}>{children}</ValueImpl>
-        </components.Option>
-    );
-}
-
-function SingleValueImpl({data, children, ...props}: any): Node {
-    return (
-        <components.SingleValue {...props}>
-            {props.in && <ValueImpl data={data}>{children}</ValueImpl>}
-        </components.SingleValue>
     );
 }
 
@@ -124,7 +105,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
     }
 
     render() {
-        const {label, isRequired, isLabelHidden, isInvalid, invalidMessage, isValidationHidden, components} = this.props;
+        const {label, isRequired, isLabelHidden, isInvalid, invalidMessage, isValidationHidden} = this.props;
         const {fetching, data} = this.state;
 
         if (isValidationHidden) {
@@ -141,11 +122,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
 
                     validationState={isInvalid ? 'error' : 'default'}
 
-                    components={{
-                        Option: OptionImpl,
-                        SingleValue: SingleValueImpl,
-                        ...(components || {})
-                    }}
+                    formatOptionLabel={formatValue}
                 />
             );
         }
@@ -169,11 +146,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
                     isLoading={!!fetching}
                     options={data.options}
 
-                    components={{
-                        Option: OptionImpl,
-                        SingleValue: SingleValueImpl,
-                        ...(components || {})
-                    }}
+                    formatOptionLabel={formatValue}
                 />
             </FormField>
         );
