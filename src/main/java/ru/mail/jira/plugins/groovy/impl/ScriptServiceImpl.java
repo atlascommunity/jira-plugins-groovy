@@ -290,9 +290,8 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         globalVariables.put("log", new LoggerGlobalVariable());
         globalVariables.put("templateEngine", new TemplateEngineGlobalVariable(gcl));
 
-        globalVariables.forEach((key, var) -> {
-            globalVariableTypes.put(key, var.getType());
-        });
+        globalVariables.forEach((key, var) -> globalVariableTypes.put(key, var.getType()));
+        globalVariableTypes.put("scriptType", ScriptType.class);
     }
 
     @Override
