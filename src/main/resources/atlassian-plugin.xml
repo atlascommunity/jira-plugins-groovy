@@ -40,7 +40,7 @@
         <resource type="download" name="main.js" location="/ru/mail/jira/plugins/groovy/js/main.js"/>
         <resource type="download" name="main.js.smap" location="/ru/mail/jira/plugins/groovy/js/main.js.smap"/>
 
-        <context>ru.mail.jira.plugins.groovy.workflow</context>
+        <context>ru.mail.jira.plugins.groovy.main</context>
     </web-resource>
 
     <web-resource key="workflow" name="groovy workflow Web Resources">
