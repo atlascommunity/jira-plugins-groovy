@@ -68,6 +68,9 @@ export class RestRoute extends React.PureComponent<{}> {
                                 />
                             }
                         </Route>
+                        <Route path="/rest/create" exact={true}>
+                            {() => <RestForm isNew={true} id={null}/>}
+                        </Route>
                         <Route path="/rest/:id/edit" exact={true}>
                             {({match}) =>
                                 <RestForm isNew={false} id={parseInt(match.params.id, 10)}/>
