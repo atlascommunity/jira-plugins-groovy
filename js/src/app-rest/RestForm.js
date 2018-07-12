@@ -2,7 +2,7 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import {withRouter, Prompt} from 'react-router-dom';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
@@ -89,6 +89,7 @@ type Props = DialogComponentProps & {
 type State = {
     ready: boolean,
     waiting: boolean,
+    isModified: boolean,
     values: RecordOf<Form>,
     error: *,
     script: ?RestScriptType
@@ -98,6 +99,7 @@ export class RestFormInternal extends React.Component<Props, State> {
     state = {
         ready: false,
         waiting: false,
+        isModified: false,
         values: makeForm(),
         error: null,
         script: null
@@ -116,6 +118,7 @@ export class RestFormInternal extends React.Component<Props, State> {
             this.setState({
                 waiting: false,
                 ready: false,
+                isModified: false,
                 values: makeForm(),
                 error: null
             });
@@ -138,12 +141,14 @@ export class RestFormInternal extends React.Component<Props, State> {
                             comment: ''
                         }),
                         ready: true,
+                        isModified: false,
                         script
                     });
                 });
         } else {
             this.setState({
                 ready: true,
+                isModified: false,
                 values: makeForm({
                     name: '',
                     methods: [],
@@ -201,7 +206,8 @@ export class RestFormInternal extends React.Component<Props, State> {
     mutateValue = (field: FormFieldKey, value: any) => {
         this.setState((state: State): * => {
             return {
-                values: state.values.set(field, value)
+                values: state.values.set(field, value),
+                isModified: true
             };
         });
     };
@@ -212,7 +218,7 @@ export class RestFormInternal extends React.Component<Props, State> {
 
     render() {
         const {isNew} = this.props;
-        const {ready, waiting, values, script, error} = this.state;
+        const {ready, waiting, isModified, values, script, error} = this.state;
 
         let body: ?Node = null;
 
@@ -389,6 +395,7 @@ export class RestFormInternal extends React.Component<Props, State> {
                     }
                 </PageHeader>
                 <ScrollToTop/>
+                <Prompt when={isModified && !waiting} message="Are you sure you want to leave?"/>
                 {body}
             </Page>
         );

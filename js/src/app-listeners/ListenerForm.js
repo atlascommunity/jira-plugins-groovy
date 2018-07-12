@@ -2,7 +2,7 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import {withRouter, Prompt} from 'react-router-dom';
 
 import {Record} from 'immutable';
 import type {RecordOf, RecordFactory} from 'immutable';
@@ -83,6 +83,7 @@ type Props = DialogComponentProps & {
 type State = {
     ready: boolean,
     waiting: boolean,
+    isModified: boolean,
     values: RecordOf<Form>,
     listener: ?ListenerType,
     error: *
@@ -92,6 +93,7 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
     state = {
         ready: false,
         waiting: false,
+        isModified: false,
         values: makeForm(),
         listener: null,
         error: null
@@ -125,12 +127,14 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                             condition: listener.condition
                         }),
                         listener: listener,
-                        ready: true
+                        ready: true,
+                        isModified: false
                     });
                 });
         } else {
             this.setState({
                 ready: true,
+                isModified: false,
                 values: makeForm(),
                 listener: null
             });
@@ -180,7 +184,8 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
     mutateValue = (field: FormFieldKey, value: any) =>
         this.setState((state: State): * => {
             return {
-                values: state.values.set(field, value)
+                values: state.values.set(field, value),
+                isModified: true
             };
         });
 
@@ -190,7 +195,7 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
 
     render() {
         const {isNew} = this.props;
-        const {ready, waiting, values, listener, error} = this.state;
+        const {ready, waiting, isModified, values, listener, error} = this.state;
 
         let body: ?Node = null;
 
@@ -368,6 +373,7 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                     }
                 </PageHeader>
                 <ScrollToTop/>
+                <Prompt when={isModified && !waiting} message="Are you sure you want to leave?"/>
 
                 {body}
             </Page>

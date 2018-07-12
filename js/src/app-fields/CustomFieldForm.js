@@ -1,7 +1,7 @@
 //@flow
 import React from 'react';
 
-import {Link, withRouter} from 'react-router-dom';
+import {Link, Prompt, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 
 import {Record} from 'immutable';
@@ -69,6 +69,7 @@ type State = {
     values: RecordOf<Form>,
     waiting: boolean,
     waitingPreview: boolean,
+    isModified: boolean,
     previewKey: ?string,
     previewResult: ?FieldConfigPreviewResult,
     error: *,
@@ -92,6 +93,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
             }),
             waiting: false,
             waitingPreview: false,
+            isModified: false,
             previewKey: '',
             previewResult: null,
             error: null,
@@ -153,7 +155,8 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
     _mutateValue = (field: FormFieldType, value: any) => {
         this.setState((state: State): * => {
             return {
-                values: state.values.set(field, value)
+                values: state.values.set(field, value),
+                isModified: true
             };
         });
     };
@@ -173,7 +176,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
 
     render() {
         const {fieldConfig} = this.props;
-        const {values, error, previewError, waiting, waitingPreview, previewKey, previewResult} = this.state;
+        const {values, error, previewError, waiting, isModified, waitingPreview, previewKey, previewResult} = this.state;
 
         let errorMessage: * = null;
         let errorField: ?string = null;
@@ -229,6 +232,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                     {ScriptFieldMessages.scriptFor(`${fieldConfig.customFieldName} - ${fieldConfig.contextName}`)}
                 </PageHeader>
                 <ScrollToTop/>
+                <Prompt when={isModified && !waiting} message="Are you sure you want to leave?"/>
 
                 <div className="flex-column">
                     <FormField

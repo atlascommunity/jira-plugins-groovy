@@ -2,7 +2,7 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import {Prompt, withRouter} from 'react-router-dom';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
@@ -95,6 +95,7 @@ type Props = DialogComponentProps & {
 type State = {
     ready: boolean,
     waiting: boolean,
+    isModified: boolean,
     values: RecordOf<Form>,
     task: ?ScheduledTaskType,
     error: *
@@ -104,6 +105,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
     state = {
         ready: false,
         waiting: false,
+        isModified: false,
         values: makeForm(),
         task: null,
         error: null
@@ -122,6 +124,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
             this.setState({
                 ready: false,
                 waiting: false,
+                isModified: false,
                 values: makeForm(),
                 error: null
             });
@@ -144,12 +147,14 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                             comment: ''
                         }),
                         ready: true,
+                        isModified: false,
                         task
                     });
                 });
         } else {
             this.setState({
                 ready: true,
+                isModified: false,
                 values: makeForm({
                     name: '',
                     description: '',
@@ -212,7 +217,8 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
     mutateValue = (field: FormFieldKey, value: any) => {
         this.setState((state: State): * => {
             return {
-                values: state.values.set(field, value)
+                values: state.values.set(field, value),
+                isModified: true
             };
         });
     };
@@ -404,7 +410,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
 
     render() {
         const {isNew} = this.props;
-        const {ready, waiting, values, task, error} = this.state;
+        const {ready, waiting, isModified, values, task, error} = this.state;
 
         let body: Node = null;
 
@@ -574,6 +580,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                     {isNew ? ScheduledTaskMessages.addTask : `${ScheduledTaskMessages.editTask}: ${task ? task.name : ''}`}
                 </PageHeader>
                 <ScrollToTop/>
+                <Prompt when={isModified && !waiting} message="Are you sure you want to leave?"/>
                 {body}
             </Page>
         );

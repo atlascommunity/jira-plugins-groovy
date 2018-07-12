@@ -1,6 +1,8 @@
 //@flow
 import React, {type Node} from 'react';
 
+import {Prompt} from 'react-router-dom';
+
 import {Record} from 'immutable';
 import type {RecordOf, RecordFactory} from 'immutable';
 
@@ -72,6 +74,7 @@ type State = {
     values: ValuesType,
     isLoadingState: boolean,
     isSubmitting: boolean,
+    isModified: boolean,
     error: ?ErrorType,
     name: ?string,
 };
@@ -95,6 +98,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
         values: makeScriptForm(),
         isLoadingState: true,
         isSubmitting: false,
+        isModified: false,
         error: null,
         name: null
     };
@@ -102,7 +106,8 @@ export class ScriptForm extends React.PureComponent<Props, State> {
     mutateValue = (field: ScriptFormField, value: any) => {
         this.setState((state: State): * => {
             return {
-                values: state.values.set(field, value)
+                values: state.values.set(field, value),
+                isModified: true
             };
         });
     };
@@ -124,6 +129,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                     values, name,
                     isLoadingState: false,
                     isSubmitting: false,
+                    isModified: false,
                     error: null
                 })
             );
@@ -167,7 +173,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
 
     render() {
         const {i18n, isNew, id, returnTypes, returnTo} = this.props;
-        const {values, isLoadingState, isSubmitting, error, name} = this.state;
+        const {values, isModified, isLoadingState, isSubmitting, error, name} = this.state;
 
         let content: Node = null;
 
@@ -292,6 +298,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                     {isNew ? i18n.createTitle : `${i18n.editTitle}: ${name || ''}`}
                 </PageHeader>
                 <ScrollToTop/>
+                <Prompt when={isModified && !isSubmitting} message="Are you sure you want to leave?"/>
                 <div className="flex-column">
                     {content}
                     <div className="formButtons">
