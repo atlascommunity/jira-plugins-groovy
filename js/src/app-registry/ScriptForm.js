@@ -35,6 +35,7 @@ import type {SingleValueType} from '../common/ak/types';
 
 
 import './ScriptForm.less';
+import {ScrollToTop} from '../common/ScrollToTop';
 
 
 const returnTypesMap = {
@@ -305,6 +306,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 >
                     {this.state.id ? `${RegistryMessages.editScript}: ${script ? script.name : ''}` : RegistryMessages.addScript}
                 </PageHeader>
+                <ScrollToTop/>
                 <Prompt when={modified && !waiting} message="Are you sure you want to leave?"/>
                 {fetching && <div className="flex-horizontal-middle"><div className="flex-vertical-middle"><Spinner size="medium"/></div></div>}
                 {!fetching && <div className="ScriptForm">

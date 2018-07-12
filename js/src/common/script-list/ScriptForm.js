@@ -15,6 +15,7 @@ import type {DialogComponentProps, ScriptForm as ScriptFormType} from './types';
 import {withRoot} from './breadcrumbs';
 
 import {RouterLink, FormField, EditorField, LoadingSpinner, ErrorMessage} from '../ak';
+import {ScrollToTop} from '../ScrollToTop';
 import {addItem, updateItem} from '../redux';
 import {getMarkers} from '../error';
 import {Bindings} from '../bindings';
@@ -290,6 +291,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                 >
                     {isNew ? i18n.createTitle : `${i18n.editTitle}: ${name || ''}`}
                 </PageHeader>
+                <ScrollToTop/>
                 <div className="flex-column">
                     {content}
                     <div className="formButtons">

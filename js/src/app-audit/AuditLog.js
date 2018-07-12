@@ -31,9 +31,10 @@ import {
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 
-import {type EntityType} from '../common/types';
 import {InfoMessage, RouterLink} from '../common/ak';
+import {ScrollToTop} from '../common/ScrollToTop';
 import {withRoot} from '../common/script-list/breadcrumbs';
+import {type EntityType} from '../common/types';
 
 
 const tableHead = {
@@ -273,6 +274,7 @@ export class AuditLog extends React.Component<Props, State> {
             >
                 {TitleMessages.audit}
             </PageHeader>
+            <ScrollToTop/>
 
             <div className="page-content">
                 {this._renderPagination()}

@@ -32,6 +32,7 @@ import {ScriptFieldMessages} from '../i18n/cf.i18n';
 import {updateItem} from '../common/redux';
 import {withRoot} from '../common/script-list/breadcrumbs';
 import {RouterLink} from '../common/ak/RouterLink';
+import {ScrollToTop} from '../common/ScrollToTop';
 
 
 const bindings = [ Bindings.issue ];
@@ -227,6 +228,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                 >
                     {ScriptFieldMessages.scriptFor(`${fieldConfig.customFieldName} - ${fieldConfig.contextName}`)}
                 </PageHeader>
+                <ScrollToTop/>
 
                 <div className="flex-column">
                     <FormField

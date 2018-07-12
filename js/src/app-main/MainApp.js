@@ -6,6 +6,8 @@ import PageHeader from '@atlaskit/page-header';
 
 import {PageCard} from './PageCard';
 
+import {ScrollToTop} from '../common/ScrollToTop';
+
 import './MainApp.less';
 
 
@@ -14,6 +16,7 @@ export class MainApp extends React.PureComponent<{}> {
         return (
             <Page>
                 <PageHeader>Mail.ru Groovy</PageHeader>
+                <ScrollToTop/>
                 <div className="MainApp">
                     <PageCard
                         href="/console"

@@ -33,6 +33,7 @@ import type {DialogComponentProps} from '../common/script-list/types';
 import type {BindingType} from '../common/editor/types';
 import {extractShortClassName} from '../common/classNames';
 import {withRoot} from '../common/script-list/breadcrumbs';
+import {ScrollToTop} from '../common/ScrollToTop';
 
 
 //AbstractProjectEvent
@@ -366,6 +367,8 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                         `${ListenerMessages.editListener}: ${listener ? listener.name : ''}`
                     }
                 </PageHeader>
+                <ScrollToTop/>
+
                 {body}
             </Page>
         );

@@ -19,6 +19,7 @@ import {RestMessages} from '../i18n/rest.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 
 import {MultiSelect, AsyncPicker, EditorField, FormField, ErrorMessage, RouterLink} from '../common/ak';
+import {ScrollToTop} from '../common/ScrollToTop';
 import {withRoot} from '../common/script-list';
 
 import {restService} from '../service/services';
@@ -387,6 +388,7 @@ export class RestFormInternal extends React.Component<Props, State> {
                         `${RegistryMessages.editScript}: ${script ? script.name : ''}`
                     }
                 </PageHeader>
+                <ScrollToTop/>
                 {body}
             </Page>
         );

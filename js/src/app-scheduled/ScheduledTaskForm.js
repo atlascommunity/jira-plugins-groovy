@@ -33,6 +33,7 @@ import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 
 import {AsyncPicker, EditorField, JqlInput, FormField, FieldError, ErrorMessage, RouterLink} from '../common/ak';
+import {ScrollToTop} from '../common/ScrollToTop';
 import {withRoot} from '../common/script-list';
 
 import {scheduledTaskService} from '../service/services';
@@ -572,6 +573,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                 >
                     {isNew ? ScheduledTaskMessages.addTask : `${ScheduledTaskMessages.editTask}: ${task ? task.name : ''}`}
                 </PageHeader>
+                <ScrollToTop/>
                 {body}
             </Page>
         );
