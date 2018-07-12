@@ -124,6 +124,8 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
 
     private void fillEntityData(AuditLogEntryDto result, EntityType category, Integer entityId) {
         if (entityId != null) {
+            result.setScriptId(entityId);
+
             String name = null;
             String parentName = null;
             Boolean deleted = null;
@@ -163,7 +165,9 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
                     break;
                 }
                 case CUSTOM_FIELD: {
-                    name = customFieldHelper.getFieldName(activeObjects.get(FieldConfig.class, entityId).getFieldConfigId());
+                    Long fieldConfigId = activeObjects.get(FieldConfig.class, entityId).getFieldConfigId();
+                    result.setScriptId((int) (long) fieldConfigId);
+                    name = customFieldHelper.getFieldName(fieldConfigId);
                     deleted = false;
                     break;
                 }
@@ -177,7 +181,6 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
             result.setScriptName(name);
             result.setParentName(parentName);
             result.setDeleted(deleted);
-            result.setScriptId(entityId);
         }
     }
 }
