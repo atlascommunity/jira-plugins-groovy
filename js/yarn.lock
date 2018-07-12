@@ -37,34 +37,7 @@
     "@atlaskit/tooltip" "^10.2.0"
     babel-runtime "^6.26.0"
 
-"@atlaskit/button@^8.1.2", "@atlaskit/button@^8.2.2":
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/@atlaskit/button/-/button-8.2.3.tgz#3b39eb9b4201d2428d1bdda6eeccb4fcb45a03cc"
-  dependencies:
-    "@atlaskit/analytics-next" "^2.1.8"
-    "@atlaskit/spinner" "8.0.0"
-    "@atlaskit/theme" "^4.0.4"
-    babel-runtime "^6.26.0"
-
-"@atlaskit/button@^8.2.4":
-  version "8.2.4"
-  resolved "https://registry.yarnpkg.com/@atlaskit/button/-/button-8.2.4.tgz#90befce6a28fe3fb484370eeb620097fca3c0009"
-  dependencies:
-    "@atlaskit/analytics-next" "^2.1.8"
-    "@atlaskit/spinner" "8.0.0"
-    "@atlaskit/theme" "^4.0.4"
-    babel-runtime "^6.26.0"
-
-"@atlaskit/button@^8.2.5":
-  version "8.2.6"
-  resolved "https://registry.yarnpkg.com/@atlaskit/button/-/button-8.2.6.tgz#1fd87424ae35f5e5efc78861f026cee0f56ae38d"
-  dependencies:
-    "@atlaskit/analytics-next" "^2.1.8"
-    "@atlaskit/spinner" "8.0.0"
-    "@atlaskit/theme" "^4.0.4"
-    babel-runtime "^6.26.0"
-
-"@atlaskit/button@^8.2.7":
+"@atlaskit/button@8.2.7", "@atlaskit/button@^8.1.2", "@atlaskit/button@^8.2.2", "@atlaskit/button@^8.2.4", "@atlaskit/button@^8.2.5", "@atlaskit/button@^8.2.7":
   version "8.2.7"
   resolved "https://registry.yarnpkg.com/@atlaskit/button/-/button-8.2.7.tgz#28d1797bf20a57ae01065df72f7810fd59105c15"
   dependencies:
@@ -186,31 +159,7 @@
     "@atlaskit/theme" "^4.0.4"
     "@atlaskit/util-shared-styles" "^2.10.3"
 
-"@atlaskit/icon@^12.1.2", "@atlaskit/icon@^12.3.1":
-  version "12.4.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.4.0.tgz#7c75642279882be0263bd9090fa2f910436888e9"
-  dependencies:
-    "@atlaskit/theme" "^4.0.4"
-    babel-runtime "^6.26.0"
-    uuid "^3.1.0"
-
-"@atlaskit/icon@^12.5.0":
-  version "12.7.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.7.0.tgz#70451364348f8b0ee6541d9b3a20ea55999304bb"
-  dependencies:
-    "@atlaskit/theme" "^4.0.4"
-    babel-runtime "^6.26.0"
-    uuid "^3.1.0"
-
-"@atlaskit/icon@^12.6.1", "@atlaskit/icon@^12.6.2":
-  version "12.6.2"
-  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.6.2.tgz#b8725ac5e1a9197ba97bbabb8a122b3d31dcf8fa"
-  dependencies:
-    "@atlaskit/theme" "^4.0.4"
-    babel-runtime "^6.26.0"
-    uuid "^3.1.0"
-
-"@atlaskit/icon@^12.8.0":
+"@atlaskit/icon@12.8.0", "@atlaskit/icon@^12.1.2", "@atlaskit/icon@^12.3.1", "@atlaskit/icon@^12.5.0", "@atlaskit/icon@^12.6.1", "@atlaskit/icon@^12.6.2", "@atlaskit/icon@^12.8.0":
   version "12.8.0"
   resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.8.0.tgz#44095171300c664834937593b32b3b8515745eaa"
   dependencies:
@@ -234,16 +183,7 @@
     "@atlaskit/inline-dialog" "^7.1.2"
     "@atlaskit/theme" "^4.0.4"
 
-"@atlaskit/item@^7.0.5":
-  version "7.0.5"
-  resolved "https://registry.yarnpkg.com/@atlaskit/item/-/item-7.0.5.tgz#403bdb6ce3b6104e664e7f0d6bf9f07ede64d777"
-  dependencies:
-    "@atlaskit/theme" "^4.0.4"
-    prop-types "^15.5.10"
-    react-addons-text-content "^0.0.4"
-    uuid "^3.1.0"
-
-"@atlaskit/item@^7.0.8":
+"@atlaskit/item@7.0.8", "@atlaskit/item@^7.0.5", "@atlaskit/item@^7.0.8":
   version "7.0.8"
   resolved "https://registry.yarnpkg.com/@atlaskit/item/-/item-7.0.8.tgz#324dfb81ce5f7e17955b5044e5c461c6e5ced030"
   dependencies:
@@ -337,13 +277,7 @@
     babel-runtime "^6.26.0"
     react-transition-group "^2.2.1"
 
-"@atlaskit/theme@^4.0.3", "@atlaskit/theme@^4.0.4":
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-4.0.4.tgz#d39820e3ffd331d8b1bf7fa4f1af7694ba51c601"
-  dependencies:
-    prop-types "^15.5.10"
-
-"@atlaskit/theme@^4.1.0":
+"@atlaskit/theme@4.1.0", "@atlaskit/theme@^4.0.3", "@atlaskit/theme@^4.0.4", "@atlaskit/theme@^4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-4.1.0.tgz#b3fec7722861af4b6dd9ee524bd57bf878e3bf09"
   dependencies:
