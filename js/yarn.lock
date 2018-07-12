@@ -55,9 +55,18 @@
     "@atlaskit/theme" "^4.0.4"
     babel-runtime "^6.26.0"
 
-"@atlaskit/button@^8.2.5", "@atlaskit/button@^8.2.6":
+"@atlaskit/button@^8.2.5":
   version "8.2.6"
   resolved "https://registry.yarnpkg.com/@atlaskit/button/-/button-8.2.6.tgz#1fd87424ae35f5e5efc78861f026cee0f56ae38d"
+  dependencies:
+    "@atlaskit/analytics-next" "^2.1.8"
+    "@atlaskit/spinner" "8.0.0"
+    "@atlaskit/theme" "^4.0.4"
+    babel-runtime "^6.26.0"
+
+"@atlaskit/button@^8.2.7":
+  version "8.2.7"
+  resolved "https://registry.yarnpkg.com/@atlaskit/button/-/button-8.2.7.tgz#28d1797bf20a57ae01065df72f7810fd59105c15"
   dependencies:
     "@atlaskit/analytics-next" "^2.1.8"
     "@atlaskit/spinner" "8.0.0"
@@ -185,7 +194,7 @@
     babel-runtime "^6.26.0"
     uuid "^3.1.0"
 
-"@atlaskit/icon@^12.5.0", "@atlaskit/icon@^12.7.0":
+"@atlaskit/icon@^12.5.0":
   version "12.7.0"
   resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.7.0.tgz#70451364348f8b0ee6541d9b3a20ea55999304bb"
   dependencies:
@@ -196,6 +205,14 @@
 "@atlaskit/icon@^12.6.1", "@atlaskit/icon@^12.6.2":
   version "12.6.2"
   resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.6.2.tgz#b8725ac5e1a9197ba97bbabb8a122b3d31dcf8fa"
+  dependencies:
+    "@atlaskit/theme" "^4.0.4"
+    babel-runtime "^6.26.0"
+    uuid "^3.1.0"
+
+"@atlaskit/icon@^12.8.0":
+  version "12.8.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-12.8.0.tgz#44095171300c664834937593b32b3b8515745eaa"
   dependencies:
     "@atlaskit/theme" "^4.0.4"
     babel-runtime "^6.26.0"
@@ -297,11 +314,12 @@
     "@atlaskit/icon" "^12.5.0"
     "@atlaskit/theme" "^4.1.0"
 
-"@atlaskit/select@^4.5.1":
-  version "4.5.1"
-  resolved "https://registry.yarnpkg.com/@atlaskit/select/-/select-4.5.1.tgz#0198cb499aeb535d24dac8ceec400b9421569d01"
+"@atlaskit/select@^4.5.2":
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/select/-/select-4.5.2.tgz#e924ba60c00348cd3b8e25d3bc124c980e0267d2"
   dependencies:
     "@atlaskit/icon" "^12.6.2"
+    "@atlaskit/spinner" "^8.0.0"
     "@atlaskit/theme" "^4.0.4"
     focus-trap "^2.4.5"
     memoize-one "^3.0.1"
