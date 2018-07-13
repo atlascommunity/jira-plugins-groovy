@@ -7,7 +7,6 @@ import memoizeOne from 'memoize-one';
 
 import Button from '@atlaskit/button';
 
-import VidPlayIcon from '@atlaskit/icon/glyph/vid-play'; //todo: better icon
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import type {JqlScriptType} from './types';
