@@ -125,6 +125,16 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     }
 
     @Override
+    public Class parseClass(String classBody, boolean extended) {
+        return parseClass(classBody, extended, false, null).getScriptClass();
+    }
+
+    @Override
+    public Class parseClassStatic(String classBody, boolean extended, Map<String, Class> types) {
+        return parseClass(classBody, extended, true, types).getScriptClass();
+    }
+
+    @Override
     public CacheStatsDto getCacheStats() {
         CacheStats stats = scriptCache.stats();
 

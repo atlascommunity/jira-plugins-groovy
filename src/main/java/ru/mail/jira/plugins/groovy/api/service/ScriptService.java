@@ -16,6 +16,10 @@ public interface ScriptService {
 
     ParseContext parseScriptStatic(String script, Map<String, Class> types);
 
+    Class parseClass(String classBody, boolean extended);
+
+    Class parseClassStatic(String classBody, boolean extended, Map<String, Class> types);
+
     CacheStatsDto getCacheStats();
 
     Map<String, Class> getGlobalVariableTypes();

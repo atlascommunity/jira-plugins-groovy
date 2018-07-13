@@ -4,6 +4,7 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
@@ -162,9 +163,9 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
 
-        CompiledScript functionClass = scriptService.parseClass(form.getScriptBody(), false);
+        Class functionClass = scriptService.parseClassStatic(form.getScriptBody(), false, ImmutableMap.of());
 
-        if (!ScriptFunction.class.isAssignableFrom(functionClass.getScriptClass())) {
+        if (!ScriptFunction.class.isAssignableFrom(functionClass)) {
             throw new ValidationException("Must implement ru.mail.jira.plugins.groovy.api.jql.ScriptFunction", "scriptBody");
         }
     }
