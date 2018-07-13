@@ -17,7 +17,6 @@ import {Loader} from '../common/ak/Loader';
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {jqlScriptService, watcherService} from '../service/services';
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
-import {withRoot} from '../common/script-list/breadcrumbs';
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 import {RouterLink} from '../common/ak/RouterLink';
 

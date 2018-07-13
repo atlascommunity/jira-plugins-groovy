@@ -10,7 +10,6 @@ import {addItem, updateItem} from '../common/redux';
 import {jqlScriptService} from '../service/services';
 
 import {RegistryMessages} from '../i18n/registry.i18n';
-import {ReturnTypes} from '../common/bindings';
 import {ScriptForm, makeScriptForm, type SubmitResult, type ProvidedState} from '../common/script-list/ScriptForm';
 import type {DialogComponentProps} from '../common/script-list/types';
 
@@ -72,11 +71,6 @@ const onSubmit = (id: ?number, data: {[string]: any}): Promise<SubmitResult> => 
         );
 };
 
-const returnTypes = [{
-    ...ReturnTypes.string,
-    optional: true
-}];
-
 class JqlFormInternal extends React.PureComponent<Props> {
     render() {
         return (
@@ -89,7 +83,7 @@ class JqlFormInternal extends React.PureComponent<Props> {
                     createTitle: RegistryMessages.addScript,
                     parentName: 'JQL scripts'
                 }}
-                returnTypes={returnTypes}
+                returnTypes={[]}
                 returnTo="/jql/"
 
                 {...this.props}
