@@ -8,6 +8,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.google.common.collect.ImmutableMap;
 import org.dom4j.tree.DefaultElement;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -52,7 +53,7 @@ public class ModuleManager {
 
     private CustomFunction initializeFunction(JqlFunctionScriptDto script) {
         try {
-            Class scriptClass = scriptService.parseClass(script.getScriptBody(), false).getScriptClass();
+            Class scriptClass = scriptService.parseClassStatic(script.getScriptBody(), false, ImmutableMap.of());
 
             if (ScriptFunction.class.isAssignableFrom(scriptClass)) {
                 if (Arrays.stream(scriptClass.getConstructors()).anyMatch(it -> it.getParameterCount() == 0)) {
