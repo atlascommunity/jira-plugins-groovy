@@ -65,7 +65,6 @@ export class JqlRoute extends React.PureComponent<{}> {
                                             {RegistryMessages.addScript}
                                         </Button>
                                     }
-                                    breadcrumbs={withRoot([])}
                                 />
                             }
                         </Route>
@@ -81,7 +80,7 @@ export class JqlRoute extends React.PureComponent<{}> {
                         </Route>
                         <Route path="/jql/create" exact={true}>
                             {() =>
-                                <JqlForm isNew={true}/>
+                                <JqlForm isNew={true} id={null}/>
                             }
                         </Route>
                         <Route component={NotFoundPage}/>
