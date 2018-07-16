@@ -11,7 +11,7 @@ module.exports = {
         workflow: ['./config/polyfills', './src/app-workflow/index.js'],
     },
     output: {
-        path: path.resolve(OUTPUT_DIR, "build"),
+        path: path.resolve(OUTPUT_DIR),
         filename: 'ru/mail/jira/plugins/groovy/js/[name].js',
         chunkFilename: 'ru/mail/jira/plugins/groovy/js/[name].chunk.js',
         publicPath: "/assets/",
@@ -34,7 +34,7 @@ module.exports = {
                 'jquery': {
                     dependency: 'com.atlassian.plugins.jquery:jquery',
                     import: {
-                        amd: 'jquery'
+                        var: 'AJS.$'
                     }
                 },
                 'AJS': {
@@ -42,12 +42,17 @@ module.exports = {
                     import: {
                         var: 'AJS'
                     }
+                },
+                'external-i18n': {
+                    dependency: 'ru.mail.jira.plugins.groovy:react-i18n',
+                    import: {
+                        var: 'require(\'mailru/groovy/i18n-react\')'
+                    }
                 }
             }
         })
     ],
     externals: {
-        'external-i18n': 'require(\'/mailru/groovy/i18n-react\')',
         extDefine: 'define',
     },
     module: {
@@ -71,7 +76,7 @@ module.exports = {
                                 require('@babel/preset-flow'),
                             ],
                             plugins: [
-                                'flow-react-proptypes',
+                                //'flow-react-proptypes',
                                 require('@babel/plugin-transform-destructuring'),
                                 require('@babel/plugin-proposal-class-properties'),
                                 require('@babel/plugin-proposal-object-rest-spread')

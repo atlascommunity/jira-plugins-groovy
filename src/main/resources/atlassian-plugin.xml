@@ -12,49 +12,15 @@
     <!-- add our i18n resource -->
     <resource type="i18n" name="i18n" location="ru.mail.jira.plugins.groovy.i18n"/>
 
-    <!-- react resources -->
-    <web-resource key="react-common">
+    <web-resource key="react-i18n">
         <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
 
-        <!--todo: remove unused -->
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <dependency>com.atlassian.auiplugin:dialog2</dependency>
-        <dependency>com.atlassian.auiplugin:aui-experimental-tooltips</dependency>
-        <dependency>com.atlassian.auiplugin:aui-select</dependency>
-        <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+        <dependency>jira.webresources:almond</dependency>
 
         <resource type="download" name="i18n.js" location="/ru/mail/jira/plugins/groovy/i18n.js"/>
-        <resource type="download" name="common.css" location="/ru/mail/jira/plugins/groovy/css/common.css"/>
-        <resource type="download" name="common.css.smap" location="/ru/mail/jira/plugins/groovy/css/common.css.smap"/>
-        <resource type="download" name="common.js" location="/ru/mail/jira/plugins/groovy/js/common.js"/>
-        <resource type="download" name="common.js.smap" location="/ru/mail/jira/plugins/groovy/js/common.js.smap"/>
     </web-resource>
-
-    <web-resource key="react-main" name="groovy main Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="main.css" location="/ru/mail/jira/plugins/groovy/css/main.css"/>
-        <resource type="download" name="main.css.smap" location="/ru/mail/jira/plugins/groovy/css/main.css.smap"/>
-        <resource type="download" name="main.js" location="/ru/mail/jira/plugins/groovy/js/main.js"/>
-        <resource type="download" name="main.js.smap" location="/ru/mail/jira/plugins/groovy/js/main.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.main</context>
-    </web-resource>
-
-    <web-resource key="workflow" name="groovy workflow Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="workflow.css" location="/ru/mail/jira/plugins/groovy/css/workflow.css"/>
-        <resource type="download" name="workflow.css.smap" location="/ru/mail/jira/plugins/groovy/css/workflow.css.smap"/>
-        <resource type="download" name="workflow.js" location="/ru/mail/jira/plugins/groovy/js/workflow.js"/>
-        <resource type="download" name="workflow.js.smap" location="/ru/mail/jira/plugins/groovy/js/workflow.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.workflow</context>
-    </web-resource>
-
-    <!-- end of resources -->
 
     <rest key="groovyRest" path="/my-groovy" version="1.0">
         <description>Groovy rest module</description>

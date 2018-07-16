@@ -9,6 +9,6 @@
 <div id="react-content">
 </div>
 
-$webResourceManager.requireResource("ru.mail.jira.plugins.groovy:react-main")
+$webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.main")
 </body>
 </html>

@@ -1,4 +1,6 @@
-define('/mailru/groovy/i18n-react', function() {
+define('mailru/groovy/i18n-react', [], function() {
+    console.log('defining i18n');
+
     return {
         fields: {
             name: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.name'),
