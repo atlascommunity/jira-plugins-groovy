@@ -11,6 +11,7 @@ import {ScrollToTop} from '../common/ScrollToTop';
 import './MainApp.less';
 
 
+// eslint-disable-next-line react/prefer-stateless-function
 export class MainApp extends React.PureComponent<{}> {
     render() {
         return (

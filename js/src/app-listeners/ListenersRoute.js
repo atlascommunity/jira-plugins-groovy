@@ -16,7 +16,6 @@ import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {ListenerMessages} from '../i18n/listener.i18n';
 
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
-import {withRoot} from '../common/script-list/breadcrumbs';
 import {ItemActionCreators} from '../common/redux';
 
 import {NotFoundPage, ItemViewPage} from '../common/script-list';
