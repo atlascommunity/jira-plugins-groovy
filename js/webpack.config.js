@@ -1,6 +1,8 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const WrmPlugin = require('atlassian-webresource-webpack-plugin');
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 
 const devMode = process.env.NODE_ENV !== 'production';
 const OUTPUT_DIR = '../src/main/resources/';
@@ -18,9 +20,29 @@ module.exports = {
         jsonpFunction: 'mailruGroovyWebpackJsonp',
         sourceMapFilename: '[file].smap'
     },
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                cache: true,
+                parallel: true,
+                sourceMap: true
+            }),
+            new OptimizeCSSAssetsPlugin({})
+        ],
+        splitChunks: {
+            cacheGroups: {
+                commons: {
+                    name: 'commons',
+                    chunks: 'initial',
+                    minChunks: 2
+                }
+            }
+        }
+    },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: "[name].css"
+            filename: "ru/mail/jira/plugins/groovy/css/[name].css",
+            chunkFilename: "ru/mail/jira/plugins/groovy/css/[id].css"
         }),
         new WrmPlugin({
             pluginKey: 'ru.mail.jira.plugins.groovy',
