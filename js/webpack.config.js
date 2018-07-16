@@ -42,7 +42,7 @@ module.exports = {
     plugins: [
         new MiniCssExtractPlugin({
             filename: "ru/mail/jira/plugins/groovy/css/[name].css",
-            chunkFilename: "ru/mail/jira/plugins/groovy/css/[id].css"
+            chunkFilename: "ru/mail/jira/plugins/groovy/css/[name].chunk.css"
         }),
         new WrmPlugin({
             pluginKey: 'ru.mail.jira.plugins.groovy',
