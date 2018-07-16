@@ -11,7 +11,6 @@ import {ViewFieldScript} from './ViewFieldScript';
 
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
-import {withRoot} from '../common/script-list/breadcrumbs';
 
 import {fieldConfigService, watcherService} from '../service/services';
 

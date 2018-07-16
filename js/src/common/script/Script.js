@@ -172,11 +172,11 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         } = this.props;
         const {activeSource, showCode, changelogsReady, changelogs, executions, executionsReady, onlyLastExecutions} = this.state;
 
-        let codeBlock : Node = null;
-        let templateBlock : Node = null;
-        let executionBar : Node = null;
+        let codeBlock: Node = null;
+        let templateBlock: Node = null;
+        let executionBar: Node = null;
 
-        const isOpen : boolean = showCode || !collapsible;
+        const isOpen: boolean = showCode || !collapsible;
 
         if (isOpen && script) {
             if (template) {
@@ -250,7 +250,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             }
         }
 
-        const buttons : Array<Element<any>> = [];
+        const buttons: Array<Element<any>> = [];
 
         if (collapsible && script) {
             buttons.push(

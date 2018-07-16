@@ -1,6 +1,7 @@
 //@flow
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
+import $ from 'jquery';
 
 import type {ErrorType, ErrorDataType, HttpMethod} from '../common/types';
 
@@ -34,7 +35,7 @@ export function ajaxPut(url: string, data: any): Promise<any> {
 
 export function ajaxPromise(url: string, method: HttpMethod, _params: any, data: any): Promise<any> {
     return new Promise((resolve: PromiseCallback, reject: PromiseRejectCallback) => {
-        AJS.$
+        $
             .ajax({
                 url: url,
                 type: (method: string),

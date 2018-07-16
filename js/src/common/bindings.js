@@ -3,7 +3,7 @@
 import type {BindingType, ReturnType} from './editor/types';
 
 
-export const globalBindings : Array<BindingType> = [
+export const globalBindings: Array<BindingType> = [
     {
         name: 'httpClient',
         className: 'HttpClient',

@@ -235,7 +235,15 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                                                     }
                                                     <div className="flex-none" style={{marginLeft: '5px'}}>
                                                         {e.javaDoc ?
-                                                            <a href={e.javaDoc} title={e.fullClassName} target="_blank">{e.className}</a> :
+                                                            <a
+                                                                href={e.javaDoc}
+                                                                title={e.fullClassName}
+
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                            >
+                                                                {e.className}
+                                                            </a> :
                                                             <abbr title={e.fullClassName}>{e.className}</abbr>
                                                         }
                                                     </div>
@@ -264,7 +272,14 @@ function Binding({binding}: BindingProps): Node {
             <div className="flex-grow"/>
             <div className="flex-none" style={{marginLeft: '5px'}}>
                 {binding.javaDoc ?
-                    <a href={binding.javaDoc} title={binding.fullClassName} target="_blank">{binding.className}</a> :
+                    <a
+                        href={binding.javaDoc}
+                        title={binding.fullClassName}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {binding.className}
+                    </a> :
                     <abbr title={binding.fullClassName}>{binding.className}</abbr>
                 }
             </div>

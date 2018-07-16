@@ -150,6 +150,7 @@
                     <jvmArgs>-Xmx2048m -Djira.websudo.is.disabled=false -Datlassian.mail.senddisabled=false</jvmArgs>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
+                        <Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>
                         <Export-Package>ru.mail.jira.plugins.api,</Export-Package>
                         <Import-Package>
                             <!-- imports -->
