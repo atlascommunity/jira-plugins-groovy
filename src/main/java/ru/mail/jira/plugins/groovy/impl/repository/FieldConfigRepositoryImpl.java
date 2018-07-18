@@ -318,9 +318,15 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         boolean isTemplated = isTemplated(jiraConfig);
 
         result.setId(jiraConfig.getId());
-        result.setCustomFieldName(customField.getName());
+
+        String customFieldName = customField.getName();
+        String contextName = fieldConfigSchemeManager.getConfigSchemeForFieldConfig(jiraConfig).getName();
+
+        result.setName(customFieldName + " - " + contextName);
+        result.setCustomFieldName(customFieldName);
         result.setCustomFieldId(customField.getIdAsLong());
-        result.setContextName(fieldConfigSchemeManager.getConfigSchemeForFieldConfig(jiraConfig).getName());
+        result.setContextName(contextName);
+
         result.setNeedsTemplate(isTemplated);
         result.setType(customField.getCustomFieldType().getName());
 

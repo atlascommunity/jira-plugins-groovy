@@ -15,6 +15,8 @@ public class FieldConfigDto extends FieldConfigForm {
     @XmlElement
     private Long id;
     @XmlElement
+    private String name;
+    @XmlElement
     private Long customFieldId;
     @XmlElement
     private boolean needsTemplate;

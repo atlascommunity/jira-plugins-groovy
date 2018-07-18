@@ -47,7 +47,7 @@ export class FieldScript extends React.PureComponent<Props> {
 
                 script={{
                     id: script.uuid,
-                    name: `${script.customFieldName} - ${script.contextName}`,
+                    name: script.name,
                     inline: true,
                     scriptBody: script.scriptBody,
                     changelogs: script.changelogs,

@@ -221,7 +221,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                                 />,
                                 <BreadcrumbsItem
                                     key="script"
-                                    text={`${fieldConfig.customFieldName} - ${fieldConfig.contextName}`}
+                                    text={fieldConfig.name}
                                     href={`/fields/${fieldConfig.id}/view`}
                                     component={RouterLink}
                                 />
