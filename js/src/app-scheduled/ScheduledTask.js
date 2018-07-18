@@ -110,7 +110,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
     });
 
     _getParams = memoizeOne(
-        (task: ScheduledTaskType): Array<ScriptParam> => {
+        (task: ScheduledTaskType): Array<?ScriptParam> => {
             const params = [
                 {
                     label: FieldMessages.schedule,

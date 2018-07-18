@@ -57,7 +57,7 @@ export type ScriptProps = {
     additionalButtons?: Array<Element<any>>,
     additionalPrimaryButtons?: Array<Element<any>>,
     dropdownItems?: Array<DropdownItemType>,
-    additionalParameters?: Array<ScriptParam>
+    additionalParameters?: Array<?ScriptParam>
 };
 
 type ScriptState = {

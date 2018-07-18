@@ -58,7 +58,7 @@ class ListenerInternal extends React.PureComponent<Props> {
     );
 
     _getParams = memoizeOne(
-        (projects: ObjectMap, eventTypes: ObjectMap, condition: ConditionType): Array<ScriptParam> => {
+        (projects: ObjectMap, eventTypes: ObjectMap, condition: ConditionType): Array<?ScriptParam> => {
             const params = [
                 {
                     label: FieldMessages.type,
