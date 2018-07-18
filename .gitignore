@@ -3,3 +3,4 @@
 target
 .DS_Store
 src/main/resources/ru/mail/jira/plugins/groovy/js
+src/main/resources/META-INF/plugin-descriptors/wr-defs.xml
