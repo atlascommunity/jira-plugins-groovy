@@ -77,6 +77,8 @@ export class MultiSelect<T: OldSelectValue> extends React.PureComponent<Props<T>
                     isLoading={this.props.isLoading}
                     options={this.props.items}
 
+                    styles={{ menu: base => ({ ...base, zIndex: 10 }) }}
+
                     value={value ? value.map(key => lookupMap.get(key)).filter(e => e) : []}
                     onChange={this._onChange}
                 />

@@ -56,7 +56,13 @@ export class LargeSelect extends React.PureComponent<any, State> {
         const {options} = this.state;
 
         return (
-            <Select {...props} options={options} onInputChange={this._onFilterChange}/>
+            <Select
+                {...props}
+
+                styles={{ menu: base => ({ ...base, zIndex: 10 }) }}
+                options={options}
+                onInputChange={this._onFilterChange}
+            />
         );
     }
 }
