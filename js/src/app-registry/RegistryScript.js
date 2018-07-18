@@ -19,12 +19,12 @@ import {addWatch, removeWatch} from './redux/actions';
 import {WorkflowsDialog} from './WorkflowsDialog';
 import type {DeleteCallback, RegistryScriptType} from './types';
 
-import {CommonMessages} from '../i18n/common.i18n';
+import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import {registryService, watcherService} from '../service/services';
 
-import Script from '../common/script';
+import Script, {ScriptParameters} from '../common/script';
 import {RouterLink} from '../common/ak/RouterLink';
 
 
@@ -39,7 +39,9 @@ export type PublicRegistryScriptProps = {
     onDelete: DeleteCallback,
     title?: Node,
     children?: Node,
-    wrapperProps?: any
+    wrapperProps?: any,
+    collapsible?: boolean,
+    showParent?: boolean
 };
 
 export type RegistryScriptProps = PublicRegistryScriptProps & RegistryScriptConnectProps;
@@ -50,6 +52,11 @@ type RegistryScriptState = {
 };
 
 class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, RegistryScriptState> {
+    static defaultProps = {
+        collapsible: true,
+        showParent: false
+    };
+
     state = {
         showWorkflows: false,
         waitingWatch: false
@@ -93,7 +100,7 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
     _onDelete = () => this.props.onDelete(this.props.script.id, 'script', this.props.script.name);
 
     render() {
-        const {script, scriptWatches, wrapperProps, onDelete, ...props} = this.props;
+        const {script, scriptWatches, wrapperProps, onDelete, showParent, ...props} = this.props;
         const {showWorkflows, waitingWatch} = this.state;
 
         const isWatching = scriptWatches.includes(script.id);
@@ -155,13 +162,24 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
                         </DropdownMenu>
                     ]}
                 >
-                    <div className="flex-row" style={{marginBottom: '5px'}}>
-                        {script.types.map(type =>
-                            <div style={{marginRight: '5px'}} key={type}>
-                                <Lozenge appearance="new" isBold={true}>{type}</Lozenge>
-                            </div>
-                        )}
-                    </div>
+                    <ScriptParameters params={[
+                        showParent ? {
+                            label: FieldMessages.parentName,
+                            value: script.parentName
+                        } : null,
+                        {
+                            label: FieldMessages.type,
+                            value: (
+                                <div className="flex-row">
+                                    {script.types.map(type =>
+                                        <div style={{marginRight: '5px'}} key={type}>
+                                            <Lozenge appearance="new" isBold={true}>{type}</Lozenge>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        }
+                    ]}/>
                 </Script>
             </div>
         );

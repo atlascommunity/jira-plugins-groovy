@@ -9,7 +9,7 @@ import PageHeader from '@atlaskit/page-header';
 import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 
 import {addScript, updateScript, deleteScript } from './redux/actions';
-import {scriptSelectorFactory} from './redux/selectors';
+import {scriptWithParentSelectorFactory} from './redux/selectors';
 import type {RegistryScriptType} from './types';
 import {RegistryScript} from './RegistryScript';
 
@@ -67,7 +67,7 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
                     {script ? script.name : 'Unknown script'}
                 </PageHeader>
                 {script ?
-                    <RegistryScript script={script} collapsible={false} onDelete={this._toggleDelete}/> :
+                    <RegistryScript script={script} collapsible={false} onDelete={this._toggleDelete} showParent={true}/> :
                     <NotFoundPage/>
                 }
                 {isDeleting && script &&
@@ -93,10 +93,10 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
 export const ViewScript = withRouter(
     connect(
         (): * => {
-            const scriptSelector = scriptSelectorFactory();
+            const scriptSelector = scriptWithParentSelectorFactory();
             //$FlowFixMe
             return (state, props) => ({
-                script: scriptSelector(state, props)
+                script: scriptSelector(state, props) //todo: modify selector to get parent names
             });
         },
         { addScript, updateScript, deleteScript }

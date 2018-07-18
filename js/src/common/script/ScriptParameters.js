@@ -10,7 +10,7 @@ export type ScriptParam = {
 };
 
 type ScriptParametersProps = {
-    params: Array<ScriptParam>
+    params: Array<?ScriptParam>
 };
 
 export class ScriptParameters extends React.PureComponent<ScriptParametersProps> {
@@ -19,7 +19,7 @@ export class ScriptParameters extends React.PureComponent<ScriptParametersProps>
 
         return (
             <div className="scriptParams">
-                {params.map((param, i) =>
+                {params.filter(Boolean).map((param, i) =>
                     <div className="item" key={i}>
                         <div className="label">
                             <Label label={`${param.label}:`} isFirstChild={true}/>
