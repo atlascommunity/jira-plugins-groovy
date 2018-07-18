@@ -5,12 +5,17 @@ import memoizeOne from 'memoize-one';
 
 import {ScriptPage} from './ScriptPage';
 
+import {orderedItemsSelector} from '../redux/selectors';
+
+
+const itemsSelector = orderedItemsSelector();
 
 export const ConnectedScriptPage = connect(
     memoizeOne(
-        ({items, watches, isReady}: *): * => {
+        ({watches, isReady, ...rest}: *): * => {
             return {
-                items, watches, isReady
+                items: itemsSelector(rest),
+                watches, isReady
             };
         }
     )
