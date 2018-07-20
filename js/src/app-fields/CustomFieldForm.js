@@ -38,14 +38,13 @@ import {ScrollToTop} from '../common/ScrollToTop';
 const bindings = [ Bindings.issue ];
 const bindingsWithVelocity = [ Bindings.issue, Bindings.velocityParams ];
 
-type Form = {
+type Form = {|
     comment: string,
     scriptBody: string,
     cacheable: boolean,
-    compileStatic: boolean,
     template?: string,
     velocityParamsEnabled: boolean
-};
+|};
 
 type FormFieldType = $Keys<Form>;
 
@@ -54,7 +53,6 @@ const makeForm: RecordFactory<Form> = Record({
     scriptBody: '',
     template: '',
     cacheable: true,
-    compileStatic: true,
     velocityParamsEnabled: false
 });
 
@@ -88,7 +86,6 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                 cacheable: fieldConfig.cacheable,
                 template: fieldConfig.template || '',
                 velocityParamsEnabled: fieldConfig.velocityParamsEnabled,
-                compileStatic: fieldConfig.compileStatic,
                 comment: ''
             }),
             waiting: false,
@@ -251,17 +248,6 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                                 isChecked={values.get('cacheable')}
 
                                 name="cacheable"
-                                value="true"
-                            />
-                            <CheckboxStateless
-                                label="Static compilation"
-
-                                isDisabled={waiting}
-
-                                onChange={this._setToggleValue('compileStatic')}
-                                isChecked={values.get('compileStatic')}
-
-                                name="compileStatic"
                                 value="true"
                             />
                             {fieldConfig.needsTemplate &&

@@ -161,8 +161,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
                 new DBParam("SCRIPT_BODY", form.getScriptBody()),
                 new DBParam("CACHEABLE", form.isCacheable()),
                 new DBParam("TEMPLATE", form.getTemplate()),
-                new DBParam("VELOCITY_PARAMS_ENABLED", form.isVelocityParamsEnabled()),
-                new DBParam("COMPILE_STATIC", form.isCompileStatic())
+                new DBParam("VELOCITY_PARAMS_ENABLED", form.isVelocityParamsEnabled())
             );
 
             diff = changelogHelper.generateDiff(configId, "", "field", "", form.getScriptBody());
@@ -196,7 +195,6 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, comment, additionalParams);
 
             fieldConfig.setCacheable(form.isCacheable());
-            fieldConfig.setCompileStatic(form.isCompileStatic());
             fieldConfig.setScriptBody(form.getScriptBody());
             fieldConfig.setUuid(UUID.randomUUID().toString());
             fieldConfig.setTemplate(form.getTemplate());
@@ -242,7 +240,6 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             fieldConfig.getScriptBody(),
             fieldConfig.getTemplate(),
             fieldConfig.getCacheable(),
-            fieldConfig.getCompileStatic() != null ? fieldConfig.getCompileStatic() : false,
             fieldConfig.isVelocityParamsEnabled()
         );
     }
@@ -276,11 +273,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
     }
 
     private void validate(boolean isNew, boolean template, FieldConfigForm form) {
-        if (form.isCompileStatic()) {
-            scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getFieldConfigTypes(form.isVelocityParamsEnabled()));
-        } else {
-            scriptService.parseScript(form.getScriptBody());
-        }
+        scriptService.parseScript(form.getScriptBody());
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
@@ -338,7 +331,6 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
 
         if (fieldConfig == null) {
             result.setCacheable(true);
-            result.setCompileStatic(true);
             result.setScriptBody("");
             if (isTemplated) {
                 result.setTemplate("");
@@ -346,7 +338,6 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             result.setChangelogs(ImmutableList.of());
         } else {
             result.setCacheable(fieldConfig.getCacheable());
-            result.setCompileStatic(fieldConfig.getCompileStatic() != null ? fieldConfig.getCompileStatic() : false);
             result.setVelocityParamsEnabled(fieldConfig.isVelocityParamsEnabled());
             result.setScriptBody(fieldConfig.getScriptBody());
             result.setUuid(fieldConfig.getUuid());
