@@ -14,7 +14,7 @@ import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
 import {fieldConfigService, watcherService} from '../service/services';
 
-import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
+import {filterReducer, ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {TitleMessages} from '../i18n/common.i18n';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
 
@@ -26,7 +26,8 @@ export class FieldsRoute extends React.PureComponent<{}> {
         combineReducers({
             items: itemsReducer,
             watches: watchesReducer,
-            isReady: readinessReducer
+            isReady: readinessReducer,
+            filter: filterReducer
         })
     );
 

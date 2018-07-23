@@ -1,7 +1,7 @@
 //@flow
 import React from 'react';
 
-import {createStore} from 'redux';
+import {combineReducers, createStore} from 'redux';
 import {Provider} from 'react-redux';
 import {Route, Switch} from 'react-router-dom';
 
@@ -10,13 +10,18 @@ import Button from '@atlaskit/button';
 import {Listener} from './Listener';
 import {ListenerForm} from './ListenerForm';
 
-import {listenersReducer} from './listeners.reducer';
-
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {ListenerMessages} from '../i18n/listener.i18n';
 
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
-import {ItemActionCreators} from '../common/redux';
+import {
+    filterReducer,
+    ItemActionCreators,
+    itemsReducer,
+    readinessReducer,
+    watchesReducer,
+    wholeObjectReducerFactory
+} from '../common/redux';
 
 import {NotFoundPage, ItemViewPage} from '../common/script-list';
 import {Loader, RouterLink} from '../common/ak';
@@ -46,7 +51,14 @@ function transformProjects(projects: *): ObjectMap {
 }
 
 export class ListenersRoute extends React.PureComponent<{}> {
-    store = createStore(listenersReducer);
+    store = createStore(combineReducers({
+        items: itemsReducer,
+        watches: watchesReducer,
+        projects: wholeObjectReducerFactory('projects', {}),
+        eventTypes: wholeObjectReducerFactory('eventTypes', {}),
+        isReady: readinessReducer,
+        filter: filterReducer
+    }));
 
     componentDidMount() {
         Promise

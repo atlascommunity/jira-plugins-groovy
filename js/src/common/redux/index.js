@@ -9,6 +9,8 @@ const ADD_ITEM = 'ADD_ITEM';
 const ADD_WATCH = 'ADD_WATCH';
 const REMOVE_WATCH = 'REMOVE_WATCH';
 
+const UPDATE_FILTER = 'UPDATE_FILTER';
+
 export type ItemType = {
     id: number
 };
@@ -133,7 +135,7 @@ export const addItem = (item: ItemType): * => ({
     type: ADD_ITEM,
     item: item
 });
-export const updateItem =  (item: ItemType): * => ({
+export const updateItem = (item: ItemType): * => ({
     type: UPDATE_ITEM,
     item: item
 });
@@ -163,3 +165,22 @@ export const WatchActionCreators = {
         };
     }
 };
+
+export type UpdateFilterAction = {
+    type: typeof UPDATE_FILTER,
+    filter: string
+};
+
+export const updateFilter = (filter: string) => ({ type: UPDATE_FILTER, filter });
+
+export function filterReducer(state?: string, action: UpdateFilterAction): string {
+    if (state === undefined) {
+        return '';
+    }
+
+    if (action.type === UPDATE_FILTER) {
+        return action.filter;
+    }
+
+    return state;
+}

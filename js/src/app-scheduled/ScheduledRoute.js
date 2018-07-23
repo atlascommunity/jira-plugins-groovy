@@ -12,7 +12,7 @@ import {ScheduledTaskForm} from './ScheduledTaskForm';
 
 import {scheduledTaskService, watcherService} from '../service/services';
 
-import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
+import {filterReducer, ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {ConnectedScriptPage, NotFoundPage, ItemViewPage} from '../common/script-list';
 import {Loader} from '../common/ak';
 
@@ -28,7 +28,8 @@ export class ScheduledRoute extends React.PureComponent<{}> {
         combineReducers({
             items: itemsReducer,
             isReady: readinessReducer,
-            watches: watchesReducer
+            watches: watchesReducer,
+            filter: filterReducer
         })
     );
 

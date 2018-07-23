@@ -15,7 +15,7 @@ import {RestMessages} from '../i18n/rest.i18n';
 
 import {NotFoundPage, ConnectedScriptPage, ItemViewPage} from '../common/script-list';
 
-import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
+import {filterReducer, ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {watcherService, restService} from '../service/services';
 import {Loader} from '../common/ak/Loader';
 import {RouterLink} from '../common/ak/RouterLink';
@@ -27,7 +27,8 @@ export class RestRoute extends React.PureComponent<{}> {
         combineReducers({
             items: itemsReducer,
             watches: watchesReducer,
-            isReady: readinessReducer
+            isReady: readinessReducer,
+            filter: filterReducer
         })
     );
 
