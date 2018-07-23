@@ -51,7 +51,8 @@ export class RunDialog extends React.PureComponent<Props, State> {
         const {values} = this.state;
 
         this.setState({
-            stage: 'running'
+            stage: 'running',
+            outcome: null
         });
 
         const params = {};
@@ -132,6 +133,10 @@ export class RunDialog extends React.PureComponent<Props, State> {
                         {
                             text: CommonMessages.close,
                             onClick: onClose,
+                        },
+                        {
+                            text: AdminScriptMessages.runAgain,
+                            onClick: this._run
                         }
                     ];
                 } else {
