@@ -71,11 +71,11 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
 
     _onSubmit = () => {
         const {id, parentId, isNew, updateDirectory, addDirectory, onClose} = this.props;
-        const {name} = this.state;
+        const {name, directory} = this.state;
 
         const data = {
             name: name,
-            parentId: parentId || undefined
+            parentId: parentId || (directory && directory.parentId) || undefined
         };
 
         if (!isNew && id) {
