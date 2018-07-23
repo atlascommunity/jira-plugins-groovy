@@ -167,13 +167,13 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
                 <div className="flex-column">
                     <FormField
                         label={FieldMessages.parentName}
-                        isRequired={true}
 
-                        isInvalid={errorField === 'directoryId'}
+                        isInvalid={errorField === 'parentId'}
                         invalidMessage={errorMessage || ''}
                     >
                         <AsyncPicker
                             src={`${getPluginBaseUrl()}/registry/directory/picker`}
+                            isClearable={true}
 
                             value={parent}
                             onChange={this._setParent}
