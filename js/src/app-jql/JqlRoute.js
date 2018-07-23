@@ -14,7 +14,7 @@ import {ViewJqlScript} from './ViewJqlScript';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {Loader} from '../common/ak/Loader';
-import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
+import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer, filterReducer} from '../common/redux';
 import {jqlScriptService, watcherService} from '../service/services';
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
@@ -26,7 +26,8 @@ export class JqlRoute extends React.PureComponent<{}> {
         combineReducers({
             items: itemsReducer,
             watches: watchesReducer,
-            isReady: readinessReducer
+            isReady: readinessReducer,
+            filter: filterReducer
         })
     );
 
