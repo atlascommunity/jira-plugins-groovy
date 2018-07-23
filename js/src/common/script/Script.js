@@ -53,6 +53,7 @@ export type ScriptProps = {
     onDelete?: VoidCallback,
 
     title?: Node,
+    scriptName?: Node,
     children?: Node,
     additionalButtons?: Array<Element<any>>,
     additionalPrimaryButtons?: Array<Element<any>>,
@@ -167,8 +168,8 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
 
     render() {
         const {
-            script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons,
-            additionalPrimaryButtons, additionalParameters, dropdownItems, headerless
+            script, template, title, scriptName, children, collapsible, withChangelog, onEdit, onDelete,
+            additionalButtons, additionalPrimaryButtons, additionalParameters, dropdownItems, headerless
         } = this.props;
         const {activeSource, showCode, changelogsReady, changelogs, executions, executionsReady, onlyLastExecutions} = this.state;
 
@@ -339,7 +340,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                             {' '}
                             <div className="flex-vertical-middle">
                                 <h3 title={script && script.name}>
-                                    {script && script.name}
+                                    {scriptName || (script && script.name)}
                                 </h3>
                             </div>
                             {script && !!script.warningCount &&

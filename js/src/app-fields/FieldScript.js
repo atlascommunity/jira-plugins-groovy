@@ -1,5 +1,5 @@
 //@flow
-import React from 'react';
+import React, {Fragment} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 
@@ -60,6 +60,16 @@ export class FieldScript extends React.PureComponent<Props> {
 
                 withChangelog={true}
                 collapsible={collapsible}
+
+                scriptName={
+                    <Fragment>
+                        {script.customFieldName}
+                        {' '}
+                        <span className="muted-text">
+                            {script.contextName}
+                        </span>
+                    </Fragment>
+                }
 
                 dropdownItems={[
                     {
