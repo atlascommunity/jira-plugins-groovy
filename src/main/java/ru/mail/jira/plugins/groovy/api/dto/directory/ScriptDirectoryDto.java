@@ -13,4 +13,6 @@ public class ScriptDirectoryDto extends ScriptDirectoryForm {
     private Integer id;
     @XmlElement
     private String fullName;
+    @XmlElement
+    private String parentName;
 }

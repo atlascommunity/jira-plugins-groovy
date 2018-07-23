@@ -20,6 +20,7 @@ export type RegistryDirectoryType = {
     id: number,
     name: string,
     parentId: ?number,
+    parentName: ?string,
     fullName?: string
 };
 

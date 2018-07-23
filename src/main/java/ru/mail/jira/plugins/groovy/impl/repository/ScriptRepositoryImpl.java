@@ -446,6 +446,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         ScriptDirectory parent = directory.getParent();
         if (parent != null) {
             result.setParentId(parent.getID());
+            result.setParentName(ScriptUtil.getExpandedName(directory.getParent()));
         }
 
         return result;

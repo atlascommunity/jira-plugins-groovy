@@ -16,6 +16,9 @@ import {registryService} from '../service/services';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import type {VoidCallback} from '../common/types';
+import {getPluginBaseUrl} from '../service/ajaxHelper';
+import {AsyncPicker, FormField} from '../common/ak';
+import type {SingleValueType} from '../common/ak/types';
 
 
 export type DialogParams = { isNew: boolean, id?: number, parentId?: ?number };
@@ -28,6 +31,7 @@ type Props = DialogParams & {
 
 type State = {
     name: string,
+    parent: ?SingleValueType,
     directory: ?RegistryDirectoryType,
     error: *
 };
@@ -35,12 +39,13 @@ type State = {
 export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, State> {
     state = {
         name: '',
+        parent: null,
         directory: null,
         error: null
     };
 
     componentDidMount() {
-        const {isNew, id} = this.props;
+        const {isNew, id, parentId} = this.props;
 
         if (!isNew) {
             registryService
@@ -48,14 +53,31 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
                 .getDirectory(id)
                 .then(data => this.setState({
                     name: data.name,
+                    parent: data.parentId? {
+                        value: data.parentId,
+                        label: data.parentName ? data.parentName : data.parentId.toString()
+                    } : null,
                     error: null,
                     directory: data
                 }));
         } else {
-            this.setState({
-                name: '',
-                error: null
-            });
+            if (parentId) {
+                registryService
+                    .getDirectory(parentId)
+                    .then(parent => this.setState({
+                        name: '',
+                        parent: {
+                            value: parent.id,
+                            label: parent.fullName ? parent.fullName : parent.id.toString()
+                        },
+                        error: null
+                    }));
+            } else {
+                this.setState({
+                    name: '',
+                    error: null
+                });
+            }
         }
     }
 
@@ -70,12 +92,12 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
     };
 
     _onSubmit = () => {
-        const {id, parentId, isNew, updateDirectory, addDirectory, onClose} = this.props;
-        const {name, directory} = this.state;
+        const {id, isNew, updateDirectory, addDirectory, onClose} = this.props;
+        const {name, parent} = this.state;
 
         const data = {
             name: name,
-            parentId: parentId || (directory && directory.parentId) || undefined
+            parentId: (parent && parent.value) || undefined
         };
 
         if (!isNew && id) {
@@ -106,9 +128,11 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
 
     _setName = (event: SyntheticEvent<HTMLInputElement>) => this.setState({ name: event.currentTarget.value });
 
+    _setParent = (value: ?SingleValueType) => this.setState({ parent: value });
+
     render() {
         const {onClose, isNew} = this.props;
-        const {error, directory} = this.state;
+        const {error, directory, parent} = this.state;
 
         let errorMessage: * = null;
         let errorField: ?string = null;
@@ -120,6 +144,9 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
         return (
             <ModalDialog
                 width="medium"
+
+                scrollBehavior="outside"
+                autoFocus={false}
 
                 isHeadingMultiline={false}
                 heading={isNew ? RegistryMessages.addDirectory : `${RegistryMessages.editDirectory}: ${directory ? directory.name : ''}`}
@@ -138,6 +165,22 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
             >
                 {error && !errorField && <ErrorMessage title={errorMessage || undefined}/>}
                 <div className="flex-column">
+                    <FormField
+                        label={FieldMessages.parentName}
+                        isRequired={true}
+
+                        isInvalid={errorField === 'directoryId'}
+                        invalidMessage={errorMessage || ''}
+                    >
+                        <AsyncPicker
+                            src={`${getPluginBaseUrl()}/registry/directory/picker`}
+
+                            value={parent}
+                            onChange={this._setParent}
+
+                            label=""
+                        />
+                    </FormField>
                     <FieldTextStateless
                         shouldFitContainer={true}
                         required={true}
