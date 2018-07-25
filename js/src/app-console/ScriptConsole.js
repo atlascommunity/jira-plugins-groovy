@@ -164,8 +164,8 @@ export class ScriptConsole extends React.Component<Props, State> {
                         <div>
                             <strong>{ConsoleMessages.executedIn(output.time.toString())}</strong>
                             {isHtml ?
-                                <div dangerouslySetInnerHTML={{__html: output.result}}/>:
-                                <pre>{output.result}</pre>
+                                <div dangerouslySetInnerHTML={{ __html: output.result }}/>:
+                                <pre style={{ overflowX: 'auto' }}>{output.result}</pre>
                             }
                         </div>
                     : null}
