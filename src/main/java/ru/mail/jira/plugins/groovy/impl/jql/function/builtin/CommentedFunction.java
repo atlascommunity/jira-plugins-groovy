@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryBaseListener;
 import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryLexer;
 import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryParser;
+import ru.mail.jira.plugins.groovy.util.AntlrUtil;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -394,36 +395,29 @@ public class CommentedFunction extends AbstractBuiltInFunction {
     private static class CommentedQueryListener extends CommentedQueryBaseListener {
         private final Map<String, String> values = new HashMap<>();
 
-        private static String unescape(String string) {
-            if (string.startsWith("'") || string.startsWith("\"")) {
-                return string.substring(1, string.length() - 1);
-            }
-            return string;
-        }
-
         @Override
         public void exitBy_query(CommentedQueryParser.By_queryContext ctx) {
-            values.put("by", unescape(ctx.username_expr().getText()));
+            values.put("by", AntlrUtil.unescapeString(ctx.username_expr().getText()));
         }
 
         @Override
         public void exitLike_query(CommentedQueryParser.Like_queryContext ctx) {
-            values.put("like", unescape(ctx.str_expr().getText()));
+            values.put("like", AntlrUtil.unescapeString(ctx.str_expr().getText()));
         }
 
         @Override
         public void exitDate_query(CommentedQueryParser.Date_queryContext ctx) {
-            values.put(ctx.date_field().getText(), unescape(ctx.date_expr().getText()));
+            values.put(ctx.date_field().getText(), AntlrUtil.unescapeString(ctx.date_expr().getText()));
         }
 
         @Override
         public void exitGroup_query(CommentedQueryParser.Group_queryContext ctx) {
-            values.put(ctx.group_field().getText(), unescape(ctx.group_expr().getText()));
+            values.put(ctx.group_field().getText(), AntlrUtil.unescapeString(ctx.group_expr().getText()));
         }
 
         @Override
         public void exitRole_query(CommentedQueryParser.Role_queryContext ctx) {
-            values.put(ctx.role_field().getText(), unescape(ctx.role_expr().getText()));
+            values.put(ctx.role_field().getText(), AntlrUtil.unescapeString(ctx.role_expr().getText()));
         }
     }
 }
