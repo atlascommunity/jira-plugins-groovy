@@ -2,6 +2,7 @@
 import React from 'react';
 
 import Button from '@atlaskit/button';
+import {CheckboxStateless} from '@atlaskit/checkbox';
 
 import type {ConsoleResult} from './types';
 
@@ -25,6 +26,7 @@ type Props = {
 
 type State = {
     script: ?string,
+    isHtml: boolean,
     output: ?ConsoleResult,
     error: ?*,
     waiting: boolean,
@@ -34,6 +36,7 @@ type State = {
 export class ScriptConsole extends React.Component<Props, State> {
     state = {
         script: '',
+        isHtml: false,
         output: null,
         error: null,
         waiting: false,
@@ -58,6 +61,8 @@ export class ScriptConsole extends React.Component<Props, State> {
             console.error('unable to save script', e);
         }
     };
+
+    _toggleHtml = () => this.setState(({isHtml}) => ({ isHtml: !isHtml }));
 
     _submit = () => {
         this.setState({ waiting: true });
@@ -105,7 +110,7 @@ export class ScriptConsole extends React.Component<Props, State> {
     }
 
     render() {
-        const {script, output, error, waiting, modified} = this.state;
+        const {script, isHtml, output, error, waiting, modified} = this.state;
 
         let errorMessage: * = null;
         let markers: * = null;
@@ -136,6 +141,12 @@ export class ScriptConsole extends React.Component<Props, State> {
                     value={script}
                     onChange={this._scriptChange}
                 />
+                <CheckboxStateless
+                    label="Render as HTML"
+
+                    isChecked={isHtml}
+                    onChange={this._toggleHtml}
+                />
                 <br/>
                 <div>
                     <Button
@@ -152,7 +163,10 @@ export class ScriptConsole extends React.Component<Props, State> {
                     {output ?
                         <div>
                             <strong>{ConsoleMessages.executedIn(output.time.toString())}</strong>
-                            <pre>{output.result}</pre>
+                            {isHtml ?
+                                <div dangerouslySetInnerHTML={{__html: output.result}}/>:
+                                <pre>{output.result}</pre>
+                            }
                         </div>
                     : null}
                     {error ?
