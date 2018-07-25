@@ -5,7 +5,9 @@ date_field_expr: UQSTRING | STRING;
 
 duration: DURATION;
 
-date_expr: date_field_expr (PLUS duration)?;
+sign_expr: PLUS | MINUS;
+
+date_expr: date_field_expr (sign_expr duration)?;
 
 date_comparison_query: date_expr operation_expr date_expr EOF;
 
@@ -15,6 +17,7 @@ GTE: '>=';
 LTE: '<=';
 EQ: '=';
 PLUS: '+';
+MINUS: '-';
 
 SHORT_DAYS: 'd';
 SHORT_WEEKS: 'w';
