@@ -97,6 +97,8 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                     isRequired={isRequired}
 
                     src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                    displayValue={true}
+
                     name={inputName}
                     onChange={this._setValue(paramName)}
                     value={value}
@@ -111,6 +113,8 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                     delimiter=";"
 
                     src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                    displayValue={true}
+
                     onChange={this._setValue(paramName)}
                     value={value}
                 />;
@@ -131,6 +135,8 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                     isRequired={isRequired}
 
                     src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`}
+                    displayValue={true}
+
                     name={inputName}
                     onChange={this._setValue(paramName)}
                     value={value}

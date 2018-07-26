@@ -50,6 +50,8 @@ export class PropField extends React.PureComponent<Props> {
                     isRequired={true}
 
                     src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                    displayValue={true}
+
                     onChange={onChange}
                     //$FlowFixMe
                     value={value}
@@ -62,6 +64,8 @@ export class PropField extends React.PureComponent<Props> {
                     isMulti={true}
 
                     src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                    displayValue={true}
+
                     onChange={onChange}
                     //$FlowFixMe
                     value={value || []}
@@ -83,6 +87,8 @@ export class PropField extends React.PureComponent<Props> {
                     isRequired={true}
 
                     src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`}
+                    displayValue={true}
+
                     onChange={onChange}
                     //$FlowFixMe
                     value={value}
