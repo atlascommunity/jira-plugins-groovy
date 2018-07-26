@@ -20,8 +20,6 @@ type Props = ElementConfig<typeof EditorField> & {
     typeParams?: {[string]: string}
 };
 
-//todo: indicate loading
-//todo: почему-то редактор тупит
 export class CheckedEditorField extends React.Component<Props, State> {
     state = {
         isLoading: false,
@@ -29,9 +27,16 @@ export class CheckedEditorField extends React.Component<Props, State> {
     };
 
     reqId = 0;
+    lastRequestedValue = null;
+    lastResult = [];
 
     _checkScript = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => {
         const {scriptType} = this.props;
+
+        if (this.lastRequestedValue === value) {
+            callback(this.lastResult);
+            return;
+        }
 
         if (!value) {
             this.setState({ isLoading: false, hasErrors: false });
@@ -48,18 +53,27 @@ export class CheckedEditorField extends React.Component<Props, State> {
                 if (currentRequest === this.reqId) {
                     this.setState({ isLoading: false, hasErrors: false });
                     callback([]);
+                    this.lastRequestedValue = value;
+                    this.lastResult = [];
                 }
             })
             .catch((e: *) => {
-                const {response} = e;
+                if (currentRequest === this.reqId) {
+                    const {response} = e;
 
-                if (response.status === 400) {
-                    this.setState({ isLoading: false, hasErrors: true });
-                    callback(transformMarkers(getMarkers(response.data.error)));
-                } else {
-                    this.setState({ isLoading: false, hasErrors: false });
-                    callback([]);
-                    throw e;
+                    if (response.status === 400) {
+                        this.setState({ isLoading: false, hasErrors: true });
+                        const annotations = transformMarkers(getMarkers(response.data.error));
+                        callback(annotations);
+                        this.lastRequestedValue = value;
+                        this.lastResult = annotations;
+                    } else {
+                        this.setState({ isLoading: false, hasErrors: false });
+                        callback([]);
+                        this.lastRequestedValue = value;
+                        this.lastResult = [];
+                        throw e;
+                    }
                 }
             });
     };
