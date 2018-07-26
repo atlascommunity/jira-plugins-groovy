@@ -3,6 +3,7 @@
 export {Loader} from './Loader';
 export {LoadingSpinner} from './LoadingSpinner';
 export {EditorField} from './EditorField';
+export {CheckedEditorField} from './CheckedEditorField';
 export {FormField} from './FormField';
 export {FieldError} from './FieldError';
 export {RouterLink} from './RouterLink';

@@ -20,8 +20,12 @@ import Lozenge from '@atlaskit/lozenge';
 import Tooltip from '@atlaskit/tooltip';
 import InlineMessage from '@atlaskit/inline-message';
 import {Label} from '@atlaskit/field-base';
+import Spinner from '@atlaskit/spinner';
+import {colors} from '@atlaskit/theme';
 
 import QuestionIcon from '@atlaskit/icon/glyph/question';
+import ErrorIcon from '@atlaskit/icon/glyph/error';
+import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
 
 import {Resizable} from 'react-resizable';
 
@@ -57,14 +61,16 @@ type EditorPosition = {
     ch: number
 };
 
-type AnnotationType = {
+export type AnnotationType = {
     message: string,
     severity: string,
     from: EditorPosition,
     to: EditorPosition
 };
 
-type EditorProps = {
+type LinterType = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => void;
+
+type EditorProps = {|
     mode: string,
     value?: string,
     onChange?: (string) => void,
@@ -75,13 +81,31 @@ type EditorProps = {
     readOnly?: boolean,
     decorated?: boolean,
     resizable?: boolean,
-    decorator?: (Node) => Node
-};
+    decorator?: (Node) => Node,
+    linter?: LinterType,
+    validationState?: 'loading' | 'valid' | 'invalid'
+|};
 
-type EditorState = {
+type EditorState = {|
     isLight: boolean,
     height: number
-};
+|};
+
+export function transformMarkers(markers?: $ReadOnlyArray<MarkerType>): $ReadOnlyArray<AnnotationType> {
+    if (markers) {
+        return markers.map(
+            (marker: MarkerType): AnnotationType => {
+                return {
+                    message: marker.message,
+                    severity: 'error',
+                    from: {line: marker.startRow, ch: marker.startCol},
+                    to: {line: marker.endRow, ch: marker.endCol}
+                };
+            }
+        );
+    }
+    return [];
+}
 
 //todo: remember height for console
 //todo: change to PureComponent
@@ -114,21 +138,8 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         }
     };
 
-    _getAnnotations = (): Array<AnnotationType> => {
-        const markers = this.props.markers;
-        if (markers) {
-            return markers.map(
-                (marker: MarkerType): AnnotationType => {
-                    return {
-                        message: marker.message,
-                        severity: 'error',
-                        from: {line: marker.startRow, ch: marker.startCol},
-                        to: {line: marker.endRow, ch: marker.endCol}
-                    };
-                }
-            );
-        }
-        return [];
+    _getAnnotations = (): $ReadOnlyArray<AnnotationType> => {
+        return transformMarkers(this.props.markers);
     };
 
     _resize = (_e: any, {size}: ResizeCallbackData) => {
@@ -144,13 +155,14 @@ export class Editor extends React.Component<EditorProps, EditorState> {
     }
 
     _getOptions = memoizeOne(
-        (readOnly?: boolean, isDisabled?: boolean, mode?: string, isLight: boolean): CodeMirrorOptions => {
+        (readOnly?: boolean, isDisabled?: boolean, mode?: string, isLight: boolean, linter?: LinterType): CodeMirrorOptions => {
             return {
                 theme: isLight ? 'eclipse' : 'lesser-dark',
                 mode: mode,
                 readOnly: readOnly || isDisabled || false,
                 lint: {
-                    getAnnotations: this._getAnnotations,
+                    getAnnotations: linter || this._getAnnotations,
+                    async: !!linter,
                     tooltips: true
                 },
                 lineNumbers: true,
@@ -162,11 +174,24 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         }
     );
 
+    _renderValidationIcon() {
+        switch (this.props.validationState) {
+            case 'invalid':
+                return <ErrorIcon primaryColor={colors.R300}/>;
+            case 'loading':
+                return <Spinner/>;
+            case 'valid':
+                return <CheckCircleIcon primaryColor={colors.G300}/>;
+            default:
+                return null;
+        }
+    }
+
     render() {
-        const {onChange, value, bindings, returnTypes, decorated, resizable, decorator, readOnly, isDisabled, mode} = this.props;
+        const {onChange, value, bindings, returnTypes, decorated, resizable, decorator, readOnly, isDisabled, mode, validationState, linter} = this.props;
         const {isLight} = this.state;
 
-        const options = this._getOptions(readOnly, isDisabled, mode, isLight);
+        const options = this._getOptions(readOnly, isDisabled, mode, isLight, linter);
 
         let el: Node = <CodeMirror
             options={options}
@@ -194,7 +219,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                 <div className={`CodeEditor ${decorated ? 'DecoratedEditor' : ''}`}>
                     {el}
                 </div>
-                <div className="flex-row">
+                <div className="EditorInfo">
                     <div style={{color: 'grey'}}>
                         {CommonMessages.editorMode}{' '}
                         <strong>{options.mode}</strong>
@@ -206,7 +231,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                         </Button>
                     </div>
                     { bindings &&
-                        <div style={{marginLeft: '5px'}}>
+                        <div style={{marginLeft: '4px'}}>
                             <InlineMessage type="info" position="top right">
                                 <div className="flex-column">
                                     {globalBindings.map(binding => <Binding key={binding.name} binding={binding}/>)}
@@ -255,6 +280,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                             </InlineMessage>
                         </div>
                     }
+                    {validationState && <div style={{marginLeft: '4px'}}>{this._renderValidationIcon()}</div>}
                 </div>
             </div>
         );

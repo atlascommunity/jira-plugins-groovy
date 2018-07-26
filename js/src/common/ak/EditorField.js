@@ -17,6 +17,7 @@ type EditorFieldProps = FieldProps & MutableFieldProps<string> & AkFormFieldProp
     bindings?: $ReadOnlyArray<BindingType>,
     returnTypes?: $ReadOnlyArray<ReturnType>,
     resizable?: boolean,
+    validationState?: 'loading' | 'valid' | 'invalid'
 };
 
 export class EditorField extends React.Component<EditorFieldProps> {
@@ -44,7 +45,7 @@ export class EditorField extends React.Component<EditorFieldProps> {
     };
 
     render() {
-        const {label, isRequired, isLabelHidden, mode, ...props} = this.props;
+        const {label, isRequired, isLabelHidden, mode, isInvalid, invalidMessage, ...props} = this.props;
 
         return (
             <div className="ak-editor">

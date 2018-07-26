@@ -9,10 +9,9 @@ import type {ConsoleResult} from './types';
 import {ConsoleMessages} from '../i18n/console.i18n';
 
 import {consoleService} from '../service/services';
-import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 
-import {EditorField, ErrorMessage} from '../common/ak';
+import {CheckedEditorField, ErrorMessage} from '../common/ak';
 import {CommonMessages} from '../i18n/common.i18n';
 
 import './ScriptConsole.less';
@@ -30,7 +29,6 @@ type State = {
     output: ?ConsoleResult,
     error: ?*,
     waiting: boolean,
-    modified: boolean
 };
 
 export class ScriptConsole extends React.Component<Props, State> {
@@ -39,14 +37,12 @@ export class ScriptConsole extends React.Component<Props, State> {
         isHtml: false,
         output: null,
         error: null,
-        waiting: false,
-        modified: false
+        waiting: false
     };
 
     _scriptChange = (script: ?string) => {
         this.setState({
-            script: script,
-            modified: true
+            script: script
         });
 
         try {
@@ -74,7 +70,6 @@ export class ScriptConsole extends React.Component<Props, State> {
                     output,
                     error: null,
                     waiting: false,
-                    modified: false
                 }),
                 (err: *) => {
                     const {response} = err;
@@ -84,13 +79,11 @@ export class ScriptConsole extends React.Component<Props, State> {
                             error: response.data,
                             output: null,
                             waiting: false,
-                            modified: false
                         });
                     } else {
                         this.setState({
                             output: null,
                             waiting: false,
-                            modified: false
                         });
 
                         throw err;
@@ -110,17 +103,13 @@ export class ScriptConsole extends React.Component<Props, State> {
     }
 
     render() {
-        const {script, isHtml, output, error, waiting, modified} = this.state;
+        const {script, isHtml, output, error, waiting} = this.state;
 
         let errorMessage: * = null;
-        let markers: * = null;
 
         if (error) {
             if (error.field === 'script' && Array.isArray(error.error)) {
                 const errors = error.error.filter(e => e);
-                if (!modified) {
-                    markers = getMarkers(errors);
-                }
                 errorMessage = errors
                     .map(error => error.message)
                     .map(error => <p key={error}>{error}</p>);
@@ -131,11 +120,11 @@ export class ScriptConsole extends React.Component<Props, State> {
 
         return (
             <div className="ScriptConsole">
-                <EditorField
+                <CheckedEditorField
                     label={CommonMessages.script}
+                    scriptType="CONSOLE"
 
                     resizable={true}
-                    markers={markers}
                     bindings={bindings}
 
                     value={script}
