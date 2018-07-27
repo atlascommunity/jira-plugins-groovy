@@ -4,6 +4,7 @@ public enum ScriptType {
     WORKFLOW_FUNCTION,
     WORKFLOW_VALIDATOR,
     WORKFLOW_CONDITION,
+    WORKFLOW_GENERIC, //used for static checking
     LISTENER,
     CONSOLE,
     REST,

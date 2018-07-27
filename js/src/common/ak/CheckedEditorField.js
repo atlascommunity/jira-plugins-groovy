@@ -3,7 +3,6 @@ import React, {type ElementConfig} from 'react';
 
 import {EditorField} from './EditorField';
 
-import type {EntityType} from '../types';
 import {extrasService} from '../../service/services';
 import {getMarkers} from '../error';
 import {transformMarkers} from '../editor/Editor';
@@ -16,10 +15,11 @@ type State = {|
 |};
 
 type Props = ElementConfig<typeof EditorField> & {
-    scriptType: EntityType | 'CONSOLE',
+    scriptType: 'CONSOLE' | 'WORKFLOW_GENERIC',
     typeParams?: {[string]: string}
 };
 
+//todo: разобраться с одновременным запросом двух проверок
 export class CheckedEditorField extends React.Component<Props, State> {
     state = {
         isLoading: false,

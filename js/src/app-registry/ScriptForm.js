@@ -23,12 +23,11 @@ import {FieldMessages, CommonMessages} from '../i18n/common.i18n';
 
 import {registryService} from '../service/services';
 
-import {getMarkers} from '../common/error';
 import {Bindings, ReturnTypes} from '../common/bindings';
 import {withRoot} from '../common/script-list/breadcrumbs';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
-import {EditorField, StaticField, AsyncPicker, ErrorMessage, RouterLink, FormField} from '../common/ak';
+import {CheckedEditorField, StaticField, AsyncPicker, ErrorMessage, RouterLink, FormField} from '../common/ak';
 
 import type {InputEvent} from '../common/EventTypes';
 import type {SingleValueType} from '../common/ak/types';
@@ -262,13 +261,9 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
         let errorMessage: ?string = null;
         let errorField: ?string = null;
 
-        let markers: * = null;
         if (error) {
             if (error.field === 'scriptBody' && Array.isArray(error.error)) {
                 const errors = error.error.filter(e => e);
-                if (!modified) {
-                    markers = getMarkers(errors);
-                }
                 errorMessage = errors.map(error => error.message).join('; ');
             } else {
                 errorMessage = error.message;
@@ -409,12 +404,12 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorMessage || ''}
                     >
-                        <EditorField
+                        <CheckedEditorField
                             label=""
                             resizable={true}
 
                             isDisabled={waiting}
-                            markers={markers}
+                            scriptType="WORKFLOW_GENERIC"
 
                             bindings={bindings}
                             returnTypes={returnTypes}
