@@ -6,9 +6,9 @@ import type {BindingType, ReturnType} from './editor/types';
 export const globalBindings: Array<BindingType> = [
     {
         name: 'httpClient',
-        className: 'HttpClient',
-        fullClassName: 'org.apache.http.client.HttpClient',
-        javaDoc: 'https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/HttpClient.html'
+        className: 'CloseableHttpClient',
+        fullClassName: 'org.apache.http.impl.client.CloseableHttpClient',
+        javaDoc: 'https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/impl/client/CloseableHttpClient.html'
     },
     {
         name: 'templateEngine',

@@ -1,6 +1,5 @@
 package ru.mail.jira.plugins.groovy.impl.var;
 
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.SocketConfig;
@@ -8,7 +7,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
-public class HttpClientGlobalVariable implements GlobalVariable<HttpClient> {
+public class HttpClientGlobalVariable implements GlobalVariable<CloseableHttpClient> {
     private static final int HTTP_CLIENT_TIMEOUT = 3000;
 
     private final CloseableHttpClient httpClient;
@@ -41,13 +40,13 @@ public class HttpClientGlobalVariable implements GlobalVariable<HttpClient> {
     }
 
     @Override
-    public HttpClient getValue() {
+    public CloseableHttpClient getValue() {
         return this.httpClient;
     }
 
     @Override
-    public Class<HttpClient> getType() {
-        return HttpClient.class;
+    public Class<CloseableHttpClient> getType() {
+        return CloseableHttpClient.class;
     }
 
     @Override
