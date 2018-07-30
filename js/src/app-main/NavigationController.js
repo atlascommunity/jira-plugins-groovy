@@ -28,6 +28,7 @@ const titleMap = {
     '/rest': TitleMessages.rest,
     '/fields': TitleMessages.fields,
     '/scheduled': TitleMessages.scheduled,
+    '/jql': TitleMessages.jql,
     '/audit': TitleMessages.audit,
     '/extras': TitleMessages.extras
 };
