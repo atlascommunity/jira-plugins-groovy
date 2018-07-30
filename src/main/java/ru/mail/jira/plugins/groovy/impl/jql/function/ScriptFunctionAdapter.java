@@ -9,6 +9,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import lombok.Getter;
 import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptFunction;
 
@@ -18,6 +19,7 @@ import java.util.List;
 public class ScriptFunctionAdapter implements CustomFunction {
     private final String key;
     private final String functionName;
+    @Getter
     private final ScriptFunction delegate;
 
     public ScriptFunctionAdapter(String key, String functionName, ScriptFunction delegate) {
