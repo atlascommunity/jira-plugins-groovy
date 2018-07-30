@@ -10,7 +10,6 @@ import com.atlassian.jira.issue.fields.rest.FieldTypeInfo;
 import com.atlassian.jira.issue.fields.rest.FieldTypeInfoContext;
 import com.atlassian.jira.issue.fields.rest.RestAwareCustomFieldType;
 import com.google.common.collect.Lists;
-import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,17 +17,14 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class ScriptedCFType<T, S> extends CalculatedCFType<T, S> implements RestAwareCustomFieldType {
-    private final FieldConfigRepository configRepository;
     private final FieldValueExtractor valueExtractor;
 
     private final Class<T> tType;
 
     protected ScriptedCFType(
-        FieldConfigRepository configRepository,
         FieldValueExtractor valueExtractor,
         Class<T> tType
     ) {
-        this.configRepository = configRepository;
         this.valueExtractor = valueExtractor;
         this.tType = tType;
     }
@@ -57,7 +53,7 @@ public abstract class ScriptedCFType<T, S> extends CalculatedCFType<T, S> implem
     @Nonnull
     @Override
     public List<FieldConfigItemType> getConfigurationItemTypes() {
-        return Lists.newArrayList(new ScriptedFieldConfigItemType(configRepository));
+        return Lists.newArrayList(new ScriptedFieldConfigItemType());
     }
 
     @Nonnull

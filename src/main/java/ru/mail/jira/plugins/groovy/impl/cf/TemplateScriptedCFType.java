@@ -12,7 +12,6 @@ import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScript;
-import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
 
 import javax.annotation.Nullable;
@@ -25,11 +24,10 @@ public class TemplateScriptedCFType extends ScriptedCFType<Object, Object> {
     private final CustomFieldHelper customFieldHelper;
 
     public TemplateScriptedCFType(
-        FieldConfigRepository configRepository,
         FieldValueExtractor valueExtractor,
         CustomFieldHelper customFieldHelper
     ) {
-        super(configRepository, valueExtractor, Object.class);
+        super(valueExtractor, Object.class);
         this.valueExtractor = valueExtractor;
         this.customFieldHelper = customFieldHelper;
     }

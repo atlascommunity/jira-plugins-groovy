@@ -4,13 +4,10 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.fields.config.FieldConfig;
 import com.atlassian.jira.issue.fields.config.FieldConfigItemType;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
-import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 public class ScriptedFieldConfigItemType implements FieldConfigItemType {
-    private final FieldConfigRepository configRepository;
 
-    public ScriptedFieldConfigItemType(FieldConfigRepository configRepository) {
-        this.configRepository = configRepository;
+    public ScriptedFieldConfigItemType() {
     }
 
     @Override
@@ -36,7 +33,7 @@ public class ScriptedFieldConfigItemType implements FieldConfigItemType {
 
     @Override
     public Object getConfigurationObject(Issue issue, FieldConfig fieldConfig) {
-        return configRepository.getScript(fieldConfig.getId());
+        return null;
     }
 
     @Override
