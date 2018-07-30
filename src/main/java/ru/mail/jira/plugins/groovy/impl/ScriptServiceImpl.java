@@ -107,12 +107,16 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
     @Override
     public ParseContext parseScript(String script) {
-        return parseClass(script, true, false, null).getParseContext();
+        CompiledScript result = parseClass(script, true, false, null);
+        InvokerHelper.removeClass(result.getScriptClass());
+        return result.getParseContext();
     }
 
     @Override
     public ParseContext parseScriptStatic(String script, Map<String, Class> types) {
-        return parseClass(script, true, true, types).getParseContext();
+        CompiledScript result = parseClass(script, true, true, types);
+        InvokerHelper.removeClass(result.getScriptClass());
+        return result.getParseContext();
     }
 
     @Override
