@@ -52,6 +52,7 @@ public class WorkflowHelper {
         Map<String, Object> paramBindings = ImmutableMap.of();
         String scriptString = Base64Util.decode((String) args.get(Const.WF_INLINE_SCRIPT));
         String id = (String) args.get(Const.WF_UUID);
+        String uuid = (String) args.get(Const.WF_UUID);
         boolean fromRegistry = false;
 
         if (scriptString == null) {
@@ -88,6 +89,10 @@ public class WorkflowHelper {
                         if (script.isDeleted()) {
                             logger.warn("Deleted script is used {}", id); //todo: log workflow & action
                         }
+
+                        if (script.getUuid() != null) {
+                            uuid = script.getUuid();
+                        }
                     } else {
                         logger.error("unable to find script with id {}", scriptId);
                     }
@@ -103,7 +108,7 @@ public class WorkflowHelper {
             return null;
         }
 
-        return new ScriptDescriptor(id, fromRegistry, scriptString, paramBindings);
+        return new ScriptDescriptor(id, uuid, fromRegistry, scriptString, paramBindings);
     }
 
     public Object executeScript(ScriptDescriptor script, ScriptType type, Issue issue, ApplicationUser user, Map transientVars) throws WorkflowException {
@@ -152,10 +157,14 @@ public class WorkflowHelper {
                 "params", script.getParams().toString()
             );
             if (script.isFromRegistry()) {
-                Integer parsedId = Ints.tryParse(id);
+                if (script.getUuid() == null) {
+                    Integer parsedId = Ints.tryParse(id);
 
-                if (parsedId != null) {
-                    executionRepository.trackFromRegistry(parsedId, t, success, error, params);
+                    if (parsedId != null) {
+                        executionRepository.trackFromRegistry(parsedId, t, success, error, params);
+                    }
+                } else {
+                    executionRepository.trackInline(script.getUuid(), t, success, error, params);
                 }
             } else {
                 executionRepository.trackInline(id, t, success, error, params);

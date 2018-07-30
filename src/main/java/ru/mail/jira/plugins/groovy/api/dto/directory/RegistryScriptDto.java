@@ -15,6 +15,8 @@ public class RegistryScriptDto extends RegistryScriptForm {
     @XmlElement
     private Integer id;
     @XmlElement
+    private String uuid;
+    @XmlElement
     private boolean deleted;
     @XmlElement
     private String parentName;

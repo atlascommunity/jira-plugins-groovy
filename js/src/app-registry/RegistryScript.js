@@ -111,7 +111,13 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
                 <Script
                     {...props}
 
-                    script={{...script}}
+                    script={{
+                        ...script,
+                        ...(script.uuid ? {
+                            inline: true,
+                            id: script.uuid
+                        } : {})
+                    }}
                     changelogsLoader={this._getChangelogs}
 
                     withChangelog={true}

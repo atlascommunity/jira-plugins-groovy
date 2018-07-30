@@ -11,6 +11,7 @@ export type DeleteCallback = (id: number, type: EntityType, name: string) => voi
 export type WorkflowScriptType = 'CONDITION' | 'VALIDATOR' | 'FUNCTION';
 
 export type RegistryScriptType = ScriptEntityWithoutChangelogs & {
+    uuid: ?string,
     types: $ReadOnlyArray<WorkflowScriptType>,
     parentName?: string,
     directoryId: number

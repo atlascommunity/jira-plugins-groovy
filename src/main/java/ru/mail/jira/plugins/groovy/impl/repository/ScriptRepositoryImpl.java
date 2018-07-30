@@ -258,6 +258,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         Script script = ao.create(
             Script.class,
             new DBParam("NAME", scriptForm.getName()),
+            new DBParam("UUID", UUID.randomUUID().toString()),
             new DBParam("DESCRIPTION", scriptForm.getDescription()),
             new DBParam("SCRIPT_BODY", scriptForm.getScriptBody()),
             new DBParam("DIRECTORY_ID", scriptForm.getDirectoryId()),
@@ -327,6 +328,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         String parameters = parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null;
 
         script.setName(form.getName());
+        script.setUuid(UUID.randomUUID().toString());
         script.setDescription(form.getDescription());
         script.setScriptBody(form.getScriptBody());
         script.setParameters(parameters);
@@ -395,6 +397,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         RegistryScriptDto result = new RegistryScriptDto();
 
         result.setId(script.getID());
+        result.setUuid(script.getUuid());
         result.setDescription(script.getDescription());
         result.setDirectoryId(script.getDirectory().getID());
         result.setScriptBody(script.getScriptBody());

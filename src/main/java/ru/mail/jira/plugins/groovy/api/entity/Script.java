@@ -6,8 +6,11 @@ import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 
 //https://ecosystem.atlassian.net/browse/AO-3454 FK column directory_id isn't preloaded by default, so we must specify all columns
-@Preload({"ID", "NAME", "TYPES", "DESCRIPTION", "DIRECTORY_ID", "SCRIPT_BODY", "DELETED", "PARAMETERS"})
+@Preload({"ID", "UUID", "NAME", "TYPES", "DESCRIPTION", "DIRECTORY_ID", "SCRIPT_BODY", "DELETED", "PARAMETERS"})
 public interface Script extends AbstractScript {
+    void setUuid(String uuid);
+    String getUuid();
+
     @NotNull
     @StringLength(StringLength.UNLIMITED)
     void setScriptBody(String scriptBody);
