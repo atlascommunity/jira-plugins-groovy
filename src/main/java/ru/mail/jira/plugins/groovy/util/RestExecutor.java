@@ -34,6 +34,11 @@ public final class RestExecutor<T> {
     public Response getResponse(Response.Status successStatus) {
         try {
             T actionResult = supplier.get();
+
+            if (actionResult instanceof Response) {
+                return (Response) actionResult;
+            }
+
             Response.ResponseBuilder responseBuilder = Response.status(successStatus).entity(actionResult);
 
             if (actionResult instanceof byte[])

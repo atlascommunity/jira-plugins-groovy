@@ -27,6 +27,7 @@ import type {ItemType} from '../redux';
 import type {ReturnType} from '../editor/types';
 
 import './ScriptForm.less';
+import type {CheckScriptType} from '../ak/CheckedEditorField';
 
 
 const bindings = [ Bindings.currentUser ];
@@ -95,8 +96,9 @@ type State<T: ScriptFormType> = {
 export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>, State<T>> {
     static defaultProps = {
         //$FlowFixMe: toJS() issue
-        valuesTransformer: (values: ValuesType): DataType => values.toJS(),
-        additionalFields: []
+        valuesTransformer: (values: ValuesType<T>): DataType => values.toJS(),
+        additionalFields: [],
+        isChecked: false
     };
 
     constructor(props: *) {
@@ -258,12 +260,13 @@ export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>,
 
                             scriptType={scriptType}
 
-                            bindings={bindings}
-                            returnTypes={returnTypes}
+                                bindings={bindings}
+                                returnTypes={returnTypes}
 
-                            value={values.get('scriptBody') || ''}
-                            onChange={this._setObjectValue('scriptBody')}
-                        />
+                                value={values.get('scriptBody') || ''}
+                                onChange={this._setObjectValue('scriptBody')}
+                            />
+                        }
                     </FormField>
 
                     {additionalFields.map(field =>

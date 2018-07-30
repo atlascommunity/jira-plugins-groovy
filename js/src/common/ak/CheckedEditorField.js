@@ -13,6 +13,8 @@ import type {AnnotationType, CodeMirrorType, ValidationState} from '../editor';
 import type {SyntaxError} from '../types';
 
 
+export type CheckScriptType = 'CONSOLE' | 'WORKFLOW_GENERIC' | 'JQL';
+
 type State = {|
     validationState: ValidationState
 |};

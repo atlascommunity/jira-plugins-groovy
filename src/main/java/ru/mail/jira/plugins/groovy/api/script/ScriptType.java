@@ -11,5 +11,6 @@ public enum ScriptType {
     CUSTOM_FIELD,
     SCHEDULED_TASK,
     ADMIN_SCRIPT,
-    PARAM
+    PARAM,
+    JQL
 }
