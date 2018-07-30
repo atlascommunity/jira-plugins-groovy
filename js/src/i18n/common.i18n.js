@@ -70,7 +70,8 @@ export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction, con
     back: i18n.common.back,
     confirmDelete: i18n.common.confirmDelete,
     all: i18n.common.all,
-    permalink: i18n.common.permalink
+    permalink: i18n.common.permalink,
+    renderAsHtml: i18n.common.renderAsHtml
 };
 
 export const DialogMessages: I18nMessages = {

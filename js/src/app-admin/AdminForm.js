@@ -1,8 +1,12 @@
 //@flow
-import React from 'react';
+import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
+
+import {Record} from 'immutable';
+
+import {CheckboxStateless} from '@atlaskit/checkbox';
 
 import type {AdminScriptType} from './types';
 
@@ -11,10 +15,11 @@ import {adminScriptService} from '../service/services';
 
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {ReturnTypes} from '../common/bindings';
-import {ScriptForm, makeScriptForm, type SubmitResult} from '../common/script-list/ScriptForm';
+import {ScriptForm, type SubmitResult} from '../common/script-list/ScriptForm';
 
-import type {ProvidedState} from '../common/script-list/ScriptForm';
+import type {AdditionalFieldProps, ProvidedState} from '../common/script-list/ScriptForm';
 import type {DialogComponentProps} from '../common/script-list/types';
+import {CommonMessages} from '../i18n/common.i18n';
 
 
 type Props = DialogComponentProps & {
@@ -23,24 +28,28 @@ type Props = DialogComponentProps & {
     updateItem: typeof updateItem
 };
 
+const recordFactory = Record({
+    name: '',
+    description: '',
+    scriptBody: '',
+    comment: '',
+    html: false
+});
+
 const defaultLoader = () => Promise.resolve(
     {
-        values: makeScriptForm({
-            name: '',
-            description: '',
-            comment: ''
-        }),
+        values: recordFactory(),
         name: null
     }
 );
 
 const editLoader = (id: number) => adminScriptService
     .getScript(id)
-    .then(({name, description, scriptBody}: AdminScriptType): ProvidedState => {
+    .then(({name, description, scriptBody, html}: AdminScriptType): ProvidedState => {
         return {
-            values: makeScriptForm({
+            values: recordFactory({
                 description: description || '',
-                name, scriptBody
+                name, scriptBody, html
             }),
             name
         };
@@ -79,12 +88,24 @@ const returnTypes = [{
     optional: true
 }];
 
-class AdminDialogInternal extends React.PureComponent<Props> {
+function HtmlField({values, mutateValue}: AdditionalFieldProps): Node {
+    return (
+        <CheckboxStateless
+            label={CommonMessages.renderAsHtml}
+            isChecked={values.get('html') || false}
+            onChange={e => mutateValue('html', e.currentTarget.checked)}
+        />
+    );
+}
+
+class AdminFormInternal extends React.PureComponent<Props> {
     render() {
         return (
             <ScriptForm
                 defaultLoader={defaultLoader}
                 editLoader={editLoader}
+                recordFactory={recordFactory}
+
                 onSubmit={onSubmit}
                 i18n={{
                     editTitle: RegistryMessages.editScript,
@@ -93,6 +114,13 @@ class AdminDialogInternal extends React.PureComponent<Props> {
                 }}
                 returnTypes={returnTypes}
                 returnTo="/admin-scripts/"
+
+                additionalFields={[
+                    {
+                        key: 'html',
+                        component: HtmlField
+                    }
+                ]}
 
                 {...this.props}
             />
@@ -104,5 +132,5 @@ export const AdminForm = withRouter(
     connect(
         null,
         { addItem, updateItem }
-    )(AdminDialogInternal)
+    )(AdminFormInternal)
 );

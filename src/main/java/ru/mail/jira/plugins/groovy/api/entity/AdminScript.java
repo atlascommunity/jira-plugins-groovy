@@ -14,6 +14,9 @@ public interface AdminScript extends AbstractScript {
     void setScriptBody(String scriptBody);
     String getScriptBody();
 
+    boolean isHtml();
+    void setHtml(boolean html);
+
     @StringLength(StringLength.UNLIMITED)
     void setParameters(String parameters);
     String getParameters();

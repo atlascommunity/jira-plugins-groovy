@@ -1,10 +1,9 @@
 //@flow
-import React, {type Node} from 'react';
+import React, {Fragment, type Node, type ComponentType} from 'react';
 
 import {Prompt} from 'react-router-dom';
 
-import {Record} from 'immutable';
-import type {RecordOf, RecordFactory} from 'immutable';
+import type {RecordOf} from 'immutable';
 
 import Button, {ButtonGroup} from '@atlaskit/button';
 import Page from '@atlaskit/page';
@@ -47,10 +46,21 @@ export type SubmitResult = {
 
 type ValuesType = RecordOf<ScriptFormType>;
 type DataType = {[string]: any};
+type ScriptFormField = $Keys<ScriptFormType>;
 
 export type ProvidedState = {
     values: ValuesType,
     name: ?string
+};
+
+export type AdditionalFieldProps = {
+    values: ValuesType,
+    mutateValue: (string, any) => void
+};
+
+type AdditionalField = {
+    key: string,
+    component: ComponentType<AdditionalFieldProps>
 };
 
 type Props = DialogComponentProps & {
@@ -65,6 +75,7 @@ type Props = DialogComponentProps & {
         parentName: string,
     },
     valuesTransformer: (values: ValuesType) => DataType,
+    additionalFields: $ReadOnlyArray<AdditionalField>,
     history: any,
     returnTo: string,
     returnTypes?: $ReadOnlyArray<ReturnType>
@@ -79,29 +90,27 @@ type State = {
     name: ?string,
 };
 
-export const makeScriptForm: RecordFactory<ScriptFormType> = Record({
-    name: '',
-    description: '',
-    scriptBody: '',
-    comment: ''
-});
-
-type ScriptFormField = $Keys<ScriptFormType>;
-
 export class ScriptForm extends React.PureComponent<Props, State> {
     static defaultProps = {
-        //$FlowFixMe todo: flow issue?
-        valuesTransformer: (values: ValuesType): DataType => values.toJS()
+        //$FlowFixMe: toJS() issue
+        valuesTransformer: (values: ValuesType): DataType => values.toJS(),
+        additionalFields: []
     };
 
-    state = {
-        values: makeScriptForm(),
-        isLoadingState: true,
-        isSubmitting: false,
-        isModified: false,
-        error: null,
-        name: null
-    };
+    constructor(props: *) {
+        super(props);
+
+        const defaultState = props.defaultLoader();
+
+        this.state = {
+            ...defaultState,
+            isLoadingState: true,
+            isSubmitting: false,
+            isModified: false,
+            error: null,
+            name: null
+        };
+    }
 
     mutateValue = (field: ScriptFormField, value: any) => {
         this.setState((state: State): * => {
@@ -172,7 +181,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
     }
 
     render() {
-        const {i18n, isNew, id, returnTypes, returnTo} = this.props;
+        const {i18n, isNew, id, additionalFields, returnTypes, returnTo} = this.props;
         const {values, isModified, isLoadingState, isSubmitting, error, name} = this.state;
 
         let content: Node = null;
@@ -253,6 +262,16 @@ export class ScriptForm extends React.PureComponent<Props, State> {
                             onChange={this._setObjectValue('scriptBody')}
                         />
                     </FormField>
+
+                    {additionalFields.map(field =>
+                        <Fragment key={field.key}>
+                            <field.component
+                                values={values}
+                                //$FlowFixMe
+                                mutateValue={this.mutateValue}
+                            />
+                        </Fragment>
+                    )}
 
                     <FormField
                         label={FieldMessages.comment}

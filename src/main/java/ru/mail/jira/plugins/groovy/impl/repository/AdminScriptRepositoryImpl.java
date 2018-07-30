@@ -71,6 +71,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
             new DBParam("DESCRIPTION", form.getDescription()),
             new DBParam("UUID", UUID.randomUUID().toString()),
             new DBParam("SCRIPT_BODY", form.getScriptBody()),
+            new DBParam("HTML", form.isHtml()),
             new DBParam("PARAMETERS", parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null),
             new DBParam("DELETED", false)
         );
@@ -109,6 +110,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
         script.setName(form.getName());
         script.setDescription(form.getDescription());
         script.setScriptBody(form.getScriptBody());
+        script.setHtml(form.isHtml());
         script.setParameters(parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null);
 
         script.save();
@@ -161,6 +163,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
         result.setName(script.getName());
         result.setDescription(script.getDescription());
         result.setScriptBody(script.getScriptBody());
+        result.setHtml(script.isHtml());
         result.setDeleted(script.isDeleted());
         result.setParams(script.getParameters() != null ? jsonMapper.read(script.getParameters(), Const.PARAM_LIST_TYPE_REF) : null);
 

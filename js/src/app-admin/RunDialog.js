@@ -168,7 +168,14 @@ export class RunDialog extends React.PureComponent<Props, State> {
             content = <LoadingSpinner/>;
         } else if (stage === 'done' && outcome) {
             if (outcome.success) {
-                content = <SuccessMessage title="Done">{outcome.message}</SuccessMessage>;
+                content = (
+                    <SuccessMessage title="Done">
+                        {script.html ?
+                            <div dangerouslySetInnerHTML={{__html: outcome.message}}/> :
+                            outcome.message
+                        }
+                    </SuccessMessage>
+                );
             } else {
                 content = <ErrorMessage title="Error occurred">{outcome.message}</ErrorMessage>;
             }
@@ -176,7 +183,7 @@ export class RunDialog extends React.PureComponent<Props, State> {
 
         return (
             <ModalDialog
-                width="small"
+                width="medium"
                 scrollBehavior="outside"
 
                 isHeadingMultiline={false}

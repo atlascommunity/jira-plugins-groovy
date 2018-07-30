@@ -131,7 +131,7 @@ export class ScriptConsole extends React.Component<Props, State> {
                     onChange={this._scriptChange}
                 />
                 <CheckboxStateless
-                    label="Render as HTML"
+                    label={CommonMessages.renderAsHtml}
 
                     isChecked={isHtml}
                     onChange={this._toggleHtml}
