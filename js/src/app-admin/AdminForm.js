@@ -18,9 +18,13 @@ import {ReturnTypes} from '../common/bindings';
 import {ScriptForm, type SubmitResult} from '../common/script-list/ScriptForm';
 
 import type {AdditionalFieldProps, ProvidedState} from '../common/script-list/ScriptForm';
-import type {DialogComponentProps} from '../common/script-list/types';
+import type {DialogComponentProps, ScriptForm as ScriptFormType} from '../common/script-list/types';
 import {CommonMessages} from '../i18n/common.i18n';
 
+
+type FormType = ScriptFormType & {
+    html: boolean
+};
 
 type Props = DialogComponentProps & {
     history: any,
@@ -45,7 +49,7 @@ const defaultLoader = () => Promise.resolve(
 
 const editLoader = (id: number) => adminScriptService
     .getScript(id)
-    .then(({name, description, scriptBody, html}: AdminScriptType): ProvidedState => {
+    .then(({name, description, scriptBody, html}: AdminScriptType): ProvidedState<FormType> => {
         return {
             values: recordFactory({
                 description: description || '',
@@ -88,7 +92,7 @@ const returnTypes = [{
     optional: true
 }];
 
-function HtmlField({values, mutateValue}: AdditionalFieldProps): Node {
+function HtmlField({values, mutateValue}: AdditionalFieldProps<FormType>): Node {
     return (
         <CheckboxStateless
             label={CommonMessages.renderAsHtml}

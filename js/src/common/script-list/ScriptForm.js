@@ -44,28 +44,28 @@ export type SubmitResult = {
     error: any
 };
 
-type ValuesType = RecordOf<ScriptFormType>;
+type ValuesType<T: ScriptFormType> = RecordOf<T>;
 type DataType = {[string]: any};
-type ScriptFormField = $Keys<ScriptFormType>;
+type ScriptFormField<T: ScriptFormType> = $Keys<T>;
 
-export type ProvidedState = {
-    values: ValuesType,
+export type ProvidedState<T: ScriptFormType> = {
+    values: ValuesType<T>,
     name: ?string
 };
 
-export type AdditionalFieldProps = {
-    values: ValuesType,
+export type AdditionalFieldProps<T: ScriptFormType> = {
+    values: ValuesType<T>,
     mutateValue: (string, any) => void
 };
 
-type AdditionalField = {
+type AdditionalField<T: ScriptFormType> = {
     key: string,
-    component: ComponentType<AdditionalFieldProps>
+    component: ComponentType<AdditionalFieldProps<T>>
 };
 
-type Props = DialogComponentProps & {
-    defaultLoader: () => Promise<ProvidedState>,
-    editLoader: (id: number) => Promise<ProvidedState>,
+type Props<T: ScriptFormType> = DialogComponentProps & {
+    defaultLoader: () => Promise<ProvidedState<T>>,
+    editLoader: (id: number) => Promise<ProvidedState<T>>,
     onSubmit: (id: ?number, data: DataType) => Promise<SubmitResult>,
     addItem: typeof addItem,
     updateItem: typeof updateItem,
@@ -74,15 +74,15 @@ type Props = DialogComponentProps & {
         createTitle: string,
         parentName: string,
     },
-    valuesTransformer: (values: ValuesType) => DataType,
-    additionalFields: $ReadOnlyArray<AdditionalField>,
+    valuesTransformer: (values: ValuesType<T>) => DataType,
+    additionalFields: $ReadOnlyArray<AdditionalField<T>>,
     history: any,
     returnTo: string,
     returnTypes?: $ReadOnlyArray<ReturnType>
 };
 
-type State = {
-    values: ValuesType,
+type State<T: ScriptFormType> = {
+    values: ValuesType<T>,
     isLoadingState: boolean,
     isSubmitting: boolean,
     isModified: boolean,
@@ -90,7 +90,7 @@ type State = {
     name: ?string,
 };
 
-export class ScriptForm extends React.PureComponent<Props, State> {
+export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>, State<T>> {
     static defaultProps = {
         //$FlowFixMe: toJS() issue
         valuesTransformer: (values: ValuesType): DataType => values.toJS(),
@@ -112,8 +112,8 @@ export class ScriptForm extends React.PureComponent<Props, State> {
         };
     }
 
-    mutateValue = (field: ScriptFormField, value: any) => {
-        this.setState((state: State): * => {
+    mutateValue = (field: ScriptFormField<T>, value: any) => {
+        this.setState((state: State<T>): * => {
             return {
                 values: state.values.set(field, value),
                 isModified: true
@@ -121,9 +121,13 @@ export class ScriptForm extends React.PureComponent<Props, State> {
         });
     };
 
-    _setTextValue = (field: ScriptFormField) => (event: SyntheticEvent<HTMLInputElement|HTMLTextAreaElement>) => this.mutateValue(field, event.currentTarget.value);
+    _setTextValue = (field: ScriptFormField<T>) => (event: SyntheticEvent<HTMLInputElement|HTMLTextAreaElement>) =>
+        //$FlowFixMe
+        this.mutateValue(field, event.currentTarget.value);
 
-    _setObjectValue = (field: ScriptFormField) => (value: any) => this.mutateValue(field, value);
+    _setObjectValue = (field: ScriptFormField<T>) => (value: any) =>
+        //$FlowFixMe
+        this.mutateValue(field, value);
 
     _init = () => {
         const {id, isNew, defaultLoader, editLoader} = this.props;
@@ -174,7 +178,7 @@ export class ScriptForm extends React.PureComponent<Props, State> {
         this._init();
     }
 
-    componentDidUpdate(prevProps: Props) {
+    componentDidUpdate(prevProps: Props<T>) {
         if (prevProps.isNew !== this.props.isNew && prevProps.id !== this.props.id) {
             this._init();
         }
