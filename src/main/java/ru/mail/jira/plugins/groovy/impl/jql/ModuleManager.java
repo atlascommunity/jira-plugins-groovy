@@ -9,6 +9,7 @@ import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableMap;
+import org.codehaus.groovy.runtime.InvokerHelper;
 import org.dom4j.tree.DefaultElement;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -30,7 +31,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class ModuleManager {
     private final Logger logger = LoggerFactory.getLogger(ModuleReplicationService.class);
+
     private final Map<String, ServiceRegistration> registeredServices = new ConcurrentHashMap<>();
+    private final Map<String, String> moduleKeyToFunction = new ConcurrentHashMap<>();
     private final Map<String, CustomFunction> allFunctions = new ConcurrentHashMap<>();
 
     private final JiraAuthenticationContext jiraAuthenticationContext;
@@ -111,8 +114,8 @@ public class ModuleManager {
             descriptor.getKey(),
             bundleContext.registerService(ModuleDescriptor.class.getName(), descriptor, null)
         );
-
         allFunctions.put(functionName, (CustomFunction) descriptor.getModule());
+        moduleKeyToFunction.put(descriptor.getKey(), functionName);
     }
 
     private void unregisterDescriptor(String moduleKey) {
@@ -120,7 +123,15 @@ public class ModuleManager {
         if (existingRegistration != null) {
             try {
                 existingRegistration.unregister();
-                //todo: remove from allFunctions
+
+                String functionName = moduleKeyToFunction.remove(moduleKey);
+                CustomFunction function = allFunctions.remove(functionName);
+                if (function instanceof ScriptFunctionAdapter) {
+                    ScriptFunction delegate = ((ScriptFunctionAdapter) function).getDelegate();
+                    if (delegate != null) {
+                        InvokerHelper.removeClass(delegate.getClass());
+                    }
+                }
             } catch (IllegalStateException e) {
                 logger.debug("already unregistered", e);
             }
