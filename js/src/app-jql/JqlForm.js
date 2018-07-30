@@ -4,15 +4,24 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
 
+import {Record} from 'immutable';
+
 import type {JqlScriptType} from './types';
 
 import {addItem, updateItem} from '../common/redux';
 import {jqlScriptService} from '../service/services';
 
 import {RegistryMessages} from '../i18n/registry.i18n';
-import {ScriptForm, makeScriptForm, type SubmitResult, type ProvidedState} from '../common/script-list/ScriptForm';
+import {ScriptForm, type SubmitResult} from '../common/script-list/ScriptForm';
 import type {DialogComponentProps} from '../common/script-list/types';
 
+
+const recordFactory = Record({
+    name: '',
+    description: '',
+    scriptBody: '',
+    comment: ''
+});
 
 type Props = DialogComponentProps & {
     history: any,
@@ -22,20 +31,16 @@ type Props = DialogComponentProps & {
 
 const defaultLoader = () => Promise.resolve(
     {
-        values: makeScriptForm({
-            name: '',
-            description: '',
-            comment: ''
-        }),
+        values: recordFactory(),
         name: null
     }
 );
 
 const editLoader = (id: number) => jqlScriptService
     .getScript(id)
-    .then(({name, description, scriptBody}: JqlScriptType): ProvidedState => {
+    .then(({name, description, scriptBody}: JqlScriptType): * => {
         return {
-            values: makeScriptForm({
+            values: recordFactory({
                 description: description || '',
                 name, scriptBody
             }),
@@ -85,6 +90,7 @@ class JqlFormInternal extends React.PureComponent<Props> {
                 }}
                 returnTypes={[]}
                 returnTo="/jql/"
+                scriptType="JQL"
 
                 {...this.props}
             />
