@@ -120,6 +120,7 @@ export class PropField extends React.PureComponent<Props> {
                     label={label}
                     required={isRequired}
                     shouldFitContainer={true}
+                    enableResize="vertical"
 
                     //$FlowFixMe
                     value={value || ''}

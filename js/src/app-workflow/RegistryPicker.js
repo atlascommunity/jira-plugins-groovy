@@ -167,6 +167,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                     label={label}
                     required={isRequired}
                     shouldFitContainer={true}
+                    enableResize="vertical"
 
                     name={inputName}
                     value={value || ''}
