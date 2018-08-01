@@ -59,9 +59,11 @@ export class RunDialog extends React.PureComponent<Props, State> {
 
         if (script.params) {
             for (const param of script.params) {
-                let value: ?string|?SingleValueType|boolean = values.get(param.name);
+                let value: ?string|?SingleValueType|?$ReadOnlyArray<SingleValueType>|boolean = values.get(param.name);
 
-                if (selectTypes.includes(param.paramType) && typeof value !== 'string' && typeof value !== 'boolean') {
+                if (param.paramType === 'MULTI_USER' && Array.isArray(value)) {
+                    value = value.map(it => it.value).join(';');
+                } else if (selectTypes.includes(param.paramType) && typeof value !== 'string' && typeof value !== 'boolean' && !Array.isArray(value)) {
                     value = value ? value.value : null;
                 } else if (param.paramType === 'BOOLEAN') {
                     value = value || false;
@@ -134,6 +136,10 @@ export class RunDialog extends React.PureComponent<Props, State> {
                         {
                             text: CommonMessages.close,
                             onClick: onClose,
+                        },
+                        {
+                            text: AdminScriptMessages.modifyAndRun,
+                            onClick: () => this.setState({ stage: 'params' })
                         },
                         {
                             text: AdminScriptMessages.runAgain,

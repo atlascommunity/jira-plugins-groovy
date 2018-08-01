@@ -8,5 +8,6 @@ import type {I18nMessages} from '../common/types';
 export const AdminScriptMessages: I18nMessages = {
     noParams: i18n.adminScript.noParams,
     builtIn: i18n.adminScript.builtIn,
-    runAgain: i18n.adminScript.runAgain
+    runAgain: i18n.adminScript.runAgain,
+    modifyAndRun: i18n.adminScript.modifyAndRun
 };

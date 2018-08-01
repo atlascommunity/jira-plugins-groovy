@@ -184,7 +184,8 @@ define('mailru/groovy/i18n-react', [], function() {
         adminScript: {
             noParams: AJS.I18n.getText('ru.mail.jira.plugins.groovy.adminScripts.noParams'),
             builtIn: AJS.I18n.getText('ru.mail.jira.plugins.groovy.adminScripts.builtIn'),
-            runAgain: AJS.I18n.getText('ru.mail.jira.plugins.groovy.adminScripts.runAgain')
+            runAgain: AJS.I18n.getText('ru.mail.jira.plugins.groovy.adminScripts.runAgain'),
+            modifyAndRun: AJS.I18n.getText('ru.mail.jira.plugins.groovy.adminScripts.modifyAndRun')
         }
     };
 });
