@@ -1,5 +1,5 @@
 //@flow
-import React, {type Node} from 'react';
+import React, {Fragment, type Node} from 'react';
 
 import memoizeOne from 'memoize-one';
 
@@ -176,12 +176,12 @@ export class RunDialog extends React.PureComponent<Props, State> {
         } else if (stage === 'done' && outcome) {
             if (outcome.success) {
                 content = (
-                    <SuccessMessage title="Done">
-                        {script.html ?
-                            <div dangerouslySetInnerHTML={{__html: outcome.message}}/> :
-                            outcome.message
-                        }
-                    </SuccessMessage>
+                    <Fragment>
+                        <SuccessMessage title="Done">
+                            {!script.html && <pre>{outcome.message}</pre>}
+                        </SuccessMessage>
+                        {script.html && <div dangerouslySetInnerHTML={{__html: outcome.message}}/>}
+                    </Fragment>
                 );
             } else {
                 content = <ErrorMessage title="Error occurred">{outcome.message}</ErrorMessage>;
