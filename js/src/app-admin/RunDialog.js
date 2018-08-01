@@ -101,6 +101,7 @@ export class RunDialog extends React.PureComponent<Props, State> {
                     <PropField
                         key={param.name}
                         label={param.displayName}
+                        isRequired={!param.optional}
                         //$FlowFixMe
                         type={param.paramType}
                         onChange={this._updateValue(param.name)}

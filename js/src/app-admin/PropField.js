@@ -17,6 +17,7 @@ type SingleValueTypesEnum = 'USER' | 'GROUP' | 'CUSTOM_FIELD' | 'RESOLUTION';
 
 type CommonProps = {
     label: string,
+    isRequired: boolean,
     onChange: (value: any) => void,
 };
 
@@ -41,13 +42,13 @@ export class PropField extends React.PureComponent<Props> {
     _textCallback = (e: SyntheticEvent<HTMLInputElement|HTMLTextAreaElement>) => this.props.onChange(e.currentTarget.value);
 
     render() {
-        const {label, type, onChange, value} = this.props;
+        const {label, isRequired, type, onChange, value} = this.props;
 
         switch (type) {
             case 'USER': {
                 return <AsyncPicker
                     label={label}
-                    isRequired={true}
+                    isRequired={isRequired}
 
                     src={`${getPluginBaseUrl()}/jira-api/userPicker`}
                     displayValue={true}
@@ -60,7 +61,7 @@ export class PropField extends React.PureComponent<Props> {
             case 'MULTI_USER': {
                 return <AsyncPicker
                     label={label}
-                    isRequired={true}
+                    isRequired={isRequired}
                     isMulti={true}
 
                     src={`${getPluginBaseUrl()}/jira-api/userPicker`}
@@ -74,7 +75,7 @@ export class PropField extends React.PureComponent<Props> {
             case 'GROUP':
                 return <AsyncPicker
                     label={label}
-                    isRequired={true}
+                    isRequired={isRequired}
 
                     src={`${getPluginBaseUrl()}/jira-api/groupPicker`}
                     onChange={onChange}
@@ -84,7 +85,7 @@ export class PropField extends React.PureComponent<Props> {
             case 'CUSTOM_FIELD':
                 return <AsyncPicker
                     label={label}
-                    isRequired={true}
+                    isRequired={isRequired}
 
                     src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`}
                     displayValue={true}
@@ -96,7 +97,7 @@ export class PropField extends React.PureComponent<Props> {
             case 'RESOLUTION':
                 return <AsyncPicker
                     label={label}
-                    isRequired={true}
+                    isRequired={isRequired}
 
                     src={`${getPluginBaseUrl()}/jira-api/resolutionPicker`}
                     onChange={onChange}
@@ -106,7 +107,7 @@ export class PropField extends React.PureComponent<Props> {
             case 'STRING':
                 return <FieldTextStateless
                     label={label}
-                    required={true}
+                    required={isRequired}
                     shouldFitContainer={true}
                     type="text"
 
@@ -117,7 +118,7 @@ export class PropField extends React.PureComponent<Props> {
             case 'TEXT':
                 return <FieldTextAreaStateless
                     label={label}
-                    required={true}
+                    required={isRequired}
                     shouldFitContainer={true}
 
                     //$FlowFixMe
@@ -127,7 +128,7 @@ export class PropField extends React.PureComponent<Props> {
             case 'LONG':
                 return <FieldTextStateless
                     label={label}
-                    required={true}
+                    required={isRequired}
                     shouldFitContainer={true}
                     type="number"
 
@@ -138,7 +139,7 @@ export class PropField extends React.PureComponent<Props> {
             case 'DOUBLE':
                 return <FieldTextStateless
                     label={label}
-                    required={true}
+                    required={isRequired}
                     shouldFitContainer={true}
                     type="text"
 
@@ -168,7 +169,7 @@ export class PropField extends React.PureComponent<Props> {
                 return (
                     <EditorField
                         label={label}
-                        isRequired={true}
+                        isRequired={isRequired}
 
                         onChange={onChange}
                         //$FlowFixMe
