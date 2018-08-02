@@ -19,65 +19,68 @@ type Props = ElementConfig<typeof EditorField> & {
     typeParams?: {[string]: string}
 };
 
+type AnnotationsType = $ReadOnlyArray<AnnotationType>;
+
 export class CheckedEditorField extends React.Component<Props, State> {
     state = {
         isLoading: false,
         hasErrors: false
     };
 
-    reqId = 0;
     lastRequestedValue = null;
-    lastCallback = null;
+    cachedPromise = null;
 
     _checkScript = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => {
         const {scriptType} = this.props;
 
-        this.lastCallback = callback;
 
-        if (this.lastRequestedValue === value) {
-            return;
+        if (this.lastRequestedValue !== value) {
+            this.cachedPromise = null;
         }
 
         this.lastRequestedValue = value;
 
         if (!value) {
             this.setState({ isLoading: false, hasErrors: false });
+            callback([]);
             return;
         }
 
-        const currentRequest = ++this.reqId;
+        let promise: ?Promise<AnnotationsType> = this.cachedPromise;
 
-        this.setState({ isLoading: true });
+        if (!promise) {
+            this.setState({ isLoading: true });
 
-        extrasService
-            .checkScript(value, scriptType)
-            .then(() => {
-                if (currentRequest === this.reqId) {
-                    this.setState({ isLoading: false, hasErrors: false });
-                    if (this.lastCallback) {
-                        this.lastCallback([]);
+            promise = this.cachedPromise = extrasService
+                .checkScript(value, scriptType)
+                .then((): AnnotationsType => {
+                    if (value === this.lastRequestedValue) {
+                        this.setState({isLoading: false, hasErrors: false});
+                        return [];
                     }
-                }
-            })
-            .catch((e: *) => {
-                if (currentRequest === this.reqId) {
-                    const {response} = e;
+                    return [];
+                })
+                .catch((e: *): AnnotationsType => {
+                    if (value === this.lastRequestedValue) {
+                        const {response} = e;
 
-                    if (response.status === 400) {
-                        this.setState({ isLoading: false, hasErrors: true });
-                        const annotations = transformMarkers(getMarkers(response.data.error));
-                        if (this.lastCallback) {
-                            this.lastCallback(annotations);
+                        if (response.status === 400) {
+                            this.setState({isLoading: false, hasErrors: true});
+                            return transformMarkers(getMarkers(response.data.error));
+                        } else {
+                            this.setState({isLoading: false, hasErrors: false});
+                            throw e;
                         }
-                    } else {
-                        this.setState({ isLoading: false, hasErrors: false });
-                        if (this.lastCallback) {
-                            this.lastCallback([]);
-                        }
-                        throw e;
                     }
-                }
-            });
+                    return [];
+                });
+        }
+
+        if (promise) {
+            promise.then(annotations => callback(annotations));
+        } else {
+            console.error('no promise');
+        }
     };
 
     render() {
