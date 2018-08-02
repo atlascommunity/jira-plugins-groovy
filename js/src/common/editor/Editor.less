@@ -36,6 +36,45 @@
   -ms-transition: none;
 }
 
+.icon-replace-fill(@src, @primary, @secondary) {
+  @escape-fill-primary: escape(@primary);
+  @escape-fill-secondary: escape(@secondary);
+  @data-uri: data-uri('image/svg+xml;charset=UTF-8', "@{src}");
+  @replace-src: replace(
+    replace(
+      replace("@{data-uri}", escape('currentColor'), @escape-fill-primary, 'g'),
+      escape('inherit'), @escape-fill-secondary, 'g'
+    ),
+    escape('<svg '), escape('<svg xmlns="http://www.w3.org/2000/svg" ')
+  );
+  background-image:e(@replace-src);
+}
+
+.CodeMirror-lint-marker-error,
+.CodeMirror-lint-message-error {
+  .icon-replace-fill('../../../node_modules/@atlaskit/icon/svgs/cross-circle.svg', @ak-color-R400, white);
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 16px;
+  margin-left: 2px
+}
+
+.CodeMirror-lint-marker-warning,
+.CodeMirror-lint-message-warning {
+  .icon-replace-fill('../../../node_modules/@atlaskit/icon/svgs/cross-circle.svg', @ak-color-R400, white);
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 16px;
+  margin-left: 2px
+}
+
+.CodeMirror-lint-marker-multiple {
+  .icon-replace-fill('../../../node_modules/@atlaskit/icon/svgs/add-circle.svg', @ak-color-N900, white);
+  background-size: 10px;
+  margin-top: 2px;
+  margin-left: 2px;
+}
+
 .cm-s-lesser-dark {
   line-height: 1.46em;
 }

@@ -24,7 +24,7 @@ import Spinner from '@atlaskit/spinner';
 import {colors} from '@atlaskit/theme';
 
 import QuestionIcon from '@atlaskit/icon/glyph/question';
-import ErrorIcon from '@atlaskit/icon/glyph/error';
+import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
 
 import {Resizable} from 'react-resizable';
@@ -177,11 +177,11 @@ export class Editor extends React.Component<EditorProps, EditorState> {
     _renderValidationIcon() {
         switch (this.props.validationState) {
             case 'invalid':
-                return <ErrorIcon primaryColor={colors.R300}/>;
+                return <CrossCircleIcon primaryColor={colors.R400}/>;
             case 'loading':
                 return <Spinner/>;
             case 'valid':
-                return <CheckCircleIcon primaryColor={colors.G300}/>;
+                return <CheckCircleIcon primaryColor={colors.G400}/>;
             default:
                 return null;
         }
