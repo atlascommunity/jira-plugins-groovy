@@ -19,7 +19,6 @@ type Props = ElementConfig<typeof EditorField> & {
     typeParams?: {[string]: string}
 };
 
-//todo: разобраться с одновременным запросом двух проверок
 export class CheckedEditorField extends React.Component<Props, State> {
     state = {
         isLoading: false,
@@ -28,15 +27,18 @@ export class CheckedEditorField extends React.Component<Props, State> {
 
     reqId = 0;
     lastRequestedValue = null;
-    lastResult = [];
+    lastCallback = null;
 
     _checkScript = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => {
         const {scriptType} = this.props;
 
+        this.lastCallback = callback;
+
         if (this.lastRequestedValue === value) {
-            callback(this.lastResult);
             return;
         }
+
+        this.lastRequestedValue = value;
 
         if (!value) {
             this.setState({ isLoading: false, hasErrors: false });
@@ -52,9 +54,9 @@ export class CheckedEditorField extends React.Component<Props, State> {
             .then(() => {
                 if (currentRequest === this.reqId) {
                     this.setState({ isLoading: false, hasErrors: false });
-                    callback([]);
-                    this.lastRequestedValue = value;
-                    this.lastResult = [];
+                    if (this.lastCallback) {
+                        this.lastCallback([]);
+                    }
                 }
             })
             .catch((e: *) => {
@@ -64,14 +66,14 @@ export class CheckedEditorField extends React.Component<Props, State> {
                     if (response.status === 400) {
                         this.setState({ isLoading: false, hasErrors: true });
                         const annotations = transformMarkers(getMarkers(response.data.error));
-                        callback(annotations);
-                        this.lastRequestedValue = value;
-                        this.lastResult = annotations;
+                        if (this.lastCallback) {
+                            this.lastCallback(annotations);
+                        }
                     } else {
                         this.setState({ isLoading: false, hasErrors: false });
-                        callback([]);
-                        this.lastRequestedValue = value;
-                        this.lastResult = [];
+                        if (this.lastCallback) {
+                            this.lastCallback([]);
+                        }
                         throw e;
                     }
                 }
