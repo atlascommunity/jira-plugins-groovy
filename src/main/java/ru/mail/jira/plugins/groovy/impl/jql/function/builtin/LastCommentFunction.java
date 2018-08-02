@@ -30,14 +30,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.util.lucene.CommentIdFilter;
 import ru.mail.jira.plugins.groovy.util.lucene.IssueIdCollector;
 import ru.mail.jira.plugins.groovy.util.lucene.IssueIdMultipleEntryFilter;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class LastCommentFunction extends AbstractCommentQueryFunction {
@@ -83,14 +81,13 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
 
         IndexSearcher searcher = searchProviderFactory.getSearcher(SearchProviderFactory.COMMENT_INDEX);
 
-        logger.error("starting search");
-        Query initialQuery;
+        logger.debug("starting search");
+
+        Filter filter = null;
         if (withSubquery) {
             String queryString = StringUtils.trimToEmpty(args.get(0));
 
-            if (queryString.isEmpty()) {
-                initialQuery = new MatchAllDocsQuery();
-            } else {
+            if (!queryString.isEmpty()) {
                 //if issue query is specified, get all issue ids that match jql query
                 com.atlassian.query.Query issueQuery = getQuery(user, queryString, null);
 
@@ -103,35 +100,34 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
 
                 Set<String> issueIds = issueIdCollector.getIssueIds();
                 if (issueIds.size() > 0) {
-                    initialQuery = new ConstantScoreQuery(new IssueIdMultipleEntryFilter(issueIds));
+                    filter = new IssueIdMultipleEntryFilter(issueIds);
                 } else {
                     return QueryFactoryResult.createFalseResult();
                 }
             }
-        } else {
-            initialQuery = new MatchAllDocsQuery();
         }
 
-        logger.error("constructed initial query");
+        logger.debug("constructed filter");
 
         LastCommentIdCollector lastCommentIdCollector = new LastCommentIdCollector();
 
         try {
-            searcher.search(initialQuery, lastCommentIdCollector);
+            searcher.search(new MatchAllDocsQuery(), filter, lastCommentIdCollector);
         } catch (IOException e) {
             logger.error("caught exception while searching", e);
         }
 
-        Set<String> commentIds = lastCommentIdCollector
+        String[] commentIds = lastCommentIdCollector
             .lastCommentIds
             .values()
             .stream()
+            .distinct()
             .map(String::valueOf)
-            .collect(Collectors.toSet());
+            .toArray(String[]::new);
 
-        logger.error("collected last comments: {}", commentIds.size());
+        logger.debug("collected last comments: {}", commentIds.length);
 
-        if (commentIds.size() == 0) {
+        if (commentIds.length == 0) {
             return QueryFactoryResult.createFalseResult();
         }
 
@@ -142,23 +138,21 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
             return QueryFactoryResult.createFalseResult();
         }
 
-        Query constructedQuery = parseResult.left().get();
-
-        logger.error("constructed comment query");
-
-        BooleanQuery query = new BooleanQuery();
-        query.add(constructedQuery, BooleanClause.Occur.MUST);
-        query.add(new ConstantScoreQuery(new CommentIdFilter(commentIds)), BooleanClause.Occur.MUST);
+        logger.debug("constructed comment query");
 
         IssueIdCollector collector = new IssueIdCollector();
 
         try {
-            searcher.search(query, collector);
+            searcher.search(
+                parseResult.left().get(),
+                new FieldCacheTermsFilter(DocumentConstants.COMMENT_ID, commentIds),
+                collector
+            );
         } catch (IOException e) {
             logger.error("caught exception while searching", e);
         }
 
-        logger.error("search complete");
+        logger.debug("search complete");
 
         return new QueryFactoryResult(
             new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())),
@@ -189,9 +183,11 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
     }
 
     private class LastCommentIdCollector extends Collector {
-        private Map<String, Long> lastCommentIds = new HashMap<>();
+        private Map<String, String> lastCommentIds = new HashMap<>();
+        private Map<String, String> lastDates = new HashMap<>();
         private String[] issueIds;
-        private long[] commentIds;
+        private String[] commentIds;
+        private String[] commentDates;
 
         @Override
         public void setScorer(Scorer scorer) {
@@ -200,19 +196,22 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         @Override
         public void collect(int i) {
             String issue = issueIds[i];
-            long commentId = commentIds[i];
+            String commentId = commentIds[i];
+            String date = commentDates[i];
 
-            lastCommentIds.merge(issue, commentId, this::mergeValue);
-        }
+            String lastDate = lastDates.get(issue);
 
-        private Long mergeValue(Long a, Long b) {
-            return Math.max(a, b);
+            if (lastDate == null || date.compareTo(lastDate) >= 0) {
+                lastCommentIds.put(issue, commentId);
+                lastDates.put(issue, date);
+            }
         }
 
         @Override
         public void setNextReader(IndexReader indexReader, int i) throws IOException {
             issueIds = FieldCache.DEFAULT.getStrings(indexReader, DocumentConstants.ISSUE_ID);
-            commentIds = FieldCache.DEFAULT.getLongs(indexReader, DocumentConstants.COMMENT_ID);
+            commentIds = FieldCache.DEFAULT.getStrings(indexReader, DocumentConstants.COMMENT_ID);
+            commentDates = FieldCache.DEFAULT.getStrings(indexReader, DocumentConstants.COMMENT_CREATED);
         }
 
         @Override
