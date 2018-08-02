@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.util.lucene.IssueIdCollector;
-import ru.mail.jira.plugins.groovy.util.lucene.IssueIdMultipleEntryFilter;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -98,9 +97,9 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
                     logger.error("caught exception while searching", e);
                 }
 
-                Set<String> issueIds = issueIdCollector.getIssueIds();
-                if (issueIds.size() > 0) {
-                    filter = new IssueIdMultipleEntryFilter(issueIds);
+                String[] issueIds = issueIdCollector.getIssueIds().toArray(new String[0]);
+                if (issueIds.length > 0) {
+                    filter = new FieldCacheTermsFilter(DocumentConstants.ISSUE_ID, issueIds);
                 } else {
                     return QueryFactoryResult.createFalseResult();
                 }
@@ -190,8 +189,7 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         private String[] commentDates;
 
         @Override
-        public void setScorer(Scorer scorer) {
-        }
+        public void setScorer(Scorer scorer) {}
 
         @Override
         public void collect(int i) {
