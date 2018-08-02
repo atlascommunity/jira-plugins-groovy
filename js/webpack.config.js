@@ -110,7 +110,12 @@ module.exports = {
                         use: [
                             devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
                             'css-loader',
-                            'less-loader'
+                            {
+                                loader: 'less-loader',
+                                options: {
+                                    noIeCompat: false
+                                }
+                            }
                         ]
                     },
                     {
