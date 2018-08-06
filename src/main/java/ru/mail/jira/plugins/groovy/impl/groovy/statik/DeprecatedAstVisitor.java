@@ -23,7 +23,10 @@ public class DeprecatedAstVisitor extends ClassCodeVisitorSupport {
 
         ClassNode inferredType = expression.getNodeMetaData(StaticTypesMarker.INFERRED_TYPE);
 
-        if (inferredType.getTypeClass() == Class.class && inferredType.getGenericsTypes().length > 0) {
+        if (inferredType != null &&
+            inferredType.getTypeClass() == Class.class &&
+            inferredType.getGenericsTypes().length > 0
+        ) {
             inferredType = inferredType.getGenericsTypes()[0].getType();
         } else {
             return;
