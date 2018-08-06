@@ -310,7 +310,6 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
                         if (groovyClass.getName().equals(mainClass)) {
                             scriptClass = clazz;
-                            break;
                         }
                     }
                 }
