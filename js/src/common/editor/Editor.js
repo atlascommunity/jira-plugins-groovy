@@ -26,7 +26,7 @@ import {colors} from '@atlaskit/theme';
 import QuestionIcon from '@atlaskit/icon/glyph/question';
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
-import WarningIcon from '@atlaskit/icon/glyph/warning';
+import WarningIcon from '@atlaskit/icon/glyph/jira/failed-build-status';
 
 import {Resizable} from 'react-resizable';
 
