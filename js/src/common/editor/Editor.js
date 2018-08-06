@@ -24,6 +24,7 @@ import Spinner from '@atlaskit/spinner';
 import {colors} from '@atlaskit/theme';
 
 import QuestionIcon from '@atlaskit/icon/glyph/question';
+import QuestionCircleIcon from '@atlaskit/icon/glyph/question-circle';
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
 import WarningIcon from '@atlaskit/icon/glyph/jira/failed-build-status';
@@ -69,7 +70,7 @@ export type AnnotationType = {
     to: EditorPosition
 };
 
-export type ValidationState = 'waiting' | 'valid' | 'hasErrors' | 'hasWarnings';
+export type ValidationState = 'waiting' | 'valid' | 'checkFailed' | 'hasErrors' | 'hasWarnings';
 
 type LinterType = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => void;
 
@@ -183,10 +184,12 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                 return <CrossCircleIcon primaryColor={colors.R400}/>;
             case 'hasWarnings':
                 return <WarningIcon primaryColor={colors.Y400}/>;
-            case 'waiting':
-                return <Spinner/>;
+            case 'checkFailed':
+                return <QuestionCircleIcon primaryColor={colors.R400} />;
             case 'valid':
                 return <CheckCircleIcon primaryColor={colors.G400}/>;
+            case 'waiting':
+                return <Spinner/>;
             default:
                 return null;
         }

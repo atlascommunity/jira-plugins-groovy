@@ -68,7 +68,7 @@ export class CheckedEditorField extends React.Component<Props, State> {
                             this.setState({ validationState: 'hasErrors' });
                             return transformMarkers(getMarkers(response.data.error));
                         } else {
-                            this.setState({ validationState: 'valid' });
+                            this.setState({ validationState: 'checkFailed' });
                             throw e;
                         }
                     }
