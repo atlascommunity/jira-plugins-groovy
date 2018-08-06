@@ -106,8 +106,6 @@ public class DeprecatedAstVisitor extends ClassCodeVisitorSupport {
                             addWarning(expression, "Internal method: " + buildMethodString(methodNode));
                         }
                     }
-
-                    System.out.println(property);
                 }
             }
         }
