@@ -18,7 +18,10 @@ import com.google.common.collect.ImmutableMap;
 import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.Script;
+import org.codehaus.groovy.control.CompilationUnit;
 import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.Phases;
+import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.slf4j.Logger;
@@ -64,6 +67,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     private final GlobalFunctionManagerImpl globalFunctionManager;
     private final DelegatingClassLoader classLoader;
     private final GroovyClassLoader gcl;
+    private final CompilerConfiguration compilerConfiguration;
 
     @Autowired
     public ScriptServiceImpl(
@@ -76,7 +80,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         this.pluginEventManager = pluginEventManager;
         this.globalFunctionManager = globalFunctionManager;
         this.classLoader = classLoader;
-        CompilerConfiguration config = new CompilerConfiguration()
+        this.compilerConfiguration = new CompilerConfiguration()
             .addCompilationCustomizers(
                 new CompileStaticExtension(parseContextHolder, this),
                 new ImportCustomizer().addStarImports("ru.mail.jira.plugins.groovy.api.script"),
@@ -85,13 +89,14 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
                 new InjectionExtension(parseContextHolder),
                 new ParamExtension(parseContextHolder)
             );
-        config.setTolerance(10);
-        config.setOptimizationOptions(ImmutableMap.of(
+        this.compilerConfiguration.setWarningLevel(WarningMessage.LIKELY_ERRORS);
+        this.compilerConfiguration.setTolerance(10);
+        this.compilerConfiguration.setOptimizationOptions(ImmutableMap.of(
             CompilerConfiguration.INVOKEDYNAMIC, Boolean.TRUE
         ));
         this.gcl = new GroovyClassLoader(
             classLoader,
-            config
+            this.compilerConfiguration
         );
     }
 
@@ -268,7 +273,30 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
             parseContextHolder.get().setCompileStatic(compileStatic);
             parseContextHolder.get().setTypes(types);
 
-            Class scriptClass = gcl.parseClass(script);
+            Class scriptClass = null;
+            if (compileStatic) {
+                scriptClass = gcl.parseClass(script);
+            } else {
+                CompilationUnit compilationUnit = new CompilationUnit(compilerConfiguration, null, gcl);
+                SourceUnit sourceUnit = compilationUnit
+                    .addSource(
+                        "script" + System.currentTimeMillis() + Math.abs(script.hashCode()) + ".groovy",
+                        script
+                    );
+                compilationUnit.compile(Phases.CLASS_GENERATION);
+
+                String mainClass = sourceUnit.getAST().getMainClassName();
+                for (Object aClass : compilationUnit.getClasses()) {
+                    if (aClass instanceof Class) {
+                        Class castedClass = (Class) aClass;
+
+                        if (castedClass.getName().equals(mainClass)) {
+                            scriptClass = castedClass;
+                            break;
+                        }
+                    }
+                }
+            }
 
             logger.debug("parsed script");
             return new CompiledScript(
