@@ -18,13 +18,12 @@ import com.google.common.collect.ImmutableMap;
 import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.Script;
-import org.codehaus.groovy.control.CompilationUnit;
-import org.codehaus.groovy.control.CompilerConfiguration;
-import org.codehaus.groovy.control.Phases;
-import org.codehaus.groovy.control.SourceUnit;
+import org.codehaus.groovy.ast.ClassNode;
+import org.codehaus.groovy.control.*;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.codehaus.groovy.control.messages.WarningMessage;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.codehaus.groovy.tools.GroovyClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +33,7 @@ import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.groovy.*;
 import ru.mail.jira.plugins.groovy.impl.groovy.statik.CompileStaticExtension;
+import ru.mail.jira.plugins.groovy.impl.groovy.statik.DeprecatedAstVisitor;
 import ru.mail.jira.plugins.groovy.impl.var.GlobalVariable;
 import ru.mail.jira.plugins.groovy.impl.var.HttpClientGlobalVariable;
 import ru.mail.jira.plugins.groovy.impl.var.LoggerGlobalVariable;
@@ -276,8 +276,6 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
             Class scriptClass = null;
             if (compileStatic) {
-                scriptClass = gcl.parseClass(script);
-            } else {
                 CompilationUnit compilationUnit = new CompilationUnit(compilerConfiguration, null, gcl);
                 SourceUnit sourceUnit = compilationUnit
                     .addSource(
@@ -286,17 +284,38 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
                     );
                 compilationUnit.compile(Phases.CLASS_GENERATION);
 
+                if (extended) {
+                    DeprecatedAstVisitor astVisitor = new DeprecatedAstVisitor();
+
+                    for (Object aClass : compilationUnit.getAST().getClasses()) {
+                        astVisitor.visitClass((ClassNode) aClass);
+                    }
+
+                    parseContextHolder.get().setWarnings(astVisitor.getWarnings());
+                }
+
                 String mainClass = sourceUnit.getAST().getMainClassName();
                 for (Object aClass : compilationUnit.getClasses()) {
-                    if (aClass instanceof Class) {
-                        Class castedClass = (Class) aClass;
+                    if (aClass instanceof GroovyClass) {
+                        GroovyClass groovyClass = (GroovyClass) aClass;
 
-                        if (castedClass.getName().equals(mainClass)) {
-                            scriptClass = castedClass;
+                        BytecodeProcessor bytecodePostprocessor = compilerConfiguration.getBytecodePostprocessor();
+
+                        byte[] byteCode = groovyClass.getBytes();
+                        if (bytecodePostprocessor != null) {
+                            byteCode = bytecodePostprocessor.processBytecode(groovyClass.getName(), byteCode);
+                        }
+
+                        Class clazz = gcl.defineClass(groovyClass.getName(), byteCode);
+
+                        if (groovyClass.getName().equals(mainClass)) {
+                            scriptClass = clazz;
                             break;
                         }
                     }
                 }
+            } else {
+                scriptClass = gcl.parseClass(script);
             }
 
             logger.debug("parsed script");
