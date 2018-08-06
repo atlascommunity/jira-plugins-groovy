@@ -6,12 +6,13 @@ import {EditorField} from './EditorField';
 import {extrasService} from '../../service/services';
 import {getMarkers} from '../error';
 import {transformMarkers} from '../editor/Editor';
-import type {AnnotationType} from '../editor/Editor';
+
+import type {AnnotationType, ValidationState} from '../editor/Editor';
+import type {SyntaxError} from '../types';
 
 
 type State = {|
-    isLoading: boolean,
-    hasErrors: boolean
+    validationState: ValidationState
 |};
 
 type Props = ElementConfig<typeof EditorField> & {
@@ -23,8 +24,7 @@ type AnnotationsType = $ReadOnlyArray<AnnotationType>;
 
 export class CheckedEditorField extends React.Component<Props, State> {
     state = {
-        isLoading: false,
-        hasErrors: false
+        validationState: 'valid'
     };
 
     lastRequestedValue = null;
@@ -41,7 +41,7 @@ export class CheckedEditorField extends React.Component<Props, State> {
         this.lastRequestedValue = value;
 
         if (!value) {
-            this.setState({ isLoading: false, hasErrors: false });
+            this.setState({ validationState: 'valid' });
             callback([]);
             return;
         }
@@ -49,14 +49,14 @@ export class CheckedEditorField extends React.Component<Props, State> {
         let promise: ?Promise<AnnotationsType> = this.cachedPromise;
 
         if (!promise) {
-            this.setState({ isLoading: true });
+            this.setState({ validationState: 'waiting' });
 
             promise = this.cachedPromise = extrasService
                 .checkScript(value, scriptType)
-                .then((): AnnotationsType => {
+                .then((result: $ReadOnlyArray<SyntaxError>): AnnotationsType => {
                     if (value === this.lastRequestedValue) {
-                        this.setState({isLoading: false, hasErrors: false});
-                        return [];
+                        this.setState({ validationState: result.length ? 'hasWarnings' : 'valid' });
+                        return transformMarkers(getMarkers(result));
                     }
                     return [];
                 })
@@ -65,10 +65,10 @@ export class CheckedEditorField extends React.Component<Props, State> {
                         const {response} = e;
 
                         if (response.status === 400) {
-                            this.setState({isLoading: false, hasErrors: true});
+                            this.setState({ validationState: 'hasErrors' });
                             return transformMarkers(getMarkers(response.data.error));
                         } else {
-                            this.setState({isLoading: false, hasErrors: false});
+                            this.setState({ validationState: 'valid' });
                             throw e;
                         }
                     }
@@ -85,12 +85,12 @@ export class CheckedEditorField extends React.Component<Props, State> {
 
     render() {
         const {scriptType, typeParams, ...props} = this.props;
-        const {isLoading, hasErrors} = this.state;
+        const {validationState} = this.state;
 
         return (<EditorField
             {...props}
             linter={this._checkScript}
-            validationState={isLoading ? 'loading' : hasErrors ? 'invalid' : 'valid'}
+            validationState={validationState}
         />);
     }
 }

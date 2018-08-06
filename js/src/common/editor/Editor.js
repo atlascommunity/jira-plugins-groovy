@@ -26,6 +26,7 @@ import {colors} from '@atlaskit/theme';
 import QuestionIcon from '@atlaskit/icon/glyph/question';
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
+import WarningIcon from '@atlaskit/icon/glyph/warning';
 
 import {Resizable} from 'react-resizable';
 
@@ -68,6 +69,8 @@ export type AnnotationType = {
     to: EditorPosition
 };
 
+export type ValidationState = 'waiting' | 'valid' | 'hasErrors' | 'hasWarnings';
+
 type LinterType = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => void;
 
 type EditorProps = {|
@@ -83,7 +86,7 @@ type EditorProps = {|
     resizable?: boolean,
     decorator?: (Node) => Node,
     linter?: LinterType,
-    validationState?: 'loading' | 'valid' | 'invalid'
+    validationState?: ValidationState
 |};
 
 type EditorState = {|
@@ -97,7 +100,7 @@ export function transformMarkers(markers?: $ReadOnlyArray<MarkerType>): $ReadOnl
             (marker: MarkerType): AnnotationType => {
                 return {
                     message: marker.message,
-                    severity: 'error',
+                    severity: marker.severity,
                     from: {line: marker.startRow, ch: marker.startCol},
                     to: {line: marker.endRow, ch: marker.endCol}
                 };
@@ -176,9 +179,11 @@ export class Editor extends React.Component<EditorProps, EditorState> {
 
     _renderValidationIcon() {
         switch (this.props.validationState) {
-            case 'invalid':
+            case 'hasErrors':
                 return <CrossCircleIcon primaryColor={colors.R400}/>;
-            case 'loading':
+            case 'hasWarnings':
+                return <WarningIcon primaryColor={colors.Y400}/>;
+            case 'waiting':
                 return <Spinner/>;
             case 'valid':
                 return <CheckCircleIcon primaryColor={colors.G400}/>;

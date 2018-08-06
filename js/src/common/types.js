@@ -83,7 +83,8 @@ export type SyntaxError = ScriptError & {
     startLine: number,
     endLine: number,
     startColumn: number,
-    endColumn: number
+    endColumn: number,
+    type: 'warning' | 'error'
 };
 
 export type ObjectMap = {[string]: string};

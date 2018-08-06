@@ -3,7 +3,7 @@ import type {SyntaxError} from './types';
 import type {MarkerType} from './editor/types';
 
 
-export function getMarkers(errors: Array<SyntaxError>): $ReadOnlyArray<MarkerType> {
+export function getMarkers(errors: $ReadOnlyArray<SyntaxError>): $ReadOnlyArray<MarkerType> {
     return errors.map((error: SyntaxError): MarkerType => {
         if (error.startLine) {
             return {
@@ -11,7 +11,7 @@ export function getMarkers(errors: Array<SyntaxError>): $ReadOnlyArray<MarkerTyp
                 endRow: error.endLine - 1,
                 startCol: error.startColumn - 1,
                 endCol: error.endColumn - 1,
-                className: 'error-marker',
+                severity: error.type || 'error',
                 message: error.message
             };
         } else {
@@ -20,7 +20,7 @@ export function getMarkers(errors: Array<SyntaxError>): $ReadOnlyArray<MarkerTyp
                 endRow: 0,
                 startCol: 0,
                 endCol: 0,
-                className: 'error-marker',
+                severity: error.type || 'error',
                 message: error.message
             };
         }

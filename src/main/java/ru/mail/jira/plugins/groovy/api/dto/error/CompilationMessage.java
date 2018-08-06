@@ -11,7 +11,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 @XmlRootElement
-public class ScriptError {
+public class CompilationMessage {
+    @XmlElement
+    private String type;
     @XmlElement
     private String message;
 }

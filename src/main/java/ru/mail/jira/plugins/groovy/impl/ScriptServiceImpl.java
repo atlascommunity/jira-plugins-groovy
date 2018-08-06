@@ -23,6 +23,7 @@ import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.Phases;
 import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
+import org.codehaus.groovy.control.messages.WarningMessage;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

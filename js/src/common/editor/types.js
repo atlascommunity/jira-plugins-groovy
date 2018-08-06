@@ -21,5 +21,5 @@ export type MarkerType = {
     startCol: number,
     endCol: number,
     message: string,
-    severity?: string
+    severity: 'error' | 'warning'
 };

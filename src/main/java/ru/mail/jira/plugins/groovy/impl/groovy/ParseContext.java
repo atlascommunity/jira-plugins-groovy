@@ -14,6 +14,7 @@ public class ParseContext {
     private boolean extended;
     @Setter
     private Map<String, Class> types;
+    private final List warnings = new ArrayList();
     private final List<ScriptParamDto> parameters = new ArrayList<>();
     private final Set<String> plugins = new HashSet<>();
     private final List<ScriptInjection> injections = new ArrayList<>();
