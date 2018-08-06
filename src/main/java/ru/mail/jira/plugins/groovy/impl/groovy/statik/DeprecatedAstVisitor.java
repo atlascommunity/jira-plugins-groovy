@@ -1,9 +1,12 @@
 package ru.mail.jira.plugins.groovy.impl.groovy.statik;
 
+import com.atlassian.annotations.Internal;
 import lombok.Getter;
 import org.codehaus.groovy.ast.*;
 import org.codehaus.groovy.ast.expr.*;
 import org.codehaus.groovy.control.SourceUnit;
+import org.codehaus.groovy.runtime.MetaClassHelper;
+import org.codehaus.groovy.transform.sc.StaticCompilationMetadataKeys;
 import org.codehaus.groovy.transform.stc.StaticTypesMarker;
 
 import java.util.ArrayList;
@@ -13,6 +16,28 @@ import java.util.Map;
 public class DeprecatedAstVisitor extends ClassCodeVisitorSupport {
     @Getter
     private final List<WarningMessage> warnings = new ArrayList<>();
+
+    @Override
+    public void visitClassExpression(ClassExpression expression) {
+        super.visitClassExpression(expression);
+
+        ClassNode inferredType = expression.getNodeMetaData(StaticTypesMarker.INFERRED_TYPE);
+
+        if (inferredType.getTypeClass() == Class.class && inferredType.getGenericsTypes().length > 0) {
+            inferredType = inferredType.getGenericsTypes()[0].getType();
+        } else {
+            return;
+        }
+
+        if (inferredType != null) {
+            if (hasAnnotation(inferredType, Deprecated.class)) {
+                addWarning(expression, "Deprecated class: " + inferredType.getName());
+            }
+            if (hasAnnotation(inferredType, Internal.class)) {
+                addWarning(expression, "Internal class: " + inferredType.getName());
+            }
+        }
+    }
 
     @Override
     public void visitMethodCallExpression(MethodCallExpression methodCallExpression) {
@@ -29,19 +54,15 @@ public class DeprecatedAstVisitor extends ClassCodeVisitorSupport {
         if (rawMethodCall instanceof MethodNode) {
             MethodNode methodCall = (MethodNode) rawMethodCall;
 
-            if (hasDeprecatedAnnotation(methodCall)) {
+            if (hasAnnotation(methodCall, Deprecated.class)) {
                 addWarning(methodCallExpression, "Deprecated method: " + buildMethodString(methodCall));
-                return;
             }
-
-            ClassNode declaringClass = methodCall.getDeclaringClass();
-            if (hasDeprecatedAnnotation(declaringClass)) {
-                addWarning(methodCallExpression, "Deprecated class: " + declaringClass.getName());
+            if (hasAnnotation(methodCall, Internal.class)) {
+                addWarning(methodCallExpression, "Internal method: " + buildMethodString(methodCall));
             }
         }
     }
 
-    /*
     @Override
     public void visitPropertyExpression(PropertyExpression expression) {
         super.visitPropertyExpression(expression);
@@ -53,27 +74,50 @@ public class DeprecatedAstVisitor extends ClassCodeVisitorSupport {
         Expression objectExpression = expression.getObjectExpression();
         Expression propertyExpression = expression.getProperty();
 
-        if (objectExpression instanceof ClassExpression && propertyExpression instanceof ConstantExpression) {
-            ClassExpression classExpression = (ClassExpression) objectExpression;
-            ClassNode classNode = classExpression.getNodeMetaData(StaticCompilationMetadataKeys.PROPERTY_OWNER);
+        if (propertyExpression instanceof ConstantExpression) {
+            ClassNode classNode = objectExpression.getNodeMetaData(StaticCompilationMetadataKeys.PROPERTY_OWNER);
 
             if (classNode != null) {
                 ConstantExpression propertyConstant = (ConstantExpression) propertyExpression;
 
-                PropertyNode property = classNode.getProperty((String) propertyConstant.getValue());
-                MethodNode methodNode = classNode.getGetterMethod((String) propertyConstant.getValue());
+                if (propertyConstant.getValue() instanceof String) {
+                    String constant = (String) propertyConstant.getValue();
 
-                System.out.println(property);
+                    PropertyNode property = classNode.getProperty(constant);
+                    FieldNode field = classNode.getField(constant);
+                    if (field != null) {
+                        if (hasAnnotation(field, Deprecated.class)) {
+                            addWarning(expression, "Deprecated field: " + buildFieldString(field));
+                        }
+                        if (hasAnnotation(field, Internal.class)) {
+                            addWarning(expression, "Internal field: " + buildFieldString(field));
+                        }
+
+                        return;
+                    }
+
+                    MethodNode methodNode = classNode.getGetterMethod("get" + MetaClassHelper.capitalize(constant));
+
+                    if (methodNode != null) {
+                        if (hasAnnotation(methodNode, Deprecated.class)) {
+                            addWarning(expression, "Deprecated method: " + buildMethodString(methodNode));
+                        }
+                        if (hasAnnotation(methodNode, Internal.class)) {
+                            addWarning(expression, "Internal method: " + buildMethodString(methodNode));
+                        }
+                    }
+
+                    System.out.println(property);
+                }
             }
         }
-        //System.out.println(expression);
-    }*/
+    }
 
-    private boolean hasDeprecatedAnnotation(AnnotatedNode node) {
+    private boolean hasAnnotation(AnnotatedNode node, Class<?> annotationClass) {
         for (AnnotationNode annotationNode : node.getAnnotations()) {
             ClassNode annotationClassNode = annotationNode.getClassNode();
             if (annotationClassNode.isResolved()) {
-                if (Deprecated.class == annotationClassNode.getTypeClass()) {
+                if (annotationClass == annotationClassNode.getTypeClass()) {
                     return true;
                 }
             }
@@ -82,12 +126,12 @@ public class DeprecatedAstVisitor extends ClassCodeVisitorSupport {
         return false;
     }
 
-    private String buildMethodString(MethodNode methodCall) {
+    private String buildMethodString(MethodNode methodNode) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(methodCall.getDeclaringClass().getName()).append('.').append(methodCall.getName()).append('(');
+        sb.append(methodNode.getDeclaringClass().getName()).append('.').append(methodNode.getName()).append('(');
         boolean isFirst = true;
-        for (Parameter parameter : methodCall.getParameters()) {
+        for (Parameter parameter : methodNode.getParameters()) {
             if (!isFirst) {
                 sb.append(',');
             } else {
@@ -100,7 +144,11 @@ public class DeprecatedAstVisitor extends ClassCodeVisitorSupport {
         return sb.toString();
     }
 
-    private void addWarning(MethodCallExpression expression, String warning) {
+    private String buildFieldString(FieldNode fieldNode) {
+        return fieldNode.getDeclaringClass().getName() + "." + fieldNode.getName();
+    }
+
+    private void addWarning(AnnotatedNode expression, String warning) {
         warnings.add(new WarningMessage(
             warning,
             expression.getLineNumber(), expression.getColumnNumber(),
