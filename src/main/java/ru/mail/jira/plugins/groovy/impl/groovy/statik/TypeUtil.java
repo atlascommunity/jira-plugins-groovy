@@ -39,6 +39,12 @@ public final class TypeUtil {
         "issue", Issue.class,
         "velocityParams", Map.class
     );
+    private static final Map<String, Class> SCHEDULED = ImmutableMap.of(
+        "issue", Issue.class
+    );
+    private static final Map<String, Class> SCHEDULED_MUTABLE = ImmutableMap.of(
+        "issue", MutableIssue.class
+    );
 
     private TypeUtil() {}
 
@@ -68,5 +74,13 @@ public final class TypeUtil {
 
     public static Map<String, Class> getFieldTypes(boolean velocityParamsEnabled) {
         return velocityParamsEnabled ? FIELD_WITH_VARS : FIELD;
+    }
+
+    public static Map<String, Class> getScheduledTypes(boolean withIssue, boolean isMutableIssue) {
+        if (!withIssue) {
+            return ImmutableMap.of();
+        }
+
+        return isMutableIssue ? SCHEDULED_MUTABLE : SCHEDULED;
     }
 }

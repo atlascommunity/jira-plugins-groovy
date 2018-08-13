@@ -66,6 +66,20 @@ public class StaticCheckResource {
 
                     parseContext = scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getFieldTypes(velocityParamsEnabled));
                     break;
+                case SCHEDULED_TASK:
+                    boolean isMutableIssue = false;
+                    boolean withIssue = false;
+
+                    if (additionalParams != null)
+                        if (additionalParams.containsKey("withIssue")) {
+                            withIssue = "true".equals(additionalParams.get("withIssue"));
+                        }
+                        if (additionalParams.containsKey("isMutableIssue")) {
+                            isMutableIssue = "true".equals(additionalParams.get("isMutableIssue"));
+                        }
+
+                    parseContext = scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getScheduledTypes(withIssue, isMutableIssue));
+                    break;
                 default:
                     throw new IllegalArgumentException("Unsupported script type");
             }

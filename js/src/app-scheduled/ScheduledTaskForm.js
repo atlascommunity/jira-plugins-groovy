@@ -32,7 +32,7 @@ import type {
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 
-import {AsyncPicker, EditorField, JqlInput, FormField, FieldError, ErrorMessage, RouterLink} from '../common/ak';
+import {AsyncPicker, CheckedEditorField, JqlInput, FormField, FieldError, ErrorMessage, RouterLink} from '../common/ak';
 import {ScrollToTop} from '../common/ScrollToTop';
 import {withRoot} from '../common/script-list';
 
@@ -275,17 +275,21 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
 
                 let bindings: ?Array<BindingType> = null;
 
+                let withIssue: boolean = false;
+                let isMutableIssue: boolean = currentType === 'ISSUE_JQL_SCRIPT';
+
                 switch (currentType) {
                     case 'ISSUE_JQL_SCRIPT':
                     case 'DOCUMENT_ISSUE_JQL_SCRIPT':
                         bindings = issueBindings;
+                        withIssue = true;
                         break;
                     default:
                         bindings = emptyBindings;
                 }
 
                 return (
-                    <EditorField
+                    <CheckedEditorField
                         key={fieldName}
 
                         label={FieldMessages.scriptCode}
@@ -294,8 +298,12 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
 
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
-                        markers={markers}
 
+                        scriptType="SCHEDULED_TASK"
+                        typeParams={{
+                            withIssue: withIssue ? 'true' : 'false',
+                            isMutableIssue: isMutableIssue ? 'true' : 'false'
+                        }}
                         bindings={bindings}
                         returnTypes={returnTypes}
 

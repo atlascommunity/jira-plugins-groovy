@@ -15,7 +15,7 @@ type State = {|
     validationState: ValidationState
 |};
 
-export type StaticCheckScriptType = 'CONSOLE' | 'WORKFLOW_GENERIC' | 'ADMIN_SCRIPT' | 'REST' | 'CUSTOM_FIELD';
+export type StaticCheckScriptType = 'CONSOLE' | 'WORKFLOW_GENERIC' | 'ADMIN_SCRIPT' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK';
 
 type Props = ElementConfig<typeof EditorField> & {
     scriptType: StaticCheckScriptType,
@@ -34,7 +34,6 @@ export class CheckedEditorField extends React.Component<Props, State> {
 
     _checkScript = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => {
         const {scriptType, typeParams} = this.props;
-
 
         if (this.lastRequestedValue !== value) {
             this.cachedPromise = null;
