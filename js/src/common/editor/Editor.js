@@ -47,8 +47,9 @@ function isLight(): boolean {
     return !(preferenceService.get('ru.mail.groovy.isLight') === 'false');
 }
 
-type CodeMirrorType = {
-    setSize: (width?: number|string, height: number|string) => void
+export type CodeMirrorType = {
+    setSize: (width?: number|string, height: number|string) => void,
+    performLint: () => void
 };
 
 type ResizeCallbackData = {
@@ -87,7 +88,8 @@ type EditorProps = {|
     resizable?: boolean,
     decorator?: (Node) => Node,
     linter?: LinterType,
-    validationState?: ValidationState
+    validationState?: ValidationState,
+    editorDidMount?: (editor: CodeMirrorType) => void
 |};
 
 type EditorState = {|
@@ -122,7 +124,13 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         height: 300
     };
 
-    _setEditor = (editor: CodeMirrorType) => this.cm = editor;
+    _setEditor = (editor: CodeMirrorType) => {
+        this.cm = editor;
+
+        if (this.props.editorDidMount) {
+            this.props.editorDidMount(editor);
+        }
+    };
 
     _switchTheme = (e: SyntheticEvent<any>) => {
         if (e) {

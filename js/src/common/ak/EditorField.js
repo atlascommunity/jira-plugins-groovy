@@ -8,7 +8,7 @@ import type {FieldProps, MutableFieldProps, AkFormFieldProps} from '../types';
 
 import Editor from '../editor';
 
-import type {ValidationState} from '../editor/Editor';
+import type {CodeMirrorType, ValidationState} from '../editor/Editor';
 
 import './EditorField.less';
 
@@ -19,7 +19,8 @@ type EditorFieldProps = FieldProps & MutableFieldProps<string> & AkFormFieldProp
     bindings?: $ReadOnlyArray<BindingType>,
     returnTypes?: $ReadOnlyArray<ReturnType>,
     resizable?: boolean,
-    validationState?: ValidationState
+    validationState?: ValidationState,
+    editorDidMount?: (editor: CodeMirrorType) => void
 };
 
 export class EditorField extends React.Component<EditorFieldProps> {

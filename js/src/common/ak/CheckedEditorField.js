@@ -1,13 +1,15 @@
 //@flow
 import React, {type ElementConfig} from 'react';
 
+import isEqual from 'lodash/isEqual';
+
 import {EditorField} from './EditorField';
 
 import {extrasService} from '../../service/services';
 import {getMarkers} from '../error';
 import {transformMarkers} from '../editor/Editor';
 
-import type {AnnotationType, ValidationState} from '../editor/Editor';
+import type {AnnotationType, CodeMirrorType, ValidationState} from '../editor/Editor';
 import type {SyntaxError} from '../types';
 
 
@@ -29,8 +31,11 @@ export class CheckedEditorField extends React.Component<Props, State> {
         validationState: 'valid'
     };
 
+    cm = null;
     lastRequestedValue = null;
     cachedPromise = null;
+
+    _setEditor = (cm: CodeMirrorType) => this.cm = cm;
 
     _checkScript = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => {
         const {scriptType, typeParams} = this.props;
@@ -84,12 +89,23 @@ export class CheckedEditorField extends React.Component<Props, State> {
         }
     };
 
+    componentDidUpdate(prevProps: Props) {
+        if (!isEqual(prevProps.typeParams, this.props.typeParams)) {
+            if (this.cm) {
+                this.cachedPromise = null;
+                this.lastRequestedValue = null;
+                this.cm.performLint();
+            }
+        }
+    }
+
     render() {
         const {scriptType, typeParams, ...props} = this.props;
         const {validationState} = this.state;
 
         return (<EditorField
             {...props}
+            editorDidMount={this._setEditor}
             linter={this._checkScript}
             validationState={validationState}
         />);
