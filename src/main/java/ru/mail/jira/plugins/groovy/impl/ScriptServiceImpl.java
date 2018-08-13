@@ -15,9 +15,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.google.common.collect.ImmutableMap;
-import groovy.lang.Binding;
-import groovy.lang.GroovyClassLoader;
-import groovy.lang.Script;
+import groovy.lang.*;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.control.*;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
@@ -276,12 +274,9 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
             Class scriptClass = null;
             if (compileStatic) {
+                String fileName = "script" + System.currentTimeMillis() + Math.abs(script.hashCode()) + ".groovy";
                 CompilationUnit compilationUnit = new CompilationUnit(compilerConfiguration, null, gcl);
-                SourceUnit sourceUnit = compilationUnit
-                    .addSource(
-                        "script" + System.currentTimeMillis() + Math.abs(script.hashCode()) + ".groovy",
-                        script
-                    );
+                SourceUnit sourceUnit = compilationUnit.addSource(fileName, script);
                 compilationUnit.compile(Phases.CLASS_GENERATION);
 
                 if (extended) {
@@ -293,6 +288,8 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
                     parseContextHolder.get().setWarnings(astVisitor.getWarnings());
                 }
+
+                GroovyClassLoader.InnerLoader innerLoader = new GroovyClassLoader.InnerLoader(gcl);
 
                 String mainClass = sourceUnit.getAST().getMainClassName();
                 for (Object aClass : compilationUnit.getClasses()) {
@@ -306,7 +303,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
                             byteCode = bytecodePostprocessor.processBytecode(groovyClass.getName(), byteCode);
                         }
 
-                        Class clazz = gcl.defineClass(groovyClass.getName(), byteCode);
+                        Class clazz = innerLoader.defineClass(groovyClass.getName(), byteCode);
 
                         if (groovyClass.getName().equals(mainClass)) {
                             scriptClass = clazz;
