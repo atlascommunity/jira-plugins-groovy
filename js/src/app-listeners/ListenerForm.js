@@ -21,13 +21,11 @@ import type {ListenerType, ConditionInputType} from './types';
 import {ListenerMessages} from '../i18n/listener.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 
-import {RouterLink, FormField} from '../common/ak';
+import {RouterLink, FormField, CheckedEditorField, ErrorMessage} from '../common/ak';
 
 import {listenerService} from '../service/services';
 import {getMarkers} from '../common/error';
 import {Bindings, ReturnTypes} from '../common/bindings';
-import {EditorField} from '../common/ak/EditorField';
-import {ErrorMessage} from '../common/ak/messages';
 import {addItem, updateItem} from '../common/redux';
 import type {DialogComponentProps} from '../common/script-list/types';
 import type {BindingType} from '../common/editor/types';
@@ -292,9 +290,14 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
                     >
-                        <EditorField
-                            markers={markers}
+                        <CheckedEditorField
                             isDisabled={waiting}
+
+                            scriptType="LISTENER"
+                            typeParams={{
+                                //$FlowFixMe
+                                className: (condition.type === 'ISSUE' ? 'com.atlassian.jira.event.issue.IssueEvent' : condition.className || undefined)
+                            }}
 
                             bindings={bindings || undefined}
                             returnTypes={returnTypes}

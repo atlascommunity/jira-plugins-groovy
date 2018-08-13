@@ -17,7 +17,7 @@ type State = {|
     validationState: ValidationState
 |};
 
-export type StaticCheckScriptType = 'CONSOLE' | 'WORKFLOW_GENERIC' | 'ADMIN_SCRIPT' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK';
+export type StaticCheckScriptType = 'CONSOLE' | 'WORKFLOW_GENERIC' | 'ADMIN_SCRIPT' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK' | 'LISTENER';
 
 type Props = ElementConfig<typeof EditorField> & {
     scriptType: StaticCheckScriptType,
@@ -61,7 +61,9 @@ export class CheckedEditorField extends React.Component<Props, State> {
                 .checkScript(value, scriptType, typeParams)
                 .then((result: $ReadOnlyArray<SyntaxError>): AnnotationsType => {
                     if (value === this.lastRequestedValue) {
-                        this.setState({ validationState: result.length ? 'hasWarnings' : 'valid' });
+                        const hasErrors = result.some(it => it.type === 'error');
+
+                        this.setState({ validationState: result.length ? (hasErrors ? 'hasErrors' : 'hasWarnings') : 'valid' });
                         return transformMarkers(getMarkers(result));
                     }
                     return [];
