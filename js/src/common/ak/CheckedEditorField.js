@@ -15,8 +15,10 @@ type State = {|
     validationState: ValidationState
 |};
 
+export type StaticCheckScriptType = 'CONSOLE' | 'WORKFLOW_GENERIC' | 'ADMIN_SCRIPT';
+
 type Props = ElementConfig<typeof EditorField> & {
-    scriptType: 'CONSOLE' | 'WORKFLOW_GENERIC',
+    scriptType: StaticCheckScriptType,
     typeParams?: {[string]: string}
 };
 

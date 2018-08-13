@@ -116,6 +116,7 @@ class AdminFormInternal extends React.PureComponent<Props> {
                     createTitle: RegistryMessages.addScript,
                     parentName: 'Admin scripts'
                 }}
+                scriptType="ADMIN_SCRIPT"
                 returnTypes={returnTypes}
                 returnTo="/admin-scripts/"
 

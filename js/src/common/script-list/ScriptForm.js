@@ -15,7 +15,9 @@ import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 import type {DialogComponentProps, ScriptForm as ScriptFormType} from './types';
 import {withRoot} from './breadcrumbs';
 
-import {RouterLink, FormField, EditorField, LoadingSpinner, ErrorMessage} from '../ak';
+import {RouterLink, FormField, CheckedEditorField, LoadingSpinner, ErrorMessage} from '../ak';
+import type {StaticCheckScriptType} from '../ak/CheckedEditorField';
+
 import {ScrollToTop} from '../ScrollToTop';
 import {addItem, updateItem} from '../redux';
 import {getMarkers} from '../error';
@@ -78,7 +80,8 @@ type Props<T: ScriptFormType> = DialogComponentProps & {
     additionalFields: $ReadOnlyArray<AdditionalField<T>>,
     history: any,
     returnTo: string,
-    returnTypes?: $ReadOnlyArray<ReturnType>
+    returnTypes?: $ReadOnlyArray<ReturnType>,
+    scriptType: StaticCheckScriptType
 };
 
 type State<T: ScriptFormType> = {
@@ -185,7 +188,7 @@ export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>,
     }
 
     render() {
-        const {i18n, isNew, id, additionalFields, returnTypes, returnTo} = this.props;
+        const {i18n, isNew, id, additionalFields, returnTypes, scriptType, returnTo} = this.props;
         const {values, isModified, isLoadingState, isSubmitting, error, name} = this.state;
 
         let content: Node = null;
@@ -254,10 +257,10 @@ export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>,
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorMessage || ''}
                     >
-                        <EditorField
+                        <CheckedEditorField
                             isDisabled={isSubmitting}
 
-                            markers={markers}
+                            scriptType={scriptType}
 
                             bindings={bindings}
                             returnTypes={returnTypes}

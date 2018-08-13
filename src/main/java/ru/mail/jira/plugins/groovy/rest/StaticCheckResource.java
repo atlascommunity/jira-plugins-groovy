@@ -42,6 +42,9 @@ public class StaticCheckResource {
             ParseContext parseContext = null;
 
             switch (form.getScriptType()) {
+                case ADMIN_SCRIPT:
+                    parseContext = scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getAdminTypes());
+                    break;
                 case CONSOLE:
                     parseContext = scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getConsoleTypes());
                     break;

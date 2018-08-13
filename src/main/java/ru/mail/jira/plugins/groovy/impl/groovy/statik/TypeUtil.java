@@ -41,4 +41,8 @@ public final class TypeUtil {
     public static Map<String, Class> getWorkflowTypes() {
         return WORKFLOW_GENERIC;
     }
+
+    public static Map<String, Class> getAdminTypes() {
+        return CONSOLE;
+    }
 }
