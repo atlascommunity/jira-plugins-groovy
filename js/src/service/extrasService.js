@@ -9,7 +9,7 @@ export class ExtrasService {
         return ajaxPost(`${getPluginBaseUrl()}/extras/clearCache`);
     }
 
-    checkScript(scriptBody: string, scriptType: string): Promise<$ReadOnlyArray<SyntaxError>> {
-        return ajaxPost(`${getPluginBaseUrl()}/staticCheck`, { scriptBody, scriptType, additionalParams: {} });
+    checkScript(scriptBody: string, scriptType: string, additionalParams: {[string]: string} = {}): Promise<$ReadOnlyArray<SyntaxError>> {
+        return ajaxPost(`${getPluginBaseUrl()}/staticCheck`, { scriptBody, scriptType, additionalParams });
     }
 }

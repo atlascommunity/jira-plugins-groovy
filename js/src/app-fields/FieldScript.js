@@ -113,6 +113,10 @@ export class FieldScript extends React.PureComponent<Props> {
                             label: FieldMessages.cacheable,
                             value: script.cacheable ? CommonMessages.yes : CommonMessages.no
                         },
+                        script.needsTemplate ? {
+                            label: 'Velocity params',
+                            value: script.velocityParamsEnabled ? CommonMessages.yes : CommonMessages.no
+                        } : null
                     ]}
                 />
             </ConnectedWatchableScript>

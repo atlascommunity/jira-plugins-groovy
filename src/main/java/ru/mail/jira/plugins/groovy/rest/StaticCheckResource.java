@@ -16,6 +16,7 @@ import ru.mail.jira.plugins.groovy.util.RestExecutor;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Scanned
@@ -39,6 +40,8 @@ public class StaticCheckResource {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
+            Map<String, String> additionalParams = form.getAdditionalParams();
+
             ParseContext parseContext = null;
 
             switch (form.getScriptType()) {
@@ -53,6 +56,15 @@ public class StaticCheckResource {
                     break;
                 case REST:
                     parseContext = scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getRestTypes());
+                    break;
+                case CUSTOM_FIELD:
+                    boolean velocityParamsEnabled = false;
+
+                    if (additionalParams != null && additionalParams.containsKey("velocityParamsEnabled")) {
+                        velocityParamsEnabled = "true".equals(additionalParams.get("velocityParamsEnabled"));
+                    }
+
+                    parseContext = scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getFieldTypes(velocityParamsEnabled));
                     break;
                 default:
                     throw new IllegalArgumentException("Unsupported script type");

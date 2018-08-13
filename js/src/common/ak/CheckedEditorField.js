@@ -15,7 +15,7 @@ type State = {|
     validationState: ValidationState
 |};
 
-export type StaticCheckScriptType = 'CONSOLE' | 'WORKFLOW_GENERIC' | 'ADMIN_SCRIPT' | 'REST';
+export type StaticCheckScriptType = 'CONSOLE' | 'WORKFLOW_GENERIC' | 'ADMIN_SCRIPT' | 'REST' | 'CUSTOM_FIELD';
 
 type Props = ElementConfig<typeof EditorField> & {
     scriptType: StaticCheckScriptType,
@@ -33,7 +33,7 @@ export class CheckedEditorField extends React.Component<Props, State> {
     cachedPromise = null;
 
     _checkScript = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => {
-        const {scriptType} = this.props;
+        const {scriptType, typeParams} = this.props;
 
 
         if (this.lastRequestedValue !== value) {
@@ -54,7 +54,7 @@ export class CheckedEditorField extends React.Component<Props, State> {
             this.setState({ validationState: 'waiting' });
 
             promise = this.cachedPromise = extrasService
-                .checkScript(value, scriptType)
+                .checkScript(value, scriptType, typeParams)
                 .then((result: $ReadOnlyArray<SyntaxError>): AnnotationsType => {
                     if (value === this.lastRequestedValue) {
                         this.setState({ validationState: result.length ? 'hasWarnings' : 'valid' });

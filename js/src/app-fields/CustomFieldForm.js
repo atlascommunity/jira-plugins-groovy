@@ -23,8 +23,7 @@ import {fieldConfigService} from '../service/services';
 import {CommonMessages, ErrorMessages, FieldMessages} from '../i18n/common.i18n';
 import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
-import {EditorField} from '../common/ak/EditorField';
-import {FormField, ErrorMessage, InfoMessage} from '../common/ak';
+import {EditorField, CheckedEditorField, FormField, ErrorMessage, InfoMessage} from '../common/ak';
 import {ConsoleMessages} from '../i18n/console.i18n';
 import type {InputEvent} from '../common/EventTypes';
 import {extractShortClassName} from '../common/classNames';
@@ -272,7 +271,9 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorMessage || ''}
                     >
-                        <EditorField
+                        <CheckedEditorField
+                            scriptType="CUSTOM_FIELD"
+                            typeParams={{ velocityParamsEnabled: velocityParamsEnabled ? 'true' : 'false' }}
                             bindings={velocityParamsEnabled ? bindingsWithVelocity : bindings}
                             returnTypes={returnTypes}
 
@@ -280,8 +281,6 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
 
                             value={values.get('scriptBody')}
                             onChange={this._setScript}
-
-                            markers={markers}
                         />
                     </FormField>
 

@@ -32,6 +32,13 @@ public final class TypeUtil {
         "body", String.class,
         "currentUser", ApplicationUser.class
     );
+    private static final Map<String, Class> FIELD = ImmutableMap.of(
+        "issue", Issue.class
+    );
+    private static final Map<String, Class> FIELD_WITH_VARS = ImmutableMap.of(
+        "issue", Issue.class,
+        "velocityParams", Map.class
+    );
 
     private TypeUtil() {}
 
@@ -57,5 +64,9 @@ public final class TypeUtil {
 
     public static Map<String, Class> getRestTypes() {
         return REST;
+    }
+
+    public static Map<String, Class> getFieldTypes(boolean velocityParamsEnabled) {
+        return velocityParamsEnabled ? FIELD_WITH_VARS : FIELD;
     }
 }
