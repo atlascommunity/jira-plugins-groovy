@@ -5,6 +5,8 @@ import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.collect.ImmutableMap;
 
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.UriInfo;
 import java.util.Map;
 
 public final class TypeUtil {
@@ -22,6 +24,13 @@ public final class TypeUtil {
         "issue", MutableIssue.class,
         "currentUser", ApplicationUser.class,
         "transientVars", Map.class
+    );
+    private static final Map<String, Class> REST = ImmutableMap.of(
+        "method", String.class,
+        "headers", HttpHeaders.class,
+        "uriInfo", UriInfo.class,
+        "body", String.class,
+        "currentUser", ApplicationUser.class
     );
 
     private TypeUtil() {}
@@ -44,5 +53,9 @@ public final class TypeUtil {
 
     public static Map<String, Class> getAdminTypes() {
         return CONSOLE;
+    }
+
+    public static Map<String, Class> getRestTypes() {
+        return REST;
     }
 }

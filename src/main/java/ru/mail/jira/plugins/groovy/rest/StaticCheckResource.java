@@ -51,6 +51,9 @@ public class StaticCheckResource {
                 case WORKFLOW_GENERIC:
                     parseContext = scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getWorkflowTypes());
                     break;
+                case REST:
+                    parseContext = scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getRestTypes());
+                    break;
                 default:
                     throw new IllegalArgumentException("Unsupported script type");
             }

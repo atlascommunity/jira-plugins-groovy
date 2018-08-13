@@ -18,7 +18,7 @@ import type {RestScriptType} from './types';
 import {RestMessages} from '../i18n/rest.i18n';
 import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n';
 
-import {MultiSelect, AsyncPicker, EditorField, FormField, ErrorMessage, RouterLink} from '../common/ak';
+import {MultiSelect, AsyncPicker, CheckedEditorField, FormField, ErrorMessage, RouterLink} from '../common/ak';
 import {ScrollToTop} from '../common/ScrollToTop';
 import {withRoot} from '../common/script-list';
 
@@ -314,8 +314,9 @@ export class RestFormInternal extends React.Component<Props, State> {
                         isInvalid={errorField === 'scriptBody'}
                         invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
                     >
-                        <EditorField
-                            markers={markers}
+                        <CheckedEditorField
+                            scriptType="REST"
+
                             bindings={bindings}
                             returnTypes={returnTypes}
                             isDisabled={waiting}
