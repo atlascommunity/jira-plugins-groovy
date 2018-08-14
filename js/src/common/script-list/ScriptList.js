@@ -3,8 +3,7 @@ import React, {type ComponentType} from 'react';
 
 import type {ScriptComponentProps, I18nType, DeleteCallbackType} from './types';
 
-import {LoadingSpinner} from '../ak/LoadingSpinner';
-import {InfoMessage} from '../ak/messages';
+import {LoadingSpinner, InfoMessage} from '../ak';
 
 import type {ItemType} from '../redux';
 

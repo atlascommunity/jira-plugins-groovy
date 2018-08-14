@@ -8,7 +8,7 @@ import type {ExecutionType} from './types';
 import type {VoidCallback} from '../types';
 
 import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
-import {StaticField} from '../ak/StaticField';
+import {StaticField} from '../ak';
 
 
 type Props = {

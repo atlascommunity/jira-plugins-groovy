@@ -3,7 +3,7 @@ import React, {type Element} from 'react';
 
 import {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 
-import {RouterLink} from '../ak/RouterLink';
+import {RouterLink} from '../ak';
 
 
 export const withRoot = (breadcrumbs: Array<?Element<typeof BreadcrumbsItem>>): Array<?Element<typeof BreadcrumbsItem>> => [
