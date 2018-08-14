@@ -1,6 +1,6 @@
 //@flow
 import React from 'react';
-import withRouter from 'react-router-dom/es/withRouter';
+import {withRouter} from 'react-router-dom';
 
 import AJS from 'AJS';
 
