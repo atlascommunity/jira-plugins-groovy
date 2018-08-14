@@ -8,7 +8,7 @@ import Breadcrumbs from '@atlaskit/breadcrumbs';
 
 import {ScrollToTop} from '../common/ScrollToTop';
 
-import {extrasService} from '../service/services';
+import {extrasService} from '../service';
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {withRoot} from '../common/script-list/breadcrumbs';
 

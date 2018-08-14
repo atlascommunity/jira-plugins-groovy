@@ -11,11 +11,11 @@ import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
 
 import {FormField} from './FormField';
 
-import {jiraService} from '../../service/services';
+import {jiraService} from '../../service';
 import {CommonMessages} from '../../i18n/common.i18n';
 
 import type {FieldProps, ErrorType, MutableTextFieldProps} from '../types';
-import type {ValidationResult} from '../../service/jira.service';
+import type {JqlQueryValidationResult} from '../../service';
 
 
 type Props = FieldProps & MutableTextFieldProps<string, HTMLTextAreaElement>;
@@ -44,7 +44,7 @@ export class JqlInput extends React.Component<Props, State> {
 
         jiraService
             .validateQuery(query)
-            .then((data: ValidationResult) => {
+            .then((data: JqlQueryValidationResult) => {
                 this.setState({
                     validating: false,
                     isInvalid: false,

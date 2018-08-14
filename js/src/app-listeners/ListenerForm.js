@@ -23,7 +23,7 @@ import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n
 
 import {RouterLink, FormField, CheckedEditorField, ErrorMessage} from '../common/ak';
 
-import {listenerService} from '../service/services';
+import {listenerService} from '../service';
 import {Bindings, ReturnTypes} from '../common/bindings';
 import {addItem, updateItem} from '../common/redux';
 import type {DialogComponentProps} from '../common/script-list/types';

@@ -12,7 +12,7 @@ import type {VoidCallback} from '../types';
 
 import {CommonMessages} from '../../i18n/common.i18n';
 
-import {getBaseUrl} from '../../service/ajaxHelper';
+import {getBaseUrl} from '../../service';
 
 
 type ChangelogProps = {

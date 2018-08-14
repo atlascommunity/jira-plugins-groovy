@@ -36,8 +36,7 @@ import {AsyncPicker, CheckedEditorField, JqlInput, FormField, FieldError, ErrorM
 import {ScrollToTop} from '../common/ScrollToTop';
 import {withRoot} from '../common/script-list';
 
-import {scheduledTaskService} from '../service/services';
-import {getPluginBaseUrl} from '../service/ajaxHelper';
+import {scheduledTaskService, getPluginBaseUrl} from '../service';
 import {Bindings, ReturnTypes} from '../common/bindings';
 import {addItem, updateItem} from '../common/redux';
 

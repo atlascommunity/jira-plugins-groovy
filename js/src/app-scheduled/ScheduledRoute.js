@@ -10,7 +10,7 @@ import Button from '@atlaskit/button';
 import {ScheduledTask} from './ScheduledTask';
 import {ScheduledTaskForm} from './ScheduledTaskForm';
 
-import {scheduledTaskService, watcherService} from '../service/services';
+import {scheduledTaskService, watcherService} from '../service';
 
 import {filterReducer, ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {ConnectedScriptPage, NotFoundPage, ItemViewPage} from '../common/script-list';

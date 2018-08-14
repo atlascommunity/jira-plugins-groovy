@@ -10,7 +10,7 @@ import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {EditorField} from '../common/ak/EditorField';
 import type {SingleValueType} from '../common/ak/types';
 
-import {getPluginBaseUrl} from '../service/ajaxHelper';
+import {getPluginBaseUrl} from '../service';
 
 
 type SingleValueTypesEnum = 'USER' | 'GROUP' | 'CUSTOM_FIELD' | 'RESOLUTION';

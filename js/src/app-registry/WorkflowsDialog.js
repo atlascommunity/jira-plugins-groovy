@@ -10,9 +10,8 @@ import EditIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import type {WorkflowActionItemType, WorkflowActionType, WorkflowScriptType, WorkflowType, WorkflowMode} from './types';
 
-import {registryService} from '../service/services';
+import {registryService, getBaseUrl} from '../service';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
-import {getBaseUrl} from '../service/ajaxHelper';
 import type {VoidCallback} from '../common/types';
 
 

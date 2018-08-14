@@ -22,9 +22,8 @@ import {MultiSelect, AsyncPicker, CheckedEditorField, FormField, ErrorMessage, R
 import {ScrollToTop} from '../common/ScrollToTop';
 import {withRoot} from '../common/script-list';
 
-import {restService} from '../service/services';
+import {restService, getPluginBaseUrl} from '../service';
 import {Bindings} from '../common/bindings';
-import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {addItem, updateItem} from '../common/redux';
 import type {DialogComponentProps} from '../common/script-list/types';

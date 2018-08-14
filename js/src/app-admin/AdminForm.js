@@ -11,7 +11,7 @@ import {CheckboxStateless} from '@atlaskit/checkbox';
 import type {AdminScriptType} from './types';
 
 import {addItem, updateItem} from '../common/redux';
-import {adminScriptService} from '../service/services';
+import {adminScriptService} from '../service';
 
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {ReturnTypes} from '../common/bindings';

@@ -13,7 +13,7 @@ import {ViewScript} from './ViewScript';
 import {Loader} from './Loader';
 import {reducer, loadState, loadUsage} from './redux';
 
-import {registryService, watcherService} from '../service/services';
+import {registryService, watcherService} from '../service';
 
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 

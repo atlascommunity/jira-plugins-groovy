@@ -37,7 +37,7 @@ import {CodeMirror} from './CM';
 
 import {globalBindings} from '../bindings';
 
-import {preferenceService} from '../../service/services';
+import {preferenceService} from '../../service';
 import {CommonMessages} from '../../i18n/common.i18n';
 
 import './Editor.less';

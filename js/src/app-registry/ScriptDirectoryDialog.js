@@ -11,12 +11,11 @@ import type {RegistryDirectoryType} from './types';
 
 import {ErrorMessage} from '../common/ak/messages';
 
-import {registryService} from '../service/services';
+import {registryService, getPluginBaseUrl} from '../service';
 
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import type {VoidCallback} from '../common/types';
-import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {AsyncPicker, FormField} from '../common/ak';
 import type {SingleValueType} from '../common/ak/types';
 

@@ -17,7 +17,7 @@ import {addWatch, removeWatch} from './redux';
 
 import type {DeleteCallback, CreateCallback, EditCallback} from './types';
 
-import {watcherService} from '../service/services';
+import {watcherService} from '../service';
 
 import {CommonMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';

@@ -23,7 +23,7 @@ import type {RunOutcomeType, ScheduledTaskType} from './types';
 
 import {ScriptParameters} from '../common/script';
 
-import {scheduledTaskService} from '../service/services';
+import {scheduledTaskService} from '../service';
 
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';

@@ -11,7 +11,7 @@ import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import type {FieldConfigItem} from './types';
 
-import {getBaseUrl} from '../service/ajaxHelper';
+import {getBaseUrl} from '../service';
 
 import {JiraMessages, FieldMessages, ErrorMessages, CommonMessages} from '../i18n/common.i18n';
 import {ErrorMessage} from '../common/ak/messages';

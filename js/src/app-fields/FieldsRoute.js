@@ -12,7 +12,7 @@ import {ViewFieldScript} from './ViewFieldScript';
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
-import {fieldConfigService, watcherService} from '../service/services';
+import {fieldConfigService, watcherService} from '../service';
 
 import {filterReducer, ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {TitleMessages} from '../i18n/common.i18n';

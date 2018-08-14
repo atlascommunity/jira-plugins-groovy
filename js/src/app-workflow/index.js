@@ -21,8 +21,7 @@ import {ErrorMessages} from '../i18n/common.i18n';
 
 import '../flex.less';
 import './workflow.less';
-import {registryService} from '../service/services';
-import {getBaseUrl} from '../service/ajaxHelper';
+import {registryService, getBaseUrl} from '../service';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 

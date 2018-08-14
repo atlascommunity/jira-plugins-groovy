@@ -1,5 +1,5 @@
 //@flow
-import {preferenceService} from '../../service/services';
+import {preferenceService} from '../../service';
 
 
 const SWITCH_THEME = 'SWITCH_THEME';

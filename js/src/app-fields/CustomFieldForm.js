@@ -19,7 +19,7 @@ import {fieldConfigSelectorFactory} from './selectors';
 
 import type {FieldConfig, FieldConfigPreviewResult} from './types';
 
-import {fieldConfigService} from '../service/services';
+import {fieldConfigService} from '../service';
 import {CommonMessages, ErrorMessages, FieldMessages} from '../i18n/common.i18n';
 import {Bindings} from '../common/bindings';
 import {EditorField, CheckedEditorField, FormField, ErrorMessage, InfoMessage} from '../common/ak';

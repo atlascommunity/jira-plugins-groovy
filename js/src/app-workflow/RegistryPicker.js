@@ -15,10 +15,9 @@ import AddIcon from '@atlaskit/icon/glyph/add';
 
 import type {ScriptType, ParamType, ScriptDescriptionType} from './types';
 
-import {registryService} from '../service/services';
 import {SingleSelect} from '../common/ak/SingleSelect';
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
-import {getBaseUrl, getPluginBaseUrl} from '../service/ajaxHelper';
+import {registryService, getBaseUrl, getPluginBaseUrl} from '../service';
 import {CommonMessages} from '../i18n/common.i18n';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {EditorField} from '../common/ak/EditorField';

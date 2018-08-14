@@ -18,7 +18,7 @@ import type {AdminScriptType} from './types';
 
 import {WatchActionCreators} from '../common/redux';
 
-import {adminScriptService} from '../service/services';
+import {adminScriptService} from '../service';
 
 import {WatchableScript} from '../common/script/WatchableScript';
 

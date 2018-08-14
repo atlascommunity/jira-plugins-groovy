@@ -8,7 +8,7 @@ import type {ConsoleResult} from './types';
 
 import {ConsoleMessages} from '../i18n/console.i18n';
 
-import {consoleService} from '../service/services';
+import {consoleService} from '../service';
 import {Bindings} from '../common/bindings';
 
 import {CheckedEditorField, ErrorMessage} from '../common/ak';

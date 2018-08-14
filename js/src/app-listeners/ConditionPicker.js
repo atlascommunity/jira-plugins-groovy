@@ -6,7 +6,7 @@ import {FieldTextStateless} from '@atlaskit/field-text';
 
 import type {ConditionInputType} from './types';
 
-import {jiraService} from '../service/services';
+import {jiraService} from '../service';
 
 import {FieldMessages} from '../i18n/common.i18n';
 import {ListenerTypeMessages} from '../i18n/listener.i18n';

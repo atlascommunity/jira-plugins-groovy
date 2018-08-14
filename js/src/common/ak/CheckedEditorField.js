@@ -5,7 +5,7 @@ import isEqual from 'lodash/isEqual';
 
 import {EditorField} from './EditorField';
 
-import {extrasService} from '../../service/services';
+import {extrasService} from '../../service';
 import {getMarkers} from '../error';
 import {transformMarkers} from '../editor';
 

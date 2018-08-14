@@ -11,7 +11,7 @@ import PeopleGroupIcon from '@atlaskit/icon/glyph/people-group';
 
 import type {AuditLogFilterType} from './types';
 
-import {getPluginBaseUrl} from '../service/ajaxHelper';
+import {getPluginBaseUrl} from '../service';
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 import {entityTypes, entityActions} from '../common/types';

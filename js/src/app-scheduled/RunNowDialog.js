@@ -8,7 +8,7 @@ import type {RunNowResultType, ScheduledTaskType} from './types';
 
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import {CommonMessages} from '../i18n/common.i18n';
-import {scheduledTaskService} from '../service/services';
+import {scheduledTaskService} from '../service';
 import {ConsoleMessages} from '../i18n/console.i18n';
 
 import type {VoidCallback} from '../common/types';

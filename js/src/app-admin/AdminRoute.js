@@ -15,7 +15,7 @@ import {RegistryMessages} from '../i18n/registry.i18n';
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {Loader} from '../common/ak/Loader';
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer, filterReducer} from '../common/redux';
-import {adminScriptService, watcherService} from '../service/services';
+import {adminScriptService, watcherService} from '../service';
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 import {RouterLink} from '../common/ak/RouterLink';

@@ -16,7 +16,7 @@ import { deleteItem } from '../common/redux';
 import {RouterLink} from '../common/ak/RouterLink';
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {CommonMessages} from '../i18n/common.i18n';
-import {adminScriptService} from '../service/services';
+import {adminScriptService} from '../service';
 import {DeleteDialog} from '../common/script-list/DeleteDialog';
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 import {withRoot} from '../common/script-list/breadcrumbs';

@@ -1,12 +1,10 @@
 //@flow
 import {ajaxGet, ajaxPost, getBaseUrl, getPluginBaseUrl} from './ajaxHelper';
 
+import type {JqlQueryValidationResult} from './types';
+
 import type {ProjectType, IssueEventType} from '../common/types';
 
-
-export type ValidationResult = {
-    total: number
-};
 
 export class JiraService {
     getAllProjects(): Promise<Array<ProjectType>> {
@@ -17,7 +15,7 @@ export class JiraService {
         return ajaxGet(`${getPluginBaseUrl()}/jira-api/eventType`);
     }
 
-    validateQuery(query: string): Promise<ValidationResult> {
+    validateQuery(query: string): Promise<JqlQueryValidationResult> {
         return ajaxPost(
             `${getBaseUrl()}/rest/api/2/search`,
             {

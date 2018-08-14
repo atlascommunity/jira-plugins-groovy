@@ -9,7 +9,7 @@ import {LargeSelect} from './LargeSelect';
 import {FormField} from './FormField';
 import type {SingleValueType} from './types';
 
-import {ajaxGet} from '../../service/ajaxHelper';
+import {ajaxGet} from '../../service';
 import type {OptMutableFieldProps, FieldProps, FormFieldProps, SelectProps, AkFormFieldProps} from '../types';
 
 

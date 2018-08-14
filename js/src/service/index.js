@@ -34,6 +34,9 @@ export const scheduledTaskService = new ScheduledTaskService();
 export const adminScriptService = new AdminScriptService();
 export const watcherService = new WatcherService();
 
+export {getPluginBaseUrl, getBaseUrl, ajaxGet} from './ajaxHelper';
+
+export * from './types';
 
 window.addEventListener('unhandledrejection', function(err: PromiseRejectionEvent) {
     console.error('uncaught error', err);

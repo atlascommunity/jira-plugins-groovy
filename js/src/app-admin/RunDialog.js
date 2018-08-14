@@ -19,7 +19,7 @@ import {AdminScriptMessages} from '../i18n/admin.i18n';
 
 import type {VoidCallback} from '../common/types';
 import type {ParamType} from '../app-workflow/types';
-import {adminScriptService} from '../service/services';
+import {adminScriptService} from '../service';
 import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 import type {SingleValueType} from '../common/ak/types';
 import {ErrorMessage, InfoMessage, SuccessMessage} from '../common/ak/messages';

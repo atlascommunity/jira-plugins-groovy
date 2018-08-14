@@ -25,7 +25,7 @@ import type {ScriptParam} from '../common/script/ScriptParameters';
 import type {ScriptComponentProps} from '../common/script-list/types';
 
 import './ListenerRegistry.less';
-import {listenerService} from '../service/services';
+import {listenerService} from '../service';
 
 
 const ConnectedWatchableScript = connect(

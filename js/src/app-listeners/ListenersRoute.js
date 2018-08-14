@@ -26,7 +26,7 @@ import {
 import {NotFoundPage, ItemViewPage} from '../common/script-list';
 import {Loader, RouterLink} from '../common/ak';
 
-import {jiraService, listenerService, watcherService} from '../service/services';
+import {jiraService, listenerService, watcherService} from '../service';
 import type {ObjectMap} from '../common/types';
 
 

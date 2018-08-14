@@ -22,7 +22,7 @@ import type {DeleteCallback, RegistryScriptType} from './types';
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
-import {registryService, watcherService} from '../service/services';
+import {registryService, watcherService} from '../service';
 
 import Script, {ScriptParameters} from '../common/script';
 import {RouterLink} from '../common/ak/RouterLink';

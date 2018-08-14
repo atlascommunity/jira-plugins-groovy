@@ -28,7 +28,7 @@ import {LoadingSpinner} from '../ak';
 
 import {CommonMessages} from '../../i18n/common.i18n';
 
-import {executionService} from '../../service/services';
+import {executionService} from '../../service';
 
 
 type DropdownItemType = {

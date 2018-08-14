@@ -13,13 +13,11 @@ import type {RestScriptType} from './types';
 
 import {ScriptParameters} from '../common/script';
 
-import {getPluginBaseUrl} from '../service/ajaxHelper';
+import {restService, getPluginBaseUrl} from '../service';
 
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 
 import {WatchActionCreators} from '../common/redux';
-
-import {restService} from '../service/services';
 
 import {WatchableScript} from '../common/script/WatchableScript';
 import {RouterLink} from '../common/ak/RouterLink';

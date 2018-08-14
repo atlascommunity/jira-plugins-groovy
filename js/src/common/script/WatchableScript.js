@@ -8,7 +8,7 @@ import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
 
 import type {ScriptProps} from './Script';
 
-import {watcherService} from '../../service/services';
+import {watcherService} from '../../service';
 
 import {CommonMessages} from '../../i18n/common.i18n';
 

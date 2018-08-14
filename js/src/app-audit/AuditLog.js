@@ -27,7 +27,7 @@ import {
     registryService,
     restService,
     scheduledTaskService
-} from '../service/services';
+} from '../service';
 import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
 import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 

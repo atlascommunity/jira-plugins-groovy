@@ -21,12 +21,11 @@ import type {WorkflowScriptType, RegistryScriptType} from './types';
 
 import {FieldMessages, CommonMessages} from '../i18n/common.i18n';
 
-import {registryService} from '../service/services';
+import {registryService, getPluginBaseUrl} from '../service';
 
 import {Bindings, ReturnTypes} from '../common/bindings';
 import {withRoot} from '../common/script-list/breadcrumbs';
 import {RegistryMessages} from '../i18n/registry.i18n';
-import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {CheckedEditorField, StaticField, AsyncPicker, ErrorMessage, RouterLink, FormField} from '../common/ak';
 
 import type {InputEvent} from '../common/EventTypes';

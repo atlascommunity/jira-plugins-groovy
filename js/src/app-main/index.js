@@ -10,7 +10,7 @@ import AJS from 'AJS';
 import {MainApp} from './MainApp';
 import {NavigationController} from './NavigationController';
 
-import {getBaseUrl} from '../service/ajaxHelper';
+import {getBaseUrl} from '../service';
 import {fixStyle} from '../common/fixStyle';
 
 import {ConsoleRoute} from '../app-console';

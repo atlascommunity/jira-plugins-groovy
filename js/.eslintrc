@@ -72,8 +72,7 @@
           //internal deps
           "common/**",
           "i18n/*",
-          "**/types",
-          "service/*"
+          "**/types"
         ]
       }
     ],

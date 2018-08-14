@@ -26,7 +26,7 @@ import type {FilterType, RegistryDirectoryType} from './types';
 
 import {InfoMessage} from '../common/ak/messages';
 
-import {registryService} from '../service/services';
+import {registryService} from '../service';
 
 import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
