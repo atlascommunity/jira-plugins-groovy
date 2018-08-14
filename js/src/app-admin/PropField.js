@@ -4,7 +4,7 @@ import React from 'react';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
-import {gridSize} from '@atlaskit/theme/dist/cjs/index';
+import {gridSize} from '@atlaskit/theme';
 
 import {AsyncPicker} from '../common/ak/AsyncPicker';
 import {EditorField} from '../common/ak/EditorField';
