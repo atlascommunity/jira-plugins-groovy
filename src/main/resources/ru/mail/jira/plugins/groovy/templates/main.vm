@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Mail.Ru groovy</title>
+    <title>MyGroovy</title>
     <meta name="decorator" content="atl.admin">
     <meta name="admin.active.section" content="admin_plugins_menu/admin_mailru_groovy_section" />
     <meta name="admin.active.tab" content="mailru-groovy-registry-link"/>

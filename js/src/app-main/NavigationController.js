@@ -113,7 +113,7 @@ export class NavigationControllerInternal extends React.PureComponent<Props> {
         }
 
         if (!updatedTitle) {
-            document.title = `Mail.Ru groovy - ${AJS.Meta.get('app-title')}`;
+            document.title = `MyGroovy - ${AJS.Meta.get('app-title')}`;
         }
     };
 

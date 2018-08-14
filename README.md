@@ -1,4 +1,4 @@
-# Mail.Ru Groovy plugin
+# MyGroovy plugin
 
 [Atlassian marketplace](https://marketplace.atlassian.com/1218755)
 
