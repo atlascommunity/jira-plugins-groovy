@@ -148,19 +148,19 @@ export class ScriptConsole extends React.Component<Props, State> {
                         </Button>
                 </div>
                 <br/>
-                {!waiting && <div className="result" style={{maxWidth: '100%', overflow: 'hidden'}}>
+                {!waiting && <div className="result">
                     {output ?
                         <div>
                             <strong>{ConsoleMessages.executedIn(output.time.toString())}</strong>
                             {isHtml ?
                                 <div dangerouslySetInnerHTML={{ __html: output.result }}/>:
-                                <pre style={{ overflowX: 'auto' }}>{output.result}</pre>
+                                <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{output.result}</pre>
                             }
                         </div>
                     : null}
                     {error ?
                         <ErrorMessage title={errorMessage || undefined}>
-                            <pre style={{overflowX: 'auto'}}>
+                            <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>
                                 {error['stack-trace']}
                             </pre>
                         </ErrorMessage>

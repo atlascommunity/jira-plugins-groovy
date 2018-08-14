@@ -178,7 +178,9 @@ export class RunDialog extends React.PureComponent<Props, State> {
                 content = (
                     <Fragment>
                         <SuccessMessage title="Done">
-                            {!script.html && <pre>{outcome.message}</pre>}
+                            {!script.html &&
+                                <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{outcome.message}</pre>
+                            }
                         </SuccessMessage>
                         {script.html && <div dangerouslySetInnerHTML={{__html: outcome.message}}/>}
                     </Fragment>
