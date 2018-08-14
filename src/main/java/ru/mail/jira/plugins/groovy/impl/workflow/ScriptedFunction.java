@@ -1,5 +1,6 @@
 package ru.mail.jira.plugins.groovy.impl.workflow;
 
+import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.workflow.function.issue.AbstractJiraFunctionProvider;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.opensymphony.module.propertyset.PropertySet;
@@ -22,13 +23,15 @@ public class ScriptedFunction extends AbstractJiraFunctionProvider {
 
     @Override
     public void execute(Map transientVars, Map args, PropertySet ps) throws WorkflowException {
-        ScriptDescriptor script = workflowHelper.getScript(args, WorkflowScriptType.FUNCTION);
+        MutableIssue issue = getIssue(transientVars);
+
+        ScriptDescriptor script = workflowHelper.getScript(args, WorkflowScriptType.FUNCTION, issue);
 
         if (script == null) {
             logger.error("script must be present");
             return;
         }
 
-        workflowHelper.executeScript(script, ScriptType.WORKFLOW_FUNCTION, getIssue(transientVars), getCallerUser(transientVars, args), transientVars);
+        workflowHelper.executeScript(script, ScriptType.WORKFLOW_FUNCTION, issue, getCallerUser(transientVars, args), transientVars);
     }
 }

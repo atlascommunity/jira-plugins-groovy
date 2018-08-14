@@ -27,14 +27,16 @@ public class ScriptedValidator implements Validator {
 
     @Override
     public void validate(Map transientVars, Map args, PropertySet ps) throws WorkflowException {
-        ScriptDescriptor script = workflowHelper.getScript(args, WorkflowScriptType.VALIDATOR);
+        Issue issue = (Issue) transientVars.get("issue");
+
+        ScriptDescriptor script = workflowHelper.getScript(args, WorkflowScriptType.VALIDATOR, issue);
 
         if (script == null) {
             logger.error("script must be present");
             return;
         }
 
-        workflowHelper.executeScript(script, ScriptType.WORKFLOW_VALIDATOR, (Issue) transientVars.get("issue"), getCaller(transientVars), transientVars);
+        workflowHelper.executeScript(script, ScriptType.WORKFLOW_VALIDATOR, issue, getCaller(transientVars), transientVars);
     }
 
     private ApplicationUser getCaller(Map transientVars) throws InvalidInputException {

@@ -48,7 +48,7 @@ public class WorkflowHelper {
         this.scriptParamFactory = scriptParamFactory;
     }
 
-    public ScriptDescriptor getScript(Map args, WorkflowScriptType type) {
+    public ScriptDescriptor getScript(Map args, WorkflowScriptType type, Issue forIssue) {
         Map<String, Object> paramBindings = ImmutableMap.of();
         String scriptString = Base64Util.decode((String) args.get(Const.WF_INLINE_SCRIPT));
         String id = (String) args.get(Const.WF_UUID);
@@ -78,7 +78,27 @@ public class WorkflowHelper {
                                 String value = Base64Util.decode((String) args.get(Const.getParamKey(paramName)));
 
                                 if (value == null && !param.isOptional()) {
-                                    logger.error("Value for script param {} is not found", paramName);
+                                    String error = "Value for script param " + paramName + " is not found";
+                                    logger.error(error);
+
+                                    if (script.getUuid() != null) {
+                                        executionRepository.trackInline(
+                                            script.getUuid(), 0, false, error,
+                                            ImmutableMap.of(
+                                                "issue", Objects.toString(forIssue, ""),
+                                                "type", Objects.toString(type, "")
+                                            )
+                                        );
+                                    } else {
+                                        executionRepository.trackFromRegistry(
+                                            script.getId(), 0, false, error,
+                                            ImmutableMap.of(
+                                                "issue", Objects.toString(forIssue, ""),
+                                                "type", Objects.toString(type, "")
+                                            )
+                                        );
+                                    }
+
                                     return null;
                                 } else {
                                     paramBindings.put(paramName, scriptParamFactory.getParamObject(param, value));
