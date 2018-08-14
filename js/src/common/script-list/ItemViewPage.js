@@ -14,7 +14,7 @@ import {NotFoundPage} from './NotFoundPage';
 
 import type {ScriptComponentProps} from './types';
 
-import {RouterLink} from '../ak/';
+import {RouterLink} from '../ak';
 import {createItemSelector} from '../redux/selectors';
 import {CommonMessages} from '../../i18n/common.i18n';
 

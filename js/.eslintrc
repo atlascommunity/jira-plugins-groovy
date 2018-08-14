@@ -60,6 +60,7 @@
     "import/no-namespace": ["warn"],
     "import/no-mutable-exports": ["warn"],
     "import/no-duplicates": ["warn"],
+    "import/no-useless-path-segments": ["warn"],
     "import/newline-after-import": ["error", { "count": 2 }],
     "import/no-self-import": ["error"],
     "import/no-cycle": ["error", { "commonjs": true }],

@@ -16,7 +16,7 @@ import {WatchActionCreators} from '../redux';
 
 import type {EntityType} from '../types';
 
-import Script from './';
+import Script from '.';
 
 
 type Props = ScriptProps & {
