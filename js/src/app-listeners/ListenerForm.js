@@ -96,8 +96,12 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
         error: null
     };
 
-    componentWillReceiveProps(nextProps: Props) {
-        this._init(nextProps);
+    componentDidUpdate(prevProps: Props) {
+        const {isNew, id} = this.props;
+
+        if (prevProps.isNew !== isNew || prevProps.id !== id) {
+            this._init(this.props);
+        }
     }
 
     componentDidMount() {

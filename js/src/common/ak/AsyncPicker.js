@@ -103,9 +103,10 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
         }
     }
 
-    componentWillReceiveProps(props: Props<T>) {
-        const value = props.value;
-        if (this.props.value !== value) {
+    componentDidUpdate(prevProps: Props<T>) {
+        const {value} = this.props;
+
+        if (prevProps.value !== value) {
             if (!Array.isArray(value)) {
                 this._getOptions(value ? value.label : '');
             }

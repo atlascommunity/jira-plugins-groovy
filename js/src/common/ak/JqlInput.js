@@ -18,16 +18,16 @@ import type {FieldProps, ErrorType, MutableTextFieldProps} from '../types';
 import type {ValidationResult} from '../../service/jira.service';
 
 
-type JqlInputProps = FieldProps & MutableTextFieldProps<string, HTMLTextAreaElement>;
+type Props = FieldProps & MutableTextFieldProps<string, HTMLTextAreaElement>;
 
-type JqlInputState = {
+type State = {
     validating: boolean,
     isInvalid: ?boolean,
     invalidMessage: ?Node,
     issues: ?number
 };
 
-export class JqlInput extends React.Component<JqlInputProps, JqlInputState> {
+export class JqlInput extends React.Component<Props, State> {
     state = {
         validating: false,
         isInvalid: null,
@@ -72,15 +72,17 @@ export class JqlInput extends React.Component<JqlInputProps, JqlInputState> {
 
     _debouncedValidate = debounce(this._validate, 500, { maxWait: 5000 });
 
-    constructor(props: JqlInputProps) {
+    constructor(props: Props) {
         super(props);
 
         this._debouncedValidate(props.value);
     }
 
-    componentWillReceiveProps(props: JqlInputProps) {
-        if (props.value !== this.props.value) {
-            this._debouncedValidate(props.value);
+    componentDidUpdate(prevProps: Props) {
+        const {value} = this.props;
+
+        if (prevProps.value !== value) {
+            this._debouncedValidate(value);
         }
     }
 

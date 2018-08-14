@@ -51,10 +51,14 @@ export class MultiSelect<T: OldSelectValue> extends React.PureComponent<Props<T>
         };
     }
 
-    componentWillReceiveProps(props: Props<T>) {
-        this.setState({
-            lookupMap: getLookupMap(props.items)
-        });
+    componentDidUpdate(prevProps: Props<T>) {
+        const {items} = this.props;
+
+        if (prevProps.items !== items) {
+            this.setState({
+                lookupMap: getLookupMap(items)
+            });
+        }
     }
 
     render() {
