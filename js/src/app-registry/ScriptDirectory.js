@@ -16,8 +16,7 @@ import FolderIcon from '@atlaskit/icon/glyph/folder';
 import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
 import { Skeleton } from '@atlaskit/icon';
 
-import {DirectoryStateActionCreators} from './redux/actions';
-import {groupedDirsSelector, groupedScriptsSelector} from './redux/selectors';
+import {DirectoryStateActionCreators, groupedDirsSelector, groupedScriptsSelector} from './redux';
 
 import {DraggableRegistryScript} from './DraggableRegistryScript';
 import {ScriptDirectoryActions} from './ScriptDirectoryActions';

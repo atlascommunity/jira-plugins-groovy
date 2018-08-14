@@ -8,8 +8,7 @@ import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 
-import {addScript, updateScript, deleteScript } from './redux/actions';
-import {scriptWithParentSelectorFactory} from './redux/selectors';
+import {addScript, updateScript, deleteScript, scriptWithParentSelectorFactory} from './redux';
 import type {RegistryScriptType} from './types';
 import {RegistryScript} from './RegistryScript';
 

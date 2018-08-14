@@ -16,8 +16,10 @@ import Breadcrumbs from '@atlaskit/breadcrumbs';
 
 import {ScriptDirectory} from './ScriptDirectory';
 import {ScriptDirectoryDialog, type DialogParams} from './ScriptDirectoryDialog';
-import {deleteDirectory, deleteScript, moveScript, UpdateActionCreators as FilterActionCreators} from './redux/actions';
-import {filteredSelector, filterSelector, groupedDirsSelector} from './redux/selectors';
+import {
+    filteredSelector, filterSelector, groupedDirsSelector,
+    deleteDirectory, deleteScript, moveScript, UpdateActionCreators as FilterActionCreators
+} from './redux';
 import {UsageStatusFlag} from './UsageStatusFlag';
 
 import type {FilterType, RegistryDirectoryType} from './types';

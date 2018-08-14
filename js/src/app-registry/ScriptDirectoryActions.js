@@ -13,7 +13,7 @@ import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
 
-import {addWatch, removeWatch} from './redux/actions';
+import {addWatch, removeWatch} from './redux';
 
 import type {DeleteCallback, CreateCallback, EditCallback} from './types';
 

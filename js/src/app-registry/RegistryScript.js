@@ -14,7 +14,7 @@ import WatchIcon from '@atlaskit/icon/glyph/watch';
 import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
-import {addWatch, removeWatch} from './redux/actions';
+import {addWatch, removeWatch} from './redux';
 
 import {WorkflowsDialog} from './WorkflowsDialog';
 import type {DeleteCallback, RegistryScriptType} from './types';

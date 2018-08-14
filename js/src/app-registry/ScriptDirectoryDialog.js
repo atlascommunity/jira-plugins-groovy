@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 
-import {addDirectory, updateDirectory} from './redux/actions';
+import {addDirectory, updateDirectory} from './redux';
 import type {RegistryDirectoryType} from './types';
 
 import {ErrorMessage} from '../common/ak/messages';

@@ -15,7 +15,7 @@ import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
-import {addScript, updateScript} from './redux/actions';
+import {addScript, updateScript} from './redux';
 
 import type {WorkflowScriptType, RegistryScriptType} from './types';
 

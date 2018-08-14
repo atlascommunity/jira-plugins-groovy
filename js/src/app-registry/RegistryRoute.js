@@ -11,8 +11,7 @@ import {ScriptRegistry} from './ScriptRegistry';
 import {ScriptForm} from './ScriptForm';
 import {ViewScript} from './ViewScript';
 import {Loader} from './Loader';
-import {reducer} from './redux/reducer';
-import {loadState, loadUsage} from './redux/actions';
+import {reducer, loadState, loadUsage} from './redux';
 
 import {registryService, watcherService} from '../service/services';
 
