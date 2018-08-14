@@ -22,6 +22,9 @@
     "no-console": ["error", { "allow": ["warn", "error"] }],
 
     "react/prefer-stateless-function": [1, { "ignorePureComponents": true }],
+    "react/jsx-no-bind": 2,
+    "react/no-access-state-in-setstate": 2,
+    "react/no-this-in-sfc": 2,
     "react/jsx-no-literals": [1, {"noStrings": false}],
     "react/jsx-no-target-blank": 2,
 

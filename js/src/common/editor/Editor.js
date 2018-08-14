@@ -137,11 +137,12 @@ export class Editor extends React.Component<EditorProps, EditorState> {
             e.preventDefault();
         }
 
-        const value = !this.state.isLight;
-        preferenceService.put('ru.mail.groovy.isLight', value.toString());
-        this.setState({
-            isLight: value
-        });
+        this.setState(
+            state => ({
+                isLight: !state.isLight
+            }),
+            () => preferenceService.put('ru.mail.groovy.isLight', this.state.isLight.toString())
+        );
     };
 
     _onChange = (_editor: CodeMirrorType, _data: any, value: string) => {

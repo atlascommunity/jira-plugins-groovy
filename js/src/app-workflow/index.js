@@ -72,6 +72,7 @@ define('mailru/groovy/renderRegistryScript', (): any => {
         ReactDOM.render(
             <Script
                 withChangelog={true}
+                // eslint-disable-next-line react/jsx-no-bind
                 changelogsLoader={() => registryService.getScriptChangelogs(id)}
 
                 script={{

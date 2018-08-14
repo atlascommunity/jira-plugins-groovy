@@ -97,6 +97,7 @@ function HtmlField({values, mutateValue}: AdditionalFieldProps<FormType>): Node 
         <CheckboxStateless
             label={CommonMessages.renderAsHtml}
             isChecked={values.get('html') || false}
+            // eslint-disable-next-line react/jsx-no-bind
             onChange={e => mutateValue('html', e.currentTarget.checked)}
         />
     );
