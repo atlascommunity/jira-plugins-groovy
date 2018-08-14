@@ -48,6 +48,7 @@
     "react-beautiful-dnd": "^8.0.7",
     "react-codemirror2": "^5.1.0",
     "react-dom": "^16.4.2",
+    "react-lazily-render": "^1.1.0",
     "react-redux": "^5.0.7",
     "react-resizable": "^1.7.5",
     "react-router-dom": "^4.3.1",

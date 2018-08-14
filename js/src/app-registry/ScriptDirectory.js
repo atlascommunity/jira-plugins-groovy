@@ -1,10 +1,12 @@
 //@flow
-import React from 'react';
+import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
 import {createSelector} from 'reselect';
 
 import {Droppable} from 'react-beautiful-dnd';
+
+import LazilyRender from 'react-lazily-render';
 
 import Button from '@atlaskit/button';
 import Badge from '@atlaskit/badge';
@@ -12,6 +14,7 @@ import {colors} from '@atlaskit/theme';
 
 import FolderIcon from '@atlaskit/icon/glyph/folder';
 import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
+import { Skeleton } from '@atlaskit/icon';
 
 import {DirectoryStateActionCreators} from './redux/actions';
 import {groupedDirsSelector, groupedScriptsSelector} from './redux/selectors';
@@ -21,6 +24,36 @@ import {ScriptDirectoryActions} from './ScriptDirectoryActions';
 
 import type {DeleteCallback, CreateCallback, EditCallback, RegistryDirectoryType, RegistryScriptType} from './types';
 
+import './ScriptDirectory.less';
+
+
+function ActionsPlaceholder(): Node {
+    return (
+        <div className="ScriptDirectoryActionsPlaceholder">
+            <div className="ButtonPlaceholder" style={{width: '144px'}}>
+                <div className="ButtonIcon">
+                    <Skeleton/>
+                </div>
+                <div className="ButtonContentPlaceholder"/>
+            </div>
+            <div className="ButtonPlaceholder" style={{width: '122px'}}>
+                <div className="ButtonIcon">
+                    <Skeleton/>
+                </div>
+                <div className="ButtonContentPlaceholder"/>
+            </div>
+            <div className="IconButtonPlaceholder">
+                <Skeleton/>
+            </div>
+            <div className="IconButtonPlaceholder">
+                <Skeleton/>
+            </div>
+            <div className="IconButtonPlaceholder">
+                <Skeleton/>
+            </div>
+        </div>
+    );
+}
 
 type ScriptDirectoryProps = {
     directory: RegistryDirectoryType,
@@ -118,14 +151,16 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                     }
                     <div className="flex-grow"/>
                     <div className="flex-none">
-                        <ScriptDirectoryActions
-                            id={directory.id}
-                            name={directory.name}
+                        <LazilyRender>
+                            {render => render ? <ScriptDirectoryActions
+                                id={directory.id}
+                                name={directory.name}
 
-                            onCreate={onCreate}
-                            onEdit={onEdit}
-                            onDelete={onDelete}
-                        />
+                                onCreate={onCreate}
+                                onEdit={onEdit}
+                                onDelete={onDelete}
+                            /> : <ActionsPlaceholder/>}
+                        </LazilyRender>
                     </div>
                 </div>
                 <div className={`scriptDirectoryChildren ${open ? 'open' : ''}`}>
