@@ -7,9 +7,9 @@ import {EditorField} from './EditorField';
 
 import {extrasService} from '../../service/services';
 import {getMarkers} from '../error';
-import {transformMarkers} from '../editor/Editor';
+import {transformMarkers} from '../editor';
 
-import type {AnnotationType, CodeMirrorType, ValidationState} from '../editor/Editor';
+import type {AnnotationType, CodeMirrorType, ValidationState} from '../editor';
 import type {SyntaxError} from '../types';
 
 

@@ -23,8 +23,8 @@ import type {ScriptParam} from './ScriptParameters';
 
 import type {VoidCallback} from '../types';
 
-import {Editor} from '../editor/Editor';
-import {LoadingSpinner} from '../ak/LoadingSpinner';
+import Editor from '../editor';
+import {LoadingSpinner} from '../ak';
 
 import {CommonMessages} from '../../i18n/common.i18n';
 

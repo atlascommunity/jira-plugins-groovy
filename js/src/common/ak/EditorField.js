@@ -8,7 +8,7 @@ import type {FieldProps, MutableFieldProps, AkFormFieldProps} from '../types';
 
 import Editor from '../editor';
 
-import type {CodeMirrorType, ValidationState} from '../editor/Editor';
+import type {CodeMirrorType, ValidationState} from '../editor';
 
 import './EditorField.less';
 

@@ -14,3 +14,5 @@ export {JqlInput} from './JqlInput';
 export {AsyncPicker} from './AsyncPicker';
 export {MultiSelect} from './MultiSelect';
 export {AsyncLoadingMultiSelect} from './AsyncLoadingMultiSelect';
+
+export type {StaticCheckScriptType} from './CheckedEditorField';

@@ -16,13 +16,13 @@ import type {DialogComponentProps, ScriptForm as ScriptFormType} from './types';
 import {withRoot} from './breadcrumbs';
 
 import {RouterLink, FormField, CheckedEditorField, LoadingSpinner, ErrorMessage} from '../ak';
-import type {StaticCheckScriptType} from '../ak/CheckedEditorField';
 
 import {ScrollToTop} from '../ScrollToTop';
 import {addItem, updateItem} from '../redux';
 import {Bindings} from '../bindings';
 import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
 
+import type {StaticCheckScriptType} from '../ak';
 import type {ItemType} from '../redux';
 import type {ReturnType} from '../editor/types';
 
