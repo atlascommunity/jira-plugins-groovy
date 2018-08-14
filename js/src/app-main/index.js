@@ -13,17 +13,17 @@ import {NavigationController} from './NavigationController';
 import {getBaseUrl} from '../service/ajaxHelper';
 import {fixStyle} from '../common/fixStyle';
 
-import {ConsoleRoute} from '../app-console/ConsoleRoute';
-import {AdminRoute} from '../app-admin/AdminRoute';
-import {RegistryRoute} from '../app-registry/RegistryRoute';
-import {ListenersRoute} from '../app-listeners/ListenersRoute';
-import {RestRoute} from '../app-rest/RestRoute';
-import {FieldsRoute} from '../app-fields/FieldsRoute';
-import {ScheduledRoute} from '../app-scheduled/ScheduledRoute';
-import {AuditLogRoute} from '../app-audit/AuditLogRoute';
+import {ConsoleRoute} from '../app-console';
+import {AdminRoute} from '../app-admin';
+import {RegistryRoute} from '../app-registry';
+import {ListenersRoute} from '../app-listeners';
+import {RestRoute} from '../app-rest';
+import {FieldsRoute} from '../app-fields';
+import {ScheduledRoute} from '../app-scheduled';
+import {AuditLogRoute} from '../app-audit';
+import {ExtrasPage} from '../app-extras';
 
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
-import {ExtrasPage} from '../app-extras/ExtrasPage';
 
 import '../flex.less';
 
