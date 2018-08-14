@@ -107,5 +107,11 @@
     "flowtype/semi": [2, "always"],
     "jsx-a11y/href-no-hash": [0]
   },
+  "settings": {
+    "react": {
+      "version": "16.4.2",
+      "flowVersion": "0.78"
+    }
+  },
   "extends": ["react-app"]
 }
