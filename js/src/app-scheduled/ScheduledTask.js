@@ -12,8 +12,6 @@ import InlineDialog from '@atlaskit/inline-dialog';
 import {ToggleStateless} from '@atlaskit/toggle';
 import {colors} from '@atlaskit/theme';
 
-import type {Appearances} from '@atlaskit/lozenge/dist/cjs/Lozenge/index';
-
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 import InfoIcon from '@atlaskit/icon/glyph/info';
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
@@ -37,7 +35,7 @@ import type {ScriptComponentProps} from '../common/script-list/types';
 import {RouterLink} from '../common/ak/RouterLink';
 
 
-function getOutcomeLozengeAppearance(outcome: RunOutcomeType): Appearances {
+function getOutcomeLozengeAppearance(outcome: RunOutcomeType): * {
     switch(outcome) {
         case 'SUCCESS':
             return 'success';
