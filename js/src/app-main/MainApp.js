@@ -16,7 +16,7 @@ export class MainApp extends React.PureComponent<{}> {
     render() {
         return (
             <Page>
-                <PageHeader>MyGroovy</PageHeader>
+                <PageHeader>{'MyGroovy'}</PageHeader>
                 <ScrollToTop/>
                 <div className="MainApp">
                     <PageCard

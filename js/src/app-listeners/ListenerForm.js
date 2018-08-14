@@ -24,7 +24,6 @@ import {CommonMessages, DialogMessages, FieldMessages} from '../i18n/common.i18n
 import {RouterLink, FormField, CheckedEditorField, ErrorMessage} from '../common/ak';
 
 import {listenerService} from '../service/services';
-import {getMarkers} from '../common/error';
 import {Bindings, ReturnTypes} from '../common/bindings';
 import {addItem, updateItem} from '../common/redux';
 import type {DialogComponentProps} from '../common/script-list/types';
@@ -203,12 +202,9 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
             let errorMessage: * = null;
             let errorField: ?string = null;
 
-            let markers: * = null;
-
             if (error) {
                 if (error.field === 'scriptBody' && Array.isArray(error.error)) {
                     const errors = error.error.filter(e => e);
-                    markers = getMarkers(errors);
                     errorMessage = errors
                         .map(error => error.message)
                         .map(error => <p key={error}>{error}</p>);

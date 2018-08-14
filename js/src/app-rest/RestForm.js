@@ -23,7 +23,6 @@ import {ScrollToTop} from '../common/ScrollToTop';
 import {withRoot} from '../common/script-list';
 
 import {restService} from '../service/services';
-import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {RegistryMessages} from '../i18n/registry.i18n';
@@ -228,12 +227,9 @@ export class RestFormInternal extends React.Component<Props, State> {
             let errorMessage: * = null;
             let errorField: ?string = null;
 
-            let markers: * = null;
-
             if (error) {
                 if (error.field === 'scriptBody' && Array.isArray(error.error)) {
                     const errors = error.error.filter(e => e);
-                    markers = getMarkers(errors);
                     errorMessage = errors
                         .map(error => error.message)
                         .map(error => <p key={error}>{error}</p>);

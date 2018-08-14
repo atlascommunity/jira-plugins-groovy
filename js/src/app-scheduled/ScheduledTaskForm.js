@@ -37,7 +37,6 @@ import {ScrollToTop} from '../common/ScrollToTop';
 import {withRoot} from '../common/script-list';
 
 import {scheduledTaskService} from '../service/services';
-import {getMarkers} from '../common/error';
 import {getPluginBaseUrl} from '../service/ajaxHelper';
 import {Bindings, ReturnTypes} from '../common/bindings';
 import {addItem, updateItem} from '../common/redux';
@@ -258,12 +257,9 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
 
         switch (fieldName) {
             case 'scriptBody': {
-                let markers: * = null;
-
                 if (error && error.field === fieldName) {
                     if (Array.isArray(error.error)) {
                         const errors = error.error.filter(e => e);
-                        markers = getMarkers(errors);
                         error = {
                             field: fieldName,
                             messages: errors.map(error => error.message)

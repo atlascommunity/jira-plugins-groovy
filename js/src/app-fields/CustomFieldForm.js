@@ -21,7 +21,6 @@ import type {FieldConfig, FieldConfigPreviewResult} from './types';
 
 import {fieldConfigService} from '../service/services';
 import {CommonMessages, ErrorMessages, FieldMessages} from '../i18n/common.i18n';
-import {getMarkers} from '../common/error';
 import {Bindings} from '../common/bindings';
 import {EditorField, CheckedEditorField, FormField, ErrorMessage, InfoMessage} from '../common/ak';
 import {ConsoleMessages} from '../i18n/console.i18n';
@@ -177,12 +176,9 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
         let errorMessage: * = null;
         let errorField: ?string = null;
 
-        let markers: * = null;
-
         if (error) {
             if (error.field === 'scriptBody' && Array.isArray(error.error)) {
                 const errors = error.error.filter(e => e);
-                markers = getMarkers(errors);
                 errorMessage = errors
                     .map(error => error.message)
                     .map(error => <p key={error}>{error}</p>);

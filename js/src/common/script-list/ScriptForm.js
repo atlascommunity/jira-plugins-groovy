@@ -20,7 +20,6 @@ import type {StaticCheckScriptType} from '../ak/CheckedEditorField';
 
 import {ScrollToTop} from '../ScrollToTop';
 import {addItem, updateItem} from '../redux';
-import {getMarkers} from '../error';
 import {Bindings} from '../bindings';
 import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
 
@@ -199,12 +198,9 @@ export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>,
             let errorMessage: ?string = null;
             let errorField: ?string = null;
 
-            let markers: * = null;
-
             if (error) {
                 if (error.field === 'scriptBody' && Array.isArray(error.error)) {
                     const errors = error.error.filter(e => e);
-                    markers = getMarkers(errors);
                     errorMessage = errors
                         .map(error => error.messages)
                         .map(error => <p key={error}>{error}</p>);
