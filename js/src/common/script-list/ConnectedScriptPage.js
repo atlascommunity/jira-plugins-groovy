@@ -5,8 +5,7 @@ import memoizeOne from 'memoize-one';
 
 import {ScriptPage} from './ScriptPage';
 
-import {orderedItemsSelector} from '../redux/selectors';
-import {updateFilter} from '../redux';
+import {orderedItemsSelector, updateFilter} from '../redux';
 
 
 const itemsSelector = orderedItemsSelector();
