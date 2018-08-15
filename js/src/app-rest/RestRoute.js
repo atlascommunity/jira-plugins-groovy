@@ -10,7 +10,7 @@ import Button from '@atlaskit/button';
 import {RestScript} from './RestScript';
 import {RestForm} from './RestForm';
 
-import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {RestMessages} from '../i18n/rest.i18n';
 
 import {NotFoundPage, ConnectedScriptPage, ItemViewPage} from '../common/script-list';
@@ -48,7 +48,7 @@ export class RestRoute extends React.PureComponent<{}> {
                                 <ConnectedScriptPage
                                     ScriptComponent={RestScript}
                                     i18n={{
-                                        title: TitleMessages.rest,
+                                        title: PageTitleMessages.rest,
                                         addItem: RestMessages.addScript,
                                         noItems: RestMessages.noScripts,
                                         delete: {

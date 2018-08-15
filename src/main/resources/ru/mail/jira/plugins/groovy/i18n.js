@@ -157,6 +157,17 @@ define('mailru/groovy/i18n-react', [], function() {
             scheduled: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.scheduled'),
             extras: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.extras'),
         },
+        pageTitles: {
+            console: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.console'),
+            adminScripts: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.adminScripts'),
+            registry: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.registry'),
+            listeners: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.listeners'),
+            audit: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.audit'),
+            rest: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.rest'),
+            fields: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.fields'),
+            scheduled: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.scheduled'),
+            extras: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.extras'),
+        },
         scheduled: {
             noTasks: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.noTasks'),
             addTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.scheduled.addTask'),

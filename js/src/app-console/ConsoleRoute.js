@@ -7,7 +7,7 @@ import Breadcrumbs from '@atlaskit/breadcrumbs';
 
 import {ScriptConsole} from './ScriptConsole';
 
-import {TitleMessages} from '../i18n/common.i18n';
+import {PageTitleMessages} from '../i18n/common.i18n';
 import {withRoot} from '../common/script-list/breadcrumbs';
 import {ScrollToTop} from '../common/ScrollToTop';
 
@@ -18,7 +18,7 @@ export function ConsoleRoute(): Node {
             <PageHeader
                 breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
             >
-                {TitleMessages.console}
+                {PageTitleMessages.console}
             </PageHeader>
             <ScrollToTop/>
             <ScriptConsole/>

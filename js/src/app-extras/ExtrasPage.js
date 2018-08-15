@@ -9,7 +9,7 @@ import Breadcrumbs from '@atlaskit/breadcrumbs';
 import {ScrollToTop} from '../common/ScrollToTop';
 
 import {extrasService} from '../service';
-import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {withRoot} from '../common/script-list/breadcrumbs';
 
 
@@ -23,7 +23,7 @@ export class ExtrasPage extends React.Component<{}> {
             <PageHeader
                 breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
             >
-                {TitleMessages.extras}
+                {PageTitleMessages.extras}
             </PageHeader>
             <ScrollToTop/>
             <div className="page-content">

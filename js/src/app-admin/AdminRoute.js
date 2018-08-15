@@ -12,7 +12,7 @@ import {AdminForm} from './AdminForm';
 import {ViewAdminScript} from './ViewAdminScript';
 
 import {RegistryMessages} from '../i18n/registry.i18n';
-import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {Loader} from '../common/ak/Loader';
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer, filterReducer} from '../common/redux';
 import {adminScriptService, watcherService} from '../service';
@@ -47,7 +47,7 @@ export class AdminRoute extends React.PureComponent<{}> {
                                 <ConnectedScriptPage
                                     ScriptComponent={AdminScript}
                                     i18n={{
-                                        title: TitleMessages.adminScripts,
+                                        title: PageTitleMessages.adminScripts,
                                         addItem: RegistryMessages.addScript,
                                         noItems: RegistryMessages.noScripts,
                                         delete: {

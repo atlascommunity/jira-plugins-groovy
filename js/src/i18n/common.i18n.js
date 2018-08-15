@@ -101,3 +101,15 @@ export const TitleMessages: I18nMessages = {
     scheduled: i18n.titles.scheduled,
     extras: i18n.titles.extras,
 };
+
+export const PageTitleMessages: I18nMessages = {
+    console: i18n.pageTitles.console,
+    adminScripts: i18n.pageTitles.adminScripts,
+    registry: i18n.pageTitles.registry,
+    listeners: i18n.pageTitles.listeners,
+    audit: i18n.pageTitles.audit,
+    rest: i18n.pageTitles.rest,
+    fields: i18n.pageTitles.fields,
+    scheduled: i18n.pageTitles.scheduled,
+    extras: i18n.pageTitles.extras,
+};

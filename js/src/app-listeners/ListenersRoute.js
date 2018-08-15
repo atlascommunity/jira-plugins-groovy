@@ -10,7 +10,7 @@ import Button from '@atlaskit/button';
 import {Listener} from './Listener';
 import {ListenerForm} from './ListenerForm';
 
-import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {ListenerMessages} from '../i18n/listener.i18n';
 
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
@@ -91,7 +91,7 @@ export class ListenersRoute extends React.PureComponent<{}> {
                                     i18n={{
                                         addItem: ListenerMessages.addListener,
                                         noItems: ListenerMessages.noListeners,
-                                        title: TitleMessages.listeners,
+                                        title: PageTitleMessages.listeners,
                                         delete: {
                                             heading: ListenerMessages.deleteListener,
                                             areYouSure: CommonMessages.confirmDelete

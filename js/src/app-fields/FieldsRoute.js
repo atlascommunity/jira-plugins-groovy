@@ -15,7 +15,7 @@ import {NotFoundPage} from '../common/script-list/NotFoundPage';
 import {fieldConfigService, watcherService} from '../service';
 
 import {filterReducer, ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
-import {TitleMessages} from '../i18n/common.i18n';
+import {PageTitleMessages} from '../i18n/common.i18n';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
 
 import {Loader} from '../common/ak/Loader';
@@ -47,7 +47,7 @@ export class FieldsRoute extends React.PureComponent<{}> {
                                 <ConnectedScriptPage
                                     ScriptComponent={FieldScript}
                                     i18n={{
-                                        title: TitleMessages.fields,
+                                        title: PageTitleMessages.fields,
                                         addItem: '',
                                         noItems: ScriptFieldMessages.noFields,
                                         delete: {

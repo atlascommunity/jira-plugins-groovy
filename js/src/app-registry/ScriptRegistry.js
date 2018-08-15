@@ -28,7 +28,7 @@ import {InfoMessage} from '../common/ak/messages';
 
 import {registryService} from '../service';
 
-import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import './ScriptRegistry.less';
@@ -194,7 +194,7 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                         }
                         breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
                     >
-                        {TitleMessages.registry}
+                        {PageTitleMessages.registry}
                     </PageHeader>
 
                     <div className={`page-content ScriptList ${this.state.isDragging ? 'dragging' : ''}`}>

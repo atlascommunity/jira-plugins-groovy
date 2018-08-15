@@ -28,7 +28,7 @@ import {
     restService,
     scheduledTaskService
 } from '../service';
-import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, FieldMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 
 import {InfoMessage, RouterLink} from '../common/ak';
@@ -272,7 +272,7 @@ export class AuditLog extends React.Component<Props, State> {
 
                 breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
             >
-                {TitleMessages.audit}
+                {PageTitleMessages.audit}
             </PageHeader>
             <ScrollToTop/>
 

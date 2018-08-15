@@ -16,7 +16,7 @@ import {filterReducer, ItemActionCreators, itemsReducer, readinessReducer, watch
 import {ConnectedScriptPage, NotFoundPage, ItemViewPage} from '../common/script-list';
 import {Loader} from '../common/ak';
 
-import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 
 import './ScheduledTaskRegistry.less';
@@ -49,7 +49,7 @@ export class ScheduledRoute extends React.PureComponent<{}> {
                                 <ConnectedScriptPage
                                     ScriptComponent={ScheduledTask}
                                     i18n={{
-                                        title: TitleMessages.scheduled,
+                                        title: PageTitleMessages.scheduled,
                                         addItem: ScheduledTaskMessages.addTask,
                                         noItems: ScheduledTaskMessages.noTasks,
                                         delete: {
