@@ -143,6 +143,13 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
     _toggleUnused = () => this.props.updateFilter({ onlyUnused: !this.props.filter.onlyUnused });
 
+    componentDidUpdate(prevProps: Props) {
+        if (prevProps.directories !== this.props.directories) {
+            //trigger scroll event when directory list is changed so all visible lazily rendered elements render
+            window.dispatchEvent(new Event('scroll'));
+        }
+    }
+
     render() {
         const {waiting, directoryDialogProps, deleteScriptProps, deleteDirectoryProps} = this.state;
         const {isScriptUsageReady, isForceOpen, filter, deleteScript, deleteDirectory} = this.props;
