@@ -9,6 +9,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import com.atlassian.query.operator.Operator;
 import lombok.Getter;
 import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptFunction;
@@ -76,7 +77,10 @@ public class ScriptFunctionAdapter implements CustomFunction {
     @Override
     public QueryFactoryResult getQuery(@Nonnull QueryCreationContext queryCreationContext, @Nonnull TerminalClause terminalClause) {
         if (terminalClause.getOperand() instanceof FunctionOperand) {
-            return new QueryFactoryResult(delegate.getQuery(queryCreationContext, ((FunctionOperand) terminalClause.getOperand())));
+            return new QueryFactoryResult(
+                delegate.getQuery(queryCreationContext, ((FunctionOperand) terminalClause.getOperand())),
+                terminalClause.getOperator() == Operator.NOT_IN
+            );
         }
         return QueryFactoryResult.createFalseResult();
     }

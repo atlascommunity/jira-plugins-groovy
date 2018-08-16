@@ -16,6 +16,7 @@ import com.atlassian.jira.util.*;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import io.atlassian.fugue.Either;
 import org.apache.lucene.search.*;
@@ -85,7 +86,10 @@ public class CommentedFunction extends AbstractCommentQueryFunction {
             logger.error("caught exception while searching", e);
         }
 
-        return new QueryFactoryResult(new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())));
+        return new QueryFactoryResult(
+            new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())),
+            terminalClause.getOperator() == Operator.NOT_IN
+        );
     }
 
     @Nonnull

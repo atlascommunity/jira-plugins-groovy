@@ -16,6 +16,7 @@ import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -50,10 +51,13 @@ public class HasSubTasksFunction extends AbstractSubTaskFunction {
             return QueryFactoryResult.createFalseResult();
         }
 
-        return new QueryFactoryResult(new TermQuery(new Term(
-            DocumentConstants.ISSUE_LINKS,
-            IssueLinkIndexer.createValue(subTaskLinkType.getId(), Direction.OUT)
-        )));
+        return new QueryFactoryResult(
+            new TermQuery(new Term(
+                DocumentConstants.ISSUE_LINKS,
+                IssueLinkIndexer.createValue(subTaskLinkType.getId(), Direction.OUT)
+            )),
+            terminalClause.getOperator() == Operator.NOT_IN
+        );
     }
 
     @Nonnull
