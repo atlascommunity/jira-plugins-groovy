@@ -80,7 +80,10 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
 
             doSearch(jqlQuery, booleanQuery, collector, user);
 
-            return new QueryFactoryResult(new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())));
+            return new QueryFactoryResult(
+                new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())),
+                terminalClause.getOperator() == Operator.NOT_IN
+            );
         } else {
             String linkTypeName = args.get(1);
             Pair<IssueLinkType, Direction> linkType = findLinkType(linkTypeName);

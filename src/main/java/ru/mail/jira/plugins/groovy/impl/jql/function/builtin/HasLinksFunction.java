@@ -70,9 +70,12 @@ public class HasLinksFunction extends AbstractIssueLinkFunction {
             Pair<IssueLinkType, Direction> linkType = findLinkType(linkName);
 
             if (linkType != null) {
-                return new QueryFactoryResult(new TermQuery(new Term(
-                    DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.left().getId(), linkType.right())
-                )));
+                return new QueryFactoryResult(
+                    new TermQuery(new Term(
+                        DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.left().getId(), linkType.right())
+                    )),
+                    terminalClause.getOperator() == Operator.NOT_IN
+                );
             } else {
                 logger.error("Link type wasn't found for \"{}\"", linkName);
             }
