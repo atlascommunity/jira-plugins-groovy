@@ -20,13 +20,13 @@ import {ListenersRoute} from '../app-listeners';
 import {RestRoute} from '../app-rest';
 import {FieldsRoute} from '../app-fields';
 import {ScheduledRoute} from '../app-scheduled';
+import {JqlRoute} from '../app-jql';
 import {AuditLogRoute} from '../app-audit';
 import {ExtrasPage} from '../app-extras';
 
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
 import '../flex.less';
-import {JqlRoute} from '../app-jql/JqlRoute';
 
 
 AJS.toInit(() => {

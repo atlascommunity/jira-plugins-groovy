@@ -27,7 +27,6 @@ import type {ItemType} from '../redux';
 import type {ReturnType} from '../editor/types';
 
 import './ScriptForm.less';
-import type {CheckScriptType} from '../ak/CheckedEditorField';
 
 
 const bindings = [ Bindings.currentUser ];
@@ -260,13 +259,12 @@ export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>,
 
                             scriptType={scriptType}
 
-                                bindings={bindings}
-                                returnTypes={returnTypes}
+                            bindings={bindings}
+                            returnTypes={returnTypes}
 
-                                value={values.get('scriptBody') || ''}
-                                onChange={this._setObjectValue('scriptBody')}
-                            />
-                        }
+                            value={values.get('scriptBody') || ''}
+                            onChange={this._setObjectValue('scriptBody')}
+                        />
                     </FormField>
 
                     {additionalFields.map(field =>
