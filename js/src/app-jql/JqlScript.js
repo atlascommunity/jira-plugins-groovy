@@ -13,7 +13,7 @@ import type {JqlScriptType} from './types';
 
 import {WatchActionCreators} from '../common/redux';
 
-import {jqlScriptService} from '../service/services';
+import {jqlScriptService} from '../service';
 
 import {WatchableScript} from '../common/script/WatchableScript';
 

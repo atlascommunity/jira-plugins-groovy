@@ -9,7 +9,7 @@ import {Record} from 'immutable';
 import type {JqlScriptType} from './types';
 
 import {addItem, updateItem} from '../common/redux';
-import {jqlScriptService} from '../service/services';
+import {jqlScriptService} from '../service';
 
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {ScriptForm, type SubmitResult} from '../common/script-list/ScriptForm';
