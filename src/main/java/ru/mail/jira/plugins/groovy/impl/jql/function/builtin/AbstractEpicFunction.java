@@ -14,6 +14,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.query.Query;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nonnull;
@@ -58,7 +59,10 @@ public abstract class AbstractEpicFunction extends AbstractIssueLinkFunction {
             return QueryFactoryResult.createFalseResult();
         }
 
-        return getQuery(user, epicLinkType, getDirection(), jqlQuery);
+        return new QueryFactoryResult(
+            getQuery(user, epicLinkType, getDirection(), jqlQuery),
+            terminalClause.getOperator() == Operator.NOT_IN
+        );
     }
 
     private IssueLinkType getEpicLinkType() {

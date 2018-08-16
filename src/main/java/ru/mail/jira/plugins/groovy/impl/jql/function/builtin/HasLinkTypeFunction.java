@@ -12,6 +12,7 @@ import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.TermQuery;
@@ -61,10 +62,13 @@ public class HasLinkTypeFunction extends AbstractBuiltInFunction {
             IssueLinkType linkType = findLinkType(name);
 
             if (linkType != null) {
-                return new QueryFactoryResult(new TermQuery(new Term(
-                    DocumentConstants.ISSUE_LINKS,
-                    IssueLinkIndexer.createValue(linkType.getId())
-                )));
+                return new QueryFactoryResult(
+                    new TermQuery(new Term(
+                        DocumentConstants.ISSUE_LINKS,
+                        IssueLinkIndexer.createValue(linkType.getId())
+                    )),
+                    terminalClause.getOperator() == Operator.NOT_IN
+                );
             } else {
                 logger.error("Link type with name \"{}\" wasn't found", name);
             }

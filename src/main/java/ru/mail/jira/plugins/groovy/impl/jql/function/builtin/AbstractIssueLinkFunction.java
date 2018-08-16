@@ -9,7 +9,6 @@ import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
-import com.atlassian.jira.jql.query.QueryFactoryResult;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -43,14 +42,14 @@ public abstract class AbstractIssueLinkFunction extends AbstractBuiltInFunction 
         this.searchService = searchService;
     }
 
-    protected QueryFactoryResult getQuery(ApplicationUser user, IssueLinkType linkType, Direction direction, Query jqlQuery) {
+    protected org.apache.lucene.search.Query getQuery(ApplicationUser user, IssueLinkType linkType, Direction direction, Query jqlQuery) {
         TermQuery luceneQuery = new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.getId(), direction)));
         String expectedPrefix = IssueLinkIndexer.createValue(linkType.getId(), direction);
         LinkedIssueCollector collector = new LinkedIssueCollector(value -> value.startsWith(expectedPrefix));
 
         doSearch(jqlQuery, luceneQuery, collector, user);
 
-        return new QueryFactoryResult(new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())));
+        return new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds()));
     }
 
     protected void doSearch(Query jqlQuery, org.apache.lucene.search.Query luceneQuery, Collector collector, ApplicationUser user) {

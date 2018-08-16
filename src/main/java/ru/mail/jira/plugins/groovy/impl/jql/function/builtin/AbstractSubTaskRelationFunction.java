@@ -14,6 +14,7 @@ import com.atlassian.jira.util.MessageSet;
 import com.atlassian.query.Query;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nonnull;
@@ -64,7 +65,10 @@ public abstract class AbstractSubTaskRelationFunction extends AbstractSubTaskFun
             return QueryFactoryResult.createFalseResult();
         }
 
-        return getQuery(user, subTaskLinkType, getDirection(), jqlQuery);
+        return new QueryFactoryResult(
+            getQuery(user, subTaskLinkType, getDirection(), jqlQuery),
+            terminalClause.getOperator() == Operator.NOT_IN
+        );
     }
 
     @Nonnull

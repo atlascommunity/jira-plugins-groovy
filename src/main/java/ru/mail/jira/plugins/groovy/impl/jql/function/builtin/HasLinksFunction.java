@@ -15,6 +15,7 @@ import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import io.atlassian.fugue.Pair;
 import org.apache.lucene.index.Term;
@@ -60,7 +61,10 @@ public class HasLinksFunction extends AbstractIssueLinkFunction {
                 );
             }
 
-            return new QueryFactoryResult(booleanQuery);
+            return new QueryFactoryResult(
+                booleanQuery,
+                terminalClause.getOperator() == Operator.NOT_IN
+            );
         } else if (args.size() == 1) {
             String linkName = args.get(0);
             Pair<IssueLinkType, Direction> linkType = findLinkType(linkName);

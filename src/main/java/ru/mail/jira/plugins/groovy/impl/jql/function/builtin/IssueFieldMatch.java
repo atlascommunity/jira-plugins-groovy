@@ -16,6 +16,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.Query;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.apache.lucene.document.Document;
@@ -114,7 +115,10 @@ public class IssueFieldMatch extends AbstractBuiltInFunction {
             logger.warn("Caught exception while searching", e);
         }
 
-        return new QueryFactoryResult(new ConstantScoreQuery(new IssueIdFilter(collector.issueIds)));
+        return new QueryFactoryResult(
+            new ConstantScoreQuery(new IssueIdFilter(collector.issueIds)),
+            terminalClause.getOperator() == Operator.NOT_IN
+        );
     }
 
     private Query getQuery(ApplicationUser user, String queryString, MessageSet messageSet) {

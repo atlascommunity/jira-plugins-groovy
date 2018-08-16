@@ -17,6 +17,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.Query;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import io.atlassian.fugue.Pair;
 import org.apache.lucene.index.Term;
@@ -85,7 +86,10 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
             Pair<IssueLinkType, Direction> linkType = findLinkType(linkTypeName);
 
             if (linkType != null) {
-                return getQuery(user, linkType.left(), linkType.right(), jqlQuery);
+                return new QueryFactoryResult(
+                    getQuery(user, linkType.left(), linkType.right(), jqlQuery),
+                    terminalClause.getOperator() == Operator.NOT_IN
+                );
             } else {
                 logger.error("Link type \"{}\" wasn't found", linkTypeName);
             }
