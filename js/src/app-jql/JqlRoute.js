@@ -12,10 +12,10 @@ import {JqlForm} from './JqlForm';
 import {ViewJqlScript} from './ViewJqlScript';
 
 import {RegistryMessages} from '../i18n/registry.i18n';
-import {CommonMessages, TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {Loader} from '../common/ak/Loader';
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer, filterReducer} from '../common/redux';
-import {jqlScriptService, watcherService} from '../service/services';
+import {jqlScriptService, watcherService} from '../service';
 import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 import {RouterLink} from '../common/ak/RouterLink';
@@ -47,7 +47,7 @@ export class JqlRoute extends React.PureComponent<{}> {
                                 <ConnectedScriptPage
                                     ScriptComponent={JqlScript}
                                     i18n={{
-                                        title: TitleMessages.jql,
+                                        title: PageTitleMessages.jql,
                                         addItem: RegistryMessages.addScript,
                                         noItems: RegistryMessages.noScripts,
                                         delete: {

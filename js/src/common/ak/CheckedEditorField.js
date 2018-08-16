@@ -19,7 +19,7 @@ type State = {|
     validationState: ValidationState
 |};
 
-export type StaticCheckScriptType = 'CONSOLE' | 'WORKFLOW_GENERIC' | 'ADMIN_SCRIPT' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK' | 'LISTENER';
+export type StaticCheckScriptType = 'CONSOLE' | 'WORKFLOW_GENERIC' | 'ADMIN_SCRIPT' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK' | 'LISTENER' | 'JQL';
 
 type Props = ElementConfig<typeof EditorField> & {
     scriptType: StaticCheckScriptType,
