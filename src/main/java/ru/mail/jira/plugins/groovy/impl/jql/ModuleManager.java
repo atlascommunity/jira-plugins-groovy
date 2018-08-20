@@ -107,6 +107,8 @@ public class ModuleManager {
     }
 
     private void registerDescriptor(String functionName, ModuleDescriptor descriptor) {
+        logger.debug("registering function with name: {}", functionName);
+
         String moduleKey = descriptor.getCompleteKey();
         unregisterDescriptor(moduleKey);
 
@@ -125,6 +127,9 @@ public class ModuleManager {
                 existingRegistration.unregister();
 
                 String functionName = moduleKeyToFunction.remove(moduleKey);
+
+                logger.debug("unregistering function with name: {}", functionName);
+
                 CustomFunction function = allFunctions.remove(functionName);
                 if (function instanceof ScriptFunctionAdapter) {
                     ScriptFunction delegate = ((ScriptFunctionAdapter) function).getDelegate();

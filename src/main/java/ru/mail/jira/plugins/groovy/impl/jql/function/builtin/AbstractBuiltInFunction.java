@@ -23,7 +23,7 @@ public abstract class AbstractBuiltInFunction implements CustomFunction {
     }
 
     protected AbstractBuiltInFunction(String functionName, JiraDataType dataType, int minimumArgs) {
-        this.functionName = functionName;
+        this.functionName = "my_" + functionName;
         this.dataType = dataType;
         this.minimumArgs = minimumArgs;
     }
