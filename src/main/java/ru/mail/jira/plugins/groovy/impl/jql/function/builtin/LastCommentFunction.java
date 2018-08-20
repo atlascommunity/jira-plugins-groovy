@@ -57,7 +57,7 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
     ) {
         super(
             projectRoleManager, timeZoneManager, projectManager, jqlDateSupport, groupManager, userManager,
-            "myLastComment", 1
+            "lastComment", 1
         );
         this.searchProviderFactory = searchProviderFactory;
         this.searchProvider = searchProvider;
