@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-//todo: consider limiting result set
 public class LinkedIssueCollector extends Collector {
     public static final Filter ACCEPT_ALL = (it) -> true;
 

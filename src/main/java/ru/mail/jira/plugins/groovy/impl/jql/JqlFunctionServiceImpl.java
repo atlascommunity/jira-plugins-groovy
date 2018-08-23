@@ -25,7 +25,6 @@ public class JqlFunctionServiceImpl implements JqlFunctionService {
     private final JqlFunctionRepository repository;
     private final List<CustomFunction> builtInFunctions;
 
-
     @Autowired
     public JqlFunctionServiceImpl(
         @ComponentImport ClusterLockService lockService,
@@ -42,7 +41,6 @@ public class JqlFunctionServiceImpl implements JqlFunctionService {
     }
 
     public void onStart() {
-        //todo: not sure if we need cluster lock here
         ClusterLock lock = lockService.getLockForName(LOCK_KEY);
 
         lock.lock();
