@@ -131,12 +131,64 @@
             <artifactId>antlr4-runtime</artifactId>
             <version>4.7.1</version>
         </dependency>
-        <!-- explicitly set as provided, so it won't be bundled with plugin (not sure where compile dependency comes from) -->
+
+        <!-- make sure we don't include these in plugin -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>18.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>1.3.9</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.annotations</groupId>
+            <artifactId>atlassian-annotations</artifactId>
+            <version>1.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>1.1.0.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.atlassian.jira.plugins</groupId>
+            <artifactId>jira-greenhopper-api</artifactId>
+            <version>${gh.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.jira.plugins</groupId>
+            <artifactId>jira-greenhopper-plugin</artifactId>
+            <version>${gh.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>jndi</groupId>
+                    <artifactId>jndi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jta</groupId>
+                    <artifactId>jta</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>antlr4-runtime</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>
@@ -171,6 +223,9 @@
                             <!-- everything else -->
                             *;resolution:=optional
                         </Import-Package>
+                        <DynamicImport-Package>
+                            com.atlassian.greenhopper.api
+                        </DynamicImport-Package>
                         <Spring-Context>*</Spring-Context>
                     </instructions>
                     <compressJs>false</compressJs>
@@ -231,6 +286,7 @@
     </build>
     <properties>
         <jira.version>7.10.2</jira.version>
+        <gh.version>6.7.12</gh.version>
         <amps.version>6.3.14</amps.version>
         <ao.version>1.5.0</ao.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
