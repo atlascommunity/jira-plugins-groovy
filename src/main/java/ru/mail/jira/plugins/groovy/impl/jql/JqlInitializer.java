@@ -68,7 +68,5 @@ public class JqlInitializer {
         }
     }
 
-    public void onStop() {
-        //todo
-    }
+    public void onStop() {}
 }
