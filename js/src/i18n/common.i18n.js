@@ -113,4 +113,5 @@ export const PageTitleMessages: I18nMessages = {
     fields: i18n.pageTitles.fields,
     scheduled: i18n.pageTitles.scheduled,
     extras: i18n.pageTitles.extras,
+    jql: i18n.pageTitles.jql
 };
