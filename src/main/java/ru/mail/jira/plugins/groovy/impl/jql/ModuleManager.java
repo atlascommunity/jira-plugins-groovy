@@ -27,10 +27,14 @@ import ru.mail.jira.plugins.groovy.util.Const;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
 public class ModuleManager {
     private final Logger logger = LoggerFactory.getLogger(ModuleReplicationService.class);
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     private final Map<String, ServiceRegistration> registeredServices = new ConcurrentHashMap<>();
     private final Map<String, String> moduleKeyToFunction = new ConcurrentHashMap<>();
@@ -108,38 +112,51 @@ public class ModuleManager {
 
     private void registerDescriptor(String functionName, ModuleDescriptor descriptor) {
         logger.debug("registering function with name: {}", functionName);
+        Lock lock = this.lock.writeLock();
 
-        String moduleKey = descriptor.getCompleteKey();
-        unregisterDescriptor(moduleKey);
+        lock.lock();
+        try {
+            String moduleKey = descriptor.getCompleteKey();
+            unregisterDescriptor(moduleKey);
 
-        registeredServices.put(
-            descriptor.getKey(),
-            bundleContext.registerService(ModuleDescriptor.class.getName(), descriptor, null)
-        );
-        allFunctions.put(functionName, (CustomFunction) descriptor.getModule());
-        moduleKeyToFunction.put(descriptor.getKey(), functionName);
+            registeredServices.put(
+                descriptor.getKey(),
+                bundleContext.registerService(ModuleDescriptor.class.getName(), descriptor, null)
+            );
+            allFunctions.put(functionName, (CustomFunction) descriptor.getModule());
+            moduleKeyToFunction.put(descriptor.getKey(), functionName);
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void unregisterDescriptor(String moduleKey) {
-        ServiceRegistration existingRegistration = registeredServices.remove(moduleKey);
-        if (existingRegistration != null) {
-            try {
-                existingRegistration.unregister();
+        Lock lock = this.lock.writeLock();
 
-                String functionName = moduleKeyToFunction.remove(moduleKey);
+        lock.lock();
+        try {
+            ServiceRegistration existingRegistration = registeredServices.remove(moduleKey);
+            if (existingRegistration != null) {
+                try {
+                    existingRegistration.unregister();
 
-                logger.debug("unregistering function with name: {}", functionName);
+                    String functionName = moduleKeyToFunction.remove(moduleKey);
 
-                CustomFunction function = allFunctions.remove(functionName);
-                if (function instanceof ScriptFunctionAdapter) {
-                    ScriptFunction delegate = ((ScriptFunctionAdapter) function).getDelegate();
-                    if (delegate != null) {
-                        InvokerHelper.removeClass(delegate.getClass());
+                    logger.debug("unregistering function with name: {}", functionName);
+
+                    CustomFunction function = allFunctions.remove(functionName);
+                    if (function instanceof ScriptFunctionAdapter) {
+                        ScriptFunction delegate = ((ScriptFunctionAdapter) function).getDelegate();
+                        if (delegate != null) {
+                            InvokerHelper.removeClass(delegate.getClass());
+                        }
                     }
+                } catch (IllegalStateException e) {
+                    logger.debug("already unregistered", e);
                 }
-            } catch (IllegalStateException e) {
-                logger.debug("already unregistered", e);
             }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -159,20 +176,33 @@ public class ModuleManager {
     }
 
     public void unregisterAll() {
-        for (ServiceRegistration serviceRegistration : registeredServices.values()) {
-            try {
-                serviceRegistration.unregister();
-                //todo: check if we need to unregister modules when plugin is disabled
-            } catch (IllegalStateException e) {
-                logger.debug("already unregistered", e);
-            } catch (Exception e) {
-                logger.error("unable to unregister {}", serviceRegistration);
+        Lock lock = this.lock.readLock();
+
+        try {
+            for (ServiceRegistration serviceRegistration : registeredServices.values()) {
+                try {
+                    serviceRegistration.unregister();
+                    //todo: check if we need to unregister modules when plugin is disabled
+                } catch (IllegalStateException e) {
+                    logger.debug("already unregistered", e);
+                } catch (Exception e) {
+                    logger.error("unable to unregister {}", serviceRegistration);
+                }
             }
+        } finally {
+            lock.unlock();
         }
     }
 
     public Map<String, CustomFunction> getAllFunctions() {
-        return allFunctions;
+        Lock lock = this.lock.readLock();
+
+        lock.lock();
+        try {
+            return allFunctions;
+        } finally {
+            lock.unlock();
+        }
     }
 
     private String getScriptModuleKey(int id) {
