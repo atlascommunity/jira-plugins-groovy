@@ -65,8 +65,23 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
     }
 
     @Override
-    protected void validate(MessageSet messageSet, ApplicationUser applicationUser, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
-        //todo
+    protected void validate(MessageSet messageSet, ApplicationUser user, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
+        List<String> args = functionOperand.getArgs();
+
+        String queryString = args.get(args.size() == 1 ? 0 : 1);
+        Either<Query, MessageSet> parseResult = parseParameters(user, ImmutableList.of(), queryString);
+
+        if (parseResult.isRight()) {
+            messageSet.addMessageSet(parseResult.right().get());
+        }
+
+        if (args.size() == 2) {
+            SearchService.ParseResult jqlParseResult = searchService.parseQuery(user, args.get(0));
+
+            if (!jqlParseResult.isValid()) {
+                messageSet.addMessageSet(jqlParseResult.getErrors());
+            }
+        }
     }
 
     @Nonnull
