@@ -1,5 +1,7 @@
 package ru.mail.jira.plugins.groovy.impl;
 
+import com.atlassian.jira.mock.security.MockSimpleAuthenticationContext;
+import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.MockApplicationUser;
 import com.atlassian.plugin.event.PluginEventManager;
@@ -17,6 +19,7 @@ import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.script.ParamType;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.GlobalFunctionManager;
+import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 import ru.mail.jira.plugins.groovy.util.DelegatingClassLoader;
@@ -35,10 +38,13 @@ class ScriptServiceImplTest {
         PluginEventManager pluginEventManager = new DefaultPluginEventManager();
         GlobalFunctionManager globalFunctionManager = new GlobalFunctionManagerImpl();
         DelegatingClassLoader delegatingClassLoader = new DelegatingClassLoader();
+        InjectionResolver injectionResolver = new MockInjectionResolver(ImmutableMap.of(
+            JiraAuthenticationContext.class, new MockSimpleAuthenticationContext(testUser())
+        ));
 
         scriptService = new ScriptServiceImpl(
-            null,
             pluginEventManager,
+            injectionResolver,
             globalFunctionManager,
             delegatingClassLoader
         );
@@ -71,9 +77,7 @@ class ScriptServiceImplTest {
     public void bindingTest(boolean isStatic) throws Exception {
         String script = FileUtil.readExample("tests/binding-test");
 
-        Map<String, Object> bindings = ImmutableMap.of(
-            "user", new MockApplicationUser("userName1337")
-        );
+        Map<String, Object> bindings = ImmutableMap.of("user", testUser());
 
         Object result;
         if (isStatic) {
@@ -90,12 +94,40 @@ class ScriptServiceImplTest {
 
     @ParameterizedTest(name = "static: {0}")
     @MethodSource("createBooleanValues")
+    public void injectionTest(boolean isStatic) throws Exception {
+        String script = FileUtil.readExample("inject-var");
+
+        Object result;
+        if (isStatic) {
+            result = scriptService.executeScriptStatic(null, script, ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
+        } else {
+            result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
+        }
+
+        assertEquals(result, testUser());
+    }
+
+    @ParameterizedTest(name = "static: {0}")
+    @MethodSource("createBooleanValues")
+    public void fieldInjectionTest(boolean isStatic) throws Exception {
+        String script = FileUtil.readExample("inject-field");
+
+        Object result;
+        if (isStatic) {
+            result = scriptService.executeScriptStatic(null, script, ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
+        } else {
+            result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
+        }
+
+        assertEquals(result, testUser());
+    }
+
+    @ParameterizedTest(name = "static: {0}")
+    @MethodSource("createBooleanValues")
     public void scriptParamsTest(boolean isStatic) throws Exception {
         String script = FileUtil.readExample("admin-param");
 
-        Map<String, Object> bindings = ImmutableMap.of(
-            "user", new MockApplicationUser("12323", "userName1337", "User Name 1337", "username@test.test")
-        );
+        Map<String, Object> bindings = ImmutableMap.of("user", testUser());
 
         Object result;
         if (isStatic) {
@@ -155,5 +187,9 @@ class ScriptServiceImplTest {
     @Test
     public void stcBugTest() throws Exception {
         scriptService.parseScriptStatic(FileUtil.readExample("stc-bug"), ImmutableMap.of());
+    }
+
+    private ApplicationUser testUser() {
+        return new MockApplicationUser("12323", "userName1337", "User Name 1337", "username@test.test");
     }
 }

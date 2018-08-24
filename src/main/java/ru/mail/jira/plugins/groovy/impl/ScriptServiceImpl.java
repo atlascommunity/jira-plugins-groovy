@@ -1,10 +1,6 @@
 package ru.mail.jira.plugins.groovy.impl;
 
-import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.util.JiraUtils;
-import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
-import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.PluginEventListener;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.event.events.PluginDisablingEvent;
@@ -29,6 +25,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
 import ru.mail.jira.plugins.groovy.api.service.GlobalFunctionManager;
+import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.groovy.*;
@@ -63,7 +60,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         .recordStats()
         .build();
 
-    private final PluginAccessor pluginAccessor;
+    private final InjectionResolver injectionResolver;
     private final PluginEventManager pluginEventManager;
     private final GlobalFunctionManager globalFunctionManager;
     private final DelegatingClassLoader classLoader;
@@ -72,13 +69,13 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
     @Autowired
     public ScriptServiceImpl(
-        @ComponentImport PluginAccessor pluginAccessor,
         @ComponentImport PluginEventManager pluginEventManager,
+        InjectionResolver injectionResolver,
         GlobalFunctionManager globalFunctionManager,
         DelegatingClassLoader classLoader
     ) {
-        this.pluginAccessor = pluginAccessor;
         this.pluginEventManager = pluginEventManager;
+        this.injectionResolver = injectionResolver;
         this.globalFunctionManager = globalFunctionManager;
         this.classLoader = classLoader;
         this.compilerConfiguration = new CompilerConfiguration()
@@ -86,7 +83,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
                 new CompileStaticExtension(parseContextHolder, this),
                 new ImportCustomizer().addStarImports("ru.mail.jira.plugins.groovy.api.script"),
                 new WithPluginGroovyExtension(parseContextHolder),
-                new LoadClassesExtension(parseContextHolder, pluginAccessor, classLoader),
+                new LoadClassesExtension(parseContextHolder, injectionResolver, classLoader),
                 new InjectionExtension(parseContextHolder),
                 new ParamExtension(parseContextHolder)
             );
@@ -193,7 +190,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         //make sure that plugin classes can be loaded for cached scripts
         Set<Plugin> plugins = new HashSet<>();
         for (String pluginKey : compiledScript.getParseContext().getPlugins()) {
-            Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+            Plugin plugin = injectionResolver.getPlugin(pluginKey);
 
             if (plugin == null) {
                 throw new RuntimeException("Plugin " + pluginKey + " couldn't be loaded");
@@ -211,24 +208,14 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
         for (ScriptInjection injection : compiledScript.getParseContext().getInjections()) {
             if (injection.getPlugin() != null) {
-                Plugin plugin = pluginAccessor.getPlugin(injection.getPlugin());
-                Class pluginClass = plugin.getClassLoader().loadClass(injection.getClassName());
-                Object component = ComponentAccessor.getOSGiComponentInstanceOfType(pluginClass);
-
-                if (component == null) {
-                    List<ModuleDescriptor> modules = plugin.getModuleDescriptorsByModuleClass(pluginClass);
-                    if (modules.size() > 0) {
-                        component = modules.get(0).getModule();
-                    }
-                }
+                Object component = injectionResolver.resolvePluginInjection(injection.getPlugin(), injection.getClassName());
 
                 if (component != null) {
                     bindings.put(injection.getVariableName(), component);
                     continue;
                 }
             } else {
-                Class componentClass = JiraUtils.class.getClassLoader().loadClass(injection.getClassName());
-                Object component = ComponentAccessor.getComponent(componentClass);
+                Object component = injectionResolver.resolveStandardInjection(injection.getClassName());
 
                 if (component != null) {
                     bindings.put(injection.getVariableName(), component);
