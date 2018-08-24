@@ -178,6 +178,7 @@ public class ModuleManager {
     public void unregisterAll() {
         Lock lock = this.lock.readLock();
 
+        lock.lock();
         try {
             for (ServiceRegistration serviceRegistration : registeredServices.values()) {
                 try {
