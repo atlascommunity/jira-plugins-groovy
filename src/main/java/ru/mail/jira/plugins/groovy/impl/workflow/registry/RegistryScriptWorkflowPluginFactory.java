@@ -1,7 +1,6 @@
 package ru.mail.jira.plugins.groovy.impl.workflow.registry;
 
 import com.atlassian.jira.plugin.workflow.AbstractWorkflowPluginFactory;
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.templaterenderer.JavaScriptEscaper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
@@ -22,7 +21,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
-@Scanned
 public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkflowPluginFactory {
     private final ScriptRepository scriptRepository;
     private final ScriptParamFactory paramFactory;

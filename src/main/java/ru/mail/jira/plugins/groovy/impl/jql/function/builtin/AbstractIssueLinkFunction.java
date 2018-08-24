@@ -11,17 +11,13 @@ import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.Query;
 import io.atlassian.fugue.Pair;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public abstract class AbstractIssueLinkFunction extends AbstractBuiltInFunction {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -29,11 +25,10 @@ public abstract class AbstractIssueLinkFunction extends AbstractBuiltInFunction 
     protected final SearchProvider searchProvider;
     protected final SearchService searchService;
 
-    @Autowired
     public AbstractIssueLinkFunction(
-        @ComponentImport IssueLinkTypeManager issueLinkTypeManager,
-        @ComponentImport SearchProvider searchProvider,
-        @ComponentImport SearchService searchService,
+        IssueLinkTypeManager issueLinkTypeManager,
+        SearchProvider searchProvider,
+        SearchService searchService,
         String functionName, int minimumArgs
     ) {
         super(functionName, minimumArgs);

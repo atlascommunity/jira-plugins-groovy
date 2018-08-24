@@ -17,8 +17,6 @@ import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.LuceneUtils;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.operand.SingleValueOperand;
 import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
@@ -29,7 +27,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryBaseListener;
 import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryLexer;
 import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryParser;
@@ -40,7 +37,6 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
 
-@Scanned
 public abstract class AbstractCommentQueryFunction extends AbstractBuiltInFunction {
     private final Logger logger = LoggerFactory.getLogger(AbstractCommentQueryFunction.class);
     private final LikeQueryFactory likeQueryFactory = new LikeQueryFactory(false);
@@ -52,14 +48,13 @@ public abstract class AbstractCommentQueryFunction extends AbstractBuiltInFuncti
     private final GroupManager groupManager;
     private final UserManager userManager;
 
-    @Autowired
     public AbstractCommentQueryFunction(
-        @ComponentImport ProjectRoleManager projectRoleManager,
-        @ComponentImport TimeZoneManager timeZoneManager,
-        @ComponentImport ProjectManager projectManager,
-        @ComponentImport JqlDateSupport jqlDateSupport,
-        @ComponentImport GroupManager groupManager,
-        @ComponentImport UserManager userManager,
+        ProjectRoleManager projectRoleManager,
+        TimeZoneManager timeZoneManager,
+        ProjectManager projectManager,
+        JqlDateSupport jqlDateSupport,
+        GroupManager groupManager,
+        UserManager userManager,
         String name, int minimumArgs
     ) {
         super(name, minimumArgs);

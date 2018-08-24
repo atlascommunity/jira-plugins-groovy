@@ -12,7 +12,6 @@ import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
@@ -29,7 +28,6 @@ import ru.mail.jira.plugins.groovy.impl.jsw.JiraSoftwareHelper;
 import javax.annotation.Nonnull;
 import java.util.*;
 
-@Scanned
 public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInFunction {
     private final Logger logger = LoggerFactory.getLogger(AbstractSprintHistoryFunction.class);
 
