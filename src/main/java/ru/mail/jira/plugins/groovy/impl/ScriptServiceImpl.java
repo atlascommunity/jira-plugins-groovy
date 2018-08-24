@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
+import ru.mail.jira.plugins.groovy.api.service.GlobalFunctionManager;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.groovy.*;
@@ -64,7 +65,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
     private final PluginAccessor pluginAccessor;
     private final PluginEventManager pluginEventManager;
-    private final GlobalFunctionManagerImpl globalFunctionManager;
+    private final GlobalFunctionManager globalFunctionManager;
     private final DelegatingClassLoader classLoader;
     private final GroovyClassLoader gcl;
     private final CompilerConfiguration compilerConfiguration;
@@ -73,7 +74,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     public ScriptServiceImpl(
         @ComponentImport PluginAccessor pluginAccessor,
         @ComponentImport PluginEventManager pluginEventManager,
-        GlobalFunctionManagerImpl globalFunctionManager,
+        GlobalFunctionManager globalFunctionManager,
         DelegatingClassLoader classLoader
     ) {
         this.pluginAccessor = pluginAccessor;
