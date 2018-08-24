@@ -53,6 +53,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInFunct
     protected void validate(MessageSet messageSet, ApplicationUser user, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
         if (!jiraSoftwareHelper.isAvailable()) {
             messageSet.addErrorMessage("Jira Software is not available");
+            return;
         }
 
         List<String> args = functionOperand.getArgs();
@@ -63,9 +64,9 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInFunct
         }
 
         String boardName = args.get(0);
-        RapidView rapidView = jiraSoftwareHelper.findRapidViewByName(user, boardName);
+        Optional<RapidView> rapidView = jiraSoftwareHelper.findRapidViewByName(user, boardName);
 
-        if (rapidView == null) {
+        if (!rapidView.isPresent()) {
             messageSet.addErrorMessage("Can't find scrum board with name \"" + boardName + "\"");
             return;
         }
@@ -73,10 +74,10 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInFunct
         if (args.size() == 2) {
             String sprintName = args.get(1);
 
-            Sprint sprint = jiraSoftwareHelper.findSprint(user, rapidView, sprintName);
+            Optional<Sprint> sprint = jiraSoftwareHelper.findSprint(user, rapidView, sprintName);
 
-            if (sprint == null) {
-                messageSet.addErrorMessage("Can't find sprint with name \"" + sprintName + "\" in board \"" + rapidView.getName() + "\"");
+            if (!sprint.isPresent()) {
+                messageSet.addErrorMessage("Can't find sprint with name \"" + sprintName + "\" in board \"" + rapidView.get().getName() + "\"");
             }
         }
     }
@@ -96,9 +97,9 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInFunct
 
         CustomField sprintField = jiraSoftwareHelper.getSprintField();
 
-        RapidView rapidView = jiraSoftwareHelper.findRapidViewByName(user, args.get(0));
+        Optional<RapidView> rapidView = jiraSoftwareHelper.findRapidViewByName(user, args.get(0));
 
-        if (rapidView == null) {
+        if (!rapidView.isPresent()) {
             logger.warn("Unable to find rapid view for name \"{}\"", args.get(0));
 
             return QueryFactoryResult.createFalseResult();
@@ -127,15 +128,15 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInFunct
 
             luceneQuery = sprintsQuery;
         } else if (args.size() == 2) {
-            Sprint sprint = jiraSoftwareHelper.findSprint(user, rapidView, args.get(1));
+            Optional<Sprint> sprint = jiraSoftwareHelper.findSprint(user, rapidView, args.get(1));
 
-            if (sprint == null) {
+            if (!sprint.isPresent()) {
                 logger.warn("Unable to find sprint with name \"{}\" in board \"{}\"", args.get(1), args.get(0));
 
                 return QueryFactoryResult.createFalseResult();
             }
 
-            luceneQuery = new TermQuery(new Term(historicFieldId, String.valueOf(sprint.getId())));
+            luceneQuery = new TermQuery(new Term(historicFieldId, String.valueOf(sprint.get().getId())));
         }
 
         SprintHistoryCollector collector = new SprintHistoryCollector(sprintField, startDates, added);
