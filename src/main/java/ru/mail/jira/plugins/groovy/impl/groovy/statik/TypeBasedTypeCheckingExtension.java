@@ -24,8 +24,6 @@ public class TypeBasedTypeCheckingExtension extends AbstractTypeCheckingExtensio
 
     @Override
     public boolean handleUnresolvedVariableExpression(VariableExpression vexp) {
-        //todo: handle PluginModule/StandardModule injections
-
         Map<String, Class> globalTypes = scriptService.getGlobalVariableTypes();
         Class type = globalTypes.get(vexp.getName());
 

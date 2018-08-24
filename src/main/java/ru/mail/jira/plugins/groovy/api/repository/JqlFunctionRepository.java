@@ -6,7 +6,6 @@ import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
 
 import java.util.List;
 
-//todo: unique name for entity
 public interface JqlFunctionRepository {
     List<JqlFunctionScriptDto> getAllScripts(boolean includeChangelogs, boolean includeErrorCount);
 
