@@ -8,6 +8,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.query.Query;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public class JiraSoftwareHelperStub implements JiraSoftwareHelper {
     public JiraSoftwareHelperStub() {}
@@ -38,22 +39,22 @@ public class JiraSoftwareHelperStub implements JiraSoftwareHelper {
     }
 
     @Override
-    public RapidView findRapidViewByName(ApplicationUser user, String name) {
+    public Optional<RapidView> findRapidViewByName(ApplicationUser user, String name) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Query getRapidViewQuery(ApplicationUser user, RapidView rapidView) {
+    public Query getRapidViewQuery(ApplicationUser user, Optional<RapidView> rapidView) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, RapidView rapidView) {
+    public Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, Optional<RapidView> rapidView) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Sprint findSprint(ApplicationUser user, RapidView rapidView, String name) {
+    public Optional<Sprint> findSprint(ApplicationUser user, Optional<RapidView> rapidView, String name) {
         throw new UnsupportedOperationException();
     }
 }

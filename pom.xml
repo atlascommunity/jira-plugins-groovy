@@ -212,6 +212,7 @@
                             <!-- imports -->
                             org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
+                            <!-- jira stuff -->
                             com.atlassian.jira.plugin.webfragment.conditions,
                             com.atlassian.jira.issue.customfields.searchers,
                             com.atlassian.jira.jql.operand,
@@ -224,7 +225,7 @@
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>
-                            com.atlassian.greenhopper.api
+                            com.atlassian.greenhopper.*
                         </DynamicImport-Package>
                         <Spring-Context>*</Spring-Context>
                     </instructions>

@@ -8,6 +8,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.query.Query;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface JiraSoftwareHelper {
     boolean isAvailable();
@@ -20,11 +21,11 @@ public interface JiraSoftwareHelper {
 
     IssueType getEpicIssueType();
 
-    RapidView findRapidViewByName(ApplicationUser user, String name);
+    Optional<RapidView> findRapidViewByName(ApplicationUser user, String name);
 
-    Query getRapidViewQuery(ApplicationUser user, RapidView rapidView);
+    Query getRapidViewQuery(ApplicationUser user, Optional<RapidView> rapidView);
 
-    Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, RapidView rapidView);
+    Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, Optional<RapidView> rapidView);
 
-    Sprint findSprint(ApplicationUser user, RapidView rapidView, String name);
+    Optional<Sprint> findSprint(ApplicationUser user, Optional<RapidView> rapidView, String name);
 }

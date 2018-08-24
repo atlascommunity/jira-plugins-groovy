@@ -27,6 +27,7 @@ import ru.mail.jira.plugins.groovy.util.ObjectUtil;
 import ru.mail.jira.plugins.groovy.util.PluginComponentUtil;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Component
 @ExportAsService(LifecycleAware.class)
@@ -126,22 +127,22 @@ public class DelegatingJiraSoftwareHelper implements LifecycleAware, JiraSoftwar
     }
 
     @Override
-    public RapidView findRapidViewByName(ApplicationUser user, String name) {
+    public Optional<RapidView> findRapidViewByName(ApplicationUser user, String name) {
         return delegate.findRapidViewByName(user, name);
     }
 
     @Override
-    public Query getRapidViewQuery(ApplicationUser user, RapidView rapidView) {
+    public Query getRapidViewQuery(ApplicationUser user, Optional rapidView) {
         return delegate.getRapidViewQuery(user, rapidView);
     }
 
     @Override
-    public Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, RapidView rapidView) {
+    public Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, Optional rapidView) {
         return delegate.findActiveSprintsByBoard(user, rapidView);
     }
 
     @Override
-    public Sprint findSprint(ApplicationUser user, RapidView rapidView, String name) {
+    public Optional<Sprint> findSprint(ApplicationUser user, Optional rapidView, String name) {
         return delegate.findSprint(user, rapidView, name);
     }
 }

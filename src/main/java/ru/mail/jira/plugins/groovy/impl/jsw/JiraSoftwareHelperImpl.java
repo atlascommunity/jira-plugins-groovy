@@ -20,6 +20,7 @@ import com.atlassian.query.Query;
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Optional;
 
 @Scanned
 public class JiraSoftwareHelperImpl implements JiraSoftwareHelper {
@@ -68,7 +69,7 @@ public class JiraSoftwareHelperImpl implements JiraSoftwareHelper {
     }
 
     @Override
-    public RapidView findRapidViewByName(ApplicationUser user, String name) {
+    public Optional<RapidView> findRapidViewByName(ApplicationUser user, String name) {
         ServiceOutcome<Page<RapidView>> outcome = rapidViewService.getRapidViews(
             user, PageRequests.all(),
             RapidViewQuery.builder().types(EnumSet.of(RapidView.Type.SCRUM)).build()
@@ -77,31 +78,35 @@ public class JiraSoftwareHelperImpl implements JiraSoftwareHelper {
         if (outcome.isValid()) {
             Page<RapidView> page = outcome.get();
 
-            return page.getValues().stream().filter(it -> it.getName().equals(name)).findAny().orElse(null);
+            return page
+                .getValues()
+                .stream()
+                .filter(it -> it.getName().equals(name))
+                .findAny();
         }
 
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public Query getRapidViewQuery(ApplicationUser user, RapidView rapidView) {
-        return rapidViewQueryService.getRapidViewQuery(user, rapidView).get();
+    public Query getRapidViewQuery(ApplicationUser user, Optional<RapidView> rapidView) {
+        return rapidViewQueryService.getRapidViewQuery(user, rapidView.get()).get();
     }
 
     @Override
-    public Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, RapidView rapidView) {
+    public Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, Optional<RapidView> rapidView) {
         return sprintService.getSprints(
-            user, rapidView,
+            user, rapidView.get(),
             PageRequests.all(),
             SprintQuery.builder().states(EnumSet.of(Sprint.State.ACTIVE)).build()
         ).get().getValues();
     }
 
     @Override
-    public Sprint findSprint(ApplicationUser user, RapidView rapidView, String name) {
+    public Optional<Sprint> findSprint(ApplicationUser user, Optional<RapidView> rapidView, String name) {
         return sprintService
             .getSprints(
-                user, rapidView,
+                user, rapidView.get(),
                 PageRequests.all(),
                 SprintQuery.builder().build()
             )
@@ -109,7 +114,6 @@ public class JiraSoftwareHelperImpl implements JiraSoftwareHelper {
             .getValues()
             .stream()
             .filter(it -> it.getName().equals(name))
-            .findAny()
-            .orElse(null);
+            .findAny();
     }
 }
