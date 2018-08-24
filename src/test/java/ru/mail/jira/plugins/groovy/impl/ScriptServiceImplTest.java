@@ -15,6 +15,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.script.ParamType;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
@@ -29,6 +31,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@RunWith(JUnitPlatform.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ScriptServiceImplTest {
     private ScriptService scriptService;
