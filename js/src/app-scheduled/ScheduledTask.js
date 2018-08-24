@@ -210,7 +210,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                         content={popup}
                         isOpen={showStatusInfo}
                         respondsTo="hover"
-                        alignment="bottom center"
+                        placement="bottom"
                     >
                         <div
                             className="flex-vertical-middle"

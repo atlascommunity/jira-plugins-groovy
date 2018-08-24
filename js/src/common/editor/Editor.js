@@ -249,7 +249,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                     </div>
                     { bindings &&
                         <div style={{marginLeft: '4px'}}>
-                            <InlineMessage type="info" position="top right">
+                            <InlineMessage type="info" placement="top-end">
                                 <div className="flex-column">
                                     {globalBindings.map(binding => <Binding key={binding.name} binding={binding}/>)}
                                     <hr className="full-width"/>
