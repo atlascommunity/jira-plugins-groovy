@@ -40,7 +40,7 @@ public class HttpClientGlobalVariable implements GlobalVariable<CloseableHttpCli
     }
 
     @Override
-    public CloseableHttpClient getValue() {
+    public CloseableHttpClient getValue(String scriptId) {
         return this.httpClient;
     }
 

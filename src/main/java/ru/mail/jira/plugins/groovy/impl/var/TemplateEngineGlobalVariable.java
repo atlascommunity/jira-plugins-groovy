@@ -12,7 +12,7 @@ public class TemplateEngineGlobalVariable implements GlobalVariable<TemplateEngi
     }
 
     @Override
-    public TemplateEngine getValue() {
+    public TemplateEngine getValue(String scriptId) {
         return templateEngine;
     }
 

@@ -231,7 +231,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         }
 
         for (Map.Entry<String, GlobalVariable> entry : globalVariables.entrySet()) {
-            bindings.put(entry.getKey(), entry.getValue().getValue());
+            bindings.put(entry.getKey(), entry.getValue().getValue(scriptId));
         }
 
         logger.debug("initialized bindings");
