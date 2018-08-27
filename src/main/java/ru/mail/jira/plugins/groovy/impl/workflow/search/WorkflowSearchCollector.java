@@ -14,4 +14,8 @@ public interface WorkflowSearchCollector {
     void collect(ConditionDescriptor descriptor);
     void collect(ValidatorDescriptor descriptor, int order);
     void collect(FunctionDescriptor descriptor, int order);
+
+    default boolean isAborted() {
+        return false;
+    }
 }

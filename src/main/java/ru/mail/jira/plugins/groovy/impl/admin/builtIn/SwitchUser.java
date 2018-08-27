@@ -74,6 +74,11 @@ public class SwitchUser implements BuiltInScript {
     }
 
     @Override
+    public boolean isHtml() {
+        return false;
+    }
+
+    @Override
     public List<ScriptParamDto> getParams() {
         return ImmutableList.of(
             new ScriptParamDto("user", "User", ParamType.USER, false)

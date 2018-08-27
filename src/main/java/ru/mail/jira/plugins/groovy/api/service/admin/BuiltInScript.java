@@ -13,5 +13,7 @@ public interface BuiltInScript {
 
     String getI18nKey();
 
+    boolean isHtml();
+
     List<ScriptParamDto> getParams();
 }

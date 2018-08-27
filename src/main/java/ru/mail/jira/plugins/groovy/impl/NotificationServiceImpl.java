@@ -14,8 +14,8 @@ import com.atlassian.sal.api.message.I18nResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.notification.NotificationDto;
-import ru.mail.jira.plugins.groovy.api.entity.EntityType;
 import ru.mail.jira.plugins.groovy.api.service.NotificationService;
+import ru.mail.jira.plugins.groovy.util.ScriptUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +49,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendNotifications(NotificationDto notificationDto, List<ApplicationUser> recipients) {
-        String permalink = getPermalink(notificationDto.getEntityType(), notificationDto.getEntityId());
+        String permalink = ScriptUtil.getPermalink(notificationDto.getEntityType(), notificationDto.getEntityId());
 
         for (ApplicationUser recipient : recipients) {
             if (!permissionHelper.isAdmin(recipient)) {
@@ -84,32 +84,5 @@ public class NotificationServiceImpl implements NotificationService {
 
             mailQueue.addItem(email);
         }
-    }
-
-    public String getPermalink(EntityType entityType, Integer id) {
-        if (entityType.isSupportsPermalink() && id != null) {
-            String pluginBaseUrl = "/plugins/servlet/my-groovy/";
-
-            switch (entityType) {
-                case REGISTRY_SCRIPT:
-                    return pluginBaseUrl + "registry/script/view/" + id;
-                case CUSTOM_FIELD:
-                    return pluginBaseUrl + "fields/" + id + "/view";
-                case ADMIN_SCRIPT:
-                    return pluginBaseUrl + "admin-scripts/" + id + "/view";
-                case LISTENER:
-                    return pluginBaseUrl + "listeners/" + id + "/view";
-                case REST:
-                    return pluginBaseUrl + "rest/" + id + "/view";
-                case SCHEDULED_TASK:
-                    return pluginBaseUrl + "scheduled/" + id + "/view";
-                case JQL_FUNCTION:
-                    return pluginBaseUrl + "jql/" + id + "/view";
-            }
-
-            return null;
-        }
-
-        return null;
     }
 }

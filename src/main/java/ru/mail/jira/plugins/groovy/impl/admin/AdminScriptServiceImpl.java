@@ -2,6 +2,8 @@ package ru.mail.jira.plugins.groovy.impl.admin;
 
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
@@ -24,6 +26,8 @@ import java.util.Objects;
 
 @Component
 public class AdminScriptServiceImpl implements AdminScriptService {
+    private final Logger logger = LoggerFactory.getLogger(AdminScriptServiceImpl.class);
+
     private final I18nHelper i18nHelper;
     private final ScriptService scriptService;
     private final BuiltInScriptManager builtInScriptManager;
@@ -56,6 +60,9 @@ public class AdminScriptServiceImpl implements AdminScriptService {
         try {
             return new AdminScriptOutcome(true, script.run(user, getParams(script.getParams(), rawParams)));
         } catch (Exception e) {
+            if (!(e instanceof ValidationException)) {
+                logger.error("Caught exception", e);
+            }
             return new AdminScriptOutcome(false, ExceptionHelper.getMessageOrClassName(e));
         }
     }

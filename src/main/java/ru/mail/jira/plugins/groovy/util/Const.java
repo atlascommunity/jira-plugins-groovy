@@ -43,6 +43,10 @@ public final class Const {
     public static final String WF_REPOSITORY_SCRIPT_PARAM_PREFIX = "SCRIPT_PARAM_";
     public static final String WF_UUID = "UUID";
 
+    public static final String INLINE_CONDITION_KEY = "ru.mail.jira.plugins.groovyinline-script-condition";
+    public static final String INLINE_VALIDATOR_KEY = "ru.mail.jira.plugins.groovyinline-script-validator";
+    public static final String INLINE_FUNCTION_KEY = "ru.mail.jira.plugins.groovyinline-script-function";
+
     public static final String REGISTRY_CONDITION_KEY = "ru.mail.jira.plugins.groovyregistry-script-condition";
     public static final String REGISTRY_VALIDATOR_KEY = "ru.mail.jira.plugins.groovyregistry-script-validator";
     public static final String REGISTRY_FUNCTION_KEY = "ru.mail.jira.plugins.groovyregistry-script-function";

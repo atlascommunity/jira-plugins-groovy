@@ -27,6 +27,9 @@ public class WorkflowSearchService {
                 collector.actionComplete();
             }
             collector.workflowComplete();
+            if (collector.isAborted()) {
+                break;
+            }
         }
         return collector;
     }

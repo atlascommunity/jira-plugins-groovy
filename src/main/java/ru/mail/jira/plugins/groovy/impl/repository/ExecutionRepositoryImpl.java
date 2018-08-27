@@ -28,12 +28,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static ru.mail.jira.plugins.groovy.util.QueryDslTables.SCRIPT_EXECUTION;
+
 //todo: consider deleting executions when their count > 50
 @Component
 @ExportAsService(LifecycleAware.class)
 public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAware {
-    private static final QScriptExecution SCRIPT_EXECUTION = new QScriptExecution();
-
     private final Logger logger = LoggerFactory.getLogger(ExecutionRepositoryImpl.class);
     private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(
         ThreadFactories.namedThreadFactory("MAILRU_GROOVY_BG_THREAD")

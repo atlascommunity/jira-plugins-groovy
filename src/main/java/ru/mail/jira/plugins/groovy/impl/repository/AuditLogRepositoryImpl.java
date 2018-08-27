@@ -15,7 +15,6 @@ import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryDto;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.Page;
-import ru.mail.jira.plugins.groovy.impl.repository.querydsl.QAuditLogEntry;
 import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
 import ru.mail.jira.plugins.groovy.util.ScriptUtil;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
@@ -26,10 +25,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ru.mail.jira.plugins.groovy.util.QueryDslTables.AUDIT_LOG_ENTRY;
+
 @Component
 public class AuditLogRepositoryImpl implements AuditLogRepository {
-    private static final QAuditLogEntry AUDIT_LOG_ENTRY = new QAuditLogEntry();
-
     private final ActiveObjects activeObjects;
     private final DateTimeFormatter dateTimeFormatter;
     private final DatabaseAccessor databaseAccessor;

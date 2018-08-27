@@ -77,6 +77,11 @@ public class FixResolution implements BuiltInScript {
     }
 
     @Override
+    public boolean isHtml() {
+        return false;
+    }
+
+    @Override
     public List<ScriptParamDto> getParams() {
         return ImmutableList.of(
             new ScriptParamDto("jql", "Query", ParamType.STRING, false),
