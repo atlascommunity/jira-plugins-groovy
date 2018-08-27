@@ -8,7 +8,7 @@ import memoizeOne from 'memoize-one';
 import Avatar from '@atlaskit/avatar';
 import Button from '@atlaskit/button';
 import Lozenge from '@atlaskit/lozenge';
-import InlineDialog from '@atlaskit/inline-dialog';
+import Tooltip from '@atlaskit/tooltip';
 import {ToggleStateless} from '@atlaskit/toggle';
 import {colors} from '@atlaskit/theme';
 
@@ -67,7 +67,6 @@ type Props = ScriptComponentProps<ScheduledTaskType> & {
 };
 
 type State = {
-    showStatusInfo: boolean,
     showRunDialog: boolean
 };
 
@@ -77,7 +76,6 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
     };
 
     state = {
-        showStatusInfo: false,
         showRunDialog: false
     };
 
@@ -86,10 +84,6 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
         this.props.script.name,
         () => scheduledTaskService.doDelete(this.props.script.id)
     );
-
-    _showStatusInfo = () => this.setState({ showStatusInfo: true });
-
-    _hideStatusInfo = () => this.setState({ showStatusInfo: false });
 
     _toggleEnabled = () => {
         const {script, updateItem} = this.props;
@@ -162,7 +156,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
 
     render() {
         const {script, collapsible} = this.props;
-        const {showStatusInfo, showRunDialog} = this.state;
+        const {showRunDialog} = this.state;
         const {lastRunInfo} = script;
 
         const outcome = lastRunInfo ? lastRunInfo.outcome : 'NOT_RAN';
@@ -176,7 +170,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                 </div>
                 {lastRunInfo.message && <div className="flex-row">
                     <div style={{color: isError ? colors.R400 : colors.P300}}>
-                        {isError ? <ErrorIcon size={'medium'}/> : <InfoIcon size={'medium'}/>}
+                        {isError ? <ErrorIcon size="small"/> : <InfoIcon size="small"/>}
                     </div>
                     <div className="TaskRunMessage">
                         {lastRunInfo.message}
@@ -206,22 +200,18 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                     </span>
                 </div>
                 <div className="flex-vertical-middle">
-                    <InlineDialog
+                    <Tooltip
                         content={popup}
-                        isOpen={showStatusInfo}
-                        respondsTo="hover"
                         placement="bottom"
                     >
                         <div
                             className="flex-vertical-middle"
-                            onMouseEnter={this._showStatusInfo}
-                            onMouseLeave={this._hideStatusInfo}
                         >
                             <Lozenge appearance={getOutcomeLozengeAppearance(outcome)} isBold={true}>
                                 {outcome}
                             </Lozenge>
                         </div>
-                    </InlineDialog>
+                    </Tooltip>
                 </div>
             </div>
         );
