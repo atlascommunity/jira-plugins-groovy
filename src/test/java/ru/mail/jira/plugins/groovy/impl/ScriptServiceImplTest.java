@@ -1,17 +1,20 @@
 package ru.mail.jira.plugins.groovy.impl;
 
+import com.atlassian.jira.mock.plugin.MockPlugin;
 import com.atlassian.jira.mock.security.MockSimpleAuthenticationContext;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.MockApplicationUser;
+import com.atlassian.plugin.PluginInformation;
+import com.atlassian.plugin.PluginState;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.event.impl.DefaultPluginEventManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,24 +29,31 @@ import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 import ru.mail.jira.plugins.groovy.util.DelegatingClassLoader;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(JUnitPlatform.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ScriptServiceImplTest {
     private ScriptService scriptService;
 
-    @BeforeAll
+    @BeforeEach
     public void setup() {
         PluginEventManager pluginEventManager = new DefaultPluginEventManager();
         GlobalFunctionManager globalFunctionManager = new GlobalFunctionManagerImpl();
         DelegatingClassLoader delegatingClassLoader = new DelegatingClassLoader();
-        InjectionResolver injectionResolver = new MockInjectionResolver(ImmutableMap.of(
-            JiraAuthenticationContext.class, new MockSimpleAuthenticationContext(testUser())
-        ));
+        MockPlugin testPlugin = new MockPlugin("Test plugin", "testPLugin", new PluginInformation(), PluginState.ENABLED);
+        testPlugin.setClassLoader(Thread.currentThread().getContextClassLoader());
+        InjectionResolver injectionResolver = new MockInjectionResolver(
+            ImmutableMap.of(
+                JiraAuthenticationContext.class, new MockSimpleAuthenticationContext(testUser())
+            ),
+            ImmutableMap.of(
+                "testPlugin", testPlugin
+            )
+        );
 
         scriptService = new ScriptServiceImpl(
             pluginEventManager,
@@ -190,6 +200,19 @@ class ScriptServiceImplTest {
     @Test
     public void stcBugTest() throws Exception {
         scriptService.parseScriptStatic(FileUtil.readExample("stc-bug"), ImmutableMap.of());
+    }
+
+    @ParameterizedTest(name = "static: {0}")
+    @MethodSource("createBooleanValues")
+    public void withPluginParseTest(boolean isStatic) throws IOException {
+        String script = FileUtil.readExample("tests/withPlugin");
+        ParseContext parseContext;
+        if (isStatic) {
+            parseContext = scriptService.parseScript(script);
+        } else {
+            parseContext = scriptService.parseScriptStatic(script, ImmutableMap.of());
+        }
+        assertEquals(parseContext.getPlugins(), ImmutableSet.of("testPlugin"));
     }
 
     private ApplicationUser testUser() {

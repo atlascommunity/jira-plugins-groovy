@@ -7,9 +7,11 @@ import java.util.Map;
 
 public class MockInjectionResolver implements InjectionResolver {
     private final Map<Class, Object> objects;
+    private final Map<String, Plugin> plugins;
 
-    public MockInjectionResolver(Map<Class, Object> objects) {
+    public MockInjectionResolver(Map<Class, Object> objects, Map<String, Plugin> plugins) {
         this.objects = objects;
+        this.plugins = plugins;
     }
 
     @Override
@@ -24,6 +26,6 @@ public class MockInjectionResolver implements InjectionResolver {
 
     @Override
     public Plugin getPlugin(String pluginKey) {
-        throw new UnsupportedOperationException(); //todo
+        return plugins.get(pluginKey);
     }
 }
