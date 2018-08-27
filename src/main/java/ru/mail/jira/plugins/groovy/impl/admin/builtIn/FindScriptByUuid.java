@@ -136,7 +136,10 @@ public class FindScriptByUuid implements BuiltInScript {
                 "&workflowTransition=" + action.getId();
 
             return "Found: <a href=\"" + href + "\">" +
-                workflow.getName() + " - " + action.getName() + " - " + result.tab + " - " + (name != null ? name : "Unnamed") +
+                HtmlEscapers.htmlEscaper().escape(workflow.getName()) + " - " +
+                HtmlEscapers.htmlEscaper().escape(action.getName()) + " - " +
+                HtmlEscapers.htmlEscaper().escape(result.tab) + " - " +
+                (name != null ? HtmlEscapers.htmlEscaper().escape(name) : "Unnamed") +
                 "<a/>";
         }
 
