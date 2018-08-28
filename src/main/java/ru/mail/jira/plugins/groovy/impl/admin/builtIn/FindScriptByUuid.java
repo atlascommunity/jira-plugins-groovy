@@ -13,6 +13,7 @@ import com.google.common.html.HtmlEscapers;
 import com.google.common.net.UrlEscapers;
 import com.opensymphony.workflow.loader.*;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.StringPath;
@@ -74,7 +75,7 @@ public class FindScriptByUuid implements BuiltInScript {
         Tuple tuple = databaseAccessor.run(connection -> {
             SQLQueryFactory queryFactory = connection.query();
 
-            Union<Tuple> union = SQLExpressions.unionAll(
+            Expression<Tuple> union = SQLExpressions.unionAll(
                 getAbstractScriptQuery(QueryDslTables.ADMIN_SCRIPT, uuid, EntityType.ADMIN_SCRIPT),
                 getAbstractScriptQuery(QueryDslTables.JQL_FUNCTION, uuid, EntityType.JQL_FUNCTION),
                 getAbstractScriptQuery(QueryDslTables.LISTENER, uuid, EntityType.LISTENER),
@@ -89,7 +90,7 @@ public class FindScriptByUuid implements BuiltInScript {
                     )
                     .from(QueryDslTables.FIELD_CONFIG)
                     .where(QueryDslTables.FIELD_CONFIG.UUID.eq(uuid))
-            );
+            ).as("union");
 
             SQLQuery<Tuple> query = queryFactory
                 .select(
