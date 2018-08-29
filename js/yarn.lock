@@ -65,9 +65,9 @@
   dependencies:
     "@atlaskit/util-shared-styles" "^2.10.3"
 
-"@atlaskit/dropdown-menu@^6.1.10":
-  version "6.1.10"
-  resolved "https://registry.yarnpkg.com/@atlaskit/dropdown-menu/-/dropdown-menu-6.1.10.tgz#7360b7d4cb99c2ac55f872b11ab60a3c2485e4bd"
+"@atlaskit/dropdown-menu@^6.1.11":
+  version "6.1.11"
+  resolved "https://registry.yarnpkg.com/@atlaskit/dropdown-menu/-/dropdown-menu-6.1.11.tgz#85ed99342c660c4ba8e717cde8471109a84c8a69"
   dependencies:
     "@atlaskit/analytics-next" "^3.0.6"
     "@atlaskit/button" "^9.0.7"
@@ -173,6 +173,14 @@
 "@atlaskit/icon@^13.3.1":
   version "13.3.1"
   resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-13.3.1.tgz#5de43e798a0eaacb23aa16a67f39062beb7eacd4"
+  dependencies:
+    "@atlaskit/theme" "^6.0.1"
+    babel-runtime "^6.26.0"
+    uuid "^3.1.0"
+
+"@atlaskit/icon@^13.6.0":
+  version "13.6.0"
+  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-13.6.0.tgz#95dbfa19e00f27b0b5a469c90aa4fd337afd5344"
   dependencies:
     "@atlaskit/theme" "^6.0.1"
     babel-runtime "^6.26.0"
@@ -284,9 +292,9 @@
     "@atlaskit/icon" "^13.3.1"
     "@atlaskit/theme" "^6.0.1"
 
-"@atlaskit/select@^5.0.12":
-  version "5.0.12"
-  resolved "https://registry.yarnpkg.com/@atlaskit/select/-/select-5.0.12.tgz#f3d091a889c6817a248e7cf16df2e6b09f6f6e51"
+"@atlaskit/select@^5.0.13":
+  version "5.0.13"
+  resolved "https://registry.yarnpkg.com/@atlaskit/select/-/select-5.0.13.tgz#747d881f03a9121b29c0ce4eb1c32257328e3a7e"
   dependencies:
     "@atlaskit/analytics-next" "^3.0.6"
     "@atlaskit/icon" "^13.3.1"
@@ -296,7 +304,7 @@
     memoize-one "^3.0.1"
     react-fast-compare "^2.0.1"
     react-node-resolver "^1.0.1"
-    react-popper "^1.0.0"
+    react-popper "^1.0.2"
     react-select "^2.0.0-beta.7"
     react-transition-group "^2.2.1"
 
@@ -5930,9 +5938,9 @@ react-node-resolver@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/react-node-resolver/-/react-node-resolver-1.0.1.tgz#1798a729c0e218bf2f0e8ddf79c550d4af61d83a"
 
-react-popper@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-1.0.0.tgz#b99452144e8fe4acc77fa3d959a8c79e07a65084"
+react-popper@1.0.2, react-popper@^1.0.0, react-popper@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-1.0.2.tgz#0e72f338b7f15ab9f9ec884e36ae0dad78a3e301"
   dependencies:
     babel-runtime "6.x.x"
     create-react-context "^0.2.1"
