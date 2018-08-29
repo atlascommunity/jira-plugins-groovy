@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -200,6 +201,12 @@ class ScriptServiceImplTest {
     @Test
     public void stcBugTest() throws Exception {
         scriptService.parseScriptStatic(FileUtil.readExample("stc-bug"), ImmutableMap.of());
+    }
+
+    //todo: JD-318
+    @Test @Disabled
+    public void stcGetAtObjectBugTest() throws Exception {
+        scriptService.parseScriptStatic(FileUtil.readExample("tests/stc-getat-object-failure"), ImmutableMap.of());
     }
 
     @ParameterizedTest(name = "static: {0}")
