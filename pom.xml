@@ -75,12 +75,56 @@
             <version>1.16.16</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>2.4.15</version>
+            <artifactId>groovy</artifactId>
+            <version>${groovy.version}</version>
             <classifier>indy</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-datetime</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-json</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-jsr223</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-macro</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-sql</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-templates</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-xml</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
@@ -325,8 +369,10 @@
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
         <quick.reload.version>2.0.0</quick.reload.version>
-        <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
+        <groovy.version>2.5.2</groovy.version>
+
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
+
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
