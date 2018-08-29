@@ -197,11 +197,13 @@ class ScriptServiceImplTest {
         );
     }
 
+    //JD-308
     @Test
     public void stcBugTest() throws Exception {
         scriptService.parseScriptStatic(FileUtil.readExample("stc-bug"), ImmutableMap.of());
     }
 
+    //JD-318
     @Test
     public void stcGetAtObjectBugTest() throws Exception {
         scriptService.parseScriptStatic(FileUtil.readExample("tests/stc-getat-object-failure"), ImmutableMap.of());
