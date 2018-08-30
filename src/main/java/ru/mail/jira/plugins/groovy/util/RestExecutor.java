@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 public final class RestExecutor<T> {
-    private static final Logger log = LoggerFactory.getLogger(RestExecutor.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestExecutor.class);
 
     private final Map<Class, ExceptionMapper> exceptionMappers = new HashMap<>();
     private final RestExecutorSupplier<T> supplier;
@@ -95,9 +95,9 @@ public final class RestExecutor<T> {
                     "message", e.getMessage() != null ? e.getMessage() : e.getClass().getCanonicalName(),
                     "stack-trace", ExceptionHelper.writeExceptionToString(e)
                 );
-                log.error("REST Exception", e);
+                logger.error("REST Exception", e);
             } else {
-                log.trace("Handled exception", e);
+                logger.debug("Handled exception", e);
             }
 
             return Response
