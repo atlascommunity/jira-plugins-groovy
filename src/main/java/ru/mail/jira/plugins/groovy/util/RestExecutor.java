@@ -96,6 +96,8 @@ public final class RestExecutor<T> {
                     "stack-trace", ExceptionHelper.writeExceptionToString(e)
                 );
                 log.error("REST Exception", e);
+            } else {
+                log.trace("Handled exception", e);
             }
 
             return Response
