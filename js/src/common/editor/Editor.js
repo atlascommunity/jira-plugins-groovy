@@ -37,15 +37,10 @@ import {CodeMirror} from './CM';
 
 import {globalBindings} from '../bindings';
 
-import {preferenceService} from '../../service';
 import {CommonMessages} from '../../i18n/common.i18n';
 
 import './Editor.less';
 
-
-function isLight(): boolean {
-    return !(preferenceService.get('ru.mail.groovy.isLight') === 'false');
-}
 
 export type CodeMirrorType = {
     setSize: (width?: number|string, height: number|string) => void,
@@ -80,6 +75,10 @@ type EditorProps = {|
     value?: string,
     onChange?: (string) => void,
     isDisabled?: boolean,
+
+    isLight: boolean,
+    toggleTheme: () => void,
+
     markers?: $ReadOnlyArray<MarkerType>,
     bindings?: $ReadOnlyArray<BindingType>,
     returnTypes?: $ReadOnlyArray<ReturnType>,
@@ -93,7 +92,6 @@ type EditorProps = {|
 |};
 
 type EditorState = {|
-    isLight: boolean,
     height: number
 |};
 
@@ -117,10 +115,13 @@ export function transformMarkers(markers?: $ReadOnlyArray<MarkerType>): $ReadOnl
 //todo: change to PureComponent
 //todo: move theme state to redux
 export class Editor extends React.Component<EditorProps, EditorState> {
+    static defaultProps = {
+        isLight: false
+    };
+
     cm: ?CodeMirrorType = null;
 
     state = {
-        isLight: isLight(),
         height: 300
     };
 
@@ -130,19 +131,6 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         if (this.props.editorDidMount) {
             this.props.editorDidMount(editor);
         }
-    };
-
-    _switchTheme = (e: SyntheticEvent<any>) => {
-        if (e) {
-            e.preventDefault();
-        }
-
-        this.setState(
-            state => ({
-                isLight: !state.isLight
-            }),
-            () => preferenceService.put('ru.mail.groovy.isLight', this.state.isLight.toString())
-        );
     };
 
     _onChange = (_editor: CodeMirrorType, _data: any, value: string) => {
@@ -205,8 +193,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
     }
 
     render() {
-        const {onChange, value, bindings, returnTypes, decorated, resizable, decorator, readOnly, isDisabled, mode, validationState, linter} = this.props;
-        const {isLight} = this.state;
+        const {onChange, value, isLight, toggleTheme, bindings, returnTypes, decorated, resizable, decorator, readOnly, isDisabled, mode, validationState, linter} = this.props;
 
         const options = this._getOptions(readOnly, isDisabled, mode, isLight, linter);
 
@@ -243,7 +230,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                     </div>
                     <div className="flex-grow"/>
                     <div className="flex-vertical-middle">
-                        <Button appearance="link" spacing="none" onClick={this._switchTheme}>
+                        <Button appearance="link" spacing="none" onClick={toggleTheme}>
                             {CommonMessages.switchTheme}
                         </Button>
                     </div>

@@ -23,7 +23,7 @@ import type {ScriptParam} from './ScriptParameters';
 
 import type {VoidCallback} from '../types';
 
-import Editor from '../editor';
+import Editor, {EditorThemeContextConsumer} from '../editor';
 import {LoadingSpinner} from '../ak';
 
 import {CommonMessages} from '../../i18n/common.i18n';
@@ -183,11 +183,16 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             if (template) {
                 templateBlock = (
                     <div style={{overflow: 'hidden'}}>
-                        <Editor
-                            readOnly={true}
-                            mode={activeSource.id === 'current' ? 'velocity' : 'diff'}
-                            value={activeSource.id === 'current' ? template.body : activeSource.templateSource}
-                        />
+                        <EditorThemeContextConsumer>
+                            {context =>
+                                <Editor
+                                    readOnly={true}
+                                    mode={activeSource.id === 'current' ? 'velocity' : 'diff'}
+                                    value={activeSource.id === 'current' ? template.body : activeSource.templateSource}
+                                    {...context}
+                                />
+                            }
+                        </EditorThemeContextConsumer>
                     </div>
                 );
             }
@@ -213,11 +218,16 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                     {changelogsNode}
                     <div className="flex-grow flex-column">
                         <div style={{overflow: 'hidden'}}>
-                            <Editor
-                                readOnly={true}
-                                mode={activeSource.id === 'current' ? 'groovy' : 'diff'}
-                                value={activeSource.id === 'current' ? script && script.scriptBody : activeSource.source}
-                            />
+                            <EditorThemeContextConsumer>
+                                {context =>
+                                    <Editor
+                                        readOnly={true}
+                                        mode={activeSource.id === 'current' ? 'groovy' : 'diff'}
+                                        value={activeSource.id === 'current' ? script && script.scriptBody : activeSource.source}
+                                        {...context}
+                                    />
+                                }
+                            </EditorThemeContextConsumer>
                         </div>
                         {templateBlock}
                     </div>

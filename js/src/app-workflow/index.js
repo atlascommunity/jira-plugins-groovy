@@ -23,6 +23,7 @@ import '../flex.less';
 import './workflow.less';
 import {registryService, getBaseUrl} from '../service';
 import {RegistryMessages} from '../i18n/registry.i18n';
+import {EditorThemeContext} from '../common/editor';
 
 
 export type ScriptParamValueProps = {
@@ -69,41 +70,43 @@ function ScriptParamValue({value, param}: ScriptParamValueProps): Node {
 define('mailru/groovy/renderRegistryScript', (): any => {
     return (element: Element, id: number, name: string, source: string, description: string, errorCount?: number, warningCount?: number, params: Array<ParamType>, paramValues: {[string]: any}) => {
         ReactDOM.render(
-            <Script
-                withChangelog={true}
-                // eslint-disable-next-line react/jsx-no-bind
-                changelogsLoader={() => registryService.getScriptChangelogs(id)}
+            <EditorThemeContext>
+                <Script
+                    withChangelog={true}
+                    // eslint-disable-next-line react/jsx-no-bind
+                    changelogsLoader={() => registryService.getScriptChangelogs(id)}
 
-                script={{
-                    id: id,
-                    name: name,
-                    scriptBody: source,
-                    description, errorCount, warningCount
-                }}
+                    script={{
+                        id: id,
+                        name: name,
+                        scriptBody: source,
+                        description, errorCount, warningCount
+                    }}
 
-                additionalButtons={[
-                    <Button
-                        key="edit"
-                        appearance="subtle"
-                        iconBefore={<EditFilledIcon label=""/>}
+                    additionalButtons={[
+                        <Button
+                            key="edit"
+                            appearance="subtle"
+                            iconBefore={<EditFilledIcon label=""/>}
 
-                        href={`${getBaseUrl()}/plugins/servlet/my-groovy/registry/script/edit/${id}`}
-                    >
-                        {RegistryMessages.editScript}
-                    </Button>
-                ]}
-            >
-                {params &&
-                    <ScriptParameters
-                        params={params.map((param: ParamType): ScriptParam => {
-                            return {
-                                label: param.displayName,
-                                value: <ScriptParamValue value={paramValues[param.name]} param={param}/>
-                            };
-                        })}
-                    />
-                }
-            </Script>,
+                            href={`${getBaseUrl()}/plugins/servlet/my-groovy/registry/script/edit/${id}`}
+                        >
+                            {RegistryMessages.editScript}
+                        </Button>
+                    ]}
+                >
+                    {params &&
+                        <ScriptParameters
+                            params={params.map((param: ParamType): ScriptParam => {
+                                return {
+                                    label: param.displayName,
+                                    value: <ScriptParamValue value={paramValues[param.name]} param={param}/>
+                                };
+                            })}
+                        />
+                    }
+                </Script>
+            </EditorThemeContext>,
             element
         );
     };
@@ -112,19 +115,21 @@ define('mailru/groovy/renderRegistryScript', (): any => {
 define('mailru/groovy/renderInlineScript', (): any => {
     return (element: Element, id: string, name: string, source: string, errorCount?: number) => {
         ReactDOM.render(
-            <Script
-                withChangelog={false}
-                editable={false}
-                deletable={false}
+            <EditorThemeContext>
+                <Script
+                    withChangelog={false}
+                    editable={false}
+                    deletable={false}
 
-                script={{
-                    id: id,
-                    name: name || 'Inline script',
-                    scriptBody: source,
-                    inline: true,
-                    errorCount
-                }}
-            />,
+                    script={{
+                        id: id,
+                        name: name || 'Inline script',
+                        scriptBody: source,
+                        inline: true,
+                        errorCount
+                    }}
+                />
+            </EditorThemeContext>,
             element
         );
     };
@@ -133,7 +138,9 @@ define('mailru/groovy/renderInlineScript', (): any => {
 define('mailru/groovy/renderEditor', (): any => {
     return (element: Element, fieldName: string, initialValue: ?string) => {
         ReactDOM.render(
-            <FormEditor fieldName={fieldName} initialValue={initialValue}/>,
+            <EditorThemeContext>
+                <FormEditor fieldName={fieldName} initialValue={initialValue}/>
+            </EditorThemeContext>,
             element
         );
     };
@@ -142,7 +149,9 @@ define('mailru/groovy/renderEditor', (): any => {
 define('mailru/groovy/renderRegistryPicker', (): any => {
     return (element: Element, fieldName: string, type: ScriptType, scriptId: ?number, values: {[string]: any}) => {
         ReactDOM.render(
-            <RegistryPicker type={type} scriptId={scriptId} values={values} fieldName={fieldName}/>,
+            <EditorThemeContext>
+                <RegistryPicker type={type} scriptId={scriptId} values={values} fieldName={fieldName}/>
+            </EditorThemeContext>,
             element
         );
     };

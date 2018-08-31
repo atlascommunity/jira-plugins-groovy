@@ -26,6 +26,8 @@ import {ExtrasPage} from '../app-extras';
 
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
+import {EditorThemeContext} from '../common/editor';
+
 import '../flex.less';
 
 
@@ -41,23 +43,25 @@ AJS.toInit(() => {
 
     ReactDOM.render(
         <BrowserRouter basename={`${getBaseUrl()}/plugins/servlet/my-groovy`}>
-            <Fragment>
-                <Switch>
-                    <Route path="/" exact={true} component={MainApp}/>
-                    <Route path="/console" component={ConsoleRoute}/>
-                    <Route path="/admin-scripts" component={AdminRoute}/>
-                    <Route path="/registry" component={RegistryRoute}/>
-                    <Route path="/listeners" component={ListenersRoute}/>
-                    <Route path="/rest" component={RestRoute}/>
-                    <Route path="/fields" component={FieldsRoute}/>
-                    <Route path="/scheduled" component={ScheduledRoute}/>
-                    <Route path="/jql" component={JqlRoute}/>
-                    <Route path="/audit" component={AuditLogRoute}/>
-                    <Route path="/extras" component={ExtrasPage}/>
-                    <Route component={NotFoundPage}/>
-                </Switch>
-                <NavigationController/>
-            </Fragment>
+            <EditorThemeContext>
+                <Fragment>
+                    <Switch>
+                        <Route path="/" exact={true} component={MainApp}/>
+                        <Route path="/console" component={ConsoleRoute}/>
+                        <Route path="/admin-scripts" component={AdminRoute}/>
+                        <Route path="/registry" component={RegistryRoute}/>
+                        <Route path="/listeners" component={ListenersRoute}/>
+                        <Route path="/rest" component={RestRoute}/>
+                        <Route path="/fields" component={FieldsRoute}/>
+                        <Route path="/scheduled" component={ScheduledRoute}/>
+                        <Route path="/jql" component={JqlRoute}/>
+                        <Route path="/audit" component={AuditLogRoute}/>
+                        <Route path="/extras" component={ExtrasPage}/>
+                        <Route component={NotFoundPage}/>
+                    </Switch>
+                    <NavigationController/>
+                </Fragment>
+            </EditorThemeContext>
         </BrowserRouter>,
         element
     );

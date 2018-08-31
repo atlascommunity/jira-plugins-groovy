@@ -6,7 +6,7 @@ import Base, {Label} from '@atlaskit/field-base';
 import type {BindingType, MarkerType, ReturnType} from '../editor/types';
 import type {FieldProps, MutableFieldProps, AkFormFieldProps} from '../types';
 
-import Editor from '../editor';
+import Editor, {EditorThemeContextConsumer} from '../editor';
 
 import type {CodeMirrorType, ValidationState} from '../editor';
 
@@ -53,11 +53,16 @@ export class EditorField extends React.Component<EditorFieldProps> {
         return (
             <div className="ak-editor">
                 <Label label={label || ''} isRequired={isRequired} isLabelHidden={isLabelHidden}/>
-                <Editor
-                    decorator={this._decorateEditor}
-                    mode={mode}
-                    {...props}
-                />
+                <EditorThemeContextConsumer>
+                    {context =>
+                        <Editor
+                            decorator={this._decorateEditor}
+                            mode={mode}
+                            {...context}
+                            {...props}
+                        />
+                    }
+                </EditorThemeContextConsumer>
             </div>
         );
     }
