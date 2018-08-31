@@ -166,8 +166,12 @@ public class IssueFieldMatch extends AbstractBuiltInFunction {
         public void collect(int i) throws IOException {
             Document document = indexReader.document(i);
 
-            if (pattern.matcher(document.get(field)).matches()) {
-                issueIds.add(document.get(DocumentConstants.ISSUE_ID));
+            String value = document.get(field);
+
+            if (value != null) {
+                if (pattern.matcher(value).matches()) {
+                    issueIds.add(document.get(DocumentConstants.ISSUE_ID));
+                }
             }
         }
 
