@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptExecutionDto;
 import ru.mail.jira.plugins.groovy.api.entity.ScriptExecution;
-import ru.mail.jira.plugins.groovy.impl.repository.querydsl.QScriptExecution;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -27,7 +26,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static ru.mail.jira.plugins.groovy.util.QueryDslTables.REGISTRY_SCRIPT;
 import static ru.mail.jira.plugins.groovy.util.QueryDslTables.SCRIPT_EXECUTION;
 
 //todo: consider deleting executions when their count > 50
@@ -82,16 +83,26 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
     @Override
     public Map<Integer, Long> getRegistryErrorCount() {
         return databaseAccessor.run(connection ->
-            connection
-                .select(SCRIPT_EXECUTION.SCRIPT_ID, SCRIPT_EXECUTION.ID.count())
-                .from(SCRIPT_EXECUTION)
-                .where(
-                    SCRIPT_EXECUTION.SCRIPT_ID.isNotNull(),
-                    SCRIPT_EXECUTION.SUCCESSFUL.isFalse()
+                Stream.concat(
+                    connection
+                        .select(SCRIPT_EXECUTION.SCRIPT_ID, SCRIPT_EXECUTION.ID.count())
+                        .from(SCRIPT_EXECUTION)
+                        .where(
+                            SCRIPT_EXECUTION.SCRIPT_ID.isNotNull(),
+                            SCRIPT_EXECUTION.SUCCESSFUL.isFalse()
+                        )
+                        .groupBy(SCRIPT_EXECUTION.SCRIPT_ID)
+                        .fetch()
+                        .stream(),
+                    connection
+                        .select(REGISTRY_SCRIPT.ID, SCRIPT_EXECUTION.ID.count())
+                        .from(SCRIPT_EXECUTION)
+                        .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.INLINE_ID.eq(REGISTRY_SCRIPT.UUID))
+                        .where(SCRIPT_EXECUTION.SUCCESSFUL.isFalse())
+                        .groupBy(REGISTRY_SCRIPT.ID)
+                        .fetch()
+                        .stream()
                 )
-                .groupBy(SCRIPT_EXECUTION.SCRIPT_ID)
-                .fetch()
-                .stream()
                 .collect(Collectors.toMap(
                     tuple -> tuple.get(0, Integer.class),
                     tuple -> tuple.get(1, Long.class),
@@ -104,6 +115,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
     @Override
     public Map<Integer, Long> getRegistryWarningCount() {
         return databaseAccessor.run(connection ->
+            Stream.concat(
                 connection
                     .select(SCRIPT_EXECUTION.SCRIPT_ID, SCRIPT_EXECUTION.ID.count())
                     .from(SCRIPT_EXECUTION)
@@ -114,12 +126,24 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
                     )
                     .groupBy(SCRIPT_EXECUTION.SCRIPT_ID)
                     .fetch()
+                    .stream(),
+                connection
+                    .select(REGISTRY_SCRIPT.ID, SCRIPT_EXECUTION.ID.count())
+                    .from(SCRIPT_EXECUTION)
+                    .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.INLINE_ID.eq(REGISTRY_SCRIPT.UUID))
+                    .where(
+                        SCRIPT_EXECUTION.SUCCESSFUL.isTrue(),
+                        SCRIPT_EXECUTION.TIME.goe(WARNING_THRESHOLD)
+                    )
+                    .groupBy(REGISTRY_SCRIPT.ID)
+                    .fetch()
                     .stream()
-                    .collect(Collectors.toMap(
-                        tuple -> tuple.get(0, Integer.class),
-                        tuple -> tuple.get(1, Long.class),
-                        (a, b) -> a + b
-                    )),
+                )
+                .collect(Collectors.toMap(
+                    tuple -> tuple.get(0, Integer.class),
+                    tuple -> tuple.get(1, Long.class),
+                    (a, b) -> a + b
+                )),
             OnRollback.NOOP
         );
     }
