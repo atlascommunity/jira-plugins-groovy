@@ -17,7 +17,7 @@ SQSTRING: '\'' ( '\\\'' | . )*? '\'';
 
 WS : [ \r\t\n]+ -> skip ;
 
-UQSTRING: ('a'..'z' | 'A'..'Z' | '0'..'9' | '@' | '-' | '(' | ')')+;
+UQSTRING: ('a'..'z' | 'A'..'Z' | '0'..'9' | '@' | '-' | '(' | ')' | '.')+;
 
 str_expr: STRING;
 date_expr: STRING | UQSTRING;
