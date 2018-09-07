@@ -9,13 +9,7 @@ import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
-import com.atlassian.jira.jql.util.JqlDateSupport;
-import com.atlassian.jira.project.ProjectManager;
-import com.atlassian.jira.security.groups.GroupManager;
-import com.atlassian.jira.security.roles.ProjectRoleManager;
-import com.atlassian.jira.timezone.TimeZoneManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
@@ -30,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.CommentQueryParser;
 import ru.mail.jira.plugins.groovy.util.lucene.IssueIdCollector;
 
 import javax.annotation.Nonnull;
@@ -46,19 +41,11 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
     @Autowired
     public LastCommentFunction(
         @ComponentImport SearchProviderFactory searchProviderFactory,
-        @ComponentImport ProjectRoleManager projectRoleManager,
-        @ComponentImport TimeZoneManager timeZoneManager,
-        @ComponentImport ProjectManager projectManager,
-        @ComponentImport JqlDateSupport jqlDateSupport,
-        @ComponentImport GroupManager groupManager,
-        @ComponentImport UserManager userManager,
         @ComponentImport SearchProvider searchProvider,
-        @ComponentImport SearchService searchService
+        @ComponentImport SearchService searchService,
+        CommentQueryParser commentQueryParser
     ) {
-        super(
-            projectRoleManager, timeZoneManager, projectManager, jqlDateSupport, groupManager, userManager,
-            "lastComment", 1
-        );
+        super(commentQueryParser, "lastComment", 1);
         this.searchProviderFactory = searchProviderFactory;
         this.searchProvider = searchProvider;
         this.searchService = searchService;
