@@ -164,7 +164,7 @@ public class IssueFieldMatch extends AbstractBuiltInFunction {
 
         @Override
         public void collect(int i) throws IOException {
-            Document document = indexReader.document(i);
+            Document document = indexReader.document(i, fieldSelector);
 
             for (String value : document.getValues(field)) {
                 if (value != null) {
