@@ -59,7 +59,7 @@ public final class PluginLauncher implements LifecycleAware {
         LIFECYCLE_AWARE_STARTED
     }
 
-    private final Set<SystemPhase> systemPhases = Collections.synchronizedSet(new HashSet<SystemPhase>(SystemPhase.values().length));
+    private final Set<SystemPhase> systemPhases = Collections.synchronizedSet(new HashSet<>(SystemPhase.values().length));
 
     private final LazyReference<FullSystemInitializer> fullSystemInitializer = new LazyReference<FullSystemInitializer>() {
         @Override
