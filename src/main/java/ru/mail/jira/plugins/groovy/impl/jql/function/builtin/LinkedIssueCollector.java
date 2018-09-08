@@ -15,8 +15,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LinkedIssueCollector extends Collector {
-    public static final Filter ACCEPT_ALL = (it) -> true;
-
     private static final FieldSelector fieldSelector = new SetBasedFieldSelector(
         ImmutableSet.of(DocumentConstants.ISSUE_ID, DocumentConstants.ISSUE_KEY, CustomIssueLinkIndexer.FIELD_KEY),
         ImmutableSet.of()

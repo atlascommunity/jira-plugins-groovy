@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
@@ -69,14 +70,22 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
 
         if (args.size() == 1) {
             BooleanQuery booleanQuery = new BooleanQuery();
-            issueLinkTypeManager
+            List<String> prefixes = issueLinkTypeManager
                 .getIssueLinkTypes()
                 .stream()
                 .map(IssueLinkType::getId)
                 .map(IssueLinkIndexer::createValue)
-                .forEach(it -> booleanQuery.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, it)), BooleanClause.Occur.SHOULD));
+                .peek(it -> booleanQuery.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, it)), BooleanClause.Occur.SHOULD))
+                .collect(Collectors.toList());
 
-            LinkedIssueCollector collector = new LinkedIssueCollector(LinkedIssueCollector.ACCEPT_ALL);
+            LinkedIssueCollector collector = new LinkedIssueCollector(value -> {
+                for (String prefix : prefixes) {
+                    if (value.startsWith(prefix)) {
+                        return true;
+                    }
+                }
+                return false;
+            });
 
             doSearch(jqlQuery, booleanQuery, collector, user);
 
