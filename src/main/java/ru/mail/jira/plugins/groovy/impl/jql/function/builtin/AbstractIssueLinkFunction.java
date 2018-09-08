@@ -64,20 +64,25 @@ public abstract class AbstractIssueLinkFunction extends AbstractBuiltInFunction 
     }
 
     protected void validateLinkType(MessageSet messageSet, String name) {
-        Pair<IssueLinkType, Direction> linkType = findLinkType(name);
+        Pair<IssueLinkType, LinkDirection> linkType = findLinkType(name);
 
         if (linkType == null) {
             messageSet.addErrorMessage("Unable to find link type with name \"" + name + "\"");
         }
     }
 
-    protected Pair<IssueLinkType, Direction> findLinkType(String name) {
+    protected Pair<IssueLinkType, LinkDirection> findLinkType(String name) {
         for (IssueLinkType linkType : issueLinkTypeManager.getIssueLinkTypes()) {
-            if (linkType.getInward().equalsIgnoreCase(name)) {
-                return Pair.pair(linkType, Direction.IN);
+            boolean inward = linkType.getInward().equalsIgnoreCase(name);
+            boolean outward = linkType.getOutward().equalsIgnoreCase(name);
+            if (inward && outward) {
+                return Pair.pair(linkType, LinkDirection.BOTH);
             }
-            if (linkType.getOutward().equalsIgnoreCase(name)) {
-                return Pair.pair(linkType, Direction.OUT);
+            if (inward) {
+                return Pair.pair(linkType, LinkDirection.IN);
+            }
+            if (outward) {
+                return Pair.pair(linkType, LinkDirection.OUT);
             }
         }
         return null;
@@ -93,5 +98,9 @@ public abstract class AbstractIssueLinkFunction extends AbstractBuiltInFunction 
         }
 
         return queryResult.getQuery();
+    }
+
+    public enum LinkDirection {
+        IN, OUT, BOTH
     }
 }

@@ -21,6 +21,7 @@ import io.atlassian.fugue.Pair;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +47,13 @@ public class HasLinksFunction extends AbstractIssueLinkFunction {
     @Nonnull
     @Override
     public QueryFactoryResult getQuery(@Nonnull QueryCreationContext queryCreationContext, @Nonnull TerminalClause terminalClause) {
-        BooleanQuery booleanQuery = new BooleanQuery();
-
+        ApplicationUser user = queryCreationContext.getApplicationUser();
         FunctionOperand operand = (FunctionOperand) terminalClause.getOperand();
 
         List<String> args = operand.getArgs();
         if (args.size() == 0) {
+            BooleanQuery booleanQuery = new BooleanQuery();
+
             for (IssueLinkType issueLinkType : issueLinkTypeManager.getIssueLinkTypes()) {
                 booleanQuery.add(
                     new TermQuery(new Term(
@@ -67,13 +69,40 @@ public class HasLinksFunction extends AbstractIssueLinkFunction {
             );
         } else if (args.size() == 1) {
             String linkName = args.get(0);
-            Pair<IssueLinkType, Direction> linkType = findLinkType(linkName);
+            Pair<IssueLinkType, LinkDirection> linkType = findLinkType(linkName);
 
             if (linkType != null) {
+                LinkDirection linkDirection = linkType.right();
+                Query query;
+
+                if (linkDirection == LinkDirection.BOTH) {
+                    BooleanQuery booleanQuery = new BooleanQuery();
+
+                    booleanQuery.add(
+                        new TermQuery(new Term(
+                            DocumentConstants.ISSUE_LINKS,
+                            IssueLinkIndexer.createValue(linkType.left().getId(), Direction.IN)
+                        )),
+                        BooleanClause.Occur.SHOULD
+                    );
+                    booleanQuery.add(
+                        new TermQuery(new Term(
+                            DocumentConstants.ISSUE_LINKS,
+                            IssueLinkIndexer.createValue(linkType.left().getId(), Direction.OUT)
+                        )),
+                        BooleanClause.Occur.SHOULD
+                    );
+
+                    query = booleanQuery;
+                } else {
+                    query = new TermQuery(new Term(
+                        DocumentConstants.ISSUE_LINKS,
+                        IssueLinkIndexer.createValue(linkType.left().getId(), linkDirection == LinkDirection.IN ? Direction.IN : Direction.OUT)
+                    ));
+                }
+
                 return new QueryFactoryResult(
-                    new TermQuery(new Term(
-                        DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.left().getId(), linkType.right())
-                    )),
+                    query,
                     terminalClause.getOperator() == Operator.NOT_IN
                 );
             } else {
@@ -95,7 +124,7 @@ public class HasLinksFunction extends AbstractIssueLinkFunction {
         if (functionOperand.getArgs().size() == 1) {
             String name = functionOperand.getArgs().get(0);
 
-            Pair<IssueLinkType, Direction> linkType = findLinkType(name);
+            Pair<IssueLinkType, LinkDirection> linkType = findLinkType(name);
 
             if (linkType == null) {
                 messageSet.addErrorMessage("Unable to find link type with name \"" + name + "\"");

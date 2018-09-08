@@ -86,13 +86,24 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
             );
         } else {
             String linkTypeName = args.get(1);
-            Pair<IssueLinkType, Direction> linkType = findLinkType(linkTypeName);
+            Pair<IssueLinkType, LinkDirection> linkType = findLinkType(linkTypeName);
 
             if (linkType != null) {
-                return new QueryFactoryResult(
-                    getQuery(user, linkType.left(), linkType.right(), jqlQuery),
-                    terminalClause.getOperator() == Operator.NOT_IN
-                );
+                LinkDirection linkDirection = linkType.right();
+
+                org.apache.lucene.search.Query result;
+                if (linkDirection == LinkDirection.BOTH) {
+                    BooleanQuery booleanQuery = new BooleanQuery();
+
+                    booleanQuery.add(getQuery(user, linkType.left(), Direction.IN, jqlQuery), BooleanClause.Occur.SHOULD);
+                    booleanQuery.add(getQuery(user, linkType.left(), Direction.OUT, jqlQuery), BooleanClause.Occur.SHOULD);
+
+                    result = booleanQuery;
+                } else {
+                    result = getQuery(user, linkType.left(), linkDirection == LinkDirection.IN ? Direction.IN : Direction.OUT, jqlQuery);
+                }
+
+                return new QueryFactoryResult(result, terminalClause.getOperator() == Operator.NOT_IN);
             } else {
                 logger.error("Link type \"{}\" wasn't found", linkTypeName);
             }
