@@ -72,7 +72,7 @@ public abstract class AbstractIssueLinkFunction extends AbstractBuiltInFunction 
     }
 
     protected Pair<IssueLinkType, LinkDirection> findLinkType(String name) {
-        for (IssueLinkType linkType : issueLinkTypeManager.getIssueLinkTypes()) {
+        for (IssueLinkType linkType : issueLinkTypeManager.getIssueLinkTypes(false)) {
             boolean inward = linkType.getInward().equalsIgnoreCase(name);
             boolean outward = linkType.getOutward().equalsIgnoreCase(name);
             if (inward && outward) {
