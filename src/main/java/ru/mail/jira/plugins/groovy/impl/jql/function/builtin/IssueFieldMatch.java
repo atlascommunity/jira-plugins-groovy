@@ -168,7 +168,7 @@ public class IssueFieldMatch extends AbstractBuiltInFunction {
 
             for (String value : document.getValues(field)) {
                 if (value != null) {
-                    if (pattern.matcher(value).matches()) {
+                    if (pattern.matcher(value).find()) {
                         issueIds.add(document.get(DocumentConstants.ISSUE_ID));
                     }
                 }
