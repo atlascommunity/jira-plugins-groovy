@@ -8,8 +8,6 @@ import type {Map as MapType} from 'immutable';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 
-import type {FunctionType} from '@atlaskit/modal-dialog/dist/cjs/types';
-
 import {PropField} from './PropField';
 
 import type {AdminScriptOutcomeType, AdminScriptType} from './types';
@@ -114,7 +112,7 @@ export class RunDialog extends React.PureComponent<Props, State> {
         );
     };
 
-    _getActions = (): Array<{onClick: FunctionType, text: string}> => {
+    _getActions = (): * => {
         const {onClose} = this.props;
         const {stage, outcome} = this.state;
 
@@ -198,7 +196,7 @@ export class RunDialog extends React.PureComponent<Props, State> {
                 isHeadingMultiline={false}
                 heading={script.name}
 
-                onClose={stage !== 'running' && onClose}
+                onClose={stage !== 'running' ? onClose : undefined}
                 actions={this._getActions()}
             >
                 {content}

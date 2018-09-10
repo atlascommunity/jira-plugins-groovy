@@ -64,7 +64,7 @@ export class DeleteDialog extends React.PureComponent<Props, State> {
 
                 heading={i18n.heading}
 
-                onClose={!waiting && onClose}
+                onClose={!waiting ? onClose : undefined}
 
                 actions={[
                     {
