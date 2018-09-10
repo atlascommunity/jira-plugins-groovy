@@ -6,7 +6,9 @@ import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchProvider;
+import com.atlassian.jira.issue.search.constants.SystemSearchConstants;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
+import com.atlassian.jira.jql.ClauseInformation;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
@@ -107,7 +109,14 @@ public class IssueFieldMatch extends AbstractBuiltInFunction {
             return QueryFactoryResult.createFalseResult();
         }
 
-        PatternCollector collector = new PatternCollector(Pattern.compile(patternString), field);
+        String indexField = field;
+
+        ClauseInformation clauseInformation = SystemSearchConstants.getClauseInformationById(field);
+        if (clauseInformation != null) {
+            indexField = clauseInformation.getIndexField();
+        }
+
+        PatternCollector collector = new PatternCollector(Pattern.compile(patternString), indexField);
 
         try {
             searchProvider.search(query, user, collector);
