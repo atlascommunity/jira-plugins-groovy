@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.PluginLauncher;
 import ru.mail.jira.plugins.groovy.impl.jql.JqlFunctionServiceImpl;
 import ru.mail.jira.plugins.groovy.impl.jql.JqlInitializer;
 import ru.mail.jira.plugins.groovy.impl.listener.EventListenerInvoker;
@@ -26,9 +27,10 @@ import java.util.Set;
 
 //we use approach like in com.atlassian.greenhopper.Launcher
 @Component
-@ExportAsService(LifecycleAware.class)
-public final class PluginLauncher implements LifecycleAware {
-    private final Logger logger = LoggerFactory.getLogger(PluginLauncher.class);
+@ExportAsService({ PluginLauncher.class, LifecycleAware.class })
+public final class PluginLauncherImpl implements LifecycleAware, PluginLauncher {
+    private final Logger logger = LoggerFactory.getLogger(PluginLauncherImpl.class);
+
     private final EventPublisher eventPublisher;
     private final EventListenerInvoker eventListenerInvoker;
     private final ScheduledTaskServiceImpl scheduledTaskService;
@@ -36,8 +38,10 @@ public final class PluginLauncher implements LifecycleAware {
     private final JqlInitializer jqlInitializer;
     private final JqlFunctionServiceImpl jqlFunctionServiceImpl;
 
+    private volatile boolean initialized = false;
+
     @Autowired
-    public PluginLauncher(
+    public PluginLauncherImpl(
         @ComponentImport EventPublisher eventPublisher,
         EventListenerInvoker eventListenerInvoker,
         ScheduledTaskServiceImpl scheduledTaskService,
@@ -67,6 +71,11 @@ public final class PluginLauncher implements LifecycleAware {
             return new FullSystemInitializer();
         }
     };
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
 
     /**
      * First event in the lifecycle: Spring context comes up.
@@ -129,6 +138,8 @@ public final class PluginLauncher implements LifecycleAware {
             jqlFunctionServiceImpl.onStart();
 
             logger.info("Plugin initialized");
+
+            initialized = true;
         }
     }
 }
