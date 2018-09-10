@@ -60,7 +60,6 @@ class ViewJqlScriptInternal extends React.PureComponent<Props, State> {
                                     text="JQL scripts"
                                     href="/jql/"
 
-                                    //$FlowFixMe https://bitbucket.org/atlassian/atlaskit-mk-2/issues/91/breadcrumbsitem-component-weird-type
                                     component={RouterLink}
                                 />
                             ])}
