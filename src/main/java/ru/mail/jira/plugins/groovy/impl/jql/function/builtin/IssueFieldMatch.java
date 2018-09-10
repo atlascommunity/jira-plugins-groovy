@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
 import com.atlassian.jira.bc.issue.search.SearchService;
+import com.atlassian.jira.bc.project.component.ProjectComponentManager;
 import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.index.DocumentConstants;
@@ -12,6 +13,8 @@ import com.atlassian.jira.jql.ClauseInformation;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
+import com.atlassian.jira.project.ProjectConstant;
+import com.atlassian.jira.project.version.VersionManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -25,21 +28,23 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.SetBasedFieldSelector;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.ConstantScoreQuery;
-import org.apache.lucene.search.Scorer;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.util.lucene.IssueIdCollector;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 @Component
 public class IssueFieldMatch extends AbstractBuiltInFunction {
@@ -47,17 +52,23 @@ public class IssueFieldMatch extends AbstractBuiltInFunction {
     private final FieldManager fieldManager;
     private final SearchProvider searchProvider;
     private final SearchService searchService;
+    private final VersionManager versionManager;
+    private final ProjectComponentManager projectComponentManager;
 
     @Autowired
     public IssueFieldMatch(
         @ComponentImport FieldManager fieldManager,
         @ComponentImport SearchProvider searchProvider,
-        @ComponentImport SearchService searchService
+        @ComponentImport SearchService searchService,
+        @ComponentImport VersionManager versionManager,
+        @ComponentImport ProjectComponentManager projectComponentManager
     ) {
         super("issueFieldMatch", 3);
         this.fieldManager = fieldManager;
         this.searchProvider = searchProvider;
         this.searchService = searchService;
+        this.versionManager = versionManager;
+        this.projectComponentManager = projectComponentManager;
     }
 
     @Nonnull
@@ -116,7 +127,49 @@ public class IssueFieldMatch extends AbstractBuiltInFunction {
             indexField = clauseInformation.getIndexField();
         }
 
-        PatternCollector collector = new PatternCollector(Pattern.compile(patternString), indexField);
+        Pattern pattern = Pattern.compile(patternString);
+
+        Set<String> entityIds = null;
+        if (DocumentConstants.ISSUE_FIXVERSION.equals(indexField) || DocumentConstants.ISSUE_VERSION.equals(indexField)) {
+            entityIds = versionManager
+                .getAllVersions()
+                .stream()
+                .filter(it -> pattern.matcher(it.getName()).find())
+                .map(ProjectConstant::getId)
+                .map(Objects::toString)
+                .collect(Collectors.toSet());
+        } else if (DocumentConstants.ISSUE_COMPONENT.equals(indexField)) {
+            entityIds = projectComponentManager
+                .findAll()
+                .stream()
+                .filter(it -> pattern.matcher(it.getName()).find())
+                .map(ProjectConstant::getId)
+                .map(Objects::toString)
+                .collect(Collectors.toSet());
+        }
+
+        if (entityIds != null) {
+            BooleanQuery booleanQuery = new BooleanQuery();
+
+            for (String entityId : entityIds) {
+                booleanQuery.add(new TermQuery(new Term(indexField, entityId)), BooleanClause.Occur.SHOULD);
+            }
+
+            IssueIdCollector issueIdCollector = new IssueIdCollector();
+
+            try {
+                searchProvider.search(query, user, issueIdCollector, booleanQuery);
+            } catch (SearchException e) {
+                logger.error("Caught exception while searching", e);
+            }
+
+            return new QueryFactoryResult(
+                new ConstantScoreQuery(new IssueIdFilter(issueIdCollector.getIssueIds())),
+                terminalClause.getOperator() == Operator.NOT_IN
+            );
+        }
+
+        PatternCollector collector = new PatternCollector(pattern, indexField);
 
         try {
             searchProvider.search(query, user, collector);
