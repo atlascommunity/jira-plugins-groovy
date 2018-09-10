@@ -170,14 +170,16 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                         }
                         bottomBar={
                             <div className="flex-row">
-                                <FieldTextStateless
-                                    isLabelHidden
-                                    compact
-                                    label="hidden"
-                                    placeholder="Filter"
-                                    value={filter.name}
-                                    onChange={this._onFilterChange}
-                                />
+                                <div>
+                                    <FieldTextStateless
+                                        isLabelHidden
+                                        compact
+                                        label="hidden"
+                                        placeholder="Filter"
+                                        value={filter.name}
+                                        onChange={this._onFilterChange}
+                                    />
+                                </div>
                                 <div className="flex-vertical-middle">
                                     <CheckboxStateless
                                         label={RegistryMessages.onlyUnused}
