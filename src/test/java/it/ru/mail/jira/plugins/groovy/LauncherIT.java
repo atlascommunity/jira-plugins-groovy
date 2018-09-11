@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.impl;
+package it.ru.mail.jira.plugins.groovy;
 
 import com.adaptavist.shrinkwrap.atlassian.plugin.api.AtlassianPluginArchive;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;

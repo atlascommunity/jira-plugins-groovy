@@ -382,6 +382,26 @@
                             <version>${quick.reload.version}</version>
                         </pluginArtifact>
                     </pluginArtifacts>
+
+                    <products>
+                        <product>
+                            <id>jira</id>
+                            <instanceId>jira</instanceId>
+                            <version>${jira.version}</version>
+                            <productDataVersion>${jira.version}</productDataVersion>
+                        </product>
+                    </products>
+                    <testGroups>
+                        <testGroup>
+                            <id>jira-integration</id>
+                            <productIds>
+                                <productId>jira</productId>
+                            </productIds>
+                            <includes>
+                                <include>*IT.java</include>
+                            </includes>
+                        </testGroup>
+                    </testGroups>
                 </configuration>
             </plugin>
             <plugin>
