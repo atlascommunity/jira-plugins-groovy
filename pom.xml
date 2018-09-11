@@ -386,7 +386,7 @@
                     <products>
                         <product>
                             <id>jira</id>
-                            <instanceId>jira</instanceId>
+                            <instanceId>jira-current</instanceId>
                             <version>${jira.version}</version>
                             <productDataVersion>${jira.version}</productDataVersion>
                         </product>
@@ -398,7 +398,7 @@
                                 <productId>jira</productId>
                             </productIds>
                             <includes>
-                                <include>*IT.java</include>
+                                <include>it/**/*IT.java</include>
                             </includes>
                         </testGroup>
                     </testGroups>
