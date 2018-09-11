@@ -16,7 +16,7 @@ import javax.inject.Inject;
 
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.*;
 
 @RunWith(Arquillian.class)
 public class ScriptServiceIT {
@@ -34,10 +34,17 @@ public class ScriptServiceIT {
     }
 
     @Test
+    public void basicScriptShouldRun() throws Exception {
+        Object result = scriptService.executeScript(null, "return 'test'", ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertEquals(result, "test");
+    }
+
+    @Test
     public void jsonShouldBeParsed() throws Exception {
         String script = FileUtil.readArquillianExample("tests/jsonSlurper");
 
-        Object result = scriptService.executeScript(null, script, ScriptType.ADMIN_SCRIPT, ImmutableMap.of());
+        Object result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
 
         assertEquals(result, ImmutableMap.of("test", "value"));
     }
