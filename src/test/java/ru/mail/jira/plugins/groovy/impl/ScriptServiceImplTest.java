@@ -211,6 +211,21 @@ class ScriptServiceImplTest {
 
     @ParameterizedTest(name = "static: {0}")
     @MethodSource("createBooleanValues")
+    public void jsonSlurperTest(boolean isStatic) throws Exception {
+        String script = FileUtil.readExample("tests/jsonSlurper");
+
+        Object result;
+        if (isStatic) {
+            result = scriptService.executeScriptStatic(null, script, ScriptType.ADMIN_SCRIPT, ImmutableMap.of(), ImmutableMap.of());
+        } else {
+            result = scriptService.executeScript(null, script, ScriptType.ADMIN_SCRIPT, ImmutableMap.of());
+        }
+
+        assertEquals(result, ImmutableMap.of("test", "value"));
+    }
+
+    @ParameterizedTest(name = "static: {0}")
+    @MethodSource("createBooleanValues")
     public void withPluginParseTest(boolean isStatic) throws IOException {
         String script = FileUtil.readExample("tests/withPlugin");
         ParseContext parseContext;

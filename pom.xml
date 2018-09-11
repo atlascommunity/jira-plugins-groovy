@@ -346,7 +346,7 @@
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>
-                        <Export-Package>ru.mail.jira.plugins.groovy.api,</Export-Package>
+                        <Export-Package>ru.mail.jira.plugins.groovy.api.*,</Export-Package>
                         <Import-Package>
                             <!-- imports -->
                             org.springframework.osgi.*;resolution:="optional",
