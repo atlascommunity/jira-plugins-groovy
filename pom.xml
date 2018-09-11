@@ -86,7 +86,7 @@
             <version>${groovy.version}</version>
             <classifier>indy</classifier>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-datetime</artifactId>
             <version>${groovy.version}</version>
@@ -97,7 +97,7 @@
                     <artifactId>groovy</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-json</artifactId>
@@ -122,7 +122,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-macro</artifactId>
             <version>${groovy.version}</version>
@@ -133,7 +133,7 @@
                     <artifactId>groovy</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-sql</artifactId>
@@ -453,7 +453,7 @@
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
         <quick.reload.version>2.0.0</quick.reload.version>
-        <groovy.version>2.5.2</groovy.version>
+        <groovy.version>2.4.15</groovy.version>
 
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
 
