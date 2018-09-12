@@ -4,6 +4,7 @@ import org.apache.felix.framework.BundleWiringImpl;
 import org.codehaus.groovy.ast.*;
 import org.codehaus.groovy.ast.expr.*;
 import org.codehaus.groovy.control.SourceUnit;
+import ru.mail.jira.plugins.groovy.api.script.ScriptInjection;
 
 import java.util.Optional;
 

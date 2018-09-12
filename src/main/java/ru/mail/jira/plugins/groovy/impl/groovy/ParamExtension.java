@@ -12,6 +12,7 @@ import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.script.ParamType;
+import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 import ru.mail.jira.plugins.groovy.api.script.WithParam;
 
 public class ParamExtension extends CompilationCustomizer {

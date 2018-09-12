@@ -4,7 +4,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import ru.mail.jira.plugins.groovy.api.dto.*;
 import ru.mail.jira.plugins.groovy.api.dto.directory.*;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
-import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
+import ru.mail.jira.plugins.groovy.api.dto.PickerOption;
 
 import java.util.List;
 

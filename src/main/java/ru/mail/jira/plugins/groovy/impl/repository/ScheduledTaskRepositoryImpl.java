@@ -34,7 +34,7 @@ import ru.mail.jira.plugins.groovy.api.dto.scheduled.TransitionOptionsDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.api.repository.ScheduledTaskRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
+import ru.mail.jira.plugins.groovy.api.dto.PickerOption;
 import ru.mail.jira.plugins.groovy.impl.scheduled.JobUtil;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.impl.AuditService;

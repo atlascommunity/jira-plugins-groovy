@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.impl.dto;
+package ru.mail.jira.plugins.groovy.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

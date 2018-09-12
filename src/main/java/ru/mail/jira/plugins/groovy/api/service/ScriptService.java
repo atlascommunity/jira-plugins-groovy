@@ -2,8 +2,7 @@ package ru.mail.jira.plugins.groovy.api.service;
 
 import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
-import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
-import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
+import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 
 import java.util.Map;
 

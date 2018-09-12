@@ -1,7 +1,6 @@
 package ru.mail.jira.plugins.groovy.api.script;
 
 import lombok.Getter;
-import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
 
 @Getter
 public class CompiledScript {

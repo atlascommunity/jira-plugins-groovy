@@ -8,6 +8,7 @@ import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.runtime.MetaClassHelper;
 import org.codehaus.groovy.transform.sc.StaticCompilationMetadataKeys;
 import org.codehaus.groovy.transform.stc.StaticTypesMarker;
+import ru.mail.jira.plugins.groovy.api.script.statik.WarningMessage;
 
 import java.util.ArrayList;
 import java.util.List;

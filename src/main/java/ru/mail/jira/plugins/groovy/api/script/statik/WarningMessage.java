@@ -1,13 +1,9 @@
-package ru.mail.jira.plugins.groovy.impl.groovy.statik;
+package ru.mail.jira.plugins.groovy.api.script.statik;
 
 import lombok.Getter;
-import org.codehaus.groovy.control.Janitor;
-import org.codehaus.groovy.control.messages.Message;
-
-import java.io.PrintWriter;
 
 @Getter
-public class WarningMessage extends Message {
+public class WarningMessage {
     private final String message;
     private final int startLine;
     private final int startColumn;
@@ -20,10 +16,5 @@ public class WarningMessage extends Message {
         this.startColumn = startColumn;
         this.endLine = endLine;
         this.endColumn = endColumn;
-    }
-
-    @Override
-    public void write(PrintWriter writer, Janitor janitor) {
-
     }
 }

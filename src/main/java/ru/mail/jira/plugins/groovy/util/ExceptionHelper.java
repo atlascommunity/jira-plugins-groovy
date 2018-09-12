@@ -4,9 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.messages.ExceptionMessage;
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
+import org.codehaus.groovy.syntax.SyntaxException;
 import ru.mail.jira.plugins.groovy.api.dto.error.CompilationMessage;
 import ru.mail.jira.plugins.groovy.api.dto.error.PositionedCompilationMessage;
-import ru.mail.jira.plugins.groovy.impl.groovy.statik.WarningMessage;
+import ru.mail.jira.plugins.groovy.api.script.statik.WarningMessage;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -38,7 +39,7 @@ public final class ExceptionHelper {
 
     public static Object mapCompilationMessage(String type, Object message) {
         if (message instanceof SyntaxErrorMessage) {
-            return PositionedCompilationMessage.fromErrorMessage(type, (SyntaxErrorMessage) message);
+            return buildCompilationMessage(type, (SyntaxErrorMessage) message);
         }
         if (message instanceof ExceptionMessage) {
             return new CompilationMessage(type, ((ExceptionMessage) message).getCause().getMessage());
@@ -54,5 +55,19 @@ public final class ExceptionHelper {
             return e.getMessage();
         }
         return e.getClass().getSimpleName();
+    }
+
+    private static PositionedCompilationMessage buildCompilationMessage(String type, SyntaxErrorMessage message) {
+        SyntaxException cause = message.getCause();
+
+        PositionedCompilationMessage result = new PositionedCompilationMessage();
+        result.setStartLine(cause.getStartLine());
+        result.setEndLine(cause.getEndLine());
+        result.setStartColumn(cause.getStartColumn());
+        result.setEndColumn(cause.getEndColumn());
+        result.setMessage(cause.getMessage());
+        result.setType(type);
+
+        return result;
     }
 }

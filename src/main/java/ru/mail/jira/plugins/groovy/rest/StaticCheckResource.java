@@ -12,12 +12,11 @@ import ru.mail.jira.plugins.groovy.api.dto.error.PositionedCompilationMessage;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptFunction;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
-import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
+import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 import ru.mail.jira.plugins.groovy.impl.groovy.statik.TypeUtil;
 import ru.mail.jira.plugins.groovy.util.DelegatingClassLoader;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.RestExecutor;
-import ru.mail.jira.plugins.groovy.util.ValidationException;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

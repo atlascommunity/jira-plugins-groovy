@@ -13,6 +13,7 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
+import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 
 import java.util.List;
 import java.util.Set;

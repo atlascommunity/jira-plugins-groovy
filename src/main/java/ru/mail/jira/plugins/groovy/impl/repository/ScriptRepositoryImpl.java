@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
-import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
+import ru.mail.jira.plugins.groovy.api.dto.PickerOption;
 import ru.mail.jira.plugins.groovy.util.*;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
@@ -24,7 +24,7 @@ import ru.mail.jira.plugins.groovy.api.dto.directory.*;
 import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.api.service.WatcherService;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
-import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
+import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 
 import java.sql.Timestamp;
 import java.text.Collator;

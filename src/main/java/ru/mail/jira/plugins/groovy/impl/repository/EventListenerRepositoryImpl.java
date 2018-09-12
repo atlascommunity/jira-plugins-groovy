@@ -25,9 +25,9 @@ import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerDto;
 import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerForm;
-import ru.mail.jira.plugins.groovy.impl.listener.ConditionType;
-import ru.mail.jira.plugins.groovy.impl.listener.ScriptedEventListener;
-import ru.mail.jira.plugins.groovy.impl.listener.ConditionDescriptor;
+import ru.mail.jira.plugins.groovy.api.dto.listener.ConditionType;
+import ru.mail.jira.plugins.groovy.api.dto.listener.ScriptedEventListener;
+import ru.mail.jira.plugins.groovy.api.dto.listener.ConditionDescriptor;
 
 import javax.annotation.Nonnull;
 import java.util.*;

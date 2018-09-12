@@ -3,8 +3,7 @@ package ru.mail.jira.plugins.groovy.api.dto.scheduled;
 import lombok.Getter;
 import lombok.Setter;
 import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
-import ru.mail.jira.plugins.groovy.api.dto.JiraUser;
-import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
+import ru.mail.jira.plugins.groovy.api.dto.PickerOption;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
