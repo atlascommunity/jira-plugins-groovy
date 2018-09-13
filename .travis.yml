@@ -19,7 +19,7 @@ matrix:
       install: true
       script:
         - cd js
-        - yarn install
+        - yarn install --frozen-lockfile
         - yarn build-prod
         - yarn flow check
 notifications:
