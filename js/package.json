@@ -89,7 +89,7 @@
     "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-react": "^7.11.1",
     "file-loader": "^2.0.0",
-    "flow-bin": "^0.80.0",
+    "flow-bin": "^0.81.0",
     "less": "^3.8.1",
     "less-loader": "^4.0.5",
     "mini-css-extract-plugin": "^0.4.2",
