@@ -389,13 +389,20 @@
                             <instanceId>jira-current</instanceId>
                             <version>${jira.version}</version>
                             <productDataVersion>${jira.version}</productDataVersion>
+
+                            <applications>
+                                <application>
+                                    <applicationKey>jira-software</applicationKey>
+                                    <version>${jira.version}</version>
+                                </application>
+                            </applications>
                         </product>
                     </products>
                     <testGroups>
                         <testGroup>
                             <id>jira-integration</id>
                             <productIds>
-                                <productId>jira-software</productId>
+                                <productId>jira</productId>
                             </productIds>
                             <includes>
                                 <include>it/**/*IT.java</include>
