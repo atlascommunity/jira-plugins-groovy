@@ -383,30 +383,45 @@
                         </pluginArtifact>
                     </pluginArtifacts>
 
-                    <applications>
-                        <application>
-                            <applicationKey>jira-software</applicationKey>
-                        </application>
-                    </applications>
-
                     <products>
                         <product>
                             <id>jira</id>
                             <instanceId>jira-current</instanceId>
                             <version>${jira.version}</version>
                             <productDataVersion>${jira.version}</productDataVersion>
+
+                            <applications>
+                                <application>
+                                    <applicationKey>jira-software</applicationKey>
+                                    <version>${jira.version}</version>
+                                </application>
+                            </applications>
                         </product>
                         <product>
                             <id>jira</id>
                             <instanceId>jira-latest</instanceId>
                             <version>7.12.1</version>
                             <productDataVersion>7.12.1</productDataVersion>
+
+                            <applications>
+                                <application>
+                                    <applicationKey>jira-software</applicationKey>
+                                    <version>7.12.1</version>
+                                </application>
+                            </applications>
                         </product>
                         <product>
                             <id>jira</id>
                             <instanceId>jira-73</instanceId>
                             <version>7.3.9</version>
                             <productDataVersion>7.3.9</productDataVersion>
+
+                            <applications>
+                                <application>
+                                    <applicationKey>jira-software</applicationKey>
+                                    <version>7.3.9</version>
+                                </application>
+                            </applications>
                         </product>
                     </products>
                     <testGroups>
