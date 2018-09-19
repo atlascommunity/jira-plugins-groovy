@@ -170,23 +170,16 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         String scriptId, String scriptString, ScriptType type, Map<String, Object> externalBindings,
         boolean compileStatic, Map<String, Class> types
     ) throws Exception {
-        //todo: r lock
-
         logger.debug("started execution");
 
         CompiledScript compiledScript = null;
 
-        boolean scriptIdPresent = scriptId != null;
-        if (scriptIdPresent) {
-            compiledScript = scriptCache.getIfPresent(scriptId);
+        if (scriptId != null) {
+            compiledScript = scriptCache.get(scriptId, ignore -> parseClass(scriptString, false, compileStatic, types));
         }
 
         if (compiledScript == null) {
             compiledScript = parseClass(scriptString, false, compileStatic, types);
-
-            if (scriptIdPresent) {
-                scriptCache.put(scriptId, compiledScript);
-            }
         }
 
         //make sure that plugin classes can be loaded for cached scripts
