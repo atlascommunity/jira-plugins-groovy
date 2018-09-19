@@ -386,25 +386,24 @@
                     <applications>
                         <application>
                             <applicationKey>jira-software</applicationKey>
-                            <version>${jira.version}</version>
                         </application>
                     </applications>
 
                     <products>
                         <product>
-                            <id>jira-software</id>
+                            <id>jira</id>
                             <instanceId>jira-current</instanceId>
                             <version>${jira.version}</version>
                             <productDataVersion>${jira.version}</productDataVersion>
                         </product>
                         <product>
-                            <id>jira-software</id>
+                            <id>jira</id>
                             <instanceId>jira-latest</instanceId>
                             <version>7.12.1</version>
                             <productDataVersion>7.12.1</productDataVersion>
                         </product>
                         <product>
-                            <id>jira-software</id>
+                            <id>jira</id>
                             <instanceId>jira-73</instanceId>
                             <version>7.3.9</version>
                             <productDataVersion>7.3.9</productDataVersion>
