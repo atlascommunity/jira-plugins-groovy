@@ -432,11 +432,27 @@
                     </products>
                     <testGroups>
                         <testGroup>
-                            <id>jira-integration</id>
+                            <id>jira-current</id>
+                            <productIds>
+                                <productId>jira</productId>
+                            </productIds>
+                            <includes>
+                                <include>it/**/*IT.java</include>
+                            </includes>
+                        </testGroup>
+                        <testGroup>
+                            <id>jira-oldest</id>
+                            <productIds>
+                                <productId>jira-73</productId>
+                            </productIds>
+                            <includes>
+                                <include>it/**/*IT.java</include>
+                            </includes>
+                        </testGroup>
+                        <testGroup>
+                            <id>jira-latest</id>
                             <productIds>
                                 <productId>jira-latest</productId>
-                                <productId>jira</productId>
-                                <productId>jira-73</productId>
                             </productIds>
                             <includes>
                                 <include>it/**/*IT.java</include>
