@@ -11,6 +11,7 @@ import com.atlassian.jira.issue.fields.config.manager.FieldConfigManager;
 import com.atlassian.jira.issue.fields.config.manager.FieldConfigSchemeManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableList;
 import net.java.ao.DBParam;
@@ -50,6 +51,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
+@ExportAsDevService
 public class FieldConfigRepositoryImpl implements FieldConfigRepository {
     private final Logger logger = LoggerFactory.getLogger(FieldConfigRepositoryImpl.class);
 
