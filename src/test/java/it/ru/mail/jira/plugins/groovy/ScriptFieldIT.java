@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(Arquillian.class)
-public class ScriptFieldTest {
+public class ScriptFieldIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
         "tests/scriptField"
     );
