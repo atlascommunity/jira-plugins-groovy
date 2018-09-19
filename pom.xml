@@ -395,7 +395,7 @@
                         <testGroup>
                             <id>jira-integration</id>
                             <productIds>
-                                <productId>jira</productId>
+                                <productId>jira-software</productId>
                             </productIds>
                             <includes>
                                 <include>it/**/*IT.java</include>
