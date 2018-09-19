@@ -434,7 +434,7 @@
                         <testGroup>
                             <id>jira-current</id>
                             <productIds>
-                                <productId>jira</productId>
+                                <productId>jira-current</productId>
                             </productIds>
                             <includes>
                                 <include>it/**/*IT.java</include>
