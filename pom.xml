@@ -390,6 +390,8 @@
                             <version>${jira.version}</version>
                             <productDataVersion>${jira.version}</productDataVersion>
 
+                            <shutdownTimeout>${shutdownTimeout}</shutdownTimeout>
+
                             <applications>
                                 <application>
                                     <applicationKey>jira-software</applicationKey>
@@ -403,6 +405,8 @@
                             <version>7.12.1</version>
                             <productDataVersion>7.12.1</productDataVersion>
 
+                            <shutdownTimeout>${shutdownTimeout}</shutdownTimeout>
+
                             <applications>
                                 <application>
                                     <applicationKey>jira-software</applicationKey>
@@ -415,6 +419,8 @@
                             <instanceId>jira-73</instanceId>
                             <version>7.3.9</version>
                             <productDataVersion>7.3.9</productDataVersion>
+
+                            <shutdownTimeout>${shutdownTimeout}</shutdownTimeout>
 
                             <applications>
                                 <application>
@@ -489,6 +495,8 @@
         <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
         <quick.reload.version>2.0.0</quick.reload.version>
         <groovy.version>2.4.15</groovy.version>
+
+        <shutdownTimeout>60000</shutdownTimeout>
 
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
 
