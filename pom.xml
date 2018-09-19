@@ -383,26 +383,40 @@
                         </pluginArtifact>
                     </pluginArtifacts>
 
+                    <applications>
+                        <application>
+                            <applicationKey>jira-software</applicationKey>
+                            <version>${jira.version}</version>
+                        </application>
+                    </applications>
+
                     <products>
                         <product>
-                            <id>jira</id>
+                            <id>jira-software</id>
                             <instanceId>jira-current</instanceId>
                             <version>${jira.version}</version>
                             <productDataVersion>${jira.version}</productDataVersion>
-
-                            <applications>
-                                <application>
-                                    <applicationKey>jira-software</applicationKey>
-                                    <version>${jira.version}</version>
-                                </application>
-                            </applications>
+                        </product>
+                        <product>
+                            <id>jira-software</id>
+                            <instanceId>jira-latest</instanceId>
+                            <version>7.12.1</version>
+                            <productDataVersion>7.12.1</productDataVersion>
+                        </product>
+                        <product>
+                            <id>jira-software</id>
+                            <instanceId>jira-73</instanceId>
+                            <version>7.3.9</version>
+                            <productDataVersion>7.3.9</productDataVersion>
                         </product>
                     </products>
                     <testGroups>
                         <testGroup>
                             <id>jira-integration</id>
                             <productIds>
+                                <productId>jira-latest</productId>
                                 <productId>jira</productId>
+                                <productId>jira-73</productId>
                             </productIds>
                             <includes>
                                 <include>it/**/*IT.java</include>
