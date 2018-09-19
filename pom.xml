@@ -402,30 +402,30 @@
                         <product>
                             <id>jira</id>
                             <instanceId>jira-latest</instanceId>
-                            <version>7.12.1</version>
-                            <productDataVersion>7.12.1</productDataVersion>
+                            <version>${jira.latest.version}</version>
+                            <productDataVersion>${jira.latest.version}</productDataVersion>
 
                             <shutdownTimeout>${shutdownTimeout}</shutdownTimeout>
 
                             <applications>
                                 <application>
                                     <applicationKey>jira-software</applicationKey>
-                                    <version>7.12.1</version>
+                                    <version>${jira.latest.version}</version>
                                 </application>
                             </applications>
                         </product>
                         <product>
                             <id>jira</id>
                             <instanceId>jira-73</instanceId>
-                            <version>7.3.9</version>
-                            <productDataVersion>7.3.9</productDataVersion>
+                            <version>${jira.oldest.version}</version>
+                            <productDataVersion>${jira.oldest.version}</productDataVersion>
 
                             <shutdownTimeout>${shutdownTimeout}</shutdownTimeout>
 
                             <applications>
                                 <application>
                                     <applicationKey>jira-software</applicationKey>
-                                    <version>7.3.9</version>
+                                    <version>${jira.oldest.version}</version>
                                 </application>
                             </applications>
                         </product>
@@ -503,6 +503,9 @@
     </build>
     <properties>
         <jira.version>7.10.2</jira.version>
+        <jira.oldest.version>7.3.0</jira.oldest.version>
+        <jira.latest.version>7.12.1</jira.latest.version>
+
         <gh.version>7.10.0-DAILY20180821023118</gh.version>
         <amps.version>6.3.14</amps.version>
         <ao.version>1.5.0</ao.version>
