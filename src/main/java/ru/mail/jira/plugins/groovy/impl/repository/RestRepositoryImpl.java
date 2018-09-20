@@ -4,6 +4,7 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableSet;
 import net.java.ao.DBParam;
@@ -28,6 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@ExportAsDevService
 public class RestRepositoryImpl implements RestRepository {
     private final ActiveObjects ao;
     private final I18nHelper i18nHelper;
