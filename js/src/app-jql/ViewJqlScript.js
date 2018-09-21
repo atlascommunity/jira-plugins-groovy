@@ -68,9 +68,9 @@ class ViewJqlScriptInternal extends React.PureComponent<Props, State> {
                 >
                     {script ? script.name : 'Unknown script'}
                 </PageHeader>
-                {script ?
-                    <JqlScript script={script} collapsible={false} onDelete={this._toggleDelete}/> :
-                    <NotFoundPage/>
+                {script
+                    ? <JqlScript script={script} collapsible={false} onDelete={this._toggleDelete}/>
+                    : <NotFoundPage/>
                 }
                 {isDeleting && script &&
                     <DeleteDialog

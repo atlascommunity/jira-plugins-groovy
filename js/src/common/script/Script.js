@@ -238,22 +238,23 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                 executionBar = (
                     <div className="executions">
                         {executionsReady &&
-                        <div className="flex-row">
-                            <ExecutionBar executions={executions}/>
-                            {onlyLastExecutions && <div className="flex-grow"/>}
-                            {onlyLastExecutions &&
-                            <div>
-                                <Button
-                                    appearance="subtle"
-                                    iconBefore={<RecentIcon label=""/>}
-                                    spacing="compact"
+                            <div className="flex-row">
+                                <ExecutionBar executions={executions}/>
+                                {onlyLastExecutions && <div className="flex-grow"/>}
+                                {onlyLastExecutions &&
+                                    <div>
+                                        <Button
+                                            appearance="subtle"
+                                            iconBefore={<RecentIcon label=""/>}
+                                            spacing="compact"
 
-                                    onClick={this._showAllExecutions}
-                                >
-                                    {CommonMessages.showAll}
-                                </Button>
-                            </div>}
-                        </div>
+                                            onClick={this._showAllExecutions}
+                                        >
+                                            {CommonMessages.showAll}
+                                        </Button>
+                                    </div>
+                                }
+                            </div>
                         }
                         {!executionsReady && <Spinner size="small"/>}
                     </div>
@@ -338,41 +339,44 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             <div className={`scriptRow ${!isOpen ? 'collapsed' : ''} ${template ? 'withTemplate' : ''}`}>
                 {!headerless &&
                 <div className="flex-row title">
-                    {title ?
-                        <div className="flex-grow flex-vertical-middle">
-                            {title}
-                        </div>
-                        :
-                        <div className="flex-grow flex-row">
-                            <div className="flex-vertical-middle flex-none">
-                                <CodeIcon label=""/>
+                    {title
+                        ? (
+                            <div className="flex-grow flex-vertical-middle">
+                                {title}
                             </div>
-                            {' '}
-                            <div className="flex-vertical-middle">
-                                <h3 title={script && script.name}>
-                                    {scriptName || (script && script.name)}
-                                </h3>
+                        )
+                        : (
+                            <div className="flex-grow flex-row">
+                                <div className="flex-vertical-middle flex-none">
+                                    <CodeIcon label=""/>
+                                </div>
+                                {' '}
+                                <div className="flex-vertical-middle">
+                                    <h3 title={script && script.name}>
+                                        {scriptName || (script && script.name)}
+                                    </h3>
+                                </div>
+                                {script && !!script.warningCount &&
+                                    <div className="flex-vertical-middle flex-none errorCount">
+                                        <div>
+                                            <Badge
+                                                max={99}
+                                                value={script.warningCount}
+                                                appearance={{ backgroundColor: colors.Y400, textColor: colors.N0 }}
+                                            />
+                                        </div>
+                                    </div>
+                                }
+                                {script && !!script.errorCount &&
+                                    <div className="flex-vertical-middle flex-none errorCount">
+                                        <div>
+                                            <Badge max={99} value={script.errorCount} appearance="important"/>
+                                        </div>
+                                    </div>
+                                }
+                                <div className="flex-grow"/>
                             </div>
-                            {script && !!script.warningCount &&
-                                <div className="flex-vertical-middle flex-none errorCount">
-                                    <div>
-                                        <Badge
-                                            max={99}
-                                            value={script.warningCount}
-                                            appearance={{ backgroundColor: colors.Y400, textColor: colors.N0 }}
-                                        />
-                                    </div>
-                                </div>
-                            }
-                            {script && !!script.errorCount &&
-                                <div className="flex-vertical-middle flex-none errorCount">
-                                    <div>
-                                        <Badge max={99} value={script.errorCount} appearance="important"/>
-                                    </div>
-                                </div>
-                            }
-                            <div className="flex-grow"/>
-                        </div>
+                        )
                     }
                     <div className="flex-none flex-row">
                         <ButtonGroup>

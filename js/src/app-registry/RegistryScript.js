@@ -79,9 +79,9 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
 
         this.setState({ waitingWatch: true });
 
-        const promise = isWatching ?
-            watcherService.stopWatching('REGISTRY_SCRIPT', script.id) :
-            watcherService.startWatching('REGISTRY_SCRIPT', script.id);
+        const promise = isWatching
+            ? watcherService.stopWatching('REGISTRY_SCRIPT', script.id)
+            : watcherService.startWatching('REGISTRY_SCRIPT', script.id);
 
         promise.then(
             () => {
@@ -113,10 +113,7 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
 
                     script={{
                         ...script,
-                        ...(script.uuid ? {
-                            inline: true,
-                            id: script.uuid
-                        } : {})
+                        ...(script.uuid ? { inline: true, id: script.uuid } : {})
                     }}
                     changelogsLoader={this._getChangelogs}
 
@@ -169,10 +166,12 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
                     ]}
                 >
                     <ScriptParameters params={[
-                        showParent ? {
-                            label: FieldMessages.parentName,
-                            value: script.parentName
-                        } : null,
+                        showParent
+                            ? {
+                                label: FieldMessages.parentName,
+                                value: script.parentName
+                            }
+                            : null,
                         {
                             label: FieldMessages.type,
                             value: (
@@ -192,7 +191,7 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
     }
 }
 
-export const RegistryScript =
+export const RegistryScript = (
     connect(
         memoizeOne(({scriptWatches}: *): * => {
             return {
@@ -200,4 +199,5 @@ export const RegistryScript =
             };
         }),
         { addWatch, removeWatch }
-    )(RegistryScriptInternal);
+    )(RegistryScriptInternal)
+);

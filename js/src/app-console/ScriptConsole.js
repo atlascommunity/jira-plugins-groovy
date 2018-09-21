@@ -149,22 +149,30 @@ export class ScriptConsole extends React.Component<Props, State> {
                 </div>
                 <br/>
                 {!waiting && <div className="result">
-                    {output ?
-                        <div>
-                            <strong>{ConsoleMessages.executedIn(output.time.toString())}</strong>
-                            {isHtml ?
-                                <div dangerouslySetInnerHTML={{ __html: output.result }}/>:
-                                <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{output.result}</pre>
-                            }
-                        </div>
-                    : null}
-                    {error ?
-                        <ErrorMessage title={errorMessage || undefined}>
-                            <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>
-                                {error['stack-trace']}
-                            </pre>
-                        </ErrorMessage>
-                    : null}
+                    {
+                        output
+                        ? (
+                            <div>
+                                <strong>{ConsoleMessages.executedIn(output.time.toString())}</strong>
+                                {isHtml
+                                    ? <div dangerouslySetInnerHTML={{ __html: output.result }}/>
+                                    : <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{output.result}</pre>
+                                }
+                            </div>
+                        )
+                        : null
+                    }
+                    {
+                        error
+                        ? (
+                            <ErrorMessage title={errorMessage || undefined}>
+                                <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>
+                                    {error['stack-trace']}
+                                </pre>
+                            </ErrorMessage>
+                        )
+                        : null
+                    }
                 </div>}
             </div>
         );

@@ -26,11 +26,9 @@ export class ScriptList<T> extends React.PureComponent<Props<T&ItemType>> {
 
         return (
             <div className="ScriptList page-content">
-                {items.length ?
-                    items.map(item =>
-                        <ScriptComponent key={item.id} script={item} onDelete={onDelete}/>
-                    ) :
-                    <InfoMessage title={i18n.noItems}/>
+                {items.length
+                    ? items.map(item => <ScriptComponent key={item.id} script={item} onDelete={onDelete}/>)
+                    : <InfoMessage title={i18n.noItems}/>
                 }
             </div>
         );

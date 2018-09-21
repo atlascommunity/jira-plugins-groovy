@@ -46,9 +46,9 @@ export class WatchableScript extends React.PureComponent<Props, State> {
 
         this.setState({ waitingWatch: true });
 
-        const promise = isWatching ?
-            watcherService.stopWatching(entityType, entityId) :
-            watcherService.startWatching(entityType, entityId);
+        const promise = isWatching
+            ? watcherService.stopWatching(entityType, entityId)
+            : watcherService.startWatching(entityType, entityId);
 
         promise.then(
             () => {

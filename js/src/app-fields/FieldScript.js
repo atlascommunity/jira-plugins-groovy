@@ -54,9 +54,12 @@ export class FieldScript extends React.PureComponent<Props> {
                     errorCount: script.errorCount,
                     warningCount: script.warningCount
                 }}
-                template={script.needsTemplate ? {
-                    body: script.template || ''
-                } : undefined}
+                template={script.needsTemplate
+                    ? {
+                        body: script.template || ''
+                    }
+                    : undefined
+                }
 
                 withChangelog={true}
                 collapsible={collapsible}
@@ -113,10 +116,12 @@ export class FieldScript extends React.PureComponent<Props> {
                             label: FieldMessages.cacheable,
                             value: script.cacheable ? CommonMessages.yes : CommonMessages.no
                         },
-                        script.needsTemplate ? {
-                            label: 'Velocity params',
-                            value: script.velocityParamsEnabled ? CommonMessages.yes : CommonMessages.no
-                        } : null
+                        script.needsTemplate
+                            ? {
+                                label: 'Velocity params',
+                                value: script.velocityParamsEnabled ? CommonMessages.yes : CommonMessages.no
+                            }
+                            : null
                     ]}
                 />
             </ConnectedWatchableScript>

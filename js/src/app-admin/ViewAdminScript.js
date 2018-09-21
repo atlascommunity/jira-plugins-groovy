@@ -68,9 +68,9 @@ class ViewAdminScriptInternal extends React.PureComponent<Props, State> {
                 >
                     {script ? script.name : 'Unknown script'}
                 </PageHeader>
-                {script ?
-                    <AdminScript script={script} collapsible={false} onDelete={this._toggleDelete}/> :
-                    <NotFoundPage/>
+                {script
+                    ? <AdminScript script={script} collapsible={false} onDelete={this._toggleDelete}/>
+                    : <NotFoundPage/>
                 }
                 {isDeleting && script &&
                     <DeleteDialog

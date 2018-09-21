@@ -379,19 +379,23 @@ export class RestFormInternal extends React.Component<Props, State> {
                                     href="/rest"
                                     component={RouterLink}
                                 />,
-                                !isNew && script ? <BreadcrumbsItem
-                                    key="script"
-                                    text={script.name}
-                                    href={`/rest/${script.id}/view`}
-                                    component={RouterLink}
-                                /> : null
+                                !isNew && script
+                                    ? (
+                                        <BreadcrumbsItem
+                                            key="script"
+                                            text={script.name}
+                                            href={`/rest/${script.id}/view`}
+                                            component={RouterLink}
+                                        />
+                                    )
+                                    : null
                             ])}
                         </Breadcrumbs>
                     }
                 >
-                    {isNew ?
-                        RegistryMessages.addScript:
-                        `${RegistryMessages.editScript}: ${script ? script.name : ''}`
+                    {isNew
+                        ? RegistryMessages.addScript
+                        : `${RegistryMessages.editScript}: ${script ? script.name : ''}`
                     }
                 </PageHeader>
                 <ScrollToTop/>

@@ -52,10 +52,12 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
                 .getDirectory(id)
                 .then(data => this.setState({
                     name: data.name,
-                    parent: data.parentId? {
-                        value: data.parentId,
-                        label: data.parentName ? data.parentName : data.parentId.toString()
-                    } : null,
+                    parent: data.parentId
+                        ? {
+                            value: data.parentId,
+                            label: data.parentName ? data.parentName : data.parentId.toString()
+                        }
+                        : null,
                     error: null,
                     directory: data
                 }));

@@ -25,5 +25,6 @@ export class LoaderInternal extends React.PureComponent<Props> {
     }
 }
 
-export const Loader: ComponentType<{children: Element<any>}> =
-    withRouter(connect(memoizeOne(({ready}) => ({ready})))(LoaderInternal));
+export const Loader: ComponentType<{children: Element<any>}> = (
+    withRouter(connect(memoizeOne(({ready}) => ({ready})))(LoaderInternal))
+);

@@ -360,19 +360,23 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                                     href="/listeners"
                                     component={RouterLink}
                                 />,
-                                !isNew && listener ? <BreadcrumbsItem
-                                    key="script"
-                                    text={listener.name}
-                                    href={`/listeners/${listener.id}/view`}
-                                    component={RouterLink}
-                                /> : null
+                                !isNew && listener
+                                    ? (
+                                        <BreadcrumbsItem
+                                            key="script"
+                                            text={listener.name}
+                                            href={`/listeners/${listener.id}/view`}
+                                            component={RouterLink}
+                                        />
+                                    )
+                                    : null
                             ])}
                         </Breadcrumbs>
                     }
                 >
-                    {isNew ?
-                        ListenerMessages.addListener :
-                        `${ListenerMessages.editListener}: ${listener ? listener.name : ''}`
+                    {isNew
+                        ? ListenerMessages.addListener
+                        : `${ListenerMessages.editListener}: ${listener ? listener.name : ''}`
                     }
                 </PageHeader>
                 <ScrollToTop/>

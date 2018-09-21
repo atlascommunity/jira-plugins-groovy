@@ -49,9 +49,9 @@ export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsP
 
         this.setState({ waitingWatch: true });
 
-        const promise = isWatched ?
-            watcherService.stopWatching('REGISTRY_DIRECTORY', id) :
-            watcherService.startWatching('REGISTRY_DIRECTORY', id);
+        const promise = isWatched
+            ? watcherService.stopWatching('REGISTRY_DIRECTORY', id)
+            : watcherService.startWatching('REGISTRY_DIRECTORY', id);
 
         promise.then(
             () => {

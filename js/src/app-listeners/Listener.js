@@ -74,17 +74,17 @@ class ListenerInternal extends React.PureComponent<Props> {
             } else if (condition.type === 'ISSUE') {
                 params.push({
                     label: FieldMessages.eventTypes,
-                    value: condition.typeIds.length ?
-                        condition.typeIds.map(id => eventTypes[id.toString()] || id).join(', ') :
-                        <div className="muted-text">{CommonMessages.notSpecified}</div>
+                    value: condition.typeIds.length
+                        ? condition.typeIds.map(id => eventTypes[id.toString()] || id).join(', ')
+                        : <div className="muted-text">{CommonMessages.notSpecified}</div>
                 });
                 params.push({
                     label: FieldMessages.projects,
                     value: (
                         <div className="flex-column">
-                            {condition.projectIds.length ?
-                                condition.projectIds.map(id => <div key={id}>{projects[id.toString()] || id}</div>) :
-                                <div className="muted-text">{CommonMessages.notSpecified}</div>
+                            {condition.projectIds.length
+                                ? condition.projectIds.map(id => <div key={id}>{projects[id.toString()] || id}</div>)
+                                : <div className="muted-text">{CommonMessages.notSpecified}</div>
                             }
                         </div>
                     )

@@ -46,9 +46,9 @@ class ViewFieldScriptInternal extends React.PureComponent<Props> {
                 >
                     {fieldConfig ? `${fieldConfig.customFieldName} - ${fieldConfig.contextName}` : 'Unknown script'}
                 </PageHeader>
-                {fieldConfig ?
-                    <FieldScript script={fieldConfig} collapsible={false}/> :
-                    <NotFoundPage/>
+                {fieldConfig
+                    ? <FieldScript script={fieldConfig} collapsible={false}/>
+                    : <NotFoundPage/>
                 }
             </Page>
         );

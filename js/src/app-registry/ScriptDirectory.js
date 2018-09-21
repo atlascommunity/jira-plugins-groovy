@@ -151,14 +151,19 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                     <div className="flex-grow"/>
                     <div className="flex-none">
                         <LazilyRender>
-                            {render => render ? <ScriptDirectoryActions
-                                id={directory.id}
-                                name={directory.name}
+                            {render => render
+                                ? (
+                                    <ScriptDirectoryActions
+                                        id={directory.id}
+                                        name={directory.name}
 
-                                onCreate={onCreate}
-                                onEdit={onEdit}
-                                onDelete={onDelete}
-                            /> : <ActionsPlaceholder/>}
+                                        onCreate={onCreate}
+                                        onEdit={onEdit}
+                                        onDelete={onDelete}
+                                    />
+                                )
+                                : <ActionsPlaceholder/>
+                            }
                         </LazilyRender>
                     </div>
                 </div>

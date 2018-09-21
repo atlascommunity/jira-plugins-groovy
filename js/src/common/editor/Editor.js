@@ -197,21 +197,24 @@ export class Editor extends React.Component<EditorProps, EditorState> {
 
         const options = this._getOptions(readOnly, isDisabled, mode, isLight, linter);
 
-        let el: Node = <CodeMirror
-            options={options}
+        let el: Node = (
+            <CodeMirror
+                options={options}
 
-            onBeforeChange={onChange && this._onChange}
-            value={value || ''}
-            editorDidMount={this._setEditor}
-        />;
+                onBeforeChange={onChange && this._onChange}
+                value={value || ''}
+                editorDidMount={this._setEditor}
+            />
+        );
 
         if (resizable) {
-            el =
+            el = (
                 <Resizable height={this.state.height} width={100} axis="y" onResize={this._resize}>
                     <div style={{width: '100%', height: `${this.state.height}px`, overflow: 'hidden'}}>
                         {el}
                     </div>
-                </Resizable>;
+                </Resizable>
+            );
         }
 
         if (decorator) {
@@ -263,17 +266,19 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                                                         </div>
                                                     }
                                                     <div className="flex-none" style={{marginLeft: '5px'}}>
-                                                        {e.javaDoc ?
-                                                            <a
-                                                                href={e.javaDoc}
-                                                                title={e.fullClassName}
+                                                        {e.javaDoc
+                                                            ? (
+                                                                <a
+                                                                    href={e.javaDoc}
+                                                                    title={e.fullClassName}
 
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                            >
-                                                                {e.className}
-                                                            </a> :
-                                                            <abbr title={e.fullClassName}>{e.className}</abbr>
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                >
+                                                                    {e.className}
+                                                                </a>
+                                                            )
+                                                            : <abbr title={e.fullClassName}>{e.className}</abbr>
                                                         }
                                                     </div>
                                                 </div>
@@ -301,16 +306,18 @@ function Binding({binding}: BindingProps): Node {
             <div className="flex-none">{binding.name}</div>
             <div className="flex-grow"/>
             <div className="flex-none" style={{marginLeft: '5px'}}>
-                {binding.javaDoc ?
-                    <a
-                        href={binding.javaDoc}
-                        title={binding.fullClassName}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        {binding.className}
-                    </a> :
-                    <abbr title={binding.fullClassName}>{binding.className}</abbr>
+                {binding.javaDoc
+                    ? (
+                        <a
+                            href={binding.javaDoc}
+                            title={binding.fullClassName}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {binding.className}
+                        </a>
+                    )
+                    : <abbr title={binding.fullClassName}>{binding.className}</abbr>
                 }
             </div>
         </div>

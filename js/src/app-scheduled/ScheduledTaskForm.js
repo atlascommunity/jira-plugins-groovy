@@ -434,7 +434,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                 errorField = error.field;
             }
 
-            body =
+            body = (
                 <div className="flex-column">
                     {error && !errorField && <ErrorMessage title={errorMessage || undefined}/>}
 
@@ -559,7 +559,8 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                             </Button>
                         </ButtonGroup>
                     </div>
-                </div>;
+                </div>
+            );
         }
 
         return (
@@ -574,12 +575,16 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                                     href="/scheduled"
                                     component={RouterLink}
                                 />,
-                                !isNew && task ? <BreadcrumbsItem
-                                    key="task"
-                                    text={task.name}
-                                    href={`/scheduled/${task.id}/view`}
-                                    component={RouterLink}
-                                /> : null
+                                !isNew && task
+                                    ? (
+                                        <BreadcrumbsItem
+                                            key="task"
+                                            text={task.name}
+                                            href={`/scheduled/${task.id}/view`}
+                                            component={RouterLink}
+                                        />
+                                    )
+                                    : null
                             ])}
                         </Breadcrumbs>
                     }

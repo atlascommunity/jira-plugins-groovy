@@ -375,7 +375,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
     }
 }
 
-export const CustomFieldForm =
+export const CustomFieldForm = (
     withRouter(
         connect(
             (): * => {
@@ -389,4 +389,5 @@ export const CustomFieldForm =
                 updateItem: updateItem
             }
         )(CustomFieldFormInternal)
-    );
+    )
+);

@@ -266,32 +266,34 @@ export class AuditLog extends React.Component<Props, State> {
     render() {
         const {isReady, rows, filter} = this.state;
 
-        return <Page>
-            <PageHeader
-                bottomBar={
-                    <div className="flex-row">
-                        <AuditLogFilter value={filter} onChange={this._updateFilter}/>
-                    </div>
-                }
+        return (
+            <Page>
+                <PageHeader
+                    bottomBar={
+                        <div className="flex-row">
+                            <AuditLogFilter value={filter} onChange={this._updateFilter}/>
+                        </div>
+                    }
 
-                breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
-            >
-                {PageTitleMessages.audit}
-            </PageHeader>
-            <ScrollToTop/>
+                    breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
+                >
+                    {PageTitleMessages.audit}
+                </PageHeader>
+                <ScrollToTop/>
 
-            <div className="page-content">
-                {this._renderPagination()}
-                <DynamicTableStateless
-                    head={tableHead}
-                    emptyView={<InfoMessage title={AuditMessages.noItems}/>}
+                <div className="page-content">
+                    {this._renderPagination()}
+                    <DynamicTableStateless
+                        head={tableHead}
+                        emptyView={<InfoMessage title={AuditMessages.noItems}/>}
 
-                    isLoading={!isReady}
-                    rows={rows}
-                />
-                {this._renderPagination()}
-            </div>
-        </Page>;
+                        isLoading={!isReady}
+                        rows={rows}
+                    />
+                    {this._renderPagination()}
+                </div>
+            </Page>
+        );
     }
 }
 

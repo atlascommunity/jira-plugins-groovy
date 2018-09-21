@@ -37,9 +37,11 @@ function ScriptParamValue({value, param}: ScriptParamValueProps): Node {
     }
     switch (param.paramType) {
         case 'USER':
-            return <div>
-                <Avatar size="xsmall" src={value.avatarUrl}/>{' '}{value.label}
-            </div>;
+            return (
+                <div>
+                    <Avatar size="xsmall" src={value.avatarUrl}/>{' '}{value.label}
+                </div>
+            );
         case 'MULTI_USER':
             return value.map(item =>
                 <div>

@@ -19,16 +19,18 @@ export class ExtrasPage extends React.Component<{}> {
     };
 
     render() {
-        return <Page>
-            <PageHeader
-                breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
-            >
-                {PageTitleMessages.extras}
-            </PageHeader>
-            <ScrollToTop/>
-            <div className="page-content">
-                <Button appearance="primary" onClick={this._clearCache}>{CommonMessages.clearCache}</Button>
-            </div>
-        </Page>;
+        return (
+            <Page>
+                <PageHeader
+                    breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
+                >
+                    {PageTitleMessages.extras}
+                </PageHeader>
+                <ScrollToTop/>
+                <div className="page-content">
+                    <Button appearance="primary" onClick={this._clearCache}>{CommonMessages.clearCache}</Button>
+                </div>
+            </Page>
+        );
     }
 }

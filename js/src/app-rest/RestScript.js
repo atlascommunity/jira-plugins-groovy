@@ -106,9 +106,9 @@ export class RestScript extends React.PureComponent<Props> {
                         },
                         {
                             label: FieldMessages.groups,
-                            value: script.groups.length ?
-                                script.groups.join(', ') :
-                                <div className="muted-text">{CommonMessages.notSpecified}</div>
+                            value: script.groups.length
+                                ? script.groups.join(', ')
+                                : <div className="muted-text">{CommonMessages.notSpecified}</div>
                         }
                     ]}
                 />

@@ -308,12 +308,16 @@ export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>,
                                     href={returnTo}
                                     component={RouterLink}
                                 />,
-                                name && id ? <BreadcrumbsItem
-                                    key="script"
-                                    text={name}
-                                    href={`${returnTo}${id}/view`}
-                                    component={RouterLink}
-                                /> : null
+                                name && id
+                                    ? (
+                                        <BreadcrumbsItem
+                                            key="script"
+                                            text={name}
+                                            href={`${returnTo}${id}/view`}
+                                            component={RouterLink}
+                                        />
+                                    )
+                                    : null
                             ])}
                         </Breadcrumbs>
                     }

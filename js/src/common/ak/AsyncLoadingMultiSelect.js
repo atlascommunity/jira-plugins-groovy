@@ -59,17 +59,19 @@ export class AsyncLoadingMultiSelect<T: OldSelectValue = string> extends React.P
         const {label, isRequired, isDisabled, value, onChange} = this.props;
         const {ready, options} = this.state;
 
-        return <MultiSelect
-            label={label}
-            isRequired={isRequired}
-            isDisabled={isDisabled}
-            shouldFitContainer={true}
+        return (
+            <MultiSelect
+                label={label}
+                isRequired={isRequired}
+                isDisabled={isDisabled}
+                shouldFitContainer={true}
 
-            isLoading={!ready}
-            items={options}
+                isLoading={!ready}
+                items={options}
 
-            onChange={onChange}
-            value={value}
-        />;
+                onChange={onChange}
+                value={value}
+            />
+        );
     }
 }

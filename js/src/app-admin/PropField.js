@@ -46,109 +46,127 @@ export class PropField extends React.PureComponent<Props> {
 
         switch (type) {
             case 'USER': {
-                return <AsyncPicker
-                    label={label}
-                    isRequired={isRequired}
+                return (
+                    <AsyncPicker
+                        label={label}
+                        isRequired={isRequired}
 
-                    src={`${getPluginBaseUrl()}/jira-api/userPicker`}
-                    displayValue={true}
+                        src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                        displayValue={true}
 
-                    onChange={onChange}
-                    //$FlowFixMe
-                    value={value}
-                />;
+                        onChange={onChange}
+                        //$FlowFixMe
+                        value={value}
+                    />
+                );
             }
             case 'MULTI_USER': {
-                return <AsyncPicker
-                    label={label}
-                    isRequired={isRequired}
-                    isMulti={true}
+                return (
+                    <AsyncPicker
+                        label={label}
+                        isRequired={isRequired}
+                        isMulti={true}
 
-                    src={`${getPluginBaseUrl()}/jira-api/userPicker`}
-                    displayValue={true}
+                        src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                        displayValue={true}
 
-                    onChange={onChange}
-                    //$FlowFixMe
-                    value={value || []}
-                />;
+                        onChange={onChange}
+                        //$FlowFixMe
+                        value={value || []}
+                    />
+                );
             }
             case 'GROUP':
-                return <AsyncPicker
-                    label={label}
-                    isRequired={isRequired}
+                return (
+                    <AsyncPicker
+                        label={label}
+                        isRequired={isRequired}
 
-                    src={`${getPluginBaseUrl()}/jira-api/groupPicker`}
-                    onChange={onChange}
-                    //$FlowFixMe
-                    value={value}
-                />;
+                        src={`${getPluginBaseUrl()}/jira-api/groupPicker`}
+                        onChange={onChange}
+                        //$FlowFixMe
+                        value={value}
+                    />
+                );
             case 'CUSTOM_FIELD':
-                return <AsyncPicker
-                    label={label}
-                    isRequired={isRequired}
+                return (
+                    <AsyncPicker
+                        label={label}
+                        isRequired={isRequired}
 
-                    src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`}
-                    displayValue={true}
+                        src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`}
+                        displayValue={true}
 
-                    onChange={onChange}
-                    //$FlowFixMe
-                    value={value}
-                />;
+                        onChange={onChange}
+                        //$FlowFixMe
+                        value={value}
+                    />
+                );
             case 'RESOLUTION':
-                return <AsyncPicker
-                    label={label}
-                    isRequired={isRequired}
+                return (
+                    <AsyncPicker
+                        label={label}
+                        isRequired={isRequired}
 
-                    src={`${getPluginBaseUrl()}/jira-api/resolutionPicker`}
-                    onChange={onChange}
-                    //$FlowFixMe
-                    value={value}
-                />;
+                        src={`${getPluginBaseUrl()}/jira-api/resolutionPicker`}
+                        onChange={onChange}
+                        //$FlowFixMe
+                        value={value}
+                    />
+                );
             case 'STRING':
-                return <FieldTextStateless
-                    label={label}
-                    required={isRequired}
-                    shouldFitContainer={true}
-                    type="text"
+                return (
+                    <FieldTextStateless
+                        label={label}
+                        required={isRequired}
+                        shouldFitContainer={true}
+                        type="text"
 
-                    //$FlowFixMe
-                    value={value || ''}
-                    onChange={this._textCallback}
-                />;
+                        //$FlowFixMe
+                        value={value || ''}
+                        onChange={this._textCallback}
+                    />
+                );
             case 'TEXT':
-                return <FieldTextAreaStateless
-                    label={label}
-                    required={isRequired}
-                    shouldFitContainer={true}
-                    enableResize="vertical"
+                return (
+                    <FieldTextAreaStateless
+                        label={label}
+                        required={isRequired}
+                        shouldFitContainer={true}
+                        enableResize="vertical"
 
-                    //$FlowFixMe
-                    value={value || ''}
-                    onChange={this._textCallback}
-                />;
+                        //$FlowFixMe
+                        value={value || ''}
+                        onChange={this._textCallback}
+                    />
+                );
             case 'LONG':
-                return <FieldTextStateless
-                    label={label}
-                    required={isRequired}
-                    shouldFitContainer={true}
-                    type="number"
+                return (
+                    <FieldTextStateless
+                        label={label}
+                        required={isRequired}
+                        shouldFitContainer={true}
+                        type="number"
 
-                    //$FlowFixMe
-                    value={value || ''}
-                    onChange={this._textCallback}
-                />;
+                        //$FlowFixMe
+                        value={value || ''}
+                        onChange={this._textCallback}
+                    />
+                );
             case 'DOUBLE':
-                return <FieldTextStateless
-                    label={label}
-                    required={isRequired}
-                    shouldFitContainer={true}
-                    type="text"
+                return (
+                    <FieldTextStateless
+                        label={label}
+                        required={isRequired}
+                        shouldFitContainer={true}
+                        type="text"
 
-                    pattern="[0-9.]+"
-                    //$FlowFixMe
-                    value={value || ''}
-                    onChange={this._textCallback}
-                />;
+                        pattern="[0-9.]+"
+                        //$FlowFixMe
+                        value={value || ''}
+                        onChange={this._textCallback}
+                    />
+                );
             case 'BOOLEAN':
                 return (
                     <div style={{marginTop: `${gridSize()}px`}}>

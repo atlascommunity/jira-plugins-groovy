@@ -71,9 +71,9 @@ export class RunDialog extends React.PureComponent<Props, State> {
             }
         }
 
-        const promise = script.builtIn && script.builtInKey ?
-            adminScriptService.runBuiltInScript(script.builtInKey, params) :
-            adminScriptService.runUserScript(script.id, params);
+        const promise = script.builtIn && script.builtInKey
+            ? adminScriptService.runBuiltInScript(script.builtInKey, params)
+            : adminScriptService.runUserScript(script.id, params);
 
         promise
             .then(outcome => this.setState({

@@ -52,10 +52,10 @@ export function ajaxPromise(url: string, method: HttpMethod, _params: any, data:
                         //assuming 401 means that websudo session is expired
                         AJS.flag({
                             type: 'error',
-                            body: JSON.parse(response.responseText).message +
-                                '<ul class="aui-nav-actions-list">' +
-                                '<li><a href="javascript:location.reload()">Reload page</a></li>' +
-                                '</ul>',
+                            body: JSON.parse(response.responseText).message
+                                + '<ul class="aui-nav-actions-list">'
+                                + '<li><a href="javascript:location.reload()">Reload page</a></li>'
+                                + '</ul>',
                         });
                         return;
                     }

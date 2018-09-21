@@ -91,110 +91,128 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
 
         switch (param.paramType) {
             case 'USER':
-                return <AsyncPicker
-                    label={label}
-                    isRequired={isRequired}
+                return (
+                    <AsyncPicker
+                        label={label}
+                        isRequired={isRequired}
 
-                    src={`${getPluginBaseUrl()}/jira-api/userPicker`}
-                    displayValue={true}
+                        src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                        displayValue={true}
 
-                    name={inputName}
-                    onChange={this._setValue(paramName)}
-                    value={value}
-                />;
+                        name={inputName}
+                        onChange={this._setValue(paramName)}
+                        value={value}
+                    />
+                );
             case 'MULTI_USER': {
-                return <AsyncPicker
-                    label={label}
-                    isRequired={true}
-                    isMulti={true}
+                return (
+                    <AsyncPicker
+                        label={label}
+                        isRequired={true}
+                        isMulti={true}
 
-                    name={inputName}
-                    delimiter=";"
+                        name={inputName}
+                        delimiter=";"
 
-                    src={`${getPluginBaseUrl()}/jira-api/userPicker`}
-                    displayValue={true}
+                        src={`${getPluginBaseUrl()}/jira-api/userPicker`}
+                        displayValue={true}
 
-                    onChange={this._setValue(paramName)}
-                    value={value}
-                />;
+                        onChange={this._setValue(paramName)}
+                        value={value}
+                    />
+                );
             }
             case 'GROUP':
-                return <AsyncPicker
-                    label={label}
-                    isRequired={isRequired}
+                return (
+                    <AsyncPicker
+                        label={label}
+                        isRequired={isRequired}
 
-                    src={`${getPluginBaseUrl()}/jira-api/groupPicker`}
-                    name={inputName}
-                    onChange={this._setValue(paramName)}
-                    value={value}
-                />;
+                        src={`${getPluginBaseUrl()}/jira-api/groupPicker`}
+                        name={inputName}
+                        onChange={this._setValue(paramName)}
+                        value={value}
+                    />
+                );
             case 'CUSTOM_FIELD':
-                return <AsyncPicker
-                    label={label}
-                    isRequired={isRequired}
+                return (
+                    <AsyncPicker
+                        label={label}
+                        isRequired={isRequired}
 
-                    src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`}
-                    displayValue={true}
+                        src={`${getPluginBaseUrl()}/jira-api/customFieldPicker`}
+                        displayValue={true}
 
-                    name={inputName}
-                    onChange={this._setValue(paramName)}
-                    value={value}
-                />;
+                        name={inputName}
+                        onChange={this._setValue(paramName)}
+                        value={value}
+                    />
+                );
             case 'RESOLUTION':
-                return <AsyncPicker
-                    label={label}
-                    isRequired={isRequired}
+                return (
+                    <AsyncPicker
+                        label={label}
+                        isRequired={isRequired}
 
-                    src={`${getPluginBaseUrl()}/jira-api/resolutionPicker`}
-                    name={inputName}
-                    onChange={this._setValue(paramName)}
-                    value={value}
-                />;
+                        src={`${getPluginBaseUrl()}/jira-api/resolutionPicker`}
+                        name={inputName}
+                        onChange={this._setValue(paramName)}
+                        value={value}
+                    />
+                );
             case 'STRING':
-                return <FieldTextStateless
-                    label={label}
-                    required={isRequired}
-                    shouldFitContainer={true}
-                    type="text"
+                return (
+                    <FieldTextStateless
+                        label={label}
+                        required={isRequired}
+                        shouldFitContainer={true}
+                        type="text"
 
-                    name={inputName}
-                    value={value || ''}
-                    onChange={this._setInputValue(paramName)}
-                />;
+                        name={inputName}
+                        value={value || ''}
+                        onChange={this._setInputValue(paramName)}
+                    />
+                );
             case 'TEXT':
-                return <FieldTextAreaStateless
-                    label={label}
-                    required={isRequired}
-                    shouldFitContainer={true}
-                    enableResize="vertical"
+                return (
+                    <FieldTextAreaStateless
+                        label={label}
+                        required={isRequired}
+                        shouldFitContainer={true}
+                        enableResize="vertical"
 
-                    name={inputName}
-                    value={value || ''}
-                    onChange={this._setInputValue(paramName)}
-                />;
+                        name={inputName}
+                        value={value || ''}
+                        onChange={this._setInputValue(paramName)}
+                    />
+                );
             case 'LONG':
-                return <FieldTextStateless
-                    label={label}
-                    required={isRequired}
-                    shouldFitContainer={true}
-                    type="number"
+                return (
+                    <FieldTextStateless
+                        label={label}
+                        required={isRequired}
+                        shouldFitContainer={true}
+                        type="number"
 
-                    name={inputName}
-                    value={value || ''}
-                    onChange={this._setInputValue(paramName)}
-                />;
+                        name={inputName}
+                        value={value || ''}
+                        onChange={this._setInputValue(paramName)}
+                    />
+                );
             case 'DOUBLE':
-                return <FieldTextStateless
-                    label={label}
-                    required={isRequired}
-                    shouldFitContainer={true}
-                    type="text"
+                return (
+                    <FieldTextStateless
+                        label={label}
+                        required={isRequired}
+                        shouldFitContainer={true}
+                        type="text"
 
-                    pattern="[0-9.]+"
-                    name={inputName}
-                    value={value || ''}
-                    onChange={this._setInputValue(paramName)}
-                />;
+                        pattern="[0-9.]+"
+                        name={inputName}
+                        value={value || ''}
+                        onChange={this._setInputValue(paramName)}
+                    />
+                );
             case 'BOOLEAN':
                 return (
                     <div style={{marginTop: `${gridSize()}px`}}>
@@ -264,7 +282,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
             return <LoadingSpinner/>;
         }
 
-        return <div className="flex-column">
+        return (<div className="flex-column">
             <Label
                 label={CommonMessages.script}
                 isRequired={true}
@@ -308,6 +326,6 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                     </div>
                 )
             }
-        </div>;
+        </div>);
     }
 }

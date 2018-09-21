@@ -67,16 +67,20 @@ export class AdminScript extends React.PureComponent<Props, State> {
     );
 
     _getScript = memoizeOne(
-        (script) => script.builtIn ? null : {
-            id: script.uuid,
-            name: script.name,
-            description: script.description,
-            inline: true,
-            scriptBody: script.scriptBody,
-            changelogs: script.changelogs,
-            errorCount: script.errorCount,
-            warningCount: script.warningCount
-        }
+        (script) => (
+            script.builtIn
+            ? null
+            : {
+                id: script.uuid,
+                name: script.name,
+                description: script.description,
+                inline: true,
+                scriptBody: script.scriptBody,
+                changelogs: script.changelogs,
+                errorCount: script.errorCount,
+                warningCount: script.warningCount
+            }
+        )
     );
 
     render() {
@@ -114,23 +118,26 @@ export class AdminScript extends React.PureComponent<Props, State> {
                 entityType="ADMIN_SCRIPT"
                 isUnwatchable={builtIn}
 
-                title={builtIn ?
-                    <div className="flex-row space-between">
-                        <div className="flex-vertical-middle flex-none">
-                            <CodeIcon label=""/>
+                title={
+                    builtIn
+                    ? (
+                        <div className="flex-row space-between">
+                            <div className="flex-vertical-middle flex-none">
+                                <CodeIcon label=""/>
+                            </div>
+                            <div className="flex-vertical-middle flex-none">
+                                <Lozenge appearance="inprogress">
+                                    {AdminScriptMessages.builtIn}
+                                </Lozenge>
+                            </div>
+                            <div className="flex-vertical-middle">
+                                <h3 title={script.name}>
+                                    {script.name}
+                                </h3>
+                            </div>
+                            <div className="flex-grow"/>
                         </div>
-                        <div className="flex-vertical-middle flex-none">
-                            <Lozenge appearance="inprogress">
-                                {AdminScriptMessages.builtIn}
-                            </Lozenge>
-                        </div>
-                        <div className="flex-vertical-middle">
-                            <h3 title={script.name}>
-                                {script.name}
-                            </h3>
-                        </div>
-                        <div className="flex-grow"/>
-                    </div>
+                    )
                     : undefined
                 }
 
@@ -140,13 +147,17 @@ export class AdminScript extends React.PureComponent<Props, State> {
 
                 onDelete={!builtIn ? this._delete : undefined}
                 additionalPrimaryButtons={buttons}
-                dropdownItems={!builtIn ? [
-                    {
-                        label: CommonMessages.permalink,
-                        href: `/admin-scripts/${script.id}/view`,
-                        linkComponent: RouterLink
-                    }
-                ] : undefined}
+                dropdownItems={
+                    !builtIn
+                    ? [
+                        {
+                            label: CommonMessages.permalink,
+                            href: `/admin-scripts/${script.id}/view`,
+                            linkComponent: RouterLink
+                        }
+                    ]
+                    : undefined
+                }
             >
                 {isRunning && <RunDialog script={script} onClose={this._toggleDialog}/>}
             </ConnectedWatchableScript>

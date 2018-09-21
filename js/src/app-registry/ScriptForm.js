@@ -286,13 +286,15 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                                     href="/registry/"
                                     component={RouterLink}
                                 />,
-                                script ?
-                                    <BreadcrumbsItem
-                                        key="script"
-                                        text={script.name}
-                                        href={`/registry/script/view/${script.id}`}
-                                        component={RouterLink}
-                                    />
+                                script
+                                    ? (
+                                        <BreadcrumbsItem
+                                            key="script"
+                                            text={script.name}
+                                            href={`/registry/script/view/${script.id}`}
+                                            component={RouterLink}
+                                        />
+                                    )
                                     : null
                             ])}
                         </Breadcrumbs>
@@ -305,28 +307,32 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 {fetching && <div className="flex-horizontal-middle"><div className="flex-vertical-middle"><Spinner size="medium"/></div></div>}
                 {!fetching && <div className="ScriptForm">
                     {error && !errorField && <ErrorMessage title={errorMessage || undefined}/>}
-                    {noParent ?
-                        <FormField
-                            label={FieldMessages.parentName}
-                            isRequired={true}
+                    {noParent
+                        ? (
+                            <FormField
+                                label={FieldMessages.parentName}
+                                isRequired={true}
 
-                            isInvalid={errorField === 'directoryId'}
-                            invalidMessage={errorMessage || ''}
-                        >
-                            <AsyncPicker
-                                src={`${getPluginBaseUrl()}/registry/directory/picker`}
+                                isInvalid={errorField === 'directoryId'}
+                                invalidMessage={errorMessage || ''}
+                            >
+                                <AsyncPicker
+                                    src={`${getPluginBaseUrl()}/registry/directory/picker`}
 
-                                value={null}
-                                onChange={this._setDirectory}
+                                    value={null}
+                                    onChange={this._setDirectory}
 
-                                label=""
-                            />
-                        </FormField>:
-                        <FormField label={FieldMessages.parentName}>
-                            <StaticField label="">
-                                {parentName}
-                            </StaticField>
-                        </FormField>
+                                    label=""
+                                />
+                            </FormField>
+                        )
+                        : (
+                            <FormField label={FieldMessages.parentName}>
+                                <StaticField label="">
+                                    {parentName}
+                                </StaticField>
+                            </FormField>
+                        )
                     }
 
                     <FormField

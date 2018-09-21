@@ -65,9 +65,9 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
                 >
                     {script ? script.name : 'Unknown script'}
                 </PageHeader>
-                {script ?
-                    <RegistryScript script={script} collapsible={false} onDelete={this._toggleDelete} showParent={true}/> :
-                    <NotFoundPage/>
+                {script
+                    ? <RegistryScript script={script} collapsible={false} onDelete={this._toggleDelete} showParent={true}/>
+                    : <NotFoundPage/>
                 }
                 {isDeleting && script &&
                     <DeleteDialog

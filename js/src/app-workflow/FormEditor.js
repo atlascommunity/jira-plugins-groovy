@@ -27,23 +27,25 @@ export class FormEditor extends React.Component<FormEditorProps, FormEditorState
     };
 
     render() {
-        return <div>
-            <EditorField
-                label={CommonMessages.script}
-                isRequired={true}
+        return (
+            <div>
+                <EditorField
+                    label={CommonMessages.script}
+                    isRequired={true}
 
-                bindings={bindings}
+                    bindings={bindings}
 
-                value={this.state.value}
-                onChange={this._setValue}
-            />
-            <textarea
-                className="hidden"
+                    value={this.state.value}
+                    onChange={this._setValue}
+                />
+                <textarea
+                    className="hidden"
 
-                readOnly={true}
-                value={this.state.value}
-                name={this.props.fieldName}
-            />
-        </div>;
+                    readOnly={true}
+                    value={this.state.value}
+                    name={this.props.fieldName}
+                />
+            </div>
+        );
     }
 }

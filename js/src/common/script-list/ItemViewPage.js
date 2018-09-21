@@ -76,9 +76,9 @@ class ItemViewPageInternal<T: NamedItemType> extends React.PureComponent<Props<T
                 >
                     {script ? script.name : 'Unknown script'}
                 </PageHeader>
-                {script ?
-                    <ScriptComponent script={script} collapsible={false} onDelete={this._toggleDelete}/> :
-                    <NotFoundPage/>
+                {script
+                    ? <ScriptComponent script={script} collapsible={false} onDelete={this._toggleDelete}/>
+                    : <NotFoundPage/>
                 }
                 {isDeleting && script &&
                     <ConnectedDeleteDialog

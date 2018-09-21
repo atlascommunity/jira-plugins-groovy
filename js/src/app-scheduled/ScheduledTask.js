@@ -162,29 +162,34 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
         const outcome = lastRunInfo ? lastRunInfo.outcome : 'NOT_RAN';
 
         const isError = outcome === 'FAILED';
-        const lastRun = lastRunInfo ?
-            <div className="flex-column">
-                <strong>{ScheduledTaskMessages.lastRun}{':'}</strong>
-                <div>
-                    {lastRunInfo.startDate}{' - '}{lastRunInfo.duration/1000}{'s'}
+        const lastRun = lastRunInfo
+            ? (
+                <div className="flex-column">
+                    <strong>{ScheduledTaskMessages.lastRun}{':'}</strong>
+                    <div>
+                        {lastRunInfo.startDate}{' - '}{lastRunInfo.duration/1000}{'s'}
+                    </div>
+                    {lastRunInfo.message && <div className="flex-row">
+                        <div style={{color: isError ? colors.R400 : colors.P300}}>
+                            {isError ? <ErrorIcon size="small"/> : <InfoIcon size="small"/>}
+                        </div>
+                        <div className="TaskRunMessage">
+                            {lastRunInfo.message}
+                        </div>
+                    </div>}
                 </div>
-                {lastRunInfo.message && <div className="flex-row">
-                    <div style={{color: isError ? colors.R400 : colors.P300}}>
-                        {isError ? <ErrorIcon size="small"/> : <InfoIcon size="small"/>}
-                    </div>
-                    <div className="TaskRunMessage">
-                        {lastRunInfo.message}
-                    </div>
-                </div>}
-            </div> : '';
+            )
+            : '';
 
-        const popup = <div className="flex-column">
-            <div>
-                <strong>{ScheduledTaskMessages.nextRun}{':'}</strong>
-                <div>{script.nextRunDate || 'unavailable'}</div>
+        const popup = (
+            <div className="flex-column">
+                <div>
+                    <strong>{ScheduledTaskMessages.nextRun}{':'}</strong>
+                    <div>{script.nextRunDate || 'unavailable'}</div>
+                </div>
+                {lastRun}
             </div>
-            {lastRun}
-        </div>;
+        );
         let titleEl: Node = (
             <div className="flex-row space-between">
                 <div className="flex-vertical-middle">
@@ -216,14 +221,18 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
             </div>
         );
 
-        const scriptObject = (script.type !== 'ISSUE_JQL_TRANSITION') ? {
-            id: script.uuid,
-            name: script.name,
-            scriptBody: script.scriptBody,
-            inline: true,
-            changelogs: script.changelogs,
-            description: script.description
-        } : null;
+        const scriptObject = (
+            script.type !== 'ISSUE_JQL_TRANSITION'
+            ? {
+                id: script.uuid,
+                name: script.name,
+                scriptBody: script.scriptBody,
+                inline: true,
+                changelogs: script.changelogs,
+                description: script.description
+            }
+            : null
+        );
 
         return (
             <ConnectedWatchableScript
