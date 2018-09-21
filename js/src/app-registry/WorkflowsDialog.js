@@ -103,58 +103,60 @@ export class WorkflowsDialog extends React.PureComponent<WorkflowsDialogProps, W
                             </tr>
                         </thead>
                         <tbody>
-                        {workflows.map(workflow =>
-                            workflow.actions.map(action =>
-                                action.items.map(item =>
-                                    <tr key={`${action.id}-${item.type}-${item.order}`}>
-                                        <td>
-                                            <ButtonGroup>
-                                                <Button
-                                                    appearance={workflow.active ? 'link' : 'link-subtle'}
-                                                    href={getWorkflowLink(workflow)}
-                                                >
-                                                    {workflow.name}
-                                                </Button>
-                                                {
-                                                    workflow.hasDraft
-                                                        ? (
-                                                            <Button
-                                                                appearance="subtle"
-                                                                iconBefore={<EditIcon label=""/>}
-                                                                href={getWorkflowLink(workflow, 'draft')}
-                                                            />
-                                                        )
-                                                        : undefined
-                                                }
-                                            </ButtonGroup>
-                                        </td>
-                                        <td>
-                                            {action.id}{' - '}{action.name}
-                                        </td>
-                                        <td>
-                                            {item.type}
-                                        </td>
-                                        <td>
-                                            {item.order}
-                                        </td>
-                                        <td>
-                                            <Button
-                                                appearance="subtle"
-                                                iconBefore={<OpenIcon label=""/>}
-                                                href={getWorkflowActionLink(workflow, action, item)}
-                                            />
-                                        </td>
-                                        <td>
-                                            {workflow.hasDraft && <Button
-                                                appearance="subtle"
-                                                iconBefore={<EditIcon label=""/>}
-                                                href={getWorkflowActionLink(workflow, action, item, 'draft')}
-                                            />}
-                                        </td>
-                                    </tr>
-                                )
-                            ).reduce((a, b) => a.concat(b))
-                        ).reduce((a, b) => a.concat(b))}
+                            {
+                                workflows.map(workflow =>
+                                    workflow.actions.map(action =>
+                                        action.items.map(item =>
+                                            <tr key={`${action.id}-${item.type}-${item.order}`}>
+                                                <td>
+                                                    <ButtonGroup>
+                                                        <Button
+                                                            appearance={workflow.active ? 'link' : 'link-subtle'}
+                                                            href={getWorkflowLink(workflow)}
+                                                        >
+                                                            {workflow.name}
+                                                        </Button>
+                                                        {
+                                                            workflow.hasDraft
+                                                                ? (
+                                                                    <Button
+                                                                        appearance="subtle"
+                                                                        iconBefore={<EditIcon label=""/>}
+                                                                        href={getWorkflowLink(workflow, 'draft')}
+                                                                    />
+                                                                )
+                                                                : undefined
+                                                        }
+                                                    </ButtonGroup>
+                                                </td>
+                                                <td>
+                                                    {action.id}{' - '}{action.name}
+                                                </td>
+                                                <td>
+                                                    {item.type}
+                                                </td>
+                                                <td>
+                                                    {item.order}
+                                                </td>
+                                                <td>
+                                                    <Button
+                                                        appearance="subtle"
+                                                        iconBefore={<OpenIcon label=""/>}
+                                                        href={getWorkflowActionLink(workflow, action, item)}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    {workflow.hasDraft && <Button
+                                                        appearance="subtle"
+                                                        iconBefore={<EditIcon label=""/>}
+                                                        href={getWorkflowActionLink(workflow, action, item, 'draft')}
+                                                    />}
+                                                </td>
+                                            </tr>
+                                        )
+                                    ).reduce((a, b) => a.concat(b))
+                                ).reduce((a, b) => a.concat(b))
+                            }
                         </tbody>
                     </table>
                 }

@@ -30,6 +30,8 @@
     "react/jsx-no-literals": [1, {"noStrings": false}],
     "react/jsx-no-target-blank": 2,
     "react/jsx-wrap-multilines": ["warn", { "arrow": "ignore" }],
+    "react/jsx-indent": ["warn"],
+    "react/jsx-indent-props": ["warn"],
 
     "jsx-quotes": ["error", "prefer-double"],
 

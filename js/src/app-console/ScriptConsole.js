@@ -145,7 +145,7 @@ export class ScriptConsole extends React.Component<Props, State> {
                         onClick={this._submit}
                     >
                         {ConsoleMessages.execute}
-                        </Button>
+                    </Button>
                 </div>
                 <br/>
                 {!waiting && <div className="result">

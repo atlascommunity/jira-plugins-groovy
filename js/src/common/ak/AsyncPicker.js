@@ -19,7 +19,7 @@ const formatValueFactory = memoize(
             return (
                 <div className="flex-row">
                     {data.imgSrc && <Avatar size="xsmall" src={data.imgSrc}/>}
-                        <span className="flex-vertical-middle" style={{marginLeft: data.imgSrc ? '5px' : ''}}>
+                    <span className="flex-vertical-middle" style={{marginLeft: data.imgSrc ? '5px' : ''}}>
                         {data.label}{displayValue ? ` (${data.value})` : null}
                     </span>
                 </div>
