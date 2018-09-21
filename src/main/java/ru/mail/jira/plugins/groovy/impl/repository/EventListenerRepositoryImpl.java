@@ -7,6 +7,7 @@ import com.atlassian.cache.CacheManager;
 import com.atlassian.cache.CacheSettingsBuilder;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -35,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
+@ExportAsDevService
 public class EventListenerRepositoryImpl implements EventListenerRepository {
     private static final String VALUE_KEY = "value";
 
@@ -212,11 +214,11 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     private void validateListener(boolean isNew, EventListenerForm form) {
         ValidationUtils.validateForm(i18nHelper, isNew, form);
 
-        scriptService.parseScript(form.getScriptBody());
-
         if (StringUtils.isEmpty(form.getScriptBody())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
+
+        scriptService.parseScript(form.getScriptBody());
 
         ConditionDescriptor condition = form.getCondition();
         if (condition == null) {
