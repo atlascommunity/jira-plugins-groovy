@@ -1,12 +1,12 @@
 package it.ru.mail.jira.plugins.groovy;
 
-import com.adaptavist.shrinkwrap.atlassian.plugin.api.AtlassianPluginArchive;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import it.ru.mail.jira.plugins.groovy.util.ArquillianUtil;
 import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -20,7 +20,6 @@ import ru.mail.jira.plugins.groovy.impl.FileUtil;
 
 import javax.inject.Inject;
 
-import java.nio.file.Paths;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -48,17 +47,8 @@ public class ScriptServiceIT {
     private ApplicationUser oldUser;
 
     @BeforeDeployment
-    public static Archive<?> useSpringScannerOne(Archive<?> archive) {
-        AtlassianPluginArchive result = archive.as(AtlassianPluginArchive.class);
-        result
-            .addClass(FileUtil.class)
-            .withSpringScannerOne(false);
-
-        for (String script : requiredScripts) {
-            result.addAsResource(Paths.get("src/examples/groovy/" + script + ".groovy").toFile(), script + ".groovy");
-        }
-
-        return result;
+    public static Archive<?> prepareArchive(Archive<?> archive) {
+        return ArquillianUtil.prepareArchive(archive, requiredScripts);
     }
 
     @Before

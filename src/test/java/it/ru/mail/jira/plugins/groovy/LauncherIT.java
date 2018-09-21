@@ -1,7 +1,8 @@
 package it.ru.mail.jira.plugins.groovy;
 
-import com.adaptavist.shrinkwrap.atlassian.plugin.api.AtlassianPluginArchive;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.google.common.collect.ImmutableSet;
+import it.ru.mail.jira.plugins.groovy.util.ArquillianUtil;
 import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -19,10 +20,8 @@ public class LauncherIT {
     private PluginLauncher pluginLauncher;
 
     @BeforeDeployment
-    public static Archive<?> useSpringScannerOne(Archive<?> archive) {
-        return archive
-            .as(AtlassianPluginArchive.class)
-            .withSpringScannerOne(false);
+    public static Archive<?> prepareArchive(Archive<?> archive) {
+        return ArquillianUtil.prepareArchive(archive, ImmutableSet.of());
     }
 
     @Test

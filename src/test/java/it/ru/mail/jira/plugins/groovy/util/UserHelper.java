@@ -39,7 +39,23 @@ public class UserHelper {
         return user;
     }
 
+    @Deprecated
     public void asAdmin() {
         authenticationContext.setLoggedInUser(getAdmin());
+    }
+
+    public <T> T runAsUser(ApplicationUser user, Supplier<T> function) throws Exception {
+        ApplicationUser oldUser = authenticationContext.getLoggedInUser();
+        try {
+            authenticationContext.setLoggedInUser(user);
+            return function.get();
+        } finally {
+            authenticationContext.setLoggedInUser(oldUser);
+        }
+    }
+
+    @FunctionalInterface
+    public interface Supplier<T> {
+        T get() throws Exception;
     }
 }

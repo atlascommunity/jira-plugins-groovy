@@ -1,6 +1,5 @@
 package it.ru.mail.jira.plugins.groovy;
 
-import com.adaptavist.shrinkwrap.atlassian.plugin.api.AtlassianPluginArchive;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.exception.RemoveException;
 import com.atlassian.jira.issue.*;
@@ -10,10 +9,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableSet;
-import it.ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
-import it.ru.mail.jira.plugins.groovy.util.IssueHelper;
-import it.ru.mail.jira.plugins.groovy.util.ProjectHelper;
-import it.ru.mail.jira.plugins.groovy.util.UserHelper;
+import it.ru.mail.jira.plugins.groovy.util.*;
 import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -27,7 +23,6 @@ import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 import ru.mail.jira.plugins.groovy.impl.FileUtil;
 
 import javax.inject.Inject;
-import java.nio.file.Paths;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -63,18 +58,8 @@ public class ScriptFieldIT {
     private Issue issue;
 
     @BeforeDeployment
-    public static Archive<?> useSpringScannerOne(Archive<?> archive) {
-        AtlassianPluginArchive result = archive.as(AtlassianPluginArchive.class);
-        result
-            .addClass(FileUtil.class)
-            .addPackage("it.ru.mail.jira.plugins.groovy.util")
-            .withSpringScannerOne(false);
-
-        for (String script : requiredScripts) {
-            result.addAsResource(Paths.get("src/examples/groovy/" + script + ".groovy").toFile(), script + ".groovy");
-        }
-
-        return result;
+    public static Archive<?> prepareArchive(Archive<?> archive) {
+        return ArquillianUtil.prepareArchive(archive, requiredScripts);
     }
 
     @Before
