@@ -11,6 +11,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.function.Consumer;
 
 @Named
 public class IssueHelper {
@@ -23,11 +24,17 @@ public class IssueHelper {
     private IssueManager issueManager;
 
     public Issue createIssue(ApplicationUser reporter, Project project) throws CreateException {
+        return createIssue(reporter, project, issue -> {});
+    }
+
+    public Issue createIssue(ApplicationUser reporter, Project project, Consumer<MutableIssue> customizer) throws CreateException {
         MutableIssue issue = issueFactory.getIssue();
         issue.setIssueType(project.getIssueTypes().iterator().next());
         issue.setSummary("TEST ISSUE");
         issue.setReporter(reporter);
         issue.setProjectObject(project);
+
+        customizer.accept(issue);
 
         return issueManager.createIssueObject(reporter, issue);
     }

@@ -3,6 +3,7 @@ package ru.mail.jira.plugins.groovy.impl.repository;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -27,6 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@ExportAsDevService
 public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
     private final Set<String> builtInNames;
     private final ActiveObjects ao;

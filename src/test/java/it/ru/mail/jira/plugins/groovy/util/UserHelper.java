@@ -29,10 +29,14 @@ public class UserHelper {
     }
 
     public ApplicationUser getUser() throws Exception {
-        ApplicationUser user = userManager.getUserByName("user");
+        return getUser("user");
+    }
+
+    public ApplicationUser getUser(String name) throws Exception {
+        ApplicationUser user = userManager.getUserByName(name);
 
         if (user == null) {
-            user = userManager.createUser(new UserDetails("user", "user").withPassword("user"));
+            user = userManager.createUser(new UserDetails(name, name).withPassword(name));
             groupManager.addUserToGroup(user, groupManager.getGroup("jira-software-users"));
         }
 

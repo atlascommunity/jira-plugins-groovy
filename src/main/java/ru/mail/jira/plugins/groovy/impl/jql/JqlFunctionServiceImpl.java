@@ -3,6 +3,7 @@ package ru.mail.jira.plugins.groovy.impl.jql;
 import com.atlassian.beehive.ClusterLock;
 import com.atlassian.beehive.ClusterLockService;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 import java.util.*;
 
 @Component
+@ExportAsDevService
 public class JqlFunctionServiceImpl implements JqlFunctionService {
     private static final String LOCK_KEY = "ru.mail.jira.groovy.jqlFunction";
 
