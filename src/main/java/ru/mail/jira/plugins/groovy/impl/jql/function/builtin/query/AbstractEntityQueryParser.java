@@ -21,7 +21,6 @@ import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.query.operand.SingleValueOperand;
 import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
-import io.atlassian.fugue.Either;
 import org.antlr.v4.runtime.*;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.lucene.index.Term;
@@ -33,6 +32,7 @@ import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryLexer;
 import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryParser;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.AbstractCommentQueryFunction;
 import ru.mail.jira.plugins.groovy.util.AntlrUtil;
+import ru.mail.jira.plugins.groovy.util.compat.JiraCompatibilityHelper;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -50,6 +50,8 @@ public abstract class AbstractEntityQueryParser {
     private final GroupManager groupManager;
     private final UserManager userManager;
 
+    private final JiraCompatibilityHelper jiraCompatibilityHelper;
+
     private final String createdField;
     private final String authorField;
     private final String bodyField;
@@ -63,14 +65,18 @@ public abstract class AbstractEntityQueryParser {
         JqlDateSupport jqlDateSupport,
         GroupManager groupManager,
         UserManager userManager,
+        JiraCompatibilityHelper jiraCompatibilityHelper,
         String createdField, String authorField, String bodyField,
-        String levelField, String roleLevelField) {
+        String levelField, String roleLevelField
+    ) {
         this.projectRoleManager = projectRoleManager;
         this.timeZoneManager = timeZoneManager;
         this.projectManager = projectManager;
         this.jqlDateSupport = jqlDateSupport;
         this.groupManager = groupManager;
         this.userManager = userManager;
+
+        this.jiraCompatibilityHelper = jiraCompatibilityHelper;
 
         this.createdField = createdField;
         this.authorField = authorField;
@@ -79,7 +85,7 @@ public abstract class AbstractEntityQueryParser {
         this.roleLevelField = roleLevelField;
     }
 
-    public Either<Query, MessageSet> parseParameters(
+    public QueryParseResult parseParameters(
         QueryCreationContext queryCreationContext,
         String queryString
     ) {
@@ -208,13 +214,10 @@ public abstract class AbstractEntityQueryParser {
                     if (role != null) {
                         BooleanQuery projectsQuery = new BooleanQuery();
                         for (Project project : projects) {
-                            //todo: do something to safely check if project is archived for Jira prior to 7.10.x
-                            /*
-                            if (project.isArchived()) {
-                                logger.warn("ignoring archived project {}", project.getKey());
+                            if (jiraCompatibilityHelper.isProjectArchived(project)) {
+                                logger.warn("Project {} is archived", project.getKey());
                                 continue;
                             }
-                            */
 
                             ProjectRoleActors projectRoleActors = projectRoleManager.getProjectRoleActors(role, project);
 
@@ -286,10 +289,10 @@ public abstract class AbstractEntityQueryParser {
         });
 
         if (messageSet.hasAnyErrors()) {
-            return Either.right(messageSet);
+            return new QueryParseResult(null, messageSet);
         }
 
-        return Either.left(addPermissionsCheck(queryCreationContext, query));
+        return new QueryParseResult(addPermissionsCheck(queryCreationContext, query), messageSet);
     }
 
     protected Map<String, String> parseQuery(MessageSet messageSet, String query) {

@@ -13,13 +13,13 @@ import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
-import io.atlassian.fugue.Either;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.CommentQueryParser;
+import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.QueryParseResult;
 import ru.mail.jira.plugins.groovy.util.lucene.IssueIdCollector;
 
 import javax.annotation.Nonnull;
@@ -43,11 +43,9 @@ public class CommentedFunction extends AbstractCommentQueryFunction {
 
     @Override
     protected void validate(MessageSet messageSet, ApplicationUser user, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
-        Either<Query, MessageSet> parseResult = parseParameters(new QueryCreationContextImpl(user), functionOperand.getArgs().get(0));
+        QueryParseResult parseResult = parseParameters(new QueryCreationContextImpl(user), functionOperand.getArgs().get(0));
 
-        if (parseResult.isRight()) {
-            messageSet.addMessageSet(parseResult.right().get());
-        }
+        messageSet.addMessageSet(parseResult.getMessageSet());
     }
 
     @Nonnull
@@ -58,17 +56,17 @@ public class CommentedFunction extends AbstractCommentQueryFunction {
 
         IndexSearcher searcher = searchProviderFactory.getSearcher(SearchProviderFactory.COMMENT_INDEX);
 
-        Either<Query, MessageSet> parseResult = parseParameters(queryCreationContext, args.get(0));
+        QueryParseResult parseResult = parseParameters(queryCreationContext, args.get(0));
 
-        if (parseResult.isRight()) {
-            logger.error("Got errors while building query: {}", parseResult.right().get());
+        if (parseResult.hasErrors()) {
+            logger.error("Got errors while building query: {}", parseResult.getMessageSet());
             return QueryFactoryResult.createFalseResult();
         }
 
         IssueIdCollector collector = new IssueIdCollector();
 
         try {
-            searcher.search(parseResult.left().get(), collector);
+            searcher.search(parseResult.getQuery(), collector);
         } catch (IOException e) {
             logger.error("caught exception while searching", e);
         }

@@ -18,7 +18,6 @@ import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
-import io.atlassian.fugue.Either;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.*;
@@ -27,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.CommentQueryParser;
+import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.QueryParseResult;
 import ru.mail.jira.plugins.groovy.util.lucene.IssueIdCollector;
 
 import javax.annotation.Nonnull;
@@ -61,11 +61,9 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         List<String> args = functionOperand.getArgs();
 
         String queryString = args.get(args.size() == 1 ? 0 : 1);
-        Either<Query, MessageSet> parseResult = parseParameters(new QueryCreationContextImpl(user), queryString);
+        QueryParseResult parseResult = parseParameters(new QueryCreationContextImpl(user), queryString);
 
-        if (parseResult.isRight()) {
-            messageSet.addMessageSet(parseResult.right().get());
-        }
+        messageSet.addMessageSet(parseResult.getMessageSet());
 
         if (args.size() == 2) {
             SearchService.ParseResult jqlParseResult = searchService.parseQuery(user, args.get(0));
@@ -143,10 +141,10 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
             return QueryFactoryResult.createFalseResult();
         }
 
-        Either<Query, MessageSet> parseResult = parseParameters(queryCreationContext, args.get(withSubquery ? 1 : 0));
+        QueryParseResult parseResult = parseParameters(queryCreationContext, args.get(withSubquery ? 1 : 0));
 
-        if (parseResult.isRight()) {
-            logger.error("Got errors while building query: {}", parseResult.right().get());
+        if (parseResult.hasErrors()) {
+            logger.error("Got errors while building query: {}", parseResult.getMessageSet());
             return QueryFactoryResult.createFalseResult();
         }
 
@@ -156,7 +154,7 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
 
         try {
             searcher.search(
-                parseResult.left().get(),
+                parseResult.getQuery(),
                 new FieldCacheTermsFilter(DocumentConstants.COMMENT_ID, commentIds),
                 collector
             );

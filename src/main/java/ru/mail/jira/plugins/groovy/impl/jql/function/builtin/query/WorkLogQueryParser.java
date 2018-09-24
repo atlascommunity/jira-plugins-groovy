@@ -13,6 +13,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.apache.lucene.search.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.util.compat.JiraCompatibilityHelper;
 
 @Component
 public class WorkLogQueryParser extends AbstractEntityQueryParser {
@@ -26,7 +27,8 @@ public class WorkLogQueryParser extends AbstractEntityQueryParser {
         @ComponentImport JqlDateSupport jqlDateSupport,
         @ComponentImport GroupManager groupManager,
         @ComponentImport UserManager userManager,
-        QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator
+        QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator,
+        JiraCompatibilityHelper jiraCompatibilityHelper
     ) {
         super(
             projectRoleManager,
@@ -35,6 +37,7 @@ public class WorkLogQueryParser extends AbstractEntityQueryParser {
             jqlDateSupport,
             groupManager,
             userManager,
+            jiraCompatibilityHelper,
             DocumentConstants.WORKLOG_DATE, DocumentConstants.WORKLOG_AUTHOR, DocumentConstants.WORKLOG_COMMENT,
             DocumentConstants.WORKLOG_LEVEL, DocumentConstants.WORKLOG_LEVEL_ROLE
         );

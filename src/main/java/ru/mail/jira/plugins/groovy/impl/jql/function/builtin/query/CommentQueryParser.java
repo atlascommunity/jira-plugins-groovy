@@ -13,6 +13,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.apache.lucene.search.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.util.compat.JiraCompatibilityHelper;
 
 @Component
 public class CommentQueryParser extends AbstractEntityQueryParser {
@@ -26,7 +27,8 @@ public class CommentQueryParser extends AbstractEntityQueryParser {
         @ComponentImport JqlDateSupport jqlDateSupport,
         @ComponentImport GroupManager groupManager,
         @ComponentImport UserManager userManager,
-        QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator
+        QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator,
+        JiraCompatibilityHelper jiraCompatibilityHelper
     ) {
         super(
             projectRoleManager,
@@ -35,6 +37,7 @@ public class CommentQueryParser extends AbstractEntityQueryParser {
             jqlDateSupport,
             groupManager,
             userManager,
+            jiraCompatibilityHelper,
             DocumentConstants.COMMENT_CREATED, DocumentConstants.COMMENT_AUTHOR, DocumentConstants.COMMENT_BODY,
             DocumentConstants.COMMENT_LEVEL, DocumentConstants.COMMENT_LEVEL_ROLE
         );
