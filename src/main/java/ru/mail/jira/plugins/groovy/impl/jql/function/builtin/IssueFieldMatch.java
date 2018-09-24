@@ -13,7 +13,9 @@ import com.atlassian.jira.jql.ClauseInformation;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
+import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectConstant;
+import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.project.version.VersionManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
@@ -54,6 +56,7 @@ public class IssueFieldMatch extends AbstractBuiltInFunction {
     private final SearchService searchService;
     private final VersionManager versionManager;
     private final ProjectComponentManager projectComponentManager;
+    private final ProjectManager projectManager;
 
     @Autowired
     public IssueFieldMatch(
@@ -61,7 +64,8 @@ public class IssueFieldMatch extends AbstractBuiltInFunction {
         @ComponentImport SearchProvider searchProvider,
         @ComponentImport SearchService searchService,
         @ComponentImport VersionManager versionManager,
-        @ComponentImport ProjectComponentManager projectComponentManager
+        @ComponentImport ProjectComponentManager projectComponentManager,
+        @ComponentImport ProjectManager projectManager
     ) {
         super("issueFieldMatch", 3);
         this.fieldManager = fieldManager;
@@ -69,6 +73,7 @@ public class IssueFieldMatch extends AbstractBuiltInFunction {
         this.searchService = searchService;
         this.versionManager = versionManager;
         this.projectComponentManager = projectComponentManager;
+        this.projectManager = projectManager;
     }
 
     @Nonnull
@@ -144,6 +149,14 @@ public class IssueFieldMatch extends AbstractBuiltInFunction {
                 .stream()
                 .filter(it -> pattern.matcher(it.getName()).find())
                 .map(ProjectConstant::getId)
+                .map(Objects::toString)
+                .collect(Collectors.toSet());
+        } else if (DocumentConstants.PROJECT_ID.equals(indexField)) {
+            entityIds = projectManager
+                .getProjects()
+                .stream()
+                .filter(it -> pattern.matcher(it.getName()).find())
+                .map(Project::getId)
                 .map(Objects::toString)
                 .collect(Collectors.toSet());
         }
