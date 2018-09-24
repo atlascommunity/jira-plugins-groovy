@@ -12,22 +12,22 @@ public interface JqlFunctionRepository {
     JqlFunctionScriptDto getScript(int id);
 
     /**
-     * All mutations must go through {@link ru.mail.jira.plugins.groovy.api.service.ScheduledTaskService}
+     * All mutations must go through {@link ru.mail.jira.plugins.groovy.api.service.JqlFunctionService}
      */
     JqlFunctionScriptDto createScript(ApplicationUser user, JqlFunctionForm form);
 
     /**
-     * All mutations must go through {@link ru.mail.jira.plugins.groovy.api.service.ScheduledTaskService}
+     * All mutations must go through {@link ru.mail.jira.plugins.groovy.api.service.JqlFunctionService}
      */
     JqlFunctionScriptDto updateScript(ApplicationUser user, int id, JqlFunctionForm form);
 
     /**
-     * All mutations must go through {@link ru.mail.jira.plugins.groovy.api.service.ScheduledTaskService}
+     * All mutations must go through {@link ru.mail.jira.plugins.groovy.api.service.JqlFunctionService}
      */
     void deleteScript(ApplicationUser user, int id);
 
     /**
-     * All mutations must go through {@link ru.mail.jira.plugins.groovy.api.service.ScheduledTaskService}
+     * All mutations must go through {@link ru.mail.jira.plugins.groovy.api.service.JqlFunctionService}
      */
     void restoreScript(ApplicationUser user, int id);
 }
