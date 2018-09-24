@@ -4,6 +4,7 @@ import com.atlassian.jira.issue.search.SearchProviderFactory;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
+import com.atlassian.jira.jql.query.QueryCreationContextImpl;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
@@ -46,7 +47,9 @@ public class WorkLoggedFunction extends AbstractBuiltInFunction {
 
     @Override
     protected void validate(MessageSet messageSet, ApplicationUser user, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
-        Either<Query, MessageSet> parseResult = workLogQueryParser.parseParameters(user, ImmutableList.of(), functionOperand.getArgs().get(0));
+        Either<Query, MessageSet> parseResult = workLogQueryParser.parseParameters(
+            new QueryCreationContextImpl(user), functionOperand.getArgs().get(0)
+        );
 
         if (parseResult.isRight()) {
             messageSet.addMessageSet(parseResult.right().get());
@@ -56,13 +59,12 @@ public class WorkLoggedFunction extends AbstractBuiltInFunction {
     @Nonnull
     @Override
     public QueryFactoryResult getQuery(@Nonnull QueryCreationContext queryCreationContext, @Nonnull TerminalClause terminalClause) {
-        ApplicationUser user = queryCreationContext.getApplicationUser();
         FunctionOperand functionOperand = (FunctionOperand) terminalClause.getOperand();
         List<String> args = functionOperand.getArgs();
 
         IndexSearcher searcher = searchProviderFactory.getSearcher(SearchProviderFactory.WORKLOG_INDEX);
 
-        Either<Query, MessageSet> parseResult = workLogQueryParser.parseParameters(user, queryCreationContext.getDeterminedProjects(), args.get(0));
+        Either<Query, MessageSet> parseResult = workLogQueryParser.parseParameters(queryCreationContext, args.get(0));
 
         if (parseResult.isRight()) {
             logger.error("Got errors while building query: {}", parseResult.right().get());

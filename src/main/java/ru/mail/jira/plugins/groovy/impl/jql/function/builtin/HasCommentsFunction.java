@@ -1,10 +1,12 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
+import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.search.SearchProviderFactory;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
+import com.atlassian.jira.jql.query.QueryProjectRoleAndGroupPermissionsDecorator;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -13,7 +15,6 @@ import com.atlassian.query.operand.FunctionOperand;
 import com.google.common.collect.ImmutableList;
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,16 @@ import java.util.List;
 public class HasCommentsFunction extends AbstractBuiltInFunction {
     private final Logger logger = LoggerFactory.getLogger(HasCommentsFunction.class);
     private final SearchProviderFactory searchProviderFactory;
+    private final QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator;
 
     @Autowired
     public HasCommentsFunction(
-        @ComponentImport SearchProviderFactory searchProviderFactory
+        @ComponentImport SearchProviderFactory searchProviderFactory,
+        QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator
     ) {
         super("hasComments", 0);
         this.searchProviderFactory = searchProviderFactory;
+        this.queryPermissionDecorator = queryPermissionDecorator;
     }
 
     @Override
@@ -49,7 +53,13 @@ public class HasCommentsFunction extends AbstractBuiltInFunction {
         IndexSearcher searcher = searchProviderFactory.getSearcher(SearchProviderFactory.COMMENT_INDEX);
 
         try {
-            searcher.search(new MatchAllDocsQuery(), issueIdCollector);
+            searcher.search(
+                queryPermissionDecorator.createPermissionQuery(
+                    queryCreationContext,
+                    DocumentConstants.COMMENT_LEVEL, DocumentConstants.COMMENT_LEVEL_ROLE
+                ),
+                issueIdCollector
+            );
         } catch (IOException e) {
             logger.error("search error", e);
         }

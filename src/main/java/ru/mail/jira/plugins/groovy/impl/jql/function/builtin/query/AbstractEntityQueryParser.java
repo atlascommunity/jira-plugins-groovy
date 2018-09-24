@@ -4,6 +4,7 @@ import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.LikeQueryFactory;
+import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.util.JqlDateSupport;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
@@ -79,10 +80,10 @@ public abstract class AbstractEntityQueryParser {
     }
 
     public Either<Query, MessageSet> parseParameters(
-        ApplicationUser user,
-        Collection<String> determinedProjects,
+        QueryCreationContext queryCreationContext,
         String queryString
     ) {
+        ApplicationUser user = queryCreationContext.getApplicationUser();
         ZoneId userZoneId = timeZoneManager.getTimeZoneforUser(user).toZoneId();
 
         BooleanQuery query = new BooleanQuery();
@@ -172,6 +173,8 @@ public abstract class AbstractEntityQueryParser {
                     break;
                 }
                 case "inRole": {
+                    Collection<String> determinedProjects = queryCreationContext.getDeterminedProjects();
+
                     List<Project> projects;
 
                     if (determinedProjects.size() > 0) {
@@ -286,7 +289,7 @@ public abstract class AbstractEntityQueryParser {
             return Either.right(messageSet);
         }
 
-        return Either.left(query);
+        return Either.left(addPermissionsCheck(queryCreationContext, query));
     }
 
     protected Map<String, String> parseQuery(MessageSet messageSet, String query) {
@@ -311,6 +314,8 @@ public abstract class AbstractEntityQueryParser {
 
         return listener.values;
     }
+
+    protected abstract Query addPermissionsCheck(QueryCreationContext queryCreationContext, Query query);
 
     private static class CommentedQueryListener extends CommentedQueryBaseListener {
         private final Map<String, String> values = new HashMap<>();

@@ -8,7 +8,9 @@ import com.atlassian.jira.issue.search.SearchProviderFactory;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
+import com.atlassian.jira.jql.query.QueryCreationContextImpl;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
+import com.atlassian.jira.jql.query.QueryProjectRoleAndGroupPermissionsDecorator;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -34,6 +36,7 @@ import java.util.*;
 @Component
 public class LastCommentFunction extends AbstractCommentQueryFunction {
     private final Logger logger = LoggerFactory.getLogger(LastCommentFunction.class);
+    private final QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator;
     private final SearchProviderFactory searchProviderFactory;
     private final SearchProvider searchProvider;
     private final SearchService searchService;
@@ -43,12 +46,14 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         @ComponentImport SearchProviderFactory searchProviderFactory,
         @ComponentImport SearchProvider searchProvider,
         @ComponentImport SearchService searchService,
-        CommentQueryParser commentQueryParser
+        CommentQueryParser commentQueryParser,
+        QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator
     ) {
         super(commentQueryParser, "lastComment", 1);
         this.searchProviderFactory = searchProviderFactory;
         this.searchProvider = searchProvider;
         this.searchService = searchService;
+        this.queryPermissionDecorator = queryPermissionDecorator;
     }
 
     @Override
@@ -56,7 +61,7 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         List<String> args = functionOperand.getArgs();
 
         String queryString = args.get(args.size() == 1 ? 0 : 1);
-        Either<Query, MessageSet> parseResult = parseParameters(user, ImmutableList.of(), queryString);
+        Either<Query, MessageSet> parseResult = parseParameters(new QueryCreationContextImpl(user), queryString);
 
         if (parseResult.isRight()) {
             messageSet.addMessageSet(parseResult.right().get());
@@ -113,7 +118,13 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         LastCommentIdCollector lastCommentIdCollector = new LastCommentIdCollector();
 
         try {
-            searcher.search(new MatchAllDocsQuery(), filter, lastCommentIdCollector);
+            searcher.search(
+                queryPermissionDecorator.createPermissionQuery(
+                    queryCreationContext,
+                    DocumentConstants.COMMENT_LEVEL, DocumentConstants.COMMENT_LEVEL_ROLE
+                ),
+                filter, lastCommentIdCollector
+            );
         } catch (IOException e) {
             logger.error("caught exception while searching", e);
         }
@@ -132,7 +143,7 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
             return QueryFactoryResult.createFalseResult();
         }
 
-        Either<Query, MessageSet> parseResult = parseParameters(user, queryCreationContext.getDeterminedProjects(), args.get(withSubquery ? 1 : 0));
+        Either<Query, MessageSet> parseResult = parseParameters(queryCreationContext, args.get(withSubquery ? 1 : 0));
 
         if (parseResult.isRight()) {
             logger.error("Got errors while building query: {}", parseResult.right().get());
