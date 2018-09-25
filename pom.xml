@@ -86,18 +86,6 @@
             <version>${groovy.version}</version>
             <classifier>indy</classifier>
         </dependency>
-        <!--dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-datetime</artifactId>
-            <version>${groovy.version}</version>
-            <classifier>indy</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency-->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-json</artifactId>
@@ -122,18 +110,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-macro</artifactId>
-            <version>${groovy.version}</version>
-            <classifier>indy</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency-->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-sql</artifactId>
@@ -525,6 +501,7 @@
             </plugin>
         </plugins>
     </build>
+
     <properties>
         <jira.version>7.10.2</jira.version>
         <jira.oldest.version>7.3.0</jira.oldest.version>
@@ -547,6 +524,42 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>groovy-next</id>
+
+            <properties>
+                <groovy.version>2.5.2</groovy.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-macro</artifactId>
+                    <version>${groovy.version}</version>
+                    <classifier>indy</classifier>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-datetime</artifactId>
+                    <version>${groovy.version}</version>
+                    <classifier>indy</classifier>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <pluginRepositories>
         <pluginRepository>
