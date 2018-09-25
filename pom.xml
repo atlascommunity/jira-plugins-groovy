@@ -429,6 +429,21 @@
                                 </application>
                             </applications>
                         </product>
+                        <product>
+                            <id>jira</id>
+                            <instanceId>jira-lts</instanceId>
+                            <version>${jira.lts.version}</version>
+                            <productDataVersion>${jira.lts.version}</productDataVersion>
+
+                            <shutdownTimeout>${shutdownTimeout}</shutdownTimeout>
+
+                            <applications>
+                                <application>
+                                    <applicationKey>jira-software</applicationKey>
+                                    <version>${jira.lts.version}</version>
+                                </application>
+                            </applications>
+                        </product>
                     </products>
                     <testGroups>
                         <testGroup>
@@ -453,6 +468,15 @@
                             <id>jira-latest</id>
                             <productIds>
                                 <productId>jira-latest</productId>
+                            </productIds>
+                            <includes>
+                                <include>it/**/*IT.java</include>
+                            </includes>
+                        </testGroup>
+                        <testGroup>
+                            <id>jira-lts</id>
+                            <productIds>
+                                <productId>jira-lts</productId>
                             </productIds>
                             <includes>
                                 <include>it/**/*IT.java</include>
@@ -505,6 +529,7 @@
         <jira.version>7.10.2</jira.version>
         <jira.oldest.version>7.3.0</jira.oldest.version>
         <jira.latest.version>7.12.1</jira.latest.version>
+        <jira.lts.version>7.6.8</jira.lts.version>
 
         <gh.version>7.10.0-DAILY20180821023118</gh.version>
         <amps.version>6.3.14</amps.version>
