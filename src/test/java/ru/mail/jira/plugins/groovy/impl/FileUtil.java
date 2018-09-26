@@ -15,8 +15,12 @@ public class FileUtil {
     }
 
     public static String readArquillianExample(String fileName) throws IOException {
+        return readArquillianFile(fileName + ".groovy");
+    }
+
+    public static String readArquillianFile(String fileName) throws IOException {
         try (InputStream in = ClassLoaderUtils.getResourceAsStream(
-             fileName + ".groovy", FileUtil.class
+            fileName, FileUtil.class
         )) {
             byte[] buffer = new byte[in.available()];
             in.read(buffer);
