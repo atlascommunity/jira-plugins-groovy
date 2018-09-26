@@ -118,7 +118,7 @@ public class InlineWorkflowIT {
     }
 
     @Test
-    public void test() throws Exception {
+    public void shouldWork() throws Exception {
         ApplicationUser admin = userHelper.getAdmin();
         ApplicationUser user = userHelper.getUser();
 
