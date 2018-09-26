@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-public class WorkLoggedFunction extends AbstractBuiltInFunction {
+public class WorkLoggedFunction extends AbstractBuiltInQueryFunction {
     private final Logger logger = LoggerFactory.getLogger(WorkLoggedFunction.class);
 
     private final SearchProviderFactory searchProviderFactory;

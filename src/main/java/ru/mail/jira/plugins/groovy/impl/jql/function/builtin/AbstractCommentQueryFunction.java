@@ -4,7 +4,7 @@ import com.atlassian.jira.jql.query.QueryCreationContext;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.CommentQueryParser;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.QueryParseResult;
 
-public abstract class AbstractCommentQueryFunction extends AbstractBuiltInFunction {
+public abstract class AbstractCommentQueryFunction extends AbstractBuiltInQueryFunction {
     private CommentQueryParser commentQueryParser;
 
     public AbstractCommentQueryFunction(

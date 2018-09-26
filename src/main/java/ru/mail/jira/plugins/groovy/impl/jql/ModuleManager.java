@@ -18,10 +18,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
+import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction;
+import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlQueryFunction;
+import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlValuesFunction;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
-import ru.mail.jira.plugins.groovy.api.jql.ScriptFunction;
-import ru.mail.jira.plugins.groovy.impl.jql.function.ScriptFunctionAdapter;
+import ru.mail.jira.plugins.groovy.impl.jql.function.QueryFunctionAdapter;
+import ru.mail.jira.plugins.groovy.impl.jql.function.ValuesFunctionAdapter;
 import ru.mail.jira.plugins.groovy.util.Const;
 
 import java.util.Arrays;
@@ -62,18 +65,24 @@ public class ModuleManager {
         try {
             Class scriptClass = scriptService.parseClassStatic(script.getScriptBody(), false, ImmutableMap.of());
 
-            if (ScriptFunction.class.isAssignableFrom(scriptClass)) {
+            if (ScriptedJqlFunction.class.isAssignableFrom(scriptClass)) {
                 if (Arrays.stream(scriptClass.getConstructors()).anyMatch(it -> it.getParameterCount() == 0)) {
                     Object functionInstance = scriptClass.getConstructor().newInstance();
 
-                    if (functionInstance instanceof ScriptFunction) {
-                        return new ScriptFunctionAdapter(
+                    if (functionInstance instanceof ScriptedJqlValuesFunction) {
+                        return new ValuesFunctionAdapter(
                             getScriptModuleKey(script.getId()),
                             script.getName(),
-                            (ScriptFunction) functionInstance
+                            (ScriptedJqlValuesFunction) functionInstance
+                        );
+                    } else if (functionInstance instanceof ScriptedJqlQueryFunction) {
+                        return new QueryFunctionAdapter(
+                            getScriptModuleKey(script.getId()),
+                            script.getName(),
+                            (ScriptedJqlQueryFunction) functionInstance
                         );
                     } else {
-                        logger.error("Constructed object is not instance of ScriptFunction {} ({})", script.getName(), script.getId());
+                        logger.error("Constructed object is not instance of ScriptedJqlFunction {} ({})", script.getName(), script.getId());
                     }
                 } else {
                     logger.error("Did not find noargs constructor for {} ({})", script.getName(), script.getId());
@@ -145,8 +154,8 @@ public class ModuleManager {
                     logger.debug("unregistering function with name: {}", functionName);
 
                     CustomFunction function = allFunctions.remove(functionName);
-                    if (function instanceof ScriptFunctionAdapter) {
-                        ScriptFunction delegate = ((ScriptFunctionAdapter) function).getDelegate();
+                    if (function instanceof ValuesFunctionAdapter) {
+                        ScriptedJqlFunction delegate = ((ValuesFunctionAdapter) function).getDelegate();
                         if (delegate != null) {
                             InvokerHelper.removeClass(delegate.getClass());
                         }

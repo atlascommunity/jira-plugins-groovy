@@ -60,7 +60,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
-public class DateCompareFunction extends AbstractBuiltInFunction {
+public class DateCompareFunction extends AbstractBuiltInQueryFunction {
     private static final Map<String, DateUtils.Duration> TOKEN_MAP = ImmutableMap.of(
         "w", DateUtils.Duration.WEEK,
         "d", DateUtils.Duration.DAY,

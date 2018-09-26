@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.groovy.api.dto.StaticCheckForm;
 import ru.mail.jira.plugins.groovy.api.dto.error.PositionedCompilationMessage;
-import ru.mail.jira.plugins.groovy.api.jql.ScriptFunction;
+import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 import ru.mail.jira.plugins.groovy.api.script.ParseContext;
@@ -91,13 +91,13 @@ public class StaticCheckResource {
                 case JQL:
                     Class<?> functionClass = scriptService.parseClassStatic(form.getScriptBody(), false, ImmutableMap.of());
                     InvokerHelper.removeClass(functionClass);
-                    if (!ScriptFunction.class.isAssignableFrom(functionClass)) {
+                    if (!ScriptedJqlFunction.class.isAssignableFrom(functionClass)) {
                         return Response
                             .status(400)
                             .entity(ImmutableMap.of(
                                 "error", ImmutableList.of(
                                     ImmutableMap.of(
-                                        "message", "Must implement ru.mail.jira.plugins.groovy.api.jql.ScriptFunction"
+                                        "message", "Must implement ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction"
                                     )
                                 )
                             ))

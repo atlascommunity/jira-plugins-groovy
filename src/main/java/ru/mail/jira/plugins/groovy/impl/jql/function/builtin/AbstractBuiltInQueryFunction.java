@@ -8,21 +8,21 @@ import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
+import ru.mail.jira.plugins.groovy.api.jql.CustomQueryFunction;
 import ru.mail.jira.plugins.groovy.impl.jql.JqlFunctionCFType;
-import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 
 import javax.annotation.Nonnull;
 
-public abstract class AbstractBuiltInFunction implements CustomFunction {
+public abstract class AbstractBuiltInQueryFunction implements CustomQueryFunction {
     private final String functionName;
     private final JiraDataType dataType;
     private final int minimumArgs;
 
-    protected AbstractBuiltInFunction(String functionName, int minimumArgs) {
+    protected AbstractBuiltInQueryFunction(String functionName, int minimumArgs) {
         this(functionName, new JiraDataTypeImpl(JqlFunctionCFType.class), minimumArgs);
     }
 
-    protected AbstractBuiltInFunction(String functionName, JiraDataType dataType, int minimumArgs) {
+    protected AbstractBuiltInQueryFunction(String functionName, JiraDataType dataType, int minimumArgs) {
         this.functionName = "my_" + functionName;
         this.dataType = dataType;
         this.minimumArgs = minimumArgs;

@@ -1,4 +1,4 @@
-package it.ru.mail.jira.plugins.groovy;
+package it.ru.mail.jira.plugins.groovy.util;
 
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.Issue;
@@ -12,10 +12,6 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.Query;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import it.ru.mail.jira.plugins.groovy.util.ArquillianUtil;
-import it.ru.mail.jira.plugins.groovy.util.IssueHelper;
-import it.ru.mail.jira.plugins.groovy.util.ProjectHelper;
-import it.ru.mail.jira.plugins.groovy.util.UserHelper;
 import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -34,7 +30,7 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 @RunWith(Arquillian.class)
-public class BasicJqlIT {
+public class BasicJqlValuesIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
         "tests/ScriptedFunction"
     );

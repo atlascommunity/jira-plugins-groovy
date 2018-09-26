@@ -18,7 +18,7 @@ import org.apache.lucene.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractIssueLinkFunction extends AbstractBuiltInFunction {
+public abstract class AbstractIssueLinkFunction extends AbstractBuiltInQueryFunction {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected final IssueLinkTypeManager issueLinkTypeManager;

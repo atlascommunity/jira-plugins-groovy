@@ -1,18 +1,17 @@
-import com.atlassian.jira.issue.index.DocumentConstants
+import com.atlassian.jira.JiraDataType
+import com.atlassian.jira.JiraDataTypes
+import com.atlassian.jira.jql.operand.QueryLiteral
 import com.atlassian.jira.jql.query.QueryCreationContext
 import com.atlassian.jira.user.ApplicationUser
 import com.atlassian.jira.util.MessageSet
 import com.atlassian.jira.util.MessageSetImpl
 import com.atlassian.query.clause.TerminalClause
 import com.atlassian.query.operand.FunctionOperand
-import org.apache.lucene.index.Term
-import org.apache.lucene.search.Query
-import org.apache.lucene.search.TermQuery
-import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlQueryFunction
+import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlValuesFunction
 
 import javax.annotation.Nonnull
 
-class TestJqlFunction implements ScriptedJqlQueryFunction {
+class TestJqlValuesFunction implements ScriptedJqlValuesFunction {
     @Override
     MessageSet validate(ApplicationUser user, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
         MessageSet result = new MessageSetImpl()
@@ -28,9 +27,12 @@ class TestJqlFunction implements ScriptedJqlQueryFunction {
     }
 
     @Override
-    Query getQuery(@Nonnull QueryCreationContext queryCreationContext, @Nonnull FunctionOperand operand) {
-        return new TermQuery(new Term(
-            DocumentConstants.ISSUE_ASSIGNEE, queryCreationContext.applicationUser.key
-        ))
+    List<QueryLiteral> getValues(QueryCreationContext queryCreationContext, FunctionOperand functionOperand, TerminalClause terminalClause) {
+        return [new QueryLiteral(functionOperand, queryCreationContext.applicationUser.key)]
+    }
+
+    @Override
+    JiraDataType getDataType() {
+        return JiraDataTypes.USER
     }
 }

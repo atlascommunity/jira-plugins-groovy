@@ -25,7 +25,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 
 @Component
-public class HasLinkTypeFunction extends AbstractBuiltInFunction {
+public class HasLinkTypeFunction extends AbstractBuiltInQueryFunction {
     private final Logger logger = LoggerFactory.getLogger(HasLinkTypeFunction.class);
 
     private final IssueLinkTypeManager issueLinkTypeManager;

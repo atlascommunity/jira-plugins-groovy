@@ -9,14 +9,13 @@ import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import com.google.common.collect.ImmutableList;
 import org.apache.lucene.search.MatchAllDocsQuery;
-import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.AbstractBuiltInFunction;
+import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.AbstractBuiltInQueryFunction;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
 //todo need to figure out how to implement this without custom JavaScript @Component
-public class AggregateExpressionFunction extends AbstractBuiltInFunction {
+public class AggregateExpressionFunction extends AbstractBuiltInQueryFunction {
     //@Autowired
     public AggregateExpressionFunction() {
         super("myAggregateExpression", 2);

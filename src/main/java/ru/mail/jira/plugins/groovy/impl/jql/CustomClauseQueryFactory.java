@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
+import ru.mail.jira.plugins.groovy.api.jql.CustomQueryFunction;
 
 import javax.annotation.Nonnull;
 
@@ -32,8 +33,8 @@ public class CustomClauseQueryFactory implements ClauseQueryFactory {
 
             CustomFunction function = moduleManager.getAllFunctions().get(operand.getName());
 
-            if (function != null) {
-                return function.getQuery(queryCreationContext, terminalClause);
+            if (function instanceof CustomQueryFunction) {
+                return ((CustomQueryFunction) function).getQuery(queryCreationContext, terminalClause);
             } else {
                 logger.debug("function not found {}", operand.getName());
             }

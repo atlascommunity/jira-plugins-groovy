@@ -49,7 +49,7 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 @Component
-public class IssueFieldMatch extends AbstractBuiltInFunction {
+public class IssueFieldMatch extends AbstractBuiltInQueryFunction {
     private final Logger logger = LoggerFactory.getLogger(IssueFieldMatch.class);
     private final FieldManager fieldManager;
     private final SearchProvider searchProvider;

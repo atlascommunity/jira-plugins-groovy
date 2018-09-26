@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-public class HasCommentsFunction extends AbstractBuiltInFunction {
+public class HasCommentsFunction extends AbstractBuiltInQueryFunction {
     private final Logger logger = LoggerFactory.getLogger(HasCommentsFunction.class);
     private final SearchProviderFactory searchProviderFactory;
     private final QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator;

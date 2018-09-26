@@ -16,7 +16,7 @@ import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionForm;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
-import ru.mail.jira.plugins.groovy.api.jql.ScriptFunction;
+import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.JqlFunctionRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
@@ -166,8 +166,8 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
 
         Class functionClass = scriptService.parseClassStatic(form.getScriptBody(), false, ImmutableMap.of());
 
-        if (!ScriptFunction.class.isAssignableFrom(functionClass)) {
-            throw new ValidationException("Must implement ru.mail.jira.plugins.groovy.api.jql.ScriptFunction", "scriptBody");
+        if (!ScriptedJqlFunction.class.isAssignableFrom(functionClass)) {
+            throw new ValidationException("Must implement ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction", "scriptBody");
         }
     }
 
