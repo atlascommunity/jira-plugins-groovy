@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 @RunWith(Arquillian.class)
 public class BasicJqlQueryIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
-        "tests/ScriptedValuesFunction"
+        "tests/ScriptedFunction"
     );
 
     @Inject
@@ -65,7 +65,7 @@ public class BasicJqlQueryIT {
     public void beforeEach() throws Exception {
         ApplicationUser admin = userHelper.getAdmin();
 
-        String script = FileUtil.readArquillianExample("tests/ScriptedValuesFunction");
+        String script = FileUtil.readArquillianExample("tests/ScriptedFunction");
 
         JqlFunctionForm form = new JqlFunctionForm();
         form.setName("testListener" + System.currentTimeMillis());
@@ -108,7 +108,7 @@ public class BasicJqlQueryIT {
             .newBuilder(projectQuery)
             .where()
             .and()
-            .assignee()
+            .field("groovyFunction")
             .in()
             .function(script.getName())
             .buildQuery();
@@ -133,7 +133,7 @@ public class BasicJqlQueryIT {
         Query query = JqlQueryBuilder
             .newBuilder()
             .where()
-            .assignee()
+            .field("groovyFunction")
             .in()
             .function(script.getName())
             .buildQuery();

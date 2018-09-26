@@ -1,4 +1,4 @@
-package it.ru.mail.jira.plugins.groovy.util;
+package it.ru.mail.jira.plugins.groovy;
 
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.Issue;
@@ -12,6 +12,10 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.Query;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import it.ru.mail.jira.plugins.groovy.util.ArquillianUtil;
+import it.ru.mail.jira.plugins.groovy.util.IssueHelper;
+import it.ru.mail.jira.plugins.groovy.util.ProjectHelper;
+import it.ru.mail.jira.plugins.groovy.util.UserHelper;
 import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -32,7 +36,7 @@ import static org.junit.Assert.*;
 @RunWith(Arquillian.class)
 public class BasicJqlValuesIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
-        "tests/ScriptedFunction"
+        "tests/ScriptedValuesFunction"
     );
 
     @Inject
@@ -61,7 +65,7 @@ public class BasicJqlValuesIT {
     public void beforeEach() throws Exception {
         ApplicationUser admin = userHelper.getAdmin();
 
-        String script = FileUtil.readArquillianExample("tests/ScriptedFunction");
+        String script = FileUtil.readArquillianExample("tests/ScriptedValuesFunction");
 
         JqlFunctionForm form = new JqlFunctionForm();
         form.setName("testListener" + System.currentTimeMillis());
@@ -104,7 +108,7 @@ public class BasicJqlValuesIT {
             .newBuilder(projectQuery)
             .where()
             .and()
-            .field("groovyFunction")
+            .assignee()
             .in()
             .function(script.getName())
             .buildQuery();
@@ -129,7 +133,7 @@ public class BasicJqlValuesIT {
         Query query = JqlQueryBuilder
             .newBuilder()
             .where()
-            .field("groovyFunction")
+            .assignee()
             .in()
             .function(script.getName())
             .buildQuery();
