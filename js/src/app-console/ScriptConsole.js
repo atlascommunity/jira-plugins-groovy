@@ -2,7 +2,7 @@
 import React from 'react';
 
 import Button from '@atlaskit/button';
-import {CheckboxStateless} from '@atlaskit/checkbox';
+import {Checkbox} from '@atlaskit/checkbox';
 
 import type {ConsoleResult} from './types';
 
@@ -130,7 +130,7 @@ export class ScriptConsole extends React.Component<Props, State> {
                     value={script}
                     onChange={this._scriptChange}
                 />
-                <CheckboxStateless
+                <Checkbox
                     label={CommonMessages.renderAsHtml}
 
                     isChecked={isHtml}

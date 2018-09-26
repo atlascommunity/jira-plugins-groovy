@@ -7,7 +7,7 @@ import type {Map as MapType} from 'immutable';
 import Button from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
-import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
+import {Checkbox} from '@atlaskit/checkbox';
 import {Label} from '@atlaskit/field-base';
 import {gridSize} from '@atlaskit/theme';
 
@@ -216,17 +216,15 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
             case 'BOOLEAN':
                 return (
                     <div style={{marginTop: `${gridSize()}px`}}>
-                        <CheckboxGroup>
-                            <CheckboxStateless
-                                label={label}
+                        <Checkbox
+                            label={label}
 
-                                isChecked={value || false}
-                                onChange={this._setToggleValue(paramName)}
+                            isChecked={value || false}
+                            onChange={this._setToggleValue(paramName)}
 
-                                name={inputName}
-                                value="true"
-                            />
-                        </CheckboxGroup>
+                            name={inputName}
+                            value="true"
+                        />
                     </div>
                 );
             case 'SCRIPT':

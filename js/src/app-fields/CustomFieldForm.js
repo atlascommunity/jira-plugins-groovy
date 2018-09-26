@@ -8,7 +8,7 @@ import {Record} from 'immutable';
 import type {RecordOf, RecordFactory} from 'immutable';
 
 import Button, {ButtonGroup} from '@atlaskit/button';
-import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
+import {Checkbox} from '@atlaskit/checkbox';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import Page from '@atlaskit/page';
@@ -233,8 +233,8 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                         isInvalid={errorField === 'options'}
                         invalidMessage={errorMessage || ''}
                     >
-                        <CheckboxGroup>
-                            <CheckboxStateless
+                        <div>
+                            <Checkbox
                                 label={FieldMessages.cacheable}
 
                                 isDisabled={waiting}
@@ -246,7 +246,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                                 value="true"
                             />
                             {fieldConfig.needsTemplate &&
-                                <CheckboxStateless
+                                <Checkbox
                                     label="Velocity params"
 
                                     isDisabled={waiting}
@@ -258,7 +258,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                                     value="true"
                                 />
                             }
-                        </CheckboxGroup>
+                        </div>
                     </FormField>
                     <FormField
                         label={FieldMessages.scriptCode}

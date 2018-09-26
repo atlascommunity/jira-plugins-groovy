@@ -13,7 +13,7 @@ import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import {AkFieldRadioGroup} from '@atlaskit/field-radio-group';
-import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
+import {Checkbox} from '@atlaskit/checkbox';
 import {colors} from '@atlaskit/theme';
 import {Label} from '@atlaskit/field-base';
 
@@ -381,8 +381,8 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                 return (
                     <div key={fieldName}>
                         <Label label={ScheduledTaskMessages.transitionOptions}/>
-                        <CheckboxGroup>
-                            <CheckboxStateless
+                        <div>
+                            <Checkbox
                                 isChecked={value.skipConditions || false}
                                 isDisabled={waiting}
                                 onChange={this._toggleTransitionOption2}
@@ -390,7 +390,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                                 value="skipConditions"
                                 name="transition-options"
                             />
-                            <CheckboxStateless
+                            <Checkbox
                                 isChecked={value.skipValidators || false}
                                 isDisabled={waiting}
                                 onChange={this._toggleTransitionOption2}
@@ -398,7 +398,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                                 value="skipValidators"
                                 name="transition-options"
                             />
-                            <CheckboxStateless
+                            <Checkbox
                                 isChecked={value.skipPermissions || false}
                                 isDisabled={waiting}
                                 onChange={this._toggleTransitionOption2}
@@ -406,7 +406,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                                 value="skipPermissions"
                                 name="transition-options"
                             />
-                        </CheckboxGroup>
+                        </div>
                     </div>
                 );
             }

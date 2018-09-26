@@ -8,7 +8,7 @@ import Button, {ButtonGroup} from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import Spinner from '@atlaskit/spinner';
-import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
+import {Checkbox} from '@atlaskit/checkbox';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
@@ -377,29 +377,29 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                         isInvalid={errorField === 'types'}
                         invalidMessage={errorMessage || ''}
                     >
-                        <CheckboxGroup>
-                            <CheckboxStateless
+                        <div>
+                            <Checkbox
                                 isChecked={types.includes('CONDITION')}
                                 onChange={this._toggleType}
                                 label={CommonMessages.condition}
                                 value="CONDITION"
                                 name="script-type-options"
                             />
-                            <CheckboxStateless
+                            <Checkbox
                                 isChecked={types.includes('VALIDATOR')}
                                 onChange={this._toggleType}
                                 label={CommonMessages.validator}
                                 value="VALIDATOR"
                                 name="script-type-options"
                             />
-                            <CheckboxStateless
+                            <Checkbox
                                 isChecked={types.includes('FUNCTION')}
                                 onChange={this._toggleType}
                                 label={CommonMessages.function}
                                 value="FUNCTION"
                                 name="script-type-options"
                             />
-                        </CheckboxGroup>
+                        </div>
                     </FormField>
 
                     <FormField

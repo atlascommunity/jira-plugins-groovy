@@ -6,7 +6,7 @@ import {withRouter} from 'react-router-dom';
 
 import {Record} from 'immutable';
 
-import {CheckboxStateless} from '@atlaskit/checkbox';
+import {Checkbox} from '@atlaskit/checkbox';
 
 import type {AdminScriptType} from './types';
 
@@ -94,7 +94,7 @@ const returnTypes = [{
 
 function HtmlField({values, mutateValue}: AdditionalFieldProps<FormType>): Node {
     return (
-        <CheckboxStateless
+        <Checkbox
             label={CommonMessages.renderAsHtml}
             isChecked={values.get('html') || false}
             // eslint-disable-next-line react/jsx-no-bind

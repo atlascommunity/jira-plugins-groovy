@@ -3,7 +3,7 @@ import React from 'react';
 
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
-import {CheckboxStateless, CheckboxGroup} from '@atlaskit/checkbox';
+import {Checkbox} from '@atlaskit/checkbox';
 import {gridSize} from '@atlaskit/theme';
 
 import {AsyncPicker} from '../common/ak/AsyncPicker';
@@ -170,18 +170,16 @@ export class PropField extends React.PureComponent<Props> {
             case 'BOOLEAN':
                 return (
                     <div style={{marginTop: `${gridSize()}px`}}>
-                        <CheckboxGroup>
-                            <CheckboxStateless
-                                label={label}
-                                name={label}
+                        <Checkbox
+                            label={label}
+                            name={label}
 
-                                //$FlowFixMe
-                                isChecked={value || false}
-                                onChange={this._toggleCallback}
+                            //$FlowFixMe
+                            isChecked={value || false}
+                            onChange={this._toggleCallback}
 
-                                value="true"
-                            />
-                        </CheckboxGroup>
+                            value="true"
+                        />
                     </div>
                 );
             case 'SCRIPT':

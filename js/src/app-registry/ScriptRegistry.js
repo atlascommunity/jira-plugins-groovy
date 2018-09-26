@@ -11,7 +11,7 @@ import Blanket from '@atlaskit/blanket';
 import PageHeader from '@atlaskit/page-header';
 import Button from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
-import {CheckboxStateless} from '@atlaskit/checkbox';
+import {Checkbox} from '@atlaskit/checkbox';
 import Breadcrumbs from '@atlaskit/breadcrumbs';
 
 import {ScriptDirectory} from './ScriptDirectory';
@@ -181,7 +181,7 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                                     />
                                 </div>
                                 <div className="flex-vertical-middle">
-                                    <CheckboxStateless
+                                    <Checkbox
                                         label={RegistryMessages.onlyUnused}
                                         isDisabled={!isScriptUsageReady}
 
