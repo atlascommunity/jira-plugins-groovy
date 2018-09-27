@@ -16,6 +16,8 @@ public final class Const {
     private Const() {
     }
 
+    public static final String CREATED_COMMENT = "Created.";
+
     public static final String SEARCHER_DATETIME = "com.atlassian.jira.plugin.system.customfieldtypes:datetimerange";
     public static final String SEARCHER_DATE = "com.atlassian.jira.plugin.system.customfieldtypes:daterange";
 

@@ -3,9 +3,11 @@ package ru.mail.jira.plugins.groovy.impl.repository;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.jira.datetime.DateTimeFormatter;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.pocketknife.api.querydsl.DatabaseAccessor;
 import com.atlassian.pocketknife.api.querydsl.util.OnRollback;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import net.java.ao.DBParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 import static ru.mail.jira.plugins.groovy.util.QueryDslTables.AUDIT_LOG_ENTRY;
 
 @Component
+@ExportAsDevService(AuditLogRepository.class)
 public class AuditLogRepositoryImpl implements AuditLogRepository {
     private final ActiveObjects activeObjects;
     private final DateTimeFormatter dateTimeFormatter;
@@ -64,6 +67,25 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
     }
 
     @Override
+    public List<AuditLogEntryDto> findAllForEntity(int id, EntityType entityType) {
+        return databaseAccessor.run(
+            connection -> connection
+                .select(AUDIT_LOG_ENTRY.all())
+                .from(AUDIT_LOG_ENTRY)
+                .where(
+                    AUDIT_LOG_ENTRY.CATEGORY.eq(entityType.name()),
+                    AUDIT_LOG_ENTRY.ENTITY_ID.eq(id)
+                )
+                .orderBy(AUDIT_LOG_ENTRY.ID.asc())
+                .fetch()
+                .stream()
+                .map(this::buildDto)
+                .collect(Collectors.toList()),
+            OnRollback.NOOP
+        );
+    }
+
+    @Override
     public Page<AuditLogEntryDto> getPagedEntries(int offset, int limit, Set<String> users, Set<EntityType> categories, Set<EntityAction> actions) {
         return databaseAccessor.run(connection -> {
             List<Predicate> conditions = new ArrayList<>();
@@ -84,31 +106,14 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
 
             List<AuditLogEntryDto> items = connection
                 .select(AUDIT_LOG_ENTRY.all())
-                .from(
-                    AUDIT_LOG_ENTRY
-                )
+                .from(AUDIT_LOG_ENTRY)
                 .where(conditionsArray)
                 .orderBy(AUDIT_LOG_ENTRY.ID.desc())
                 .limit(limit)
                 .offset(offset)
                 .fetch()
                 .stream()
-                .map(row -> {
-                    AuditLogEntryDto result = new AuditLogEntryDto();
-
-                    EntityType category = EntityType.valueOf(row.get(AUDIT_LOG_ENTRY.CATEGORY));
-
-                    result.setDate(dateTimeFormatter.forLoggedInUser().format(row.get(AUDIT_LOG_ENTRY.DATE)));
-                    result.setId(row.get(AUDIT_LOG_ENTRY.ID));
-                    result.setUser(userMapper.buildUser(row.get(AUDIT_LOG_ENTRY.USER_KEY)));
-                    result.setAction(EntityAction.valueOf(row.get(AUDIT_LOG_ENTRY.ACTION)));
-                    result.setCategory(category);
-                    result.setDescription(row.get(AUDIT_LOG_ENTRY.DESCRIPTION));
-
-                    fillEntityData(result, category, row.get(AUDIT_LOG_ENTRY.ENTITY_ID));
-
-                    return result;
-                })
+                .map(this::buildDto)
                 .collect(Collectors.toList());
 
             long totalCount = connection
@@ -186,5 +191,22 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
             result.setParentName(parentName);
             result.setDeleted(deleted);
         }
+    }
+
+    private AuditLogEntryDto buildDto(Tuple row) {
+        AuditLogEntryDto result = new AuditLogEntryDto();
+
+        EntityType category = EntityType.valueOf(row.get(AUDIT_LOG_ENTRY.CATEGORY));
+
+        result.setDate(dateTimeFormatter.forLoggedInUser().format(row.get(AUDIT_LOG_ENTRY.DATE)));
+        result.setId(row.get(AUDIT_LOG_ENTRY.ID));
+        result.setUser(userMapper.buildUser(row.get(AUDIT_LOG_ENTRY.USER_KEY)));
+        result.setAction(EntityAction.valueOf(row.get(AUDIT_LOG_ENTRY.ACTION)));
+        result.setCategory(category);
+        result.setDescription(row.get(AUDIT_LOG_ENTRY.DESCRIPTION));
+
+        fillEntityData(result, category, row.get(AUDIT_LOG_ENTRY.ENTITY_ID));
+
+        return result;
     }
 }

@@ -5,6 +5,7 @@ import com.atlassian.beehive.ClusterLock;
 import com.atlassian.beehive.ClusterLockService;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
@@ -32,6 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@ExportAsDevService(ScriptRepository.class)
 public class ScriptRepositoryImpl implements ScriptRepository {
     private static final Collator COLLATOR = Collator.getInstance();
 

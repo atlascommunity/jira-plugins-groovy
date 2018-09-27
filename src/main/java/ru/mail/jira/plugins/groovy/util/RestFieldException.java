@@ -11,4 +11,13 @@ public class RestFieldException extends IllegalArgumentException {
     public String getField() {
         return this.field;
     }
+
+    @Override
+    public String getMessage() {
+        if (field != null) {
+            return field + ": " + super.getMessage();
+        }
+
+        return super.getMessage();
+    }
 }
