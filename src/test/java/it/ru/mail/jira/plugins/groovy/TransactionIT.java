@@ -37,7 +37,7 @@ public class TransactionIT {
 
     @Test
     public void transactionalOnInterfaceShouldRollback() {
-        String directoryName = "testdir" + System.currentTimeMillis();
+        String directoryName = "testdir1" + System.currentTimeMillis();
 
         try {
             transactionService.transactional(userHelper.getAdmin(), directoryName);
@@ -54,7 +54,7 @@ public class TransactionIT {
 
     @Test
     public void nonTransactionalShouldNotRollback() {
-        String directoryName = "testdir" + System.currentTimeMillis();
+        String directoryName = "testdir2" + System.currentTimeMillis();
 
         try {
             transactionService.nonTransactional(userHelper.getAdmin(), directoryName);
