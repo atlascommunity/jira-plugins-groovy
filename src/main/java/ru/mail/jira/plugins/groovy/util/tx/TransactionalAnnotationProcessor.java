@@ -34,7 +34,7 @@ public final class TransactionalAnnotationProcessor implements BeanPostProcessor
                     ProxyFactory proxyFactory = new ProxyFactory(bean);
                     proxyFactory.addAdvice(interceptor);
 
-                    return proxyFactory.getProxy(TransactionalInterceptor.class.getClassLoader());
+                    return proxyFactory.getProxy(TransactionalAnnotationProcessor.class.getClassLoader());
                 }
                 else return bean;
             }

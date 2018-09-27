@@ -327,6 +327,8 @@
                             <!-- imports -->
                             org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
+                            <!-- spring imports -->
+                            org.springframework.aop,
                             <!-- jira stuff -->
                             com.atlassian.jira.plugin.webfragment.conditions,
                             com.atlassian.jira.issue.customfields.searchers,
