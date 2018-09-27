@@ -1,5 +1,6 @@
 package ru.mail.jira.plugins.groovy.api.repository;
 
+import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.jira.user.ApplicationUser;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScript;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigDto;
@@ -12,6 +13,7 @@ public interface FieldConfigRepository {
 
     FieldConfigDto getConfig(long id, boolean includeChangelogs);
 
+    @Transactional
     FieldConfigDto updateConfig(ApplicationUser user, long id, FieldConfigForm form);
 
     FieldScript getScript(long fieldConfigId);
