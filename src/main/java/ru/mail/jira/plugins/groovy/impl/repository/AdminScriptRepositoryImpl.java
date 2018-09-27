@@ -80,7 +80,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
 
         String comment = form.getComment();
         if (comment == null) {
-            comment = "Created.";
+            comment = Const.CREATED_COMMENT;
         }
 
         changelogHelper.addChangelog(AdminScriptChangelog.class, script.getID(), user.getKey(), diff, comment);

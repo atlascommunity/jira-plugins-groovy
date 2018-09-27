@@ -176,7 +176,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
 
             comment = form.getComment();
             if (comment == null) {
-                comment = "Created.";
+                comment = Const.CREATED_COMMENT;
             }
 
             changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldConfig.getID(), user.getKey(), diff, comment, additionalParams);

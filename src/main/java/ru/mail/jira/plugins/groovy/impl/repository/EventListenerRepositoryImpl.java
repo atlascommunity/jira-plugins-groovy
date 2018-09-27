@@ -118,7 +118,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         String comment = form.getComment();
         if (comment == null) {
-            comment = "Created.";
+            comment = Const.CREATED_COMMENT;
         }
 
         changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, comment);

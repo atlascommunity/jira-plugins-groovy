@@ -22,6 +22,7 @@ import ru.mail.jira.plugins.groovy.api.repository.JqlFunctionRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
+import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 
 import java.util.*;
@@ -94,7 +95,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
 
         String comment = form.getComment();
         if (comment == null) {
-            comment = "Created.";
+            comment = Const.CREATED_COMMENT;
         }
 
         changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), user.getKey(), diff, comment);

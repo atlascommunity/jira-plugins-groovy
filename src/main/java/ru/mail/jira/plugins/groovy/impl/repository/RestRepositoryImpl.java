@@ -90,7 +90,7 @@ public class RestRepositoryImpl implements RestRepository {
 
         String comment = form.getComment();
         if (comment == null) {
-            comment = "Created.";
+            comment = Const.CREATED_COMMENT;
         }
 
         changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, comment);
