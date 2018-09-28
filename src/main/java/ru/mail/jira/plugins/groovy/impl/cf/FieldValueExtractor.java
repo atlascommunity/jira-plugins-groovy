@@ -12,9 +12,8 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScript;
+import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScriptDto;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
-import ru.mail.jira.plugins.groovy.impl.groovy.statik.TypeUtil;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
@@ -44,7 +43,7 @@ public class FieldValueExtractor {
         this.cache = cache;
     }
 
-    public FieldScript getScript(CustomField field, Issue issue) {
+    public FieldScriptDto getScript(CustomField field, Issue issue) {
         FieldConfig config = field.getRelevantConfig(issue);
 
         if (config != null) {
@@ -53,7 +52,7 @@ public class FieldValueExtractor {
         return null;
     }
 
-    public ValueHolder preview(Issue issue, CustomField field, FieldScript script) {
+    public ValueHolder preview(Issue issue, CustomField field, FieldScriptDto script) {
         CustomFieldSearcher searcher = field.getCustomFieldSearcher();
         Class type = searcher != null ?
             Const.SEARCHER_TYPES.getOrDefault(searcher.getDescriptor().getCompleteKey(), Object.class) : Object.class;
@@ -75,12 +74,12 @@ public class FieldValueExtractor {
             throw new IllegalStateException("Trying to extract value from script of other field");
         }
 
-        FieldScript script = getScript(field, issue);
+        FieldScriptDto script = getScript(field, issue);
 
         return extractValueHolder(script, field, issue, tType);
     }
 
-    private ValueHolder extractValueHolder(FieldScript script, CustomField field, Issue issue, Class tType) {
+    private ValueHolder extractValueHolder(FieldScriptDto script, CustomField field, Issue issue, Class tType) {
         if (script != null && script.getScriptBody() != null && script.getId() != null) {
             if (script.isCacheable()) {
                 try {
@@ -125,7 +124,7 @@ public class FieldValueExtractor {
         CustomField field,
         Issue issue,
         long lastModified,
-        FieldScript script,
+        FieldScriptDto script,
         Class<T> tType
     ) {
         boolean isTemplated = field.getCustomFieldType() instanceof TemplateScriptedCFType;
@@ -142,7 +141,7 @@ public class FieldValueExtractor {
         );
     }
 
-    private <T> T doExtractValue(CustomField field, FieldScript script, Issue issue, Map<String, Object> velocityParams, Class<T> tType) {
+    private <T> T doExtractValue(CustomField field, FieldScriptDto script, Issue issue, Map<String, Object> velocityParams, Class<T> tType) {
         if (logger.isTraceEnabled()) {
             logger.trace("Extracting value from issue {} for field {} (cacheable: {})", issue.getKey(), field.getId(), script.isCacheable());
         }

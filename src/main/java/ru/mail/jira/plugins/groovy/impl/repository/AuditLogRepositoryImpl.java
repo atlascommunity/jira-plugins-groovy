@@ -169,7 +169,7 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
                     break;
                 }
                 case CUSTOM_FIELD: {
-                    Long fieldConfigId = activeObjects.get(FieldConfig.class, entityId).getFieldConfigId();
+                    Long fieldConfigId = activeObjects.get(FieldScript.class, entityId).getFieldConfigId();
                     result.setScriptId((int) (long) fieldConfigId);
                     name = customFieldHelper.getFieldName(fieldConfigId);
                     deleted = false;

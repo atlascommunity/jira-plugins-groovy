@@ -4,9 +4,11 @@ import net.java.ao.Entity;
 import net.java.ao.OneToMany;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
+import net.java.ao.schema.Table;
 import net.java.ao.schema.Unique;
 
-public interface FieldConfig extends Entity {
+@Table("FIELD_CONFIG")
+public interface FieldScript extends Entity {
     @NotNull
     @Unique
     Long getFieldConfigId();

@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 @XmlRootElement
-public class FieldScript {
+public class FieldScriptDto {
     @XmlElement
     private String id;
     @XmlElement

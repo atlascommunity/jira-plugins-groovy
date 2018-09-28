@@ -11,7 +11,7 @@ import com.atlassian.jira.util.velocity.NumberTool;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScript;
+import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScriptDto;
 import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
 
 import javax.annotation.Nullable;
@@ -39,7 +39,7 @@ public class TemplateScriptedCFType extends ScriptedCFType<Object, Object> {
 
     @Override
     public void fillDynamicVelocityParams(Map<String, Object> params, Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
-        FieldScript script = valueExtractor.getScript(field, issue);
+        FieldScriptDto script = valueExtractor.getScript(field, issue);
 
         params.put("template", script != null ? script.getTemplate() : "");
 

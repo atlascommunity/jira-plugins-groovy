@@ -16,7 +16,7 @@ import com.atlassian.templaterenderer.TemplateRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigForm;
-import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScript;
+import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.cf.PreviewForm;
 import ru.mail.jira.plugins.groovy.api.dto.cf.PreviewResult;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
@@ -76,7 +76,7 @@ public class FieldPreviewService {
         }
         ScriptedCFType type = ((ScriptedCFType) customField.getCustomFieldType());
 
-        FieldScript script = new FieldScript();
+        FieldScriptDto script = new FieldScriptDto();
         script.setCacheable(false);
         script.setId(UUID.randomUUID().toString());
         script.setScriptBody(configForm.getScriptBody());
