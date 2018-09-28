@@ -11,15 +11,14 @@ import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dao.ListenerDao;
 import ru.mail.jira.plugins.groovy.api.entity.*;
-import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.*;
 import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
@@ -45,11 +44,11 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     private final Cache<String, List<ScriptedEventListener>> cache;
     private final ActiveObjects ao;
     private final I18nHelper i18nHelper;
+    private final ListenerDao listenerDao;
     private final JsonMapper jsonMapper;
     private final ChangelogHelper changelogHelper;
     private final ScriptService scriptService;
     private final ExecutionRepository executionRepository;
-    private final AuditService auditService;
     private final DelegatingClassLoader classLoader;
 
     @Autowired
@@ -57,11 +56,11 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         @ComponentImport CacheManager cacheManager,
         @ComponentImport ActiveObjects ao,
         @ComponentImport I18nHelper i18nHelper,
+        ListenerDao listenerDao,
         JsonMapper jsonMapper,
         ChangelogHelper changelogHelper,
         ScriptService scriptService,
         ExecutionRepository executionRepository,
-        AuditService auditService,
         DelegatingClassLoader classLoader
     ) {
         cache = cacheManager.getCache(EventListenerRepositoryImpl.class.getCanonicalName() + ".cache",
@@ -74,11 +73,11 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         );
         this.ao = ao;
         this.i18nHelper = i18nHelper;
+        this.listenerDao = listenerDao;
         this.jsonMapper = jsonMapper;
         this.changelogHelper = changelogHelper;
         this.scriptService = scriptService;
         this.executionRepository = executionRepository;
-        this.auditService = auditService;
         this.classLoader = classLoader;
     }
 
@@ -104,28 +103,9 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     public EventListenerDto createEventListener(ApplicationUser user, EventListenerForm form) {
         validateListener(true, form);
 
-        Listener listener = ao.create(
-            Listener.class,
-            new DBParam("UUID", UUID.randomUUID().toString()),
-            new DBParam("NAME", form.getName()),
-            new DBParam("DESCRIPTION", form.getDescription()),
-            new DBParam("SCRIPT_BODY", form.getScriptBody()),
-            new DBParam("DELETED", false),
-            new DBParam("CONDITION", jsonMapper.write(form.getCondition()))
-        );
-
-        String diff = changelogHelper.generateDiff(listener.getID(), "", listener.getName(), "", form.getScriptBody());
-
-        String comment = form.getComment();
-        if (comment == null) {
-            comment = Const.CREATED_COMMENT;
-        }
-
-        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, comment);
+        Listener listener = listenerDao.createEventListener(user, form);
 
         cache.remove(VALUE_KEY);
-
-        addAuditLogAndNotify(user, EntityAction.CREATED, listener, diff, comment);
 
         return buildDto(listener, true, true);
     }
@@ -134,60 +114,30 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     public EventListenerDto updateEventListener(ApplicationUser user, int id, EventListenerForm form) {
         validateListener(false, form);
 
-        Listener listener = ao.get(Listener.class, id);
-
-        if (listener == null || listener.isDeleted()) {
-            throw new RuntimeException("Event listener is deleted");
-        }
-
-        String diff = changelogHelper.generateDiff(id, listener.getName(), form.getName(), listener.getScriptBody(), form.getScriptBody());
-        String comment = form.getComment();
-
-        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, comment);
-
-        listener.setName(form.getName());
-        listener.setDescription(form.getDescription());
-        listener.setUuid(UUID.randomUUID().toString());
-        listener.setScriptBody(form.getScriptBody());
-        listener.setCondition(jsonMapper.write(form.getCondition()));
-        listener.save();
+        Listener listener = listenerDao.updateEventListener(user, id, form);
 
         cache.remove(VALUE_KEY);
-
-        addAuditLogAndNotify(user, EntityAction.UPDATED, listener, diff, comment);
 
         return buildDto(listener, true, true);
     }
 
     @Override
     public void deleteEventListener(ApplicationUser user, int id) {
-        Listener listener = ao.get(Listener.class, id);
-        listener.setDeleted(true);
-        listener.save();
+        listenerDao.deleteEventListener(user, id);
 
         cache.remove(VALUE_KEY);
-
-        addAuditLogAndNotify(user, EntityAction.DELETED, listener, null, listener.getID() + " - " + listener.getName());
     }
 
     @Override
     public void restoreEventListener(ApplicationUser user, int id) {
-        Listener listener = ao.get(Listener.class, id);
-        listener.setDeleted(false);
-        listener.save();
+        listenerDao.restoreEventListener(user, id);
 
         cache.remove(VALUE_KEY);
-
-        addAuditLogAndNotify(user, EntityAction.RESTORED, listener, null, listener.getID() + " - " + listener.getName());
     }
 
     @Override
     public void invalidate() {
         cache.removeAll();
-    }
-
-    private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, Listener listener, String diff, String description) {
-        auditService.addAuditLogAndNotify(user, action, EntityType.LISTENER, listener, diff, description);
     }
 
     private EventListenerDto buildDto(Listener listener, boolean includeChangelogs, boolean includeErrorCount) {
