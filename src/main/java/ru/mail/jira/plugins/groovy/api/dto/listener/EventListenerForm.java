@@ -12,4 +12,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class EventListenerForm extends ScriptForm {
     @XmlElement
     private ConditionDescriptor condition;
+
+    public boolean matches(EventListenerForm other) {
+        return super.matches(other)
+            && condition.equals(other.condition);
+    }
 }

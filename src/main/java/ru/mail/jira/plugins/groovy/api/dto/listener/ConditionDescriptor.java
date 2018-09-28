@@ -6,6 +6,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter @Setter
@@ -22,4 +23,20 @@ public class ConditionDescriptor {
     private Set<Long> typeIds;
 
     private Class classInstance;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConditionDescriptor that = (ConditionDescriptor) o;
+        return type == that.type &&
+            Objects.equals(className, that.className) &&
+            Objects.equals(projectIds, that.projectIds) &&
+            Objects.equals(typeIds, that.typeIds);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, className, projectIds, typeIds);
+    }
 }
