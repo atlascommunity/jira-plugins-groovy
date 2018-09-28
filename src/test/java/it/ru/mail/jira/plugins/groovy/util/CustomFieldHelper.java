@@ -28,6 +28,13 @@ public class CustomFieldHelper {
         );
     }
 
+    public CustomField createTemplateField() throws GenericEntityException {
+        return createField(
+            "ru.mail.jira.plugins.groovy:groovy-template-field",
+            "com.atlassian.jira.plugin.system.customfieldtypes:exactnumber"
+        );
+    }
+
     public CustomField createField(String typeKey, String searcherKey) throws GenericEntityException {
         CustomFieldType type = customFieldManager.getCustomFieldType(typeKey);
         CustomFieldSearcher searcher = customFieldManager.getCustomFieldSearcher(searcherKey);
