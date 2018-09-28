@@ -17,7 +17,11 @@ public class ChangeLogHelper {
     private TestHelperService testHelperService;
 
     public void assertAuditLogCreated(Class<? extends AbstractChangelog> changelogClass, int id, String comment, ApplicationUser author) {
-        AbstractChangelog[] changelogs = testHelperService.getActiveObjects().find(changelogClass, "SCRIPT_ID = ?", id);
+        assertAuditLogCreated(changelogClass, "SCRIPT_ID = ?", id, comment, author);
+    }
+
+    public void assertAuditLogCreated(Class<? extends AbstractChangelog> changelogClass, String scriptQuery, int id, String comment, ApplicationUser author) {
+        AbstractChangelog[] changelogs = testHelperService.getActiveObjects().find(changelogClass, scriptQuery, id);
 
         assertTrue(changelogs.length > 0);
 
