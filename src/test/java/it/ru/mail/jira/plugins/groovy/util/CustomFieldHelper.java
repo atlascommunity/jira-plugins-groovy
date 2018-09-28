@@ -6,6 +6,7 @@ import com.atlassian.jira.issue.context.GlobalIssueContext;
 import com.atlassian.jira.issue.customfields.CustomFieldSearcher;
 import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.fields.CustomField;
+import com.atlassian.jira.issue.fields.config.FieldConfig;
 import com.atlassian.jira.issue.fields.config.manager.FieldConfigSchemeManager;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableList;
@@ -40,5 +41,9 @@ public class CustomFieldHelper {
 
     public void deleteField(CustomField field) throws RemoveException {
         customFieldManager.removeCustomField(field);
+    }
+
+    public FieldConfig getFirstConfig(CustomField field) {
+        return field.getConfigurationSchemes().iterator().next().getConfigs().values().iterator().next();
     }
 }

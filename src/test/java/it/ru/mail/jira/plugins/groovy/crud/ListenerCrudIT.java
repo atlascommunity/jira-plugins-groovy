@@ -35,7 +35,7 @@ public class ListenerCrudIT {
     @Inject
     private AuditLogHelper auditLogHelper;
     @Inject
-    protected ChangeLogHelper changeLogHelper;
+    private ChangeLogHelper changeLogHelper;
 
     @BeforeDeployment
     public static Archive<?> prepareArchive(Archive<?> archive) {
@@ -75,7 +75,7 @@ public class ListenerCrudIT {
         assertTrue(form.matches(script));
         assertTrue(isScriptExists(script.getId()));
         auditLogHelper.assertAuditLogCreated(script.getId(), EntityType.LISTENER, EntityAction.CREATED);
-        changeLogHelper.assertAuditLogCreated(ListenerChangelog.class, "LISTENER_ID = ?", script.getId(), Const.CREATED_COMMENT, userHelper.getAdmin());
+        changeLogHelper.assertChangeLogCreated(ListenerChangelog.class, "LISTENER_ID = ?", script.getId(), Const.CREATED_COMMENT, userHelper.getAdmin());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class ListenerCrudIT {
         assertNotNull(updatedScript);
         assertTrue(form.matches(updatedScript));
         auditLogHelper.assertAuditLogCreated(script.getId(), EntityType.LISTENER, EntityAction.UPDATED);
-        changeLogHelper.assertAuditLogCreated(ListenerChangelog.class, "LISTENER_ID = ?", script.getId(), comment, userHelper.getAdmin());
+        changeLogHelper.assertChangeLogCreated(ListenerChangelog.class, "LISTENER_ID = ?", script.getId(), comment, userHelper.getAdmin());
     }
 
     @Test

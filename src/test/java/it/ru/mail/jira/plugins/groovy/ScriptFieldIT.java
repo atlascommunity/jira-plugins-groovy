@@ -86,7 +86,7 @@ public class ScriptFieldIT {
 
     @Test
     public void scriptedFieldShouldWork() throws Exception {
-        FieldConfig fieldConfig = field.getConfigurationSchemes().iterator().next().getConfigs().values().iterator().next();
+        FieldConfig fieldConfig = fieldHelper.getFirstConfig(field);
 
         assertNotNull(fieldConfig);
 

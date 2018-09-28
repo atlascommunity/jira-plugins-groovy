@@ -16,11 +16,11 @@ public class ChangeLogHelper {
     @ComponentImport
     private TestHelperService testHelperService;
 
-    public void assertAuditLogCreated(Class<? extends AbstractChangelog> changelogClass, int id, String comment, ApplicationUser author) {
-        assertAuditLogCreated(changelogClass, "SCRIPT_ID = ?", id, comment, author);
+    public void assertChangeLogCreated(Class<? extends AbstractChangelog> changelogClass, int id, String comment, ApplicationUser author) {
+        assertChangeLogCreated(changelogClass, "SCRIPT_ID = ?", id, comment, author);
     }
 
-    public void assertAuditLogCreated(Class<? extends AbstractChangelog> changelogClass, String scriptQuery, int id, String comment, ApplicationUser author) {
+    public void assertChangeLogCreated(Class<? extends AbstractChangelog> changelogClass, String scriptQuery, int id, String comment, ApplicationUser author) {
         AbstractChangelog[] changelogs = testHelperService.getActiveObjects().find(changelogClass, scriptQuery, id);
 
         assertTrue(changelogs.length > 0);

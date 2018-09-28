@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.groovy.api.dto.cf;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -9,11 +10,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 import java.util.Objects;
 
-@Getter @Setter
+@Getter @Setter @ToString
 @XmlRootElement
 public class FieldConfigDto extends FieldConfigForm {
     @XmlElement
     private Long id;
+    @XmlElement
+    private Integer fieldScriptId;
     @XmlElement
     private String name;
     @XmlElement

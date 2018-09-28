@@ -34,7 +34,7 @@ public class RegistryCrudIT {
     @Inject
     private AuditLogHelper auditLogHelper;
     @Inject
-    protected ChangeLogHelper changeLogHelper;
+    private ChangeLogHelper changeLogHelper;
 
     @BeforeDeployment
     public static Archive<?> prepareArchive(Archive<?> archive) {
@@ -110,7 +110,7 @@ public class RegistryCrudIT {
         assertTrue(form.matches(script));
         assertTrue(isScriptExists(script.getId()));
         auditLogHelper.assertAuditLogCreated(script.getId(), EntityType.REGISTRY_SCRIPT, EntityAction.CREATED);
-        changeLogHelper.assertAuditLogCreated(Changelog.class, script.getId(), Const.CREATED_COMMENT, userHelper.getAdmin());
+        changeLogHelper.assertChangeLogCreated(Changelog.class, script.getId(), Const.CREATED_COMMENT, userHelper.getAdmin());
     }
 
     @Test
@@ -130,7 +130,7 @@ public class RegistryCrudIT {
         assertNotNull(updatedScript);
         assertTrue(form.matches(updatedScript));
         auditLogHelper.assertAuditLogCreated(script.getId(), EntityType.REGISTRY_SCRIPT, EntityAction.UPDATED);
-        changeLogHelper.assertAuditLogCreated(Changelog.class, script.getId(), comment, userHelper.getAdmin());
+        changeLogHelper.assertChangeLogCreated(Changelog.class, script.getId(), comment, userHelper.getAdmin());
     }
 
     @Test

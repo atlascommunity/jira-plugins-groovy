@@ -244,6 +244,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             result.setVelocityParamsEnabled(fieldScript.isVelocityParamsEnabled());
             result.setScriptBody(fieldScript.getScriptBody());
             result.setUuid(fieldScript.getUuid());
+            result.setFieldScriptId(fieldScript.getID());
 
             if (isTemplated) {
                 result.setTemplate(fieldScript.getTemplate());

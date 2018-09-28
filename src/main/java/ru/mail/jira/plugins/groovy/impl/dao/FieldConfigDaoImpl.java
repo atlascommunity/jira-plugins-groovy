@@ -120,7 +120,7 @@ public class FieldConfigDaoImpl implements FieldConfigDao {
         fieldScript.save();
 
         CustomField cf = jiraFieldConfig.getCustomField();
-        addAuditLogAndNotify(user, EntityAction.CREATED, fieldScript, (int) configId, cf != null ? cf.getName() : "undefined", diff, templateDiff, form.getComment());
+        addAuditLogAndNotify(user, EntityAction.UPDATED, fieldScript, (int) configId, cf != null ? cf.getName() : "undefined", diff, templateDiff, form.getComment());
 
         return fieldScript;
     }

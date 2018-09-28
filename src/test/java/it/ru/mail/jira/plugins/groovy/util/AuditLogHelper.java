@@ -21,6 +21,10 @@ public class AuditLogHelper {
     private AuditLogRepository auditLogRepository;
 
     public void assertAuditLogCreated(int id, EntityType entityType, EntityAction action) {
+        assertAuditLogCreated(id, id, entityType, action);
+    }
+
+    public void assertAuditLogCreated(int id, long scriptId, EntityType entityType, EntityAction action) {
         List<AuditLogEntryDto> auditLogs = auditLogRepository.findAllForEntity(id, entityType);
 
         assertTrue(auditLogs.size() > 0);
@@ -28,7 +32,7 @@ public class AuditLogHelper {
         AuditLogEntryDto lastItem = auditLogs.get(auditLogs.size() - 1);
 
         assertNotNull(lastItem);
-        assertEquals(id, (long) lastItem.getScriptId());
+        assertEquals(scriptId, (long) lastItem.getScriptId());
         assertEquals(entityType, lastItem.getCategory());
         assertEquals(action, lastItem.getAction());
     }
