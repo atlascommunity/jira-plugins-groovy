@@ -1,6 +1,5 @@
 package ru.mail.jira.plugins.groovy.util.tx;
 
-import net.java.ao.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.ProxyFactory;
@@ -13,12 +12,6 @@ public final class TransactionalAnnotationProcessor implements BeanPostProcessor
     private final Logger logger = LoggerFactory.getLogger(TransactionalAnnotationProcessor.class);
 
     private final TransactionalInterceptor interceptor = new TransactionalInterceptor();
-
-    public TransactionalAnnotationProcessor() {
-        // AO-283, http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6588239
-        // prevent a sun (Oracle) JVM deadlock.
-        Transaction.class.getAnnotations();
-    }
 
     public Object postProcessBeforeInitialization(Object o, String s) throws BeansException {
         return o;
