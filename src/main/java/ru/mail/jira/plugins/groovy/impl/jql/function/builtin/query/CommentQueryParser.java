@@ -38,6 +38,7 @@ public class CommentQueryParser extends AbstractEntityQueryParser {
             groupManager,
             userManager,
             jiraCompatibilityHelper,
+            false,
             DocumentConstants.COMMENT_CREATED, DocumentConstants.COMMENT_AUTHOR, DocumentConstants.COMMENT_BODY,
             DocumentConstants.COMMENT_LEVEL, DocumentConstants.COMMENT_LEVEL_ROLE
         );

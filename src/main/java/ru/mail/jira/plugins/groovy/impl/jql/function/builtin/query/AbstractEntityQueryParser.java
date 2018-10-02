@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query;
 
 import com.atlassian.crowd.embedded.api.Group;
+import com.atlassian.jira.datetime.LocalDateFactory;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.LikeQueryFactory;
@@ -52,6 +53,7 @@ public abstract class AbstractEntityQueryParser {
 
     private final JiraCompatibilityHelper jiraCompatibilityHelper;
 
+    private final boolean isLocalDate;
     private final String createdField;
     private final String authorField;
     private final String bodyField;
@@ -66,7 +68,7 @@ public abstract class AbstractEntityQueryParser {
         GroupManager groupManager,
         UserManager userManager,
         JiraCompatibilityHelper jiraCompatibilityHelper,
-        String createdField, String authorField, String bodyField,
+        boolean isLocalDate, String createdField, String authorField, String bodyField,
         String levelField, String roleLevelField
     ) {
         this.projectRoleManager = projectRoleManager;
@@ -78,6 +80,7 @@ public abstract class AbstractEntityQueryParser {
 
         this.jiraCompatibilityHelper = jiraCompatibilityHelper;
 
+        this.isLocalDate = isLocalDate;
         this.createdField = createdField;
         this.authorField = authorField;
         this.bodyField = bodyField;
@@ -142,7 +145,7 @@ public abstract class AbstractEntityQueryParser {
                         query.add(
                             new TermRangeQuery(
                                 createdField,
-                                LuceneUtils.dateToString(since), LuceneUtils.dateToString(until),
+                                formatDate(since), formatDate(until),
                                 true, true
                             ),
                             BooleanClause.Occur.MUST
@@ -157,7 +160,7 @@ public abstract class AbstractEntityQueryParser {
                         Date date = jqlDateSupport.convertToDate(value);
 
                         query.add(
-                            new TermRangeQuery(createdField, null, LuceneUtils.dateToString(date), true, true),
+                            new TermRangeQuery(createdField, null, formatDate(date), true, false),
                             BooleanClause.Occur.MUST
                         );
                     } else {
@@ -170,7 +173,7 @@ public abstract class AbstractEntityQueryParser {
                         Date date = jqlDateSupport.convertToDate(value);
 
                         query.add(
-                            new TermRangeQuery(createdField, LuceneUtils.dateToString(date), null, true, true),
+                            new TermRangeQuery(createdField, formatDate(date), null, false, true),
                             BooleanClause.Occur.MUST
                         );
                     } else {
@@ -316,6 +319,14 @@ public abstract class AbstractEntityQueryParser {
         }
 
         return listener.values;
+    }
+
+    private String formatDate(Date date) {
+        if (isLocalDate) {
+            return LuceneUtils.localDateToString(LocalDateFactory.from(date));
+        } else {
+            return LuceneUtils.dateToString(date);
+        }
     }
 
     protected abstract Query addPermissionsCheck(QueryCreationContext queryCreationContext, Query query);

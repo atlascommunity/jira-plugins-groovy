@@ -38,6 +38,7 @@ public class WorkLogQueryParser extends AbstractEntityQueryParser {
             groupManager,
             userManager,
             jiraCompatibilityHelper,
+            true,
             DocumentConstants.WORKLOG_DATE, DocumentConstants.WORKLOG_AUTHOR, DocumentConstants.WORKLOG_COMMENT,
             DocumentConstants.WORKLOG_LEVEL, DocumentConstants.WORKLOG_LEVEL_ROLE
         );
