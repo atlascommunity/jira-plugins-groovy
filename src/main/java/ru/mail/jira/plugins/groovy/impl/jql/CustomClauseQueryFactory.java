@@ -31,7 +31,7 @@ public class CustomClauseQueryFactory implements ClauseQueryFactory {
         if (terminalClause.getOperand() instanceof FunctionOperand) {
             FunctionOperand operand = (FunctionOperand) terminalClause.getOperand();
 
-            CustomFunction function = moduleManager.getAllFunctions().get(operand.getName());
+            CustomFunction function = moduleManager.getAllFunctions().get(operand.getName().toLowerCase());
 
             if (function instanceof CustomQueryFunction) {
                 return ((CustomQueryFunction) function).getQuery(queryCreationContext, terminalClause);

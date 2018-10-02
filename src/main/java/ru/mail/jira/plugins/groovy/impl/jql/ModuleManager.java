@@ -132,7 +132,7 @@ public class ModuleManager {
                 descriptor.getKey(),
                 bundleContext.registerService(ModuleDescriptor.class.getName(), descriptor, null)
             );
-            allFunctions.put(functionName, (CustomFunction) descriptor.getModule());
+            allFunctions.put(functionName.toLowerCase(), (CustomFunction) descriptor.getModule());
             moduleKeyToFunction.put(descriptor.getKey(), functionName);
         } finally {
             lock.unlock();
@@ -153,7 +153,7 @@ public class ModuleManager {
 
                     logger.debug("unregistering function with name: {}", functionName);
 
-                    CustomFunction function = allFunctions.remove(functionName);
+                    CustomFunction function = allFunctions.remove(functionName.toLowerCase());
                     if (function instanceof ValuesFunctionAdapter) {
                         ScriptedJqlFunction delegate = ((ValuesFunctionAdapter) function).getDelegate();
                         if (delegate != null) {
@@ -204,6 +204,9 @@ public class ModuleManager {
         }
     }
 
+    /**
+     *   Returns all managed functions. Keys are all lower case.
+     */
     public Map<String, CustomFunction> getAllFunctions() {
         Lock lock = this.lock.readLock();
 
