@@ -185,7 +185,11 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
             }
         });
 
-        parser.date_comparison_query();
+        try {
+            parser.date_comparison_query();
+        } catch (Exception e) {
+            messageSet.addErrorMessage(e.getMessage());
+        }
 
         return listener.buildQuery();
     }
