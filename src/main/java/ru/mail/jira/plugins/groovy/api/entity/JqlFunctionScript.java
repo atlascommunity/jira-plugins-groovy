@@ -12,6 +12,11 @@ public interface JqlFunctionScript extends AbstractScript {
     String getName();
 
     @NotNull
+    @Unique
+    void setLowerName(String lowerName);
+    String getLowerName();
+
+    @NotNull
     void setUuid(String uuid);
     String getUuid();
 

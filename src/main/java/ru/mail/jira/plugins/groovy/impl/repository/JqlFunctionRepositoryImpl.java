@@ -85,6 +85,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         JqlFunctionScript script = ao.create(
             JqlFunctionScript.class,
             new DBParam("NAME", form.getName()),
+            new DBParam("LOWER_NAME", form.getName().toLowerCase()),
             new DBParam("DESCRIPTION", form.getDescription()),
             new DBParam("UUID", UUID.randomUUID().toString()),
             new DBParam("SCRIPT_BODY", form.getScriptBody()),
@@ -119,6 +120,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
 
         script.setUuid(UUID.randomUUID().toString());
         script.setName(form.getName());
+        script.setLowerName(form.getName().toLowerCase());
         script.setDescription(form.getDescription());
         script.setScriptBody(form.getScriptBody());
 
