@@ -27,7 +27,7 @@ public class DelegatingClassLoader extends ClassLoader {
         this.classLoaders = new LinkedHashMap<>();
         this.classLoaders.put("__local", new WeakReference<>(Thread.currentThread().getContextClassLoader()));
         //loader for jira core classes
-        this.classLoaders.put("__jira", new WeakReference<>(JiraUtils.class.getClassLoader()));
+        this.classLoaders.put("__jira", new WeakReference<>(ClassLoaderUtil.getJiraClassLoader()));
     }
 
     public void ensureAvailability(Set<Plugin> plugins) {
