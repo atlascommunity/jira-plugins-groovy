@@ -349,6 +349,10 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
             Field field = fieldManager.getField(fieldName);
 
             if (field == null) {
+                field = fieldManager.getField(fieldName.toLowerCase());
+            }
+
+            if (field == null) {
                 Collection<CustomField> fieldsByName = customFieldManager.getCustomFieldObjectsByName(fieldName);
 
                 if (fieldsByName.size() > 1) {
@@ -364,7 +368,7 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
             }
 
             if (field == null) {
-                throw new RuntimeException("Unknown field");
+                throw new RuntimeException("Unknown field: " + fieldName);
             }
 
             if (!(field instanceof DateField)) {
