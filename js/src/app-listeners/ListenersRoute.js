@@ -23,12 +23,14 @@ import {
     wholeObjectReducerFactory
 } from '../common/redux';
 
-import {NotFoundPage, ItemViewPage} from '../common/script-list';
+import {NotFoundPage, ItemViewPage, focusOnRender} from '../common/script-list';
 import {Loader, RouterLink} from '../common/ak';
 
 import {jiraService, listenerService, watcherService} from '../service';
 import type {ObjectMap} from '../common/types';
 
+
+const ListenerComponent = focusOnRender(Listener);
 
 function transformEventTypes(eventTypes: *): ObjectMap {
     const object = {};
@@ -87,7 +89,7 @@ export class ListenersRoute extends React.PureComponent<{}> {
                         <Route path="/listeners" exact={true}>
                             {() =>
                                 <ConnectedScriptPage
-                                    ScriptComponent={Listener}
+                                    ScriptComponent={ListenerComponent}
                                     i18n={{
                                         addItem: ListenerMessages.addListener,
                                         noItems: ListenerMessages.noListeners,

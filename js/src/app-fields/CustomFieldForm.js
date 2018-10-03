@@ -1,7 +1,7 @@
 //@flow
 import React from 'react';
 
-import {Link, Prompt, withRouter} from 'react-router-dom';
+import {Link, Prompt, withRouter, type RouterHistory} from 'react-router-dom';
 import {connect} from 'react-redux';
 
 import {Record} from 'immutable';
@@ -57,7 +57,7 @@ const makeForm: RecordFactory<Form> = Record({
 type Props = {
     id: number,
     fieldConfig: FieldConfig,
-    history: any,
+    history: RouterHistory,
     updateItem: typeof updateItem
 };
 
@@ -106,7 +106,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
             .then(
                 (data: FieldConfig) => {
                     this.props.updateItem(data);
-                    history.push('/fields/');
+                    history.push('/fields/', {focus: data.id});
                 },
                 (error: *) => {
                     const {response} = error;

@@ -11,6 +11,7 @@ export type DeleteCallbackType = (id: number, name: string, onConfirm: () => Pro
 export type ScriptComponentProps<T> = {|
     script: T,
     onDelete?: DeleteCallbackType,
+    focused?: boolean,
     collapsible?: boolean
 |};
 

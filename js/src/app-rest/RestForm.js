@@ -2,7 +2,7 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
-import {withRouter, Prompt} from 'react-router-dom';
+import {withRouter, Prompt, type RouterHistory} from 'react-router-dom';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
@@ -81,7 +81,7 @@ const makeForm: RecordFactory<Form> = Record({
 type Props = DialogComponentProps & {
     updateItem: typeof updateItem,
     addItem: typeof addItem,
-    history: any
+    history: RouterHistory
 };
 
 type State = {
@@ -187,7 +187,7 @@ export class RestFormInternal extends React.Component<Props, State> {
                 .updateScript(id, data)
                 .then(
                     (script: RestScriptType) => {
-                        history.push('/rest/');
+                        history.push('/rest/', {focus: script.id});
                         this.props.updateItem(script);
                     },
                     this._handleError
@@ -197,7 +197,7 @@ export class RestFormInternal extends React.Component<Props, State> {
                 .createScript(data)
                 .then(
                     (script: RestScriptType) => {
-                        history.push('/rest/');
+                        history.push('/rest/', {focus: script.id});
                         this.props.addItem(script);
                     },
                     this._handleError

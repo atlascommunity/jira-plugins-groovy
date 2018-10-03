@@ -16,10 +16,11 @@ import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {Loader} from '../common/ak/Loader';
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer, filterReducer} from '../common/redux';
 import {adminScriptService, watcherService} from '../service';
-import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
-import {NotFoundPage} from '../common/script-list/NotFoundPage';
+import {ConnectedScriptPage, NotFoundPage, focusOnRender} from '../common/script-list';
 import {RouterLink} from '../common/ak/RouterLink';
 
+
+const AdminScriptComponent = focusOnRender(AdminScript);
 
 export class AdminRoute extends React.PureComponent<{}> {
     store = createStore(
@@ -45,7 +46,7 @@ export class AdminRoute extends React.PureComponent<{}> {
                         <Route path="/admin-scripts/" exact={true}>
                             {() =>
                                 <ConnectedScriptPage
-                                    ScriptComponent={AdminScript}
+                                    ScriptComponent={AdminScriptComponent}
                                     i18n={{
                                         title: PageTitleMessages.adminScripts,
                                         addItem: RegistryMessages.addScript,

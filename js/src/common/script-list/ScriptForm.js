@@ -1,7 +1,7 @@
 //@flow
 import React, {Fragment, type Node, type ComponentType} from 'react';
 
-import {Prompt} from 'react-router-dom';
+import {Prompt, type RouterHistory} from 'react-router-dom';
 
 import type {RecordOf} from 'immutable';
 
@@ -77,7 +77,7 @@ type Props<T: ScriptFormType> = DialogComponentProps & {
     },
     valuesTransformer: (values: ValuesType<T>) => DataType,
     additionalFields: $ReadOnlyArray<AdditionalField<T>>,
-    history: any,
+    history: RouterHistory,
     returnTo: string,
     returnTypes?: $ReadOnlyArray<ReturnType>,
     scriptType: StaticCheckScriptType
@@ -166,7 +166,7 @@ export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>,
                         } else {
                             updateItem(result.item);
                         }
-                        history.push(returnTo);
+                        history.push(returnTo, {focus: result.item.id});
                     } else {
                         this.setState({
                             isSubmitting: false,

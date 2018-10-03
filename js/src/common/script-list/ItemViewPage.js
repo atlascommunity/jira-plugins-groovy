@@ -1,7 +1,7 @@
 //@flow
 import React, {type ComponentType} from 'react';
 
-import {withRouter} from 'react-router-dom';
+import {withRouter, type RouterHistory} from 'react-router-dom';
 import {connect} from 'react-redux';
 
 import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
@@ -35,7 +35,7 @@ type PublicProps<T: NamedItemType> = {|
 
 type Props<T: NamedItemType> = PublicProps<T> & {
     script?: T,
-    history: any
+    history: RouterHistory
 };
 
 type State = {

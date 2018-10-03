@@ -57,6 +57,11 @@
 
   padding: 3px 0 0;
 
+  &.focused {
+    animation-name: focus-blink;
+    animation-duration: 3s;
+  }
+
   &.withTemplate {
     >.ScriptBody {
       >.editor {
@@ -195,4 +200,12 @@
       padding: 4px 0 4px 0;
     }
   }
+}
+
+@-webkit-keyframes focus-blink {
+  0% {
+    border-color: @ak-color-B100;
+    background-color: @ak-color-B50;
+  }
+
 }

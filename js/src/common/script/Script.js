@@ -41,6 +41,7 @@ export type ScriptProps = {
     withChangelog: boolean,
     collapsible: boolean,
     headerless: boolean,
+    focused: boolean,
 
     script: ?ScriptType,
     changelogsLoader?: () => Promise<$ReadOnlyArray<ChangelogType>>,
@@ -80,7 +81,8 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
     static defaultProps = {
         collapsible: true,
         withChangelog: false,
-        headerless: false
+        headerless: false,
+        focused: false
     };
 
     state = {
@@ -169,7 +171,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
     render() {
         const {
             script, template, title, scriptName, children, collapsible, withChangelog, onEdit, onDelete,
-            additionalButtons, additionalPrimaryButtons, additionalParameters, dropdownItems, headerless
+            additionalButtons, additionalPrimaryButtons, additionalParameters, dropdownItems, headerless, focused
         } = this.props;
         const {activeSource, showCode, changelogsReady, changelogs, executions, executionsReady, onlyLastExecutions} = this.state;
 
@@ -336,7 +338,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         }
 
         return (
-            <div className={`scriptRow ${!isOpen ? 'collapsed' : ''} ${template ? 'withTemplate' : ''}`}>
+            <div className={`scriptRow${!isOpen ? ' collapsed' : ''}${template ? ' withTemplate' : ''}${focused ? ' focused' : ''}`}>
                 {!headerless &&
                 <div className="flex-row title">
                     {title

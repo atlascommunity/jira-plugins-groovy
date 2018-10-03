@@ -96,7 +96,7 @@ class ListenerInternal extends React.PureComponent<Props> {
     );
 
     render() {
-        const {script, collapsible, projects, eventTypes} = this.props;
+        const {script, collapsible, focused, projects, eventTypes} = this.props;
 
         return (
             <ConnectedWatchableScript
@@ -116,6 +116,7 @@ class ListenerInternal extends React.PureComponent<Props> {
 
                 withChangelog={true}
                 collapsible={collapsible}
+                focused={focused}
 
                 onDelete={this._delete}
 

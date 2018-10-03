@@ -13,7 +13,7 @@ import {ScheduledTaskForm} from './ScheduledTaskForm';
 import {scheduledTaskService, watcherService} from '../service';
 
 import {filterReducer, ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
-import {ConnectedScriptPage, NotFoundPage, ItemViewPage} from '../common/script-list';
+import {ConnectedScriptPage, NotFoundPage, ItemViewPage, focusOnRender} from '../common/script-list';
 import {Loader} from '../common/ak';
 
 import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
@@ -22,6 +22,8 @@ import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import './ScheduledTaskRegistry.less';
 import {RouterLink} from '../common/ak/RouterLink';
 
+
+const ScheduledTaskComponent = focusOnRender(ScheduledTask);
 
 export class ScheduledRoute extends React.PureComponent<{}> {
     store = createStore(
@@ -47,7 +49,7 @@ export class ScheduledRoute extends React.PureComponent<{}> {
                         <Route path="/scheduled/" exact={true}>
                             {() =>
                                 <ConnectedScriptPage
-                                    ScriptComponent={ScheduledTask}
+                                    ScriptComponent={ScheduledTaskComponent}
                                     i18n={{
                                         title: PageTitleMessages.scheduled,
                                         addItem: ScheduledTaskMessages.addTask,

@@ -50,7 +50,7 @@ export class RestScript extends React.PureComponent<Props> {
     );
 
     render() {
-        const {script, collapsible} = this.props;
+        const {script, collapsible, focused} = this.props;
 
         const url = `${getPluginBaseUrl()}/custom/${script.name}`;
 
@@ -72,6 +72,7 @@ export class RestScript extends React.PureComponent<Props> {
 
                 withChangelog={true}
                 collapsible={collapsible}
+                focused={focused}
 
                 onDelete={this._delete}
 

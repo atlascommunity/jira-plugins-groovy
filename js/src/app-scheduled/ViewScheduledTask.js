@@ -1,7 +1,7 @@
 //@flow
 import React from 'react';
 
-import {withRouter} from 'react-router-dom';
+import {withRouter, type RouterHistory} from 'react-router-dom';
 import {connect} from 'react-redux';
 
 import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
@@ -21,7 +21,7 @@ import {RouterLink} from '../common/ak/RouterLink';
 type Props = {
     id: number,
     script?: ScheduledTaskType,
-    history: any
+    history: RouterHistory
 };
 
 class ViewScheduledTaskInternal extends React.PureComponent<Props> {

@@ -61,7 +61,7 @@ export class JqlScript extends React.PureComponent<Props, State> {
     );
 
     render() {
-        const {script, collapsible} = this.props;
+        const {script, collapsible, focused} = this.props;
 
         const buttons = [
             <Button
@@ -91,6 +91,7 @@ export class JqlScript extends React.PureComponent<Props, State> {
 
                 withChangelog={true}
                 collapsible={collapsible}
+                focused={focused}
 
                 onDelete={this._delete}
                 additionalPrimaryButtons={buttons}

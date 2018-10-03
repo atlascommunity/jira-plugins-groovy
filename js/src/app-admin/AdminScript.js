@@ -84,7 +84,7 @@ export class AdminScript extends React.PureComponent<Props, State> {
     );
 
     render() {
-        const {script, collapsible} = this.props;
+        const {script, collapsible, focused} = this.props;
         const {isRunning} = this.state;
         const {builtIn} = script;
 
@@ -144,6 +144,7 @@ export class AdminScript extends React.PureComponent<Props, State> {
                 script={this._getScript(script)}
                 withChangelog={true}
                 collapsible={collapsible}
+                focused={focused}
 
                 onDelete={!builtIn ? this._delete : undefined}
                 additionalPrimaryButtons={buttons}

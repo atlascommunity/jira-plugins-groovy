@@ -9,17 +9,18 @@ import {FieldScript} from './FieldScript';
 import {CustomFieldForm} from './CustomFieldForm';
 import {ViewFieldScript} from './ViewFieldScript';
 
-import {ConnectedScriptPage} from '../common/script-list/ConnectedScriptPage';
-import {NotFoundPage} from '../common/script-list/NotFoundPage';
+import {ConnectedScriptPage, NotFoundPage, focusOnRender} from '../common/script-list';
 
 import {fieldConfigService, watcherService} from '../service';
 
 import {filterReducer, ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
+import {Loader} from '../common/ak';
+
 import {PageTitleMessages} from '../i18n/common.i18n';
 import {ScriptFieldMessages} from '../i18n/cf.i18n';
 
-import {Loader} from '../common/ak/Loader';
 
+const FieldScriptComponent = focusOnRender(FieldScript);
 
 export class FieldsRoute extends React.PureComponent<{}> {
     store = createStore(
@@ -45,7 +46,7 @@ export class FieldsRoute extends React.PureComponent<{}> {
                         <Route path="/fields/" exact={true}>
                             {() =>
                                 <ConnectedScriptPage
-                                    ScriptComponent={FieldScript}
+                                    ScriptComponent={FieldScriptComponent}
                                     i18n={{
                                         title: PageTitleMessages.fields,
                                         addItem: '',

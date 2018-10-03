@@ -155,7 +155,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
     );
 
     render() {
-        const {script, collapsible} = this.props;
+        const {script, collapsible, focused} = this.props;
         const {showRunDialog} = this.state;
         const {lastRunInfo} = script;
 
@@ -241,6 +241,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
 
                 withChangelog={true}
                 collapsible={collapsible}
+                focused={focused}
 
                 script={scriptObject}
                 title={titleEl}

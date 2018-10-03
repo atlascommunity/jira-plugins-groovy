@@ -2,7 +2,7 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
-import {Prompt, withRouter} from 'react-router-dom';
+import {Prompt, withRouter, type RouterHistory} from 'react-router-dom';
 
 import {Record, type RecordOf, type RecordFactory} from 'immutable';
 
@@ -87,7 +87,7 @@ const makeForm: RecordFactory<Form> = Record({
 type Props = DialogComponentProps & {
     updateItem: typeof updateItem,
     addItem: typeof addItem,
-    history: any
+    history: RouterHistory
 };
 
 type State = {
@@ -198,7 +198,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                 .update(id, data)
                 .then(
                     (script: ScheduledTaskType) => {
-                        history.push('/scheduled');
+                        history.push('/scheduled', {focus: script.id});
                         updateItem(script);
                     },
                     this._handleError
@@ -208,7 +208,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                 .create(data)
                 .then(
                     (script: ScheduledTaskType) => {
-                        history.push('/scheduled');
+                        history.push('/scheduled', {focus: script.id});
                         addItem(script);
                     },
                     this._handleError

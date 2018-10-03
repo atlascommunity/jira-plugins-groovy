@@ -2,7 +2,7 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
-import {withRouter, Prompt} from 'react-router-dom';
+import {withRouter, Prompt, type RouterHistory} from 'react-router-dom';
 
 import {Record} from 'immutable';
 import type {RecordOf, RecordFactory} from 'immutable';
@@ -74,7 +74,7 @@ const makeForm: RecordFactory<Form> = Record({
 type Props = DialogComponentProps & {
     addItem: typeof addItem,
     updateItem: typeof updateItem,
-    history: any
+    history: RouterHistory
 };
 
 type State = {
@@ -164,7 +164,7 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                 .updateListener(id, data)
                 .then(
                     (listener: ListenerType) => {
-                        history.push('/listeners/');
+                        history.push('/listeners/', {focus: listener.id});
                         updateItem(listener);
                     },
                     this._handleError
@@ -174,7 +174,7 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                 .createListener(data)
                 .then(
                     (listener: ListenerType) => {
-                        history.push('/listeners/');
+                        history.push('/listeners/', {focus: listener.id});
                         addItem(listener);
                     },
                     this._handleError

@@ -2,7 +2,7 @@
 import React from 'react';
 
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import {withRouter, type RouterHistory} from 'react-router-dom';
 
 import {Record} from 'immutable';
 
@@ -24,7 +24,7 @@ const recordFactory = Record({
 });
 
 type Props = DialogComponentProps & {
-    history: any,
+    history: RouterHistory,
     addItem: typeof addItem,
     updateItem: typeof updateItem
 };

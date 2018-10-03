@@ -2,7 +2,7 @@
 import React from 'react';
 
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import {withRouter, type RouterHistory} from 'react-router-dom';
 
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
@@ -27,7 +27,7 @@ type Props = {
     id: number,
     script?: JqlScriptType,
     deleteItem: typeof deleteItem,
-    history: any
+    history: RouterHistory
 };
 
 type State = {

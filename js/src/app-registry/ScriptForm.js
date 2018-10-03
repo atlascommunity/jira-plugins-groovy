@@ -2,7 +2,7 @@
 import React from 'react';
 
 import {connect} from 'react-redux';
-import {Prompt, withRouter} from 'react-router-dom';
+import {Prompt, withRouter, type RouterHistory} from 'react-router-dom';
 
 import Button, {ButtonGroup} from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
@@ -76,7 +76,7 @@ const makeForm: RecordFactory<Form> = Record({
 type Props = {
     addScript: typeof addScript,
     updateScript: typeof updateScript,
-    history: any,
+    history: RouterHistory,
     isNew: boolean,
     id: ?number,
     directoryId: ?number,

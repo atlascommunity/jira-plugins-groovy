@@ -13,14 +13,15 @@ import {RestForm} from './RestForm';
 import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {RestMessages} from '../i18n/rest.i18n';
 
-import {NotFoundPage, ConnectedScriptPage, ItemViewPage} from '../common/script-list';
+import {NotFoundPage, ConnectedScriptPage, ItemViewPage, focusOnRender} from '../common/script-list';
 
 import {filterReducer, ItemActionCreators, itemsReducer, readinessReducer, watchesReducer} from '../common/redux';
 import {watcherService, restService} from '../service';
-import {Loader} from '../common/ak/Loader';
-import {RouterLink} from '../common/ak/RouterLink';
+import {Loader, RouterLink} from '../common/ak';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
+
+const RestScriptComponent = focusOnRender(RestScript);
 
 export class RestRoute extends React.PureComponent<{}> {
     store = createStore(
@@ -46,7 +47,7 @@ export class RestRoute extends React.PureComponent<{}> {
                         <Route path="/rest/" exact={true}>
                             {() =>
                                 <ConnectedScriptPage
-                                    ScriptComponent={RestScript}
+                                    ScriptComponent={RestScriptComponent}
                                     i18n={{
                                         title: PageTitleMessages.rest,
                                         addItem: RestMessages.addScript,

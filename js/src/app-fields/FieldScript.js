@@ -38,7 +38,7 @@ type Props = ScriptComponentProps<FieldConfigItem>;
 
 export class FieldScript extends React.PureComponent<Props> {
     render() {
-        const {script, collapsible} = this.props;
+        const {script, collapsible, focused} = this.props;
 
         return (
             <ConnectedWatchableScript
@@ -63,6 +63,7 @@ export class FieldScript extends React.PureComponent<Props> {
 
                 withChangelog={true}
                 collapsible={collapsible}
+                focused={focused}
 
                 scriptName={
                     <Fragment>

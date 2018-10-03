@@ -1,6 +1,6 @@
 //@flow
 import React from 'react';
-import {withRouter} from 'react-router-dom';
+import {withRouter, type RouterHistory, type Location} from 'react-router-dom';
 
 import AJS from 'AJS';
 
@@ -34,8 +34,8 @@ const titleMap = {
 };
 
 type Props = {
-    history: any,
-    location: any
+    history: RouterHistory,
+    location: Location
 };
 
 export class NavigationControllerInternal extends React.PureComponent<Props> {

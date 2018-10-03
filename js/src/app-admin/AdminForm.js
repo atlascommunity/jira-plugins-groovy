@@ -2,7 +2,7 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import {withRouter, type RouterHistory} from 'react-router-dom';
 
 import {Record} from 'immutable';
 
@@ -27,7 +27,7 @@ type FormType = ScriptFormType & {
 };
 
 type Props = DialogComponentProps & {
-    history: any,
+    history: RouterHistory,
     addItem: typeof addItem,
     updateItem: typeof updateItem
 };
