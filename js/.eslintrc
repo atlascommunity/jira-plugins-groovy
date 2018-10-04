@@ -19,7 +19,7 @@
       }
     ],
     "eol-last": ["error", "always"],
-    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-console": ["error", { "allow": ["debug", "warn", "error"] }],
     "operator-linebreak": ["warn", "before", { "overrides": { "&&": "after"} }],
     "multiline-ternary": ["warn", "always-multiline"],
 

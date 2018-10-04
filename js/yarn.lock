@@ -5979,12 +5979,6 @@ react-is@^16.3.2:
   version "16.4.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.4.1.tgz#d624c4650d2c65dbd52c72622bbf389435d9776e"
 
-react-lazily-render@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/react-lazily-render/-/react-lazily-render-1.1.0.tgz#bd831961040503bfd9e852b990fd44561090ff09"
-  dependencies:
-    scrollparent "^2.0.1"
-
 react-motion@^0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/react-motion/-/react-motion-0.5.2.tgz#0dd3a69e411316567927917c6626551ba0607316"
@@ -6462,10 +6456,6 @@ schema-utils@^1.0.0:
     ajv "^6.1.0"
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
-
-scrollparent@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/scrollparent/-/scrollparent-2.0.1.tgz#715d5b9cc57760fb22bdccc3befb5bfe06b1a317"
 
 "semver@2 || 3 || 4 || 5", semver@^5.3.0:
   version "5.4.1"

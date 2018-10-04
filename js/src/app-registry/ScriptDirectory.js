@@ -6,8 +6,6 @@ import {createSelector} from 'reselect';
 
 import {Droppable} from 'react-beautiful-dnd';
 
-import LazilyRender from 'react-lazily-render';
-
 import Button from '@atlaskit/button';
 import Badge from '@atlaskit/badge';
 import {colors} from '@atlaskit/theme';
@@ -22,6 +20,8 @@ import {DraggableRegistryScript} from './DraggableRegistryScript';
 import {ScriptDirectoryActions} from './ScriptDirectoryActions';
 
 import type {DeleteCallback, CreateCallback, EditCallback, RegistryDirectoryType, RegistryScriptType} from './types';
+
+import {LazilyRendered} from '../common/lazyRender';
 
 import './ScriptDirectory.less';
 
@@ -150,7 +150,7 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                     }
                     <div className="flex-grow"/>
                     <div className="flex-none">
-                        <LazilyRender>
+                        <LazilyRendered>
                             {render => render
                                 ? (
                                     <ScriptDirectoryActions
@@ -164,7 +164,7 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                                 )
                                 : <ActionsPlaceholder/>
                             }
-                        </LazilyRender>
+                        </LazilyRendered>
                     </div>
                 </div>
                 <div className={`scriptDirectoryChildren ${open ? 'open' : ''}`}>
