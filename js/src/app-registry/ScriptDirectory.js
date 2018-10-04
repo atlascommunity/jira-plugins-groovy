@@ -110,6 +110,7 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
                         key={script.id}
                         script={script}
 
+                        //$FlowFixMe TODO: use same callback interface
                         onDelete={onDelete}
                     />
                 )

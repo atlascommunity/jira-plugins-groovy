@@ -3,7 +3,8 @@ import React from 'react';
 import {Provider} from 'react-redux';
 import {Switch, Route} from 'react-router-dom';
 
-import {createStore} from 'redux';
+import {createStore, applyMiddleware} from 'redux';
+import thunk from 'redux-thunk';
 
 import keyBy from 'lodash/keyBy';
 
@@ -19,7 +20,11 @@ import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
 
 export class RegistryRoute extends React.PureComponent<{}> {
-    store = createStore(reducer);
+    //$FlowFixMe ??
+    store = createStore(
+        reducer,
+        applyMiddleware(thunk)
+    );
 
     componentDidMount() {
         Promise

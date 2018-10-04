@@ -14,6 +14,8 @@ import CodeIcon from '@atlaskit/icon/glyph/code';
 import {RegistryScript, type PublicRegistryScriptProps} from './RegistryScript';
 import type {ScriptUsageType} from './types';
 
+import {focusOnRender} from '../common/script-list';
+
 
 type Props = {
     scriptUsage: ScriptUsageType
@@ -70,10 +72,12 @@ export class DraggableRegistryScriptInternal extends React.PureComponent<PublicR
     }
 }
 
-export const DraggableRegistryScript = connect(
-    memoizeOne(({scriptUsage}: *): * => {
-        return {
-            scriptUsage
-        };
-    })
-)(DraggableRegistryScriptInternal);
+export const DraggableRegistryScript = focusOnRender(
+    connect(
+        memoizeOne(({scriptUsage}: *): * => {
+            return {
+                scriptUsage
+            };
+        })
+    )(DraggableRegistryScriptInternal)
+);

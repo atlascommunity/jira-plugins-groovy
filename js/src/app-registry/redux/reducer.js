@@ -99,13 +99,17 @@ function openDirsReducer(state: $ReadOnlyArray<number>, action: DirectoryStateAc
         return [];
     }
 
-    if (action.type === OPEN_DIRECTORY) {
-        return [...state, action.id];
-    } else if (action.type === CLOSE_DIRECTORY) {
-        return state.filter(id => id !== action.id);
+    switch (action.type) {
+        case UPDATE_SCRIPT:
+        case ADD_SCRIPT:
+            return [...state, ...action.parents];
+        case OPEN_DIRECTORY:
+            return [...state, action.id];
+        case CLOSE_DIRECTORY:
+            return state.filter(id => id !== action.id);
+        default:
+            return state;
     }
-
-    return state;
 }
 
 function directoriesReducer(state: KeyedEntities<RegistryDirectoryType>, action: *): KeyedEntities<RegistryDirectoryType> {

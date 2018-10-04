@@ -192,7 +192,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 .then(
                     (data: RegistryScriptType) => {
                         this.props.updateScript(data);
-                        history.push('/registry/');
+                        history.push('/registry/', {focus: data.id});
                         //component should be unmounted at this point
                     },
                     this._handleError
@@ -203,7 +203,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                 .then(
                     (data: RegistryScriptType) => {
                         this.props.addScript(data);
-                        history.push('/registry/');
+                        history.push('/registry/', {focus: data.id});
                         //component should be unmounted at this point
                     },
                     this._handleError

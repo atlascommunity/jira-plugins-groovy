@@ -41,14 +41,6 @@ export const loadUsage = (items: ScriptUsageItems): * => ({
     items
 });
 
-export const addScript = (script: RegistryScriptType): * => ({
-    type: ADD_SCRIPT,
-    script: script
-});
-export const updateScript = (script: RegistryScriptType): * => ({
-    type: UPDATE_SCRIPT,
-    script: script
-});
 export const deleteScript = (id: number): * => ({
     type: DELETE_SCRIPT,
     id: id

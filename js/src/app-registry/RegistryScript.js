@@ -25,7 +25,7 @@ import {RegistryMessages} from '../i18n/registry.i18n';
 import {registryService, watcherService} from '../service';
 
 import Script, {ScriptParameters} from '../common/script';
-import {RouterLink} from '../common/ak/RouterLink';
+import {RouterLink} from '../common/ak';
 
 
 type RegistryScriptConnectProps = {
