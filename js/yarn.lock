@@ -58,9 +58,9 @@
     "@atlaskit/theme" "^6.0.2"
     babel-runtime "^6.26.0"
 
-"@atlaskit/checkbox@^5.0.2":
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/@atlaskit/checkbox/-/checkbox-5.0.2.tgz#e5855de1dac2f5c9fe4d81e1cce825cd630507b2"
+"@atlaskit/checkbox@^5.0.3":
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/@atlaskit/checkbox/-/checkbox-5.0.3.tgz#a2df2a80161eb29ed6d21699e9d9cf6ed3e0ae3d"
   dependencies:
     "@atlaskit/analytics-next" "^3.0.6"
     "@atlaskit/icon" "^14.0.0"
@@ -173,9 +173,9 @@
     "@atlaskit/field-base" "^11.0.7"
     "@atlaskit/theme" "^6.0.2"
 
-"@atlaskit/flag@^9.0.11":
-  version "9.0.11"
-  resolved "https://registry.yarnpkg.com/@atlaskit/flag/-/flag-9.0.11.tgz#3ede79dc8fb725709d639aaacb5d61c1f46ced68"
+"@atlaskit/flag@^9.0.12":
+  version "9.0.12"
+  resolved "https://registry.yarnpkg.com/@atlaskit/flag/-/flag-9.0.12.tgz#d33d0aa9098eb321ac13b2a03d0115c2822fcc4d"
   dependencies:
     "@atlaskit/analytics-next" "^3.0.6"
     "@atlaskit/icon" "^14.0.0"
@@ -294,9 +294,19 @@
   version "8.0.5"
   resolved "https://registry.yarnpkg.com/@atlaskit/page/-/page-8.0.5.tgz#e673b20610c820afc0e179be6dbe930c755f1ccc"
 
-"@atlaskit/pagination@^8.0.0", "@atlaskit/pagination@^8.0.1":
+"@atlaskit/pagination@^8.0.0":
   version "8.0.1"
   resolved "https://registry.yarnpkg.com/@atlaskit/pagination/-/pagination-8.0.1.tgz#2fef30a4e48e7abd35d7f59a0a57bc4916f8cf2e"
+  dependencies:
+    "@atlaskit/analytics-next" "^3.0.6"
+    "@atlaskit/button" "^9.0.13"
+    "@atlaskit/icon" "^14.0.0"
+    "@atlaskit/theme" "^6.0.3"
+    babel-runtime "^6.26.0"
+
+"@atlaskit/pagination@^8.0.2":
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/pagination/-/pagination-8.0.2.tgz#d975c3975d1e7f940cceec86330a2fe38641c28e"
   dependencies:
     "@atlaskit/analytics-next" "^3.0.6"
     "@atlaskit/button" "^9.0.13"
@@ -400,6 +410,18 @@
 "@atlaskit/tooltip@^12.1.1":
   version "12.1.1"
   resolved "https://registry.yarnpkg.com/@atlaskit/tooltip/-/tooltip-12.1.1.tgz#84cf7cb82caa9462db5c3088891398778d06a6b9"
+  dependencies:
+    "@atlaskit/analytics-next" "^3.0.6"
+    "@atlaskit/portal" "^0.0.10"
+    "@atlaskit/theme" "^6.0.2"
+    babel-runtime "^6.26.0"
+    flushable "^1.0.0"
+    react-node-resolver "^1.0.1"
+    react-transition-group "^2.2.1"
+
+"@atlaskit/tooltip@^12.1.2":
+  version "12.1.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/tooltip/-/tooltip-12.1.2.tgz#5f99db2eb7e9b7069a88a22dc7169512b469a27d"
   dependencies:
     "@atlaskit/analytics-next" "^3.0.6"
     "@atlaskit/portal" "^0.0.10"
