@@ -140,7 +140,7 @@ module.exports = {
                                         removeImport: true,
                                     },
                                 ],
-                            ]
+                            ].filter(it => it)
                         }
                     },
                     {
