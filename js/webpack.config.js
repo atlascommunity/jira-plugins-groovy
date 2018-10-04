@@ -93,15 +93,53 @@ module.exports = {
                         loader: 'babel-loader',
                         options: {
                             presets: [
-                                require('@babel/preset-env'),
-                                require('@babel/preset-react'),
-                                require('@babel/preset-flow'),
+                                [
+                                    require('@babel/preset-env'),
+                                    {
+                                        //based on https://confluence.atlassian.com/adminjiraserver073/supported-platforms-861253018.html
+                                        targets: {
+                                            chrome: "69",
+                                            ie: "11",
+                                            edge: "42",
+                                            firefox: "62",
+                                            safari: "12"
+                                        },
+                                        ignoreBrowserslistConfig: true,
+                                        useBuiltIns: false,
+                                        modules: false,
+                                        exclude: ['transform-typeof-symbol'],
+                                    },
+                                ],
+                                [
+                                    require('@babel/preset-react'),
+                                    {
+                                        useBuiltIns: true,
+                                    }
+                                ]
                             ],
                             plugins: [
                                 //'flow-react-proptypes',
+                                require('@babel/plugin-transform-flow-strip-types'),
                                 require('@babel/plugin-transform-destructuring'),
-                                require('@babel/plugin-proposal-class-properties'),
-                                require('@babel/plugin-proposal-object-rest-spread')
+                                [
+                                    require('@babel/plugin-proposal-class-properties'),
+                                    {
+                                        loose: true,
+                                    }
+                                ],
+                                [
+                                    require('@babel/plugin-proposal-object-rest-spread'),
+                                    {
+                                        useBuiltIns: true,
+                                    }
+                                ],
+                                !devMode && [
+                                    // Remove PropTypes from production build
+                                    require('babel-plugin-transform-react-remove-prop-types').default,
+                                    {
+                                        removeImport: true,
+                                    },
+                                ],
                             ]
                         }
                     },
