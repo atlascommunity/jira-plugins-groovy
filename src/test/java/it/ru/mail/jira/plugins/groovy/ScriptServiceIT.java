@@ -29,7 +29,8 @@ public class ScriptServiceIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
         "tests/jsonSlurper",
         "tests/standardModule",
-        "tests/pluginModule"
+        "tests/pluginModule",
+        "tests/containerService"
     );
 
     @ComponentImport
@@ -91,6 +92,15 @@ public class ScriptServiceIT {
     @Test
     public void pluginModuleShouldWork() throws Exception {
         String script = FileUtil.readArquillianExample("tests/pluginModule");
+
+        Object result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertNotNull(result);
+    }
+
+    @Test
+    public void pluginModuleShouldWorkWithPrivateService() throws Exception {
+        String script = FileUtil.readArquillianExample("tests/containerService");
 
         Object result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
 
