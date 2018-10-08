@@ -10,14 +10,14 @@ import Button from '@atlaskit/button';
 import {AdminScript} from './AdminScript';
 import {AdminForm} from './AdminForm';
 import {ViewAdminScript} from './ViewAdminScript';
+import {ConnectedAdminScriptPage} from './ConnectedAdminScriptPage';
 
 import {RegistryMessages} from '../i18n/registry.i18n';
 import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
-import {Loader} from '../common/ak/Loader';
 import {ItemActionCreators, itemsReducer, readinessReducer, watchesReducer, filterReducer} from '../common/redux';
 import {adminScriptService, watcherService} from '../service';
-import {ConnectedScriptPage, NotFoundPage, focusOnRender} from '../common/script-list';
-import {RouterLink} from '../common/ak/RouterLink';
+import {NotFoundPage, focusOnRender} from '../common/script-list';
+import {RouterLink, Loader} from '../common/ak';
 
 
 const AdminScriptComponent = focusOnRender(AdminScript);
@@ -45,7 +45,7 @@ export class AdminRoute extends React.PureComponent<{}> {
                     <Switch>
                         <Route path="/admin-scripts/" exact={true}>
                             {() =>
-                                <ConnectedScriptPage
+                                <ConnectedAdminScriptPage
                                     ScriptComponent={AdminScriptComponent}
                                     i18n={{
                                         title: PageTitleMessages.adminScripts,
