@@ -11,6 +11,7 @@ import ModalDialog from '@atlaskit/modal-dialog';
 import {PropField} from './PropField';
 
 import type {AdminScriptOutcomeType, AdminScriptType} from './types';
+import {customRenderers} from './customRenderers';
 
 import {CommonMessages} from '../i18n/common.i18n';
 import {AdminScriptMessages} from '../i18n/admin.i18n';
@@ -161,9 +162,48 @@ export class RunDialog extends React.PureComponent<Props, State> {
         }
     };
 
+    _renderOutcome() {
+        const {script} = this.props;
+        const {outcome} = this.state;
+
+        if (!outcome) {
+            return null;
+        }
+
+        let result: ?Node = null;
+
+        if (outcome.success) {
+            if (script.builtIn && script.builtInKey && customRenderers.hasOwnProperty(script.builtInKey)) {
+                result = (
+                    <Fragment>
+                        <SuccessMessage title="Done"/>
+                        {customRenderers[script.builtInKey](outcome.message)}
+                    </Fragment>
+                );
+            } else {
+                result = (
+                    <Fragment>
+                        <SuccessMessage title="Done">
+                            {!script.html &&
+                            <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{outcome.message && outcome.message.toString()}</pre>
+                            }
+                        </SuccessMessage>
+                        {script.html && <div dangerouslySetInnerHTML={{__html: outcome.message}}/>}
+                    </Fragment>
+                );
+            }
+        } else {
+            result = <ErrorMessage title="Error occurred">{outcome.message}</ErrorMessage>;
+        }
+
+        return result;
+    }
+
     render() {
         const {script, onClose} = this.props;
         const {stage, outcome} = this.state;
+
+        const isDone = stage === 'done' && outcome;
 
         let content: ?Node = null;
 
@@ -171,26 +211,13 @@ export class RunDialog extends React.PureComponent<Props, State> {
             content = this._renderFields();
         } else if (stage === 'running') {
             content = <LoadingSpinner/>;
-        } else if (stage === 'done' && outcome) {
-            if (outcome.success) {
-                content = (
-                    <Fragment>
-                        <SuccessMessage title="Done">
-                            {!script.html &&
-                                <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{outcome.message}</pre>
-                            }
-                        </SuccessMessage>
-                        {script.html && <div dangerouslySetInnerHTML={{__html: outcome.message}}/>}
-                    </Fragment>
-                );
-            } else {
-                content = <ErrorMessage title="Error occurred">{outcome.message}</ErrorMessage>;
-            }
+        } else if (isDone) {
+            content = this._renderOutcome();
         }
 
         return (
             <ModalDialog
-                width="medium"
+                width={isDone ? (script.resultWidth || 'medium') : 'medium'}
                 scrollBehavior="outside"
 
                 isHeadingMultiline={false}

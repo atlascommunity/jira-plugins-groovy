@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class FixResolution implements BuiltInScript {
+public class FixResolution implements BuiltInScript<String> {
     private final SearchService searchService;
     private final IssueManager issueManager;
 

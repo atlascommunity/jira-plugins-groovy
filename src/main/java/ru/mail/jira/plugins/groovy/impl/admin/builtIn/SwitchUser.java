@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class SwitchUser implements BuiltInScript {
+public class SwitchUser implements BuiltInScript<String> {
     private final HttpContext httpContext;
     private final AuditingManager auditingManager;
 

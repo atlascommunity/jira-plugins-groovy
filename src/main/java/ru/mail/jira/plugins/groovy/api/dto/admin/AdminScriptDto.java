@@ -17,6 +17,8 @@ public class AdminScriptDto extends AdminScriptForm {
     @XmlElement
     private String builtInKey;
     @XmlElement
+    private String resultWidth;
+    @XmlElement
     private List<ScriptParamDto> params;
     @XmlElement
     private Integer id;

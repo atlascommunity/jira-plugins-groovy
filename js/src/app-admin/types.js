@@ -8,6 +8,7 @@ export type AdminScriptType = ScriptEntity & {
     html: boolean,
     builtIn: boolean,
     builtInKey: ?string,
+    resultWidth: ?('small' | 'medium' | 'large' | 'x-large'),
     params: ?Array<ParamType>
 };
 

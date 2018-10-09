@@ -61,6 +61,7 @@ public class BuiltInScriptManagerImpl implements BuiltInScriptManager {
         result.setHtml(isHtml);
         result.setName(i18nHelper.getText(script.getI18nKey()));
         result.setParams(script.getParams());
+        result.setResultWidth(script.getResultWidth());
 
         return result;
     }

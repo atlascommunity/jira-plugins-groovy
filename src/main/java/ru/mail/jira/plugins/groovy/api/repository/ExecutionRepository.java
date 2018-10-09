@@ -1,6 +1,6 @@
 package ru.mail.jira.plugins.groovy.api.repository;
 
-import ru.mail.jira.plugins.groovy.api.dto.ScriptExecutionDto;
+import ru.mail.jira.plugins.groovy.api.dto.execution.ScriptExecutionDto;
 
 import java.sql.Timestamp;
 import java.util.List;

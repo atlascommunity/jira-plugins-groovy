@@ -7,5 +7,5 @@ import java.util.List;
 public interface BuiltInScriptManager {
     List<AdminScriptDto> getAllScripts();
 
-    BuiltInScript getScript(String key);
+    <T> BuiltInScript<T> getScript(String key);
 }

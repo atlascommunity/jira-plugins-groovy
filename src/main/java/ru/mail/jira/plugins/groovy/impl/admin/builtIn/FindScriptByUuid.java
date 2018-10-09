@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class FindScriptByUuid implements BuiltInScript {
+public class FindScriptByUuid implements BuiltInScript<String> {
     private final ApplicationProperties applicationProperties;
     private final I18nHelper i18nHelper;
     private final DatabaseAccessor databaseAccessor;
@@ -80,7 +80,7 @@ public class FindScriptByUuid implements BuiltInScript {
                 getAbstractScriptQuery(QueryDslTables.LISTENER, uuid, EntityType.LISTENER),
                 getAbstractScriptQuery(QueryDslTables.REST, uuid, EntityType.REST),
                 getAbstractScriptQuery(QueryDslTables.SCHEDULED_TASK, uuid, EntityType.SCHEDULED_TASK),
-                getAbstractScriptQuery(QueryDslTables.REGISTRY_SCRIPT, uuid, EntityType.REGISTRY_DIRECTORY),
+                getAbstractScriptQuery(QueryDslTables.REGISTRY_SCRIPT, uuid, EntityType.REGISTRY_SCRIPT),
                 SQLExpressions
                     .select(
                         QueryDslTables.FIELD_CONFIG.FIELD_CONFIG_ID.as(idPath),
