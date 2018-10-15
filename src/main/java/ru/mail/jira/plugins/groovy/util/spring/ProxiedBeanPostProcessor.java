@@ -8,7 +8,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import ru.mail.jira.plugins.groovy.util.AnnotationUtil;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
-import ru.mail.jira.plugins.groovy.util.tx.TransactionalAnnotationProcessor;
 
 import java.lang.annotation.Annotation;
 
