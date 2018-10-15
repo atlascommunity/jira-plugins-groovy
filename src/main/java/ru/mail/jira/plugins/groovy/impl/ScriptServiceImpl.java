@@ -37,7 +37,7 @@ import ru.mail.jira.plugins.groovy.impl.var.GlobalVariable;
 import ru.mail.jira.plugins.groovy.impl.var.HttpClientGlobalVariable;
 import ru.mail.jira.plugins.groovy.impl.var.LoggerGlobalVariable;
 import ru.mail.jira.plugins.groovy.impl.var.TemplateEngineGlobalVariable;
-import ru.mail.jira.plugins.groovy.util.DelegatingClassLoader;
+import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 
 import java.io.IOException;
 import java.util.*;

@@ -28,7 +28,7 @@ import ru.mail.jira.plugins.groovy.api.service.GlobalFunctionManager;
 import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ParseContext;
-import ru.mail.jira.plugins.groovy.util.DelegatingClassLoader;
+import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 
 import java.io.IOException;
 import java.util.Map;

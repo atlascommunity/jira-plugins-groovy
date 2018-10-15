@@ -28,6 +28,7 @@ import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerForm;
 import ru.mail.jira.plugins.groovy.api.dto.listener.ConditionType;
 import ru.mail.jira.plugins.groovy.api.dto.listener.ScriptedEventListener;
 import ru.mail.jira.plugins.groovy.api.dto.listener.ConditionDescriptor;
+import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 
 import javax.annotation.Nonnull;
 import java.util.*;

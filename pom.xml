@@ -532,7 +532,7 @@
             <id>groovy-next</id>
 
             <properties>
-                <groovy.version>2.5.3-SNAPSHOT</groovy.version>
+                <groovy.version>2.5.3</groovy.version>
             </properties>
             <dependencies>
                 <dependency>

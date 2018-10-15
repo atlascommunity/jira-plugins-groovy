@@ -1,6 +1,5 @@
-package ru.mail.jira.plugins.groovy.util;
+package ru.mail.jira.plugins.groovy.util.cl;
 
-import com.atlassian.jira.util.JiraUtils;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginState;
 import org.slf4j.Logger;

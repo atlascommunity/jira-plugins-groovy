@@ -40,7 +40,7 @@ import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryLexer;
 import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryParser;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.AbstractCommentQueryFunction;
 import ru.mail.jira.plugins.groovy.util.AntlrUtil;
-import ru.mail.jira.plugins.groovy.util.ClassLoaderUtil;
+import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 import ru.mail.jira.plugins.groovy.util.compat.JiraCompatibilityHelper;
 
 import java.time.LocalDate;
