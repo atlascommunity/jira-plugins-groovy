@@ -9,6 +9,7 @@ import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import ru.mail.jira.plugins.groovy.api.jql.CustomQueryFunction;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlQueryFunction;
+import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -29,7 +30,9 @@ public class QueryFunctionAdapter extends ScriptedFunctionAdapter<ScriptedJqlQue
     public QueryFactoryResult getQuery(@Nonnull QueryCreationContext queryCreationContext, @Nonnull TerminalClause terminalClause) {
         if (terminalClause.getOperand() instanceof FunctionOperand) {
             return new QueryFactoryResult(
-                delegate.getQuery(queryCreationContext, ((FunctionOperand) terminalClause.getOperand())),
+                ClassLoaderUtil.runInContext(() ->
+                    delegate.getQuery(queryCreationContext, ((FunctionOperand) terminalClause.getOperand()))
+                ),
                 terminalClause.getOperator() == Operator.NOT_IN
             );
         }

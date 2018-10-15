@@ -9,6 +9,7 @@ import com.atlassian.query.operand.FunctionOperand;
 import lombok.Getter;
 import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction;
+import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 
 import javax.annotation.Nonnull;
 
@@ -48,17 +49,17 @@ public abstract class ScriptedFunctionAdapter<T extends ScriptedJqlFunction> imp
     @Nonnull
     @Override
     public final JiraDataType getDataType() {
-        return delegate.getDataType();
+        return ClassLoaderUtil.runInContext(delegate::getDataType);
     }
 
     @Nonnull
     @Override
     public final MessageSet validate(ApplicationUser applicationUser, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
-        return delegate.validate(applicationUser, functionOperand, terminalClause);
+        return ClassLoaderUtil.runInContext(() -> delegate.validate(applicationUser, functionOperand, terminalClause));
     }
 
     @Override
     public final int getMinimumNumberOfExpectedArguments() {
-        return delegate.getMinimumNumberOfExpectedArguments();
+        return ClassLoaderUtil.runInContext(delegate::getMinimumNumberOfExpectedArguments);
     }
 }

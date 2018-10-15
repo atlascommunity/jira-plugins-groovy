@@ -5,6 +5,7 @@ import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlValuesFunction;
+import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -17,6 +18,8 @@ public class ValuesFunctionAdapter extends ScriptedFunctionAdapter<ScriptedJqlVa
     @Nonnull
     @Override
     public List<QueryLiteral> getValues(@Nonnull QueryCreationContext queryCreationContext, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
-        return delegate.getValues(queryCreationContext, functionOperand, terminalClause);
+        return ClassLoaderUtil.runInContext(() ->
+            delegate.getValues(queryCreationContext, functionOperand, terminalClause)
+        );
     }
 }
