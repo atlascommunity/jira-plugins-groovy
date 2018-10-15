@@ -65,11 +65,13 @@ public class ScriptInvalidationService implements LifecycleAware {
     @Override
     public void onStart() {
         this.clusterMessagingService.registerListener(SCRIPT_INVALIDATION_CHANNEL, this.messageConsumer);
+        this.clusterMessagingService.registerListener(FIELD_INVALIDATION_CHANNEL, this.messageConsumer);
     }
 
     @Override
     public void onStop() {
         this.clusterMessagingService.unregisterListener(SCRIPT_INVALIDATION_CHANNEL, this.messageConsumer);
+        this.clusterMessagingService.unregisterListener(FIELD_INVALIDATION_CHANNEL, this.messageConsumer);
     }
 
     private class MessageConsumer implements ClusterMessageConsumer {
