@@ -7,8 +7,6 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.MockApplicationUser;
 import com.atlassian.plugin.PluginInformation;
 import com.atlassian.plugin.PluginState;
-import com.atlassian.plugin.event.PluginEventManager;
-import com.atlassian.plugin.event.impl.DefaultPluginEventManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -42,7 +40,6 @@ class ScriptServiceImplTest {
 
     @BeforeEach
     public void setup() {
-        PluginEventManager pluginEventManager = new DefaultPluginEventManager();
         GlobalFunctionManager globalFunctionManager = new GlobalFunctionManagerImpl();
         DelegatingClassLoader delegatingClassLoader = new DelegatingClassLoader();
         MockPlugin testPlugin = new MockPlugin("Test plugin", "testPLugin", new PluginInformation(), PluginState.ENABLED);
@@ -57,7 +54,6 @@ class ScriptServiceImplTest {
         );
 
         scriptService = new ScriptServiceImpl(
-            pluginEventManager,
             injectionResolver,
             globalFunctionManager,
             delegatingClassLoader
