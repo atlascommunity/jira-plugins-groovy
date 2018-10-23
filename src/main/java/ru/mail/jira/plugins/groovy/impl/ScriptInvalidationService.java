@@ -1,7 +1,10 @@
 package ru.mail.jira.plugins.groovy.impl;
 
+import com.atlassian.event.api.EventListener;
 import com.atlassian.jira.cluster.ClusterMessageConsumer;
 import com.atlassian.jira.cluster.ClusterMessagingService;
+import com.atlassian.plugin.event.PluginEventManager;
+import com.atlassian.plugin.event.events.PluginDisablingEvent;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
@@ -13,28 +16,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.cf.FieldValueCache;
+import ru.mail.jira.plugins.groovy.impl.groovy.var.GlobalObjectsBindingProvider;
 
 @Component
 @ExportAsService(LifecycleAware.class)
 public class ScriptInvalidationService implements LifecycleAware {
     private static final String SCRIPT_INVALIDATION_CHANNEL = "ru.mail.groovy.si";
     private static final String FIELD_INVALIDATION_CHANNEL = "ru.mail.groovy.fi";
+    private static final String GLOBAL_OBJECTS_CHANNEL = "ru.mail.groovy.go";
 
     private final Logger logger = LoggerFactory.getLogger(ScriptInvalidationService.class);
     private final ClusterMessagingService clusterMessagingService;
+    private final PluginEventManager pluginEventManager;
     private final ScriptService scriptService;
     private final FieldValueCache fieldValueCache;
     private final MessageConsumer messageConsumer;
+    private final GlobalObjectsBindingProvider globalObjectsBindingProvider;
 
     @Autowired
     public ScriptInvalidationService(
         @ComponentImport ClusterMessagingService clusterMessagingService,
+        @ComponentImport PluginEventManager pluginEventManager,
         ScriptService scriptService,
-        FieldValueCache fieldValueCache
+        FieldValueCache fieldValueCache,
+        GlobalObjectsBindingProvider globalObjectsBindingProvider
     ) {
         this.clusterMessagingService = clusterMessagingService;
+        this.pluginEventManager = pluginEventManager;
         this.scriptService = scriptService;
         this.fieldValueCache = fieldValueCache;
+        this.globalObjectsBindingProvider = globalObjectsBindingProvider;
         this.messageConsumer = new MessageConsumer();
     }
 
@@ -62,16 +73,35 @@ public class ScriptInvalidationService implements LifecycleAware {
         fieldValueCache.invalidateAll();
     }
 
+    //todo: возможно, можно без сильной боли инвалидировать только конкретный скрипт (есть ли в этом смысл?)
+    public void invalidateGlobalObjects() {
+        clusterMessagingService.sendRemote(GLOBAL_OBJECTS_CHANNEL, "");
+        globalObjectsBindingProvider.refresh();
+    }
+
     @Override
     public void onStart() {
         this.clusterMessagingService.registerListener(SCRIPT_INVALIDATION_CHANNEL, this.messageConsumer);
         this.clusterMessagingService.registerListener(FIELD_INVALIDATION_CHANNEL, this.messageConsumer);
+        this.clusterMessagingService.registerListener(GLOBAL_OBJECTS_CHANNEL, this.messageConsumer);
+
+        pluginEventManager.register(this);
     }
 
     @Override
     public void onStop() {
         this.clusterMessagingService.unregisterListener(SCRIPT_INVALIDATION_CHANNEL, this.messageConsumer);
         this.clusterMessagingService.unregisterListener(FIELD_INVALIDATION_CHANNEL, this.messageConsumer);
+        this.clusterMessagingService.unregisterListener(GLOBAL_OBJECTS_CHANNEL, this.messageConsumer);
+
+        pluginEventManager.unregister(this);
+    }
+
+    @EventListener
+    public void onPluginUnloading(PluginDisablingEvent event) {
+        scriptService.onPluginUnloading(event);
+        globalObjectsBindingProvider.refresh();
+        //todo: invalidate listeners
     }
 
     private class MessageConsumer implements ClusterMessageConsumer {
@@ -95,6 +125,8 @@ public class ScriptInvalidationService implements LifecycleAware {
                         logger.error("unable to parse field id {}", message);
                     }
                 }
+            } else if (GLOBAL_OBJECTS_CHANNEL.equals(channel)) {
+                globalObjectsBindingProvider.refresh();
             }
         }
     }

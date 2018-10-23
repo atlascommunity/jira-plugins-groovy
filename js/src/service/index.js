@@ -17,6 +17,7 @@ import {ScheduledTaskService} from './scheduledTask.service';
 import {AdminScriptService} from './adminScript.service';
 import {JqlScriptService} from './jqlScript.service';
 import {WatcherService} from './watcher.service';
+import {GlobalObjectService} from './go.service';
 
 import {ErrorMessages} from '../i18n/common.i18n';
 
@@ -35,6 +36,7 @@ export const scheduledTaskService = new ScheduledTaskService();
 export const adminScriptService = new AdminScriptService();
 export const jqlScriptService = new JqlScriptService();
 export const watcherService = new WatcherService();
+export const globalObjectService = new GlobalObjectService();
 
 export {getPluginBaseUrl, getBaseUrl, ajaxGet} from './ajaxHelper';
 

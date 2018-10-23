@@ -3,11 +3,12 @@ package ru.mail.jira.plugins.groovy.impl.var;
 import groovy.lang.GroovyClassLoader;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.TemplateEngine;
+import ru.mail.jira.plugins.groovy.api.script.BindingDescriptor;
 
-public class TemplateEngineGlobalVariable implements GlobalVariable<TemplateEngine> {
+public class TemplateEngineBindingDescriptor implements BindingDescriptor<TemplateEngine> {
     private final TemplateEngine templateEngine;
 
-    public TemplateEngineGlobalVariable(GroovyClassLoader gcl) {
+    public TemplateEngineBindingDescriptor(GroovyClassLoader gcl) {
         this.templateEngine = new GStringTemplateEngine(gcl);
     }
 

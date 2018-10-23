@@ -159,7 +159,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         ValidationUtils.validateForm2(i18nHelper, isNew, form);
 
         if (builtInNames.contains(form.getName().toLowerCase())) {
-            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.jqlNameTaken"), "name");
+            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.nameTaken"), "name");
         }
         //todo: also validate for system and other plugin function names
 

@@ -7,6 +7,7 @@ import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.atlassian.util.concurrent.LazyReference;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,12 @@ import ru.mail.jira.plugins.groovy.impl.jql.JqlInitializer;
 import ru.mail.jira.plugins.groovy.impl.listener.EventListenerInvoker;
 import ru.mail.jira.plugins.groovy.impl.scheduled.ScheduledTaskServiceImpl;
 import ru.mail.jira.plugins.groovy.util.Const;
+import ru.mail.jira.plugins.groovy.util.init.PluginLifecycleAware;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 //we use approach like in com.atlassian.greenhopper.Launcher
@@ -37,6 +38,7 @@ public final class PluginLauncherImpl implements LifecycleAware, PluginLauncher 
     private final OldExecutionDeletionScheduler executionDeletionScheduler;
     private final JqlInitializer jqlInitializer;
     private final JqlFunctionServiceImpl jqlFunctionServiceImpl;
+    private final List<PluginLifecycleAware> pluginLifecycleAwareObjects;
 
     private volatile boolean initialized = false;
 
@@ -47,7 +49,8 @@ public final class PluginLauncherImpl implements LifecycleAware, PluginLauncher 
         ScheduledTaskServiceImpl scheduledTaskService,
         OldExecutionDeletionScheduler executionDeletionScheduler,
         JqlInitializer jqlInitializer,
-        JqlFunctionServiceImpl jqlFunctionServiceImpl
+        JqlFunctionServiceImpl jqlFunctionServiceImpl,
+        List<PluginLifecycleAware> pluginLifecycleAwareObjects
     ) {
         this.eventPublisher = eventPublisher;
         this.eventListenerInvoker = eventListenerInvoker;
@@ -55,6 +58,10 @@ public final class PluginLauncherImpl implements LifecycleAware, PluginLauncher 
         this.executionDeletionScheduler = executionDeletionScheduler;
         this.jqlInitializer = jqlInitializer;
         this.jqlFunctionServiceImpl = jqlFunctionServiceImpl;
+        this.pluginLifecycleAwareObjects = pluginLifecycleAwareObjects
+            .stream()
+            .sorted(Comparator.comparingInt(PluginLifecycleAware::getInitOrder))
+            .collect(Collectors.toList());
     }
 
     private enum SystemPhase {
@@ -126,11 +133,21 @@ public final class PluginLauncherImpl implements LifecycleAware, PluginLauncher 
 
         eventPublisher.unregister(this);
 
+        for (PluginLifecycleAware object : Lists.reverse(pluginLifecycleAwareObjects)) {
+            logger.info("stopping {}", object);
+            object.onStop();
+        }
+
         logger.info("Plugin stopped");
     }
 
     private class FullSystemInitializer {
         private FullSystemInitializer() {
+            for (PluginLifecycleAware object : pluginLifecycleAwareObjects) {
+                logger.info("starting {}", object);
+                object.onStart();
+            }
+
             eventListenerInvoker.onStart();
             scheduledTaskService.onStart();
             executionDeletionScheduler.onStart();

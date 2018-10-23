@@ -6,13 +6,14 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import ru.mail.jira.plugins.groovy.api.script.BindingDescriptor;
 
-public class HttpClientGlobalVariable implements GlobalVariable<CloseableHttpClient> {
+public class HttpClientBindingDescriptor implements BindingDescriptor<CloseableHttpClient> {
     private static final int HTTP_CLIENT_TIMEOUT = 3000;
 
     private final CloseableHttpClient httpClient;
 
-    public HttpClientGlobalVariable() {
+    public HttpClientBindingDescriptor() {
         PoolingHttpClientConnectionManager httpConnectionManager = new PoolingHttpClientConnectionManager();
         httpConnectionManager.setMaxTotal(50);
         httpConnectionManager.setDefaultMaxPerRoute(4);

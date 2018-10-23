@@ -1,6 +1,6 @@
-package ru.mail.jira.plugins.groovy.impl.var;
+package ru.mail.jira.plugins.groovy.api.script;
 
-public interface GlobalVariable<T> {
+public interface BindingDescriptor<T> {
     T getValue(String scriptId);
 
     Class<T> getType();

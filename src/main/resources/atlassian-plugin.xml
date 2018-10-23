@@ -49,6 +49,8 @@
         <entity>ru.mail.jira.plugins.groovy.api.entity.AdminScriptChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.JqlFunctionScript</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.JqlFunctionScriptChangelog</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.GlobalObject</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.GlobalObjectChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.Watcher</entity>
     </ao>
 

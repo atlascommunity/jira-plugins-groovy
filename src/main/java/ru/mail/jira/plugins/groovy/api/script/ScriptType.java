@@ -12,5 +12,6 @@ public enum ScriptType {
     SCHEDULED_TASK,
     ADMIN_SCRIPT,
     PARAM,
-    JQL
+    JQL,
+    GLOBAL_OBJECT
 }
