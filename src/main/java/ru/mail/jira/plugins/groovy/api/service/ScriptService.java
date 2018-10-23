@@ -1,6 +1,8 @@
 package ru.mail.jira.plugins.groovy.api.service;
 
+import com.atlassian.plugin.event.events.PluginDisablingEvent;
 import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
+import ru.mail.jira.plugins.groovy.api.script.BindingProvider;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 import ru.mail.jira.plugins.groovy.util.cl.WithPluginLoader;
@@ -28,9 +30,13 @@ public interface ScriptService {
 
     CacheStatsDto getCacheStats();
 
-    Map<String, Class> getGlobalVariableTypes();
+    Map<String, Class> getGlobalBindingTypes();
+
+    void registerBindingProvider(BindingProvider bindingProvider);
 
     void invalidate(String id);
 
     void invalidateAll();
+
+    void onPluginUnloading(PluginDisablingEvent event);
 }

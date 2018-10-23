@@ -104,6 +104,11 @@ public class StaticCheckResource {
                             .build();
                     }
                     break;
+                case GLOBAL_OBJECT:
+                    Class<?> objectClass = scriptService.parseClassStatic(form.getScriptBody(), false, ImmutableMap.of());
+                    //todo: check injections
+                    InvokerHelper.removeClass(objectClass);
+                    break;
                 case LISTENER:
                     Map<String, Class> types = ImmutableMap.of();
 

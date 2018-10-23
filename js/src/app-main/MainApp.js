@@ -52,6 +52,10 @@ export class MainApp extends React.PureComponent<{}> {
                         title="JQL functions"
                     />
                     <PageCard
+                        href="/go"
+                        title="Global objects"
+                    />
+                    <PageCard
                         href="/audit"
                         title="Audit log"
                     />

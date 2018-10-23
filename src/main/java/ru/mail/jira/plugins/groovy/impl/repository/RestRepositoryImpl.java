@@ -186,7 +186,7 @@ public class RestRepositoryImpl implements RestRepository {
         }
 
         if ((isNew || !form.getName().equals(oldName)) && !isNameAvailable(form.getName())) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.restNameTaken"), "name");
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.nameTaken"), "name");
         }
 
         if (StringUtils.isEmpty(form.getScriptBody())) {

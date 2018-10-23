@@ -2,8 +2,9 @@ package ru.mail.jira.plugins.groovy.impl.var;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mail.jira.plugins.groovy.api.script.BindingDescriptor;
 
-public class LoggerGlobalVariable implements GlobalVariable<Logger> {
+public class LoggerBindingDescriptor implements BindingDescriptor<Logger> {
     private final Logger defaultLogger = LoggerFactory.getLogger("ru.mail.jira.plugins.groovy.script.$script$");
 
     @Override
