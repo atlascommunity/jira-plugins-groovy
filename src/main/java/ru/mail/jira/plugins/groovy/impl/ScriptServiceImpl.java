@@ -315,7 +315,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
                     }
                 }
 
-                gcl.clearCache(); //todo: don't cache specific classes
+                //todo: we might have an issue if some script (parsed by gcl) created class with name Xxx and there's global object with same class name
             } else {
                 scriptClass = gcl.parseClass(script);
             }
