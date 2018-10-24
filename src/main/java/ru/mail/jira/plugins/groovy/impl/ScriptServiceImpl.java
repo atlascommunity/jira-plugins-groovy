@@ -314,6 +314,8 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
                         }
                     }
                 }
+
+                gcl.clearCache(); //todo: don't cache specific classes
             } else {
                 scriptClass = gcl.parseClass(script);
             }
