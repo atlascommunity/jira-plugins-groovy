@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.groovy.impl.repository;
 
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@ExportAsDevService(GlobalObjectRepository.class)
 public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
     private final I18nHelper i18nHelper;
     private final GlobalObjectDao globalObjectDao;

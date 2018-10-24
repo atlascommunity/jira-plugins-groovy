@@ -4,8 +4,9 @@ import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,12 +15,12 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-@Service
+@Component
 public class DelegatingClassLoader extends ClassLoader {
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final Logger logger = LoggerFactory.getLogger(DelegatingClassLoader.class);
     //todo: maybe change to Map<String, String(plugin key)> with LoadingCache<String, ClassLoader>
-    private final Map<String, WeakReference<ClassLoader>> classLoaders;
+    private final Map<String, Reference<ClassLoader>> classLoaders;
 
     public DelegatingClassLoader() {
         super(null);
@@ -44,6 +45,16 @@ public class DelegatingClassLoader extends ClassLoader {
         }
     }
 
+    public void registerClassLoader(String key, ClassLoader classLoader) {
+        Lock wLock = rwLock.writeLock();
+        wLock.lock();
+        try {
+            this.classLoaders.put(key, new WeakReference<>(classLoader));
+        } finally {
+            wLock.unlock();
+        }
+    }
+
     public void unloadPlugin(String key) {
         classLoaders.remove(key);
     }
@@ -53,7 +64,7 @@ public class DelegatingClassLoader extends ClassLoader {
         Lock lock = rwLock.readLock();
         lock.lock();
         try {
-            for (Map.Entry<String, WeakReference<ClassLoader>> entry : classLoaders.entrySet()) {
+            for (Map.Entry<String, Reference<ClassLoader>> entry : classLoaders.entrySet()) {
                 try {
                     ClassLoader classLoader = entry.getValue().get();
 
