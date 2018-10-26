@@ -6,7 +6,7 @@
     <meta name="admin.active.tab" content="mailru-groovy-registry-link"/>
 </head>
 <body>
-<div id="react-content">
+<div id="react-content" data-skate-ignore="">
 </div>
 
 $webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.main")
