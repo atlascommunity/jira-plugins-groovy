@@ -1,5 +1,6 @@
 //@flow
 import React, {type Node} from 'react';
+import ReactDOM from 'react-dom';
 
 import debounce from 'lodash/debounce';
 
@@ -108,9 +109,11 @@ export class LazilyRenderedContext extends React.PureComponent<ContextProps> {
 
                 console.debug('will render', nowVisible.length);
                 requestAnimationFrame(() => {
-                    for (const item of nowVisible) {
-                        item.callback();
-                    }
+                    ReactDOM.unstable_batchedUpdates(() => {
+                        for (const item of nowVisible) {
+                            item.callback();
+                        }
+                    });
                 });
             }
         },
