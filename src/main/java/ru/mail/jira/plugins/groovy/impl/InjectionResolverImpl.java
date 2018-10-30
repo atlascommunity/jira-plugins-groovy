@@ -5,6 +5,7 @@ import com.atlassian.jira.util.JiraUtils;
 import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
+import com.atlassian.plugin.PluginState;
 import com.atlassian.plugin.module.ContainerAccessor;
 import com.atlassian.plugin.module.ContainerManagedPlugin;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -28,12 +29,23 @@ public class InjectionResolverImpl implements InjectionResolver {
 
     @Override
     public <T> T resolvePluginInjection(String pluginKey, String className) throws ClassNotFoundException {
-        Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+        Plugin plugin = getPlugin(pluginKey);
+
+        if (plugin == null) {
+            throw new IllegalArgumentException("Invalid plugin " + pluginKey);
+        }
+
         Class pluginClass = plugin.getClassLoader().loadClass(className);
+
+        return (T) resolvePluginInjection(plugin, pluginClass);
+    }
+
+    @Override
+    public <T> T resolvePluginInjection(Plugin plugin, Class<T> pluginClass) {
         Object component = ComponentAccessor.getOSGiComponentInstanceOfType(pluginClass);
 
         if (component == null) {
-            List<ModuleDescriptor> modules = plugin.getModuleDescriptorsByModuleClass(pluginClass);
+            List<ModuleDescriptor<T>> modules = plugin.getModuleDescriptorsByModuleClass(pluginClass);
             if (modules.size() > 0) {
                 component = modules.get(0).getModule();
             }
@@ -53,12 +65,19 @@ public class InjectionResolverImpl implements InjectionResolver {
 
     @Override
     public <T> T resolveStandardInjection(String className) throws ClassNotFoundException {
-        Class componentClass = JiraUtils.class.getClassLoader().loadClass(className);
-        return (T) ComponentAccessor.getComponent(componentClass);
+        Class<T> componentClass = (Class<T>) JiraUtils.class.getClassLoader().loadClass(className);
+        return resolveStandardInjection(componentClass);
+    }
+
+    @Override
+    public <T> T resolveStandardInjection(Class<T> type) {
+        return ComponentAccessor.getComponent(type);
     }
 
     @Override
     public Plugin getPlugin(String key) {
-        return pluginAccessor.getPlugin(key);
+        Plugin plugin = pluginAccessor.getPlugin(key);
+
+        return plugin.getPluginState() == PluginState.ENABLED ? plugin : null;
     }
 }

@@ -3,7 +3,9 @@ package ru.mail.jira.plugins.groovy.impl;
 import com.atlassian.event.api.EventListener;
 import com.atlassian.jira.cluster.ClusterMessageConsumer;
 import com.atlassian.jira.cluster.ClusterMessagingService;
+import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.event.PluginEventManager;
+import com.atlassian.plugin.event.events.PluginDisabledEvent;
 import com.atlassian.plugin.event.events.PluginDisablingEvent;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -99,9 +101,18 @@ public class ScriptInvalidationService implements LifecycleAware {
 
     @EventListener
     public void onPluginUnloading(PluginDisablingEvent event) {
-        scriptService.onPluginUnloading(event);
+        flushPluginDependenants(event.getPlugin());
+    }
+
+    @EventListener
+    public void onPluginUnloaded(PluginDisabledEvent event) {
+        flushPluginDependenants(event.getPlugin());
+    }
+
+    private void flushPluginDependenants(Plugin plugin) {
+        scriptService.onPluginDisable(plugin);
         globalObjectsBindingProvider.refresh();
-        //todo: invalidate listeners
+        //todo: invalidate listeners & jql with dependencies on plugins
     }
 
     private class MessageConsumer implements ClusterMessageConsumer {

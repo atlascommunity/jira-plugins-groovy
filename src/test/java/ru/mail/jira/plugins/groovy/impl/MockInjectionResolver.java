@@ -20,8 +20,18 @@ public class MockInjectionResolver implements InjectionResolver {
     }
 
     @Override
+    public <T> T resolvePluginInjection(Plugin plugin, Class<T> type) {
+        throw new UnsupportedOperationException(); //todo
+    }
+
+    @Override
     public <T> T resolveStandardInjection(String className) throws ClassNotFoundException {
         return (T) objects.get(Thread.currentThread().getContextClassLoader().loadClass(className));
+    }
+
+    @Override
+    public <T> T resolveStandardInjection(Class<T> type) {
+        return (T) objects.get(type);
     }
 
     @Override
