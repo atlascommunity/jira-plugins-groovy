@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.util.cl;
+package ru.mail.jira.plugins.groovy.api.util;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

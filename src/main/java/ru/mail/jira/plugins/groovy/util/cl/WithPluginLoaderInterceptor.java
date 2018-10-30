@@ -3,6 +3,7 @@ package ru.mail.jira.plugins.groovy.util.cl;
 import com.atlassian.plugin.util.ClassLoaderStack;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import ru.mail.jira.plugins.groovy.api.util.WithPluginLoader;
 import ru.mail.jira.plugins.groovy.util.AnnotationUtil;
 
 import java.lang.annotation.Annotation;
