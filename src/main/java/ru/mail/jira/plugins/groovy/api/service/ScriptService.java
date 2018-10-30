@@ -1,6 +1,6 @@
 package ru.mail.jira.plugins.groovy.api.service;
 
-import com.atlassian.plugin.event.events.PluginDisablingEvent;
+import com.atlassian.plugin.Plugin;
 import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
 import ru.mail.jira.plugins.groovy.api.script.BindingProvider;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
@@ -38,5 +38,5 @@ public interface ScriptService {
 
     void invalidateAll();
 
-    void onPluginUnloading(PluginDisablingEvent event);
+    void onPluginDisable(Plugin event);
 }

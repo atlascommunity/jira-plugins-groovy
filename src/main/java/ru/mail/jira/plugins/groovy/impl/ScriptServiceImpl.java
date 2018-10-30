@@ -1,7 +1,6 @@
 package ru.mail.jira.plugins.groovy.impl;
 
 import com.atlassian.plugin.Plugin;
-import com.atlassian.plugin.event.events.PluginDisablingEvent;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -40,7 +39,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-//todo Export ru.mail.jira.plugins.groovy.api.service,  has 1,  private references [ru.mail.jira.plugins.groovy.util.cl],
 @ExportAsService({ScriptService.class, LifecycleAware.class})
 @Component
 public class ScriptServiceImpl implements ScriptService, LifecycleAware {
@@ -256,8 +254,8 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         }
     }
 
-    public void onPluginUnloading(PluginDisablingEvent event) {
-        String pluginKey = event.getPlugin().getKey();
+    public void onPluginDisable(Plugin plugin) {
+        String pluginKey = plugin.getKey();
 
         Lock lock = rwLock.writeLock();
         lock.lock();

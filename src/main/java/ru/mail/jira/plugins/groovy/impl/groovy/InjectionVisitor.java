@@ -1,10 +1,10 @@
 package ru.mail.jira.plugins.groovy.impl.groovy;
 
-import org.apache.felix.framework.BundleWiringImpl;
 import org.codehaus.groovy.ast.*;
 import org.codehaus.groovy.ast.expr.*;
 import org.codehaus.groovy.control.SourceUnit;
 import ru.mail.jira.plugins.groovy.api.script.ScriptInjection;
+import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 
 import java.util.Optional;
 
@@ -49,19 +49,11 @@ public class InjectionVisitor extends ClassCodeVisitorSupport {
                 ScriptInjection injectionObject;
 
                 if (pluginModule) {
-                    ClassLoader typeClassLoader = type.getTypeClass().getClassLoader();
-
-                    if (typeClassLoader instanceof BundleWiringImpl.BundleClassLoader) {
-                        BundleWiringImpl.BundleClassLoader castedClassLoader = (BundleWiringImpl.BundleClassLoader) typeClassLoader;
-
-                        injectionObject = new ScriptInjection(
-                            castedClassLoader.getBundle().getSymbolicName(),
-                            type.getName(),
-                            varName
-                        );
-                    } else {
-                        throw new RuntimeException("Class is not from osgi bundle");
-                    }
+                    injectionObject = new ScriptInjection(
+                        ClassLoaderUtil.getClassBundleName(type.getTypeClass()),
+                        type.getName(),
+                        varName
+                    );
                 } else {
                     injectionObject = new ScriptInjection(
                         null,

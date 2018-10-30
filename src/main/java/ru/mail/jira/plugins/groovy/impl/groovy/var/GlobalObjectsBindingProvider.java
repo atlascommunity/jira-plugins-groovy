@@ -15,6 +15,7 @@ import ru.mail.jira.plugins.groovy.api.script.BindingDescriptorImpl;
 import ru.mail.jira.plugins.groovy.api.script.BindingProvider;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
+import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
@@ -39,6 +40,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
     private final GlobalObjectDao globalObjectDao;
     private final ExecutionRepository executionRepository;
     private final DelegatingClassLoader delegatingClassLoader;
+    private final SingletonFactory singletonFactory;
     //we must keep reference to this object
     private final GlobalObjectClassLoader globalObjectClassLoader;
 
@@ -47,12 +49,14 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         ScriptService scriptService,
         GlobalObjectDao globalObjectDao,
         ExecutionRepository executionRepository,
-        DelegatingClassLoader delegatingClassLoader
+        DelegatingClassLoader delegatingClassLoader,
+        SingletonFactory singletonFactory
     ) {
         this.scriptService = scriptService;
         this.globalObjectDao = globalObjectDao;
         this.executionRepository = executionRepository;
         this.delegatingClassLoader = delegatingClassLoader;
+        this.singletonFactory = singletonFactory;
         this.globalObjectClassLoader = new GlobalObjectClassLoader(this);
     }
 
@@ -86,7 +90,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                 try {
                     Class objectClass = scriptService.parseClassStatic(globalObject.getScriptBody(), true, ImmutableMap.of());
                     InvokerHelper.removeClass(objectClass);
-                    Object object = objectClass.getConstructor().newInstance();
+                    Object object = singletonFactory.createInstance(objectClass);
                     objects.put(
                         globalObject.getName(),
                         new BindingDescriptorImpl(object, object.getClass())

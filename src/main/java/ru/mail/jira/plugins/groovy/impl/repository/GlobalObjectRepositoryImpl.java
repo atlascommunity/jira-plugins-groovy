@@ -15,6 +15,7 @@ import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.GlobalObjectRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
+import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.Const;
@@ -30,6 +31,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
     private final I18nHelper i18nHelper;
     private final GlobalObjectDao globalObjectDao;
     private final ScriptService scriptService;
+    private final SingletonFactory singletonFactory;
     private final ScriptInvalidationService invalidationService;
     private final ChangelogHelper changelogHelper;
     private final ExecutionRepository executionRepository;
@@ -39,6 +41,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
         @ComponentImport I18nHelper i18nHelper,
         GlobalObjectDao globalObjectDao,
         ScriptService scriptService,
+        SingletonFactory singletonFactory,
         ScriptInvalidationService invalidationService,
         ChangelogHelper changelogHelper,
         ExecutionRepository executionRepository
@@ -46,6 +49,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
         this.i18nHelper = i18nHelper;
         this.globalObjectDao = globalObjectDao;
         this.scriptService = scriptService;
+        this.singletonFactory = singletonFactory;
         this.invalidationService = invalidationService;
         this.changelogHelper = changelogHelper;
         this.executionRepository = executionRepository;
@@ -108,7 +112,13 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
 
-        scriptService.parseScriptStatic(form.getScriptBody(), ImmutableMap.of());
+        Class scriptClass = scriptService.parseClassStatic(form.getScriptBody(), true, ImmutableMap.of());
+
+        try {
+            singletonFactory.getConstructorArguments(scriptClass);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException(e.getMessage(), "scriptBody");
+        }
 
         if (globalObjectDao.getByName(form.getName()) != null) {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.nameTaken"), "name");
