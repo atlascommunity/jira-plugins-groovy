@@ -35,7 +35,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(Arquillian.class)
 public class GlobalObjectIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
-        "tests/GlobalObject"
+        "tests/go/GlobalObject"
     );
 
     @Inject
