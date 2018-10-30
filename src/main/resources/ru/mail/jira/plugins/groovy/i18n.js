@@ -157,6 +157,7 @@ define('mailru/groovy/i18n-react', [], function() {
             fields: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.fields'),
             scheduled: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.scheduled'),
             jql: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.jql'),
+            globalObjects: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.go'),
             extras: AJS.I18n.getText('ru.mail.jira.plugins.groovy.link.extras'),
         },
         pageTitles: {
@@ -168,8 +169,8 @@ define('mailru/groovy/i18n-react', [], function() {
             rest: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.rest'),
             fields: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.fields'),
             scheduled: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.scheduled'),
-            globalObjects: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.globalObjects'),
             jql: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.jql'),
+            globalObjects: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.globalObjects'),
             extras: AJS.I18n.getText('ru.mail.jira.plugins.groovy.pageTitle.extras'),
         },
         scheduled: {
