@@ -5,7 +5,7 @@ import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
 import ru.mail.jira.plugins.groovy.api.script.BindingProvider;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.script.ParseContext;
-import ru.mail.jira.plugins.groovy.util.cl.WithPluginLoader;
+import ru.mail.jira.plugins.groovy.api.util.WithPluginLoader;
 
 import java.util.Map;
 
