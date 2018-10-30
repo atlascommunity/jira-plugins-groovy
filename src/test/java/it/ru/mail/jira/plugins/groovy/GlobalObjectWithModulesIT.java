@@ -5,6 +5,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import it.ru.mail.jira.plugins.groovy.util.ArquillianUtil;
+import it.ru.mail.jira.plugins.groovy.util.Forms;
 import it.ru.mail.jira.plugins.groovy.util.UserHelper;
 import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -12,18 +13,20 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import ru.mail.jira.plugins.groovy.api.dao.GlobalObjectDao;
 import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectDto;
-import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectForm;
 import ru.mail.jira.plugins.groovy.api.e.UnableToLoadPluginException;
+import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
 import ru.mail.jira.plugins.groovy.api.repository.GlobalObjectRepository;
 import ru.mail.jira.plugins.groovy.api.script.BindingProvider;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.TestHelperService;
-import ru.mail.jira.plugins.groovy.impl.FileUtil;
+import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -44,15 +47,21 @@ public class GlobalObjectWithModulesIT {
     private GlobalObjectRepository globalObjectRepository;
     @Inject
     @ComponentImport
+    private GlobalObjectDao globalObjectDao;
+    @Inject
+    @ComponentImport
     private TestHelperService testHelperService;
     @Inject
     @ComponentImport("GlobalObjectsBindingProvider")
     private BindingProvider bindingProvider;
     @Inject
+    @ComponentImport
+    private ScriptInvalidationService scriptInvalidationService;
+    @Inject
     private UserHelper userHelper;
 
     private String globalObjectName;
-    private Integer globalObjectId;
+    private Set<Integer> deleteIds = new HashSet<>();
 
     @BeforeDeployment
     public static Archive<?> prepareArchive(Archive<?> archive) {
@@ -61,22 +70,20 @@ public class GlobalObjectWithModulesIT {
 
     @After
     public void afterEach() {
-        if (globalObjectId != null) {
-            globalObjectRepository.delete(userHelper.getAdmin(), globalObjectId);
+        for (Integer deleteId : deleteIds) {
+            try {
+                globalObjectRepository.delete(userHelper.getAdmin(), deleteId);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private void createObject(String sourcePath) throws IOException {
-        long ts = System.currentTimeMillis();
-        globalObjectName = "testObject" + ts;
+        GlobalObjectDto globalObjectDto = globalObjectRepository.create(userHelper.getAdmin(), Forms.globalObject(sourcePath));
 
-        GlobalObjectForm form = new GlobalObjectForm();
-        form.setName(globalObjectName);
-        form.setScriptBody(FileUtil.readArquillianExample(sourcePath));
-
-        GlobalObjectDto globalObjectDto = globalObjectRepository.create(userHelper.getAdmin(), form);
-
-        globalObjectId = globalObjectDto.getId();
+        globalObjectName = globalObjectDto.getName();
+        deleteIds.add(globalObjectDto.getId());
     }
 
     @Test
@@ -142,5 +149,25 @@ public class GlobalObjectWithModulesIT {
         }
 
         assertTrue(exceptionThrown);
+    }
+
+    @Test
+    public void brokenScriptShouldNotBreakEverything() throws Exception {
+        GlobalObject script = globalObjectDao.createScript(userHelper.getAdmin(), Forms.globalObject("tests/go/NonExistingImport"));
+        globalObjectName = script.getName();
+        deleteIds.add(script.getID());
+
+        scriptInvalidationService.invalidateGlobalObjects();
+
+        assertNotNull(globalObjectDao.get(script.getID()));
+        assertNull(bindingProvider.getBindings().get(globalObjectName));
+
+        GlobalObjectDto legitScript = globalObjectRepository.create(userHelper.getAdmin(), Forms.globalObject("tests/go/WithStandardModule"));
+        deleteIds.add(legitScript.getId());
+
+        assertNotNull(globalObjectDao.get(script.getID()));
+        assertNull(bindingProvider.getBindings().get(globalObjectName));
+
+        assertNotNull(bindingProvider.getBindings().get(legitScript.getName()));
     }
 }
