@@ -11,4 +11,6 @@ public interface TestHelperService {
     void transactional(ApplicationUser user, String directoryName);
 
     void nonTransactional(ApplicationUser user, String directoryName);
+
+    <T extends Exception> T getCompilationExceptionCause(Exception e);
 }
