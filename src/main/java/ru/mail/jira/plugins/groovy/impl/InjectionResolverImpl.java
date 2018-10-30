@@ -78,6 +78,6 @@ public class InjectionResolverImpl implements InjectionResolver {
     public Plugin getPlugin(String key) {
         Plugin plugin = pluginAccessor.getPlugin(key);
 
-        return plugin.getPluginState() == PluginState.ENABLED ? plugin : null;
+        return plugin != null && plugin.getPluginState() == PluginState.ENABLED ? plugin : null;
     }
 }

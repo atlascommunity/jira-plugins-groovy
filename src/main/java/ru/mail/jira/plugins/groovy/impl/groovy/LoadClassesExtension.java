@@ -40,7 +40,7 @@ public class LoadClassesExtension extends CompilationCustomizer {
                 .map(key -> {
                     Plugin plugin = injectionResolver.getPlugin(key);
                     if (plugin == null) {
-                        throw new RuntimeException("Unable to load plugin " + key);
+                        throw new RuntimeException("Unable to load plugin with key \"" + key + "\"");
                     }
 
                     return plugin;
