@@ -65,7 +65,7 @@ public class GlobalObjectIT {
 
         GlobalObjectForm form = new GlobalObjectForm();
         form.setName(globalObjectName);
-        form.setScriptBody(FileUtil.readArquillianExample("tests/GlobalObject").replaceAll("\\$TS\\$", String.valueOf(ts)));
+        form.setScriptBody(FileUtil.readArquillianExample("tests/go/GlobalObject").replaceAll("\\$TS\\$", String.valueOf(ts)));
 
         GlobalObjectDto globalObjectDto = globalObjectRepository.create(userHelper.getAdmin(), form);
 
