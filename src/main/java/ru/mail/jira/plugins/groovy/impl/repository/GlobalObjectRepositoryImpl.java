@@ -16,7 +16,7 @@ import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.GlobalObjectRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
-import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
+import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.RestFieldException;

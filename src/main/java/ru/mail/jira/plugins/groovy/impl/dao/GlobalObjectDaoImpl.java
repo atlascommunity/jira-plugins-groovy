@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.groovy.impl.dao;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
+@ExportAsDevService(GlobalObjectDao.class)
 public class GlobalObjectDaoImpl implements GlobalObjectDao {
     private final ActiveObjects ao;
     private final ChangelogHelper changelogHelper;

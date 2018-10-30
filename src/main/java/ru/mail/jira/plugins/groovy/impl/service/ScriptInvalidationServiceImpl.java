@@ -1,4 +1,4 @@
-package ru.mail.jira.plugins.groovy.impl;
+package ru.mail.jira.plugins.groovy.impl.service;
 
 import com.atlassian.event.api.EventListener;
 import com.atlassian.jira.cluster.ClusterMessageConsumer;
@@ -17,12 +17,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
+import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.cf.FieldValueCache;
 import ru.mail.jira.plugins.groovy.impl.groovy.var.GlobalObjectsBindingProvider;
 
 @Component
-@ExportAsService(LifecycleAware.class)
-public class ScriptInvalidationService implements LifecycleAware {
+@ExportAsService({LifecycleAware.class, ScriptInvalidationService.class})
+public class ScriptInvalidationServiceImpl implements LifecycleAware, ScriptInvalidationService {
     private static final String SCRIPT_INVALIDATION_CHANNEL = "ru.mail.groovy.si";
     private static final String FIELD_INVALIDATION_CHANNEL = "ru.mail.groovy.fi";
     private static final String GLOBAL_OBJECTS_CHANNEL = "ru.mail.groovy.go";
@@ -36,7 +37,7 @@ public class ScriptInvalidationService implements LifecycleAware {
     private final GlobalObjectsBindingProvider globalObjectsBindingProvider;
 
     @Autowired
-    public ScriptInvalidationService(
+    public ScriptInvalidationServiceImpl(
         @ComponentImport ClusterMessagingService clusterMessagingService,
         @ComponentImport PluginEventManager pluginEventManager,
         ScriptService scriptService,
@@ -51,32 +52,32 @@ public class ScriptInvalidationService implements LifecycleAware {
         this.messageConsumer = new MessageConsumer();
     }
 
-    public void invalidate(String scriptId) {
+    @Override public void invalidate(String scriptId) {
         logger.debug("sending invalidation message for {}", scriptId);
         clusterMessagingService.sendRemote(SCRIPT_INVALIDATION_CHANNEL, scriptId);
         scriptService.invalidate(scriptId);
     }
 
-    public void invalidateAll() {
+    @Override public void invalidateAll() {
         logger.debug("sending invalidation message for all");
         clusterMessagingService.sendRemote(SCRIPT_INVALIDATION_CHANNEL, "");
         scriptService.invalidateAll();
     }
 
-    public void invalidateField(long fieldId) {
+    @Override public void invalidateField(long fieldId) {
         logger.debug("sending invalidation message for field {}", fieldId);
         clusterMessagingService.sendRemote(FIELD_INVALIDATION_CHANNEL, String.valueOf(fieldId));
         fieldValueCache.invalidateField(fieldId);
     }
 
-    public void invalidateAllFields() {
+    @Override public void invalidateAllFields() {
         logger.debug("sending invalidation message for all fields");
         clusterMessagingService.sendRemote(FIELD_INVALIDATION_CHANNEL, "");
         fieldValueCache.invalidateAll();
     }
 
     //todo: возможно, можно без сильной боли инвалидировать только конкретный скрипт (есть ли в этом смысл?)
-    public void invalidateGlobalObjects() {
+    @Override public void invalidateGlobalObjects() {
         clusterMessagingService.sendRemote(GLOBAL_OBJECTS_CHANNEL, "");
         globalObjectsBindingProvider.refresh();
     }
