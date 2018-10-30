@@ -5,6 +5,10 @@ import {connect} from 'react-redux';
 
 import memoizeOne from 'memoize-one';
 
+import Button from '@atlaskit/button';
+
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
+
 import type {GlobalObjectScriptType} from './types';
 
 import {WatchActionCreators} from '../common/redux';
@@ -72,14 +76,7 @@ export class GlobalObjectScript extends React.PureComponent<Props, State> {
     render() {
         const {script, collapsible, focused} = this.props;
 
-            /*<Button
-                key="edit"
-                appearance="subtle"
-                iconBefore={<EditFilledIcon label=""/>}
-
-                component={RouterLink}
-                href={`/admin-scripts/${script.id}/edit`}
-            />*/
+            /**/
 
         return (
             <ConnectedWatchableScript
@@ -92,6 +89,18 @@ export class GlobalObjectScript extends React.PureComponent<Props, State> {
                 focused={focused}
 
                 onDelete={this._delete}
+
+                additionalPrimaryButtons={[
+                    <Button
+                        key="edit"
+                        appearance="subtle"
+                        iconBefore={<EditFilledIcon label=""/>}
+
+                        component={RouterLink}
+                        href={`/go/${script.id}/edit`}
+                    />
+                ]}
+
                 dropdownItems={[
                     {
                         label: CommonMessages.permalink,
