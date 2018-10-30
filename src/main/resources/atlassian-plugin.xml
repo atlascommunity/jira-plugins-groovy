@@ -298,6 +298,16 @@
         </condition>
     </web-item>
 
+    <web-item key="groovy-go-menu-item" name="Groovy global objects menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy global objects page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.go" />
+        <link linkId="mailru-groovy-go-link">/plugins/servlet/my-groovy/go</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
     <web-item key="groovy-audit-menu-item" name="Groovy audit menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy audit page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.audit" />

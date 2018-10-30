@@ -16,6 +16,7 @@ const routeMap = {
     'mailru-groovy-fields-link': '/fields',
     'mailru-groovy-scheduled-link': '/scheduled',
     'mailru-groovy-jql-link': '/jql',
+    'mailru-groovy-go-link': '/go',
     'mailru-groovy-audit-link': '/audit'
 };
 
@@ -28,6 +29,7 @@ const titleMap = {
     '/fields': TitleMessages.fields,
     '/scheduled': TitleMessages.scheduled,
     '/jql': TitleMessages.jql,
+    '/go': TitleMessages.globalObjects,
     '/audit': TitleMessages.audit
 };
 

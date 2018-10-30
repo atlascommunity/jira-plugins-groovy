@@ -99,6 +99,7 @@ export const TitleMessages: I18nMessages = {
     rest: i18n.titles.rest,
     fields: i18n.titles.fields,
     scheduled: i18n.titles.scheduled,
+    globalObjects: i18n.titles.globalObjects,
     jql: i18n.titles.jql,
     extras: i18n.titles.extras,
 };
