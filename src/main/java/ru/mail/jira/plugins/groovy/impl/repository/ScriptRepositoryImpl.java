@@ -21,7 +21,7 @@ import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.*;
 import ru.mail.jira.plugins.groovy.api.dto.directory.*;
 import ru.mail.jira.plugins.groovy.api.entity.*;
-import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
+import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 
 import java.text.Collator;

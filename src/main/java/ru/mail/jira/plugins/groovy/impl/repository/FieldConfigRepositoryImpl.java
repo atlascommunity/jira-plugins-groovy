@@ -29,7 +29,7 @@ import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigDto;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigForm;
-import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
+import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.cf.ScriptedCFType;
 import ru.mail.jira.plugins.groovy.impl.cf.TemplateScriptedCFType;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
