@@ -3,7 +3,9 @@ package it.ru.mail.jira.plugins.groovy;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.util.BuildUtilsInfo;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import it.ru.mail.jira.plugins.groovy.util.ArquillianUtil;
@@ -14,7 +16,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import ru.mail.jira.plugins.groovy.api.dto.docs.ClassDoc;
+import ru.mail.jira.plugins.groovy.api.dto.docs.MethodDoc;
+import ru.mail.jira.plugins.groovy.api.dto.docs.ParameterDoc;
+import ru.mail.jira.plugins.groovy.api.dto.docs.TypeDoc;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
+import ru.mail.jira.plugins.groovy.api.service.GroovyDocService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.FileUtil;
 
@@ -30,7 +37,8 @@ public class ScriptServiceIT {
         "tests/jsonSlurper",
         "tests/standardModule",
         "tests/pluginModule",
-        "tests/containerService"
+        "tests/containerService",
+        "tests/GroovyDocTest"
     );
 
     @ComponentImport
@@ -39,11 +47,19 @@ public class ScriptServiceIT {
 
     @ComponentImport
     @Inject
+    private GroovyDocService groovyDocService;
+
+    @ComponentImport
+    @Inject
     private JiraAuthenticationContext authenticationContext;
 
     @ComponentImport
     @Inject
     private UserManager userManager;
+
+    @ComponentImport
+    @Inject
+    private BuildUtilsInfo buildUtilsInfo;
 
     private ApplicationUser oldUser;
 
@@ -105,5 +121,52 @@ public class ScriptServiceIT {
         Object result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
 
         assertNotNull(result);
+    }
+
+    @Test
+    public void docGenerationShouldWork() throws Exception {
+        ClassDoc generatedDoc = groovyDocService.parseDocs(FileUtil.readArquillianExample("tests/GroovyDocTest"));
+
+        assertEquals(
+            new ClassDoc(
+                "some description",
+                ImmutableList.of(
+                    new MethodDoc(
+                        "getUserByName",
+                        "Returns user for current name<DL><DT><B>name:</B></DT><DD>user name</DD></DL>",
+                        new TypeDoc(
+                            "com.atlassian.jira.user.ApplicationUser",
+                            buildLink(
+                                "https://docs.atlassian.com/software/jira/docs/api/" + buildUtilsInfo.getVersion() + "/com/atlassian/jira/user/ApplicationUser.html",
+                                "com.atlassian.jira.user.ApplicationUser"
+                            )
+                        ),
+                        ImmutableList.of(
+                            new ParameterDoc(
+                                new TypeDoc(
+                                    "java.lang.String",
+                                    buildLink(
+                                        "https://docs.oracle.com/javase/8/docs/api/java/lang/String.html",
+                                        "java.lang.String"
+                                    )
+                                ),
+                                "name"
+                            )
+                        )
+                    ),
+                    new MethodDoc(
+                        "voidMethod",
+                        null,
+                        new TypeDoc("void", "void"),
+                        ImmutableList.of()
+                    )
+                )
+            ),
+            generatedDoc
+        );
+    }
+
+    private static String buildLink(String url, String className) {
+        return "<a href='" + url + "' title='" + className + "'>" + className + "</a>";
     }
 }
