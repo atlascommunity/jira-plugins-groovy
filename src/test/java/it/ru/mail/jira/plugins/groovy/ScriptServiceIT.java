@@ -129,6 +129,7 @@ public class ScriptServiceIT {
 
         assertEquals(
             new ClassDoc(
+                "GroovyDocTest",
                 "some description",
                 ImmutableList.of(
                     new MethodDoc(

@@ -10,10 +10,11 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dao.GlobalObjectDao;
 import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
-import ru.mail.jira.plugins.groovy.api.script.BindingDescriptor;
-import ru.mail.jira.plugins.groovy.api.script.BindingDescriptorImpl;
-import ru.mail.jira.plugins.groovy.api.script.BindingProvider;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingProvider;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
+import ru.mail.jira.plugins.groovy.api.script.binding.LazyDocBindingDescriptorImpl;
+import ru.mail.jira.plugins.groovy.api.service.GroovyDocService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
@@ -40,6 +41,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
     private final GlobalObjectDao globalObjectDao;
     private final ExecutionRepository executionRepository;
     private final DelegatingClassLoader delegatingClassLoader;
+    private final GroovyDocService groovyDocService;
     private final SingletonFactory singletonFactory;
     //we must keep reference to this object
     private final GlobalObjectClassLoader globalObjectClassLoader;
@@ -50,12 +52,14 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         GlobalObjectDao globalObjectDao,
         ExecutionRepository executionRepository,
         DelegatingClassLoader delegatingClassLoader,
+        GroovyDocService groovyDocService,
         SingletonFactory singletonFactory
     ) {
         this.scriptService = scriptService;
         this.globalObjectDao = globalObjectDao;
         this.executionRepository = executionRepository;
         this.delegatingClassLoader = delegatingClassLoader;
+        this.groovyDocService = groovyDocService;
         this.singletonFactory = singletonFactory;
         this.globalObjectClassLoader = new GlobalObjectClassLoader(this);
     }
@@ -93,7 +97,14 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                     Object object = singletonFactory.createInstance(objectClass);
                     objects.put(
                         globalObject.getName(),
-                        new BindingDescriptorImpl(object, object.getClass())
+                        new LazyDocBindingDescriptorImpl(object, object.getClass(), () -> {
+                            try {
+                                return groovyDocService.parseDocs(globalObject.getScriptBody());
+                            } catch (Exception e) {
+                                logger.error("Unable to parse doc for global object {}", globalObject.getName(), e);
+                                return null;
+                            }
+                        })
                     );
                     types.put(objectClass.getName(), objectClass);
                 } catch (Exception e) {

@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
@@ -11,9 +12,13 @@ import java.util.List;
 @ToString @EqualsAndHashCode
 @XmlRootElement
 public class MethodDoc {
+    @XmlElement
     private final String name;
+    @XmlElement
     private final String description;
+    @XmlElement
     private final TypeDoc returnType;
+    @XmlElement
     private final List<ParameterDoc> parameters;
 
     public MethodDoc(String name, String description, TypeDoc returnType, List<ParameterDoc> parameters) {
