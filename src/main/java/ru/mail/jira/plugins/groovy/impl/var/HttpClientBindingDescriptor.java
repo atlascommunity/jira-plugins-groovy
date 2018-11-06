@@ -6,7 +6,10 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import ru.mail.jira.plugins.groovy.api.script.BindingDescriptor;
+import ru.mail.jira.plugins.groovy.api.dto.docs.ClassDoc;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
+
+import javax.annotation.Nonnull;
 
 public class HttpClientBindingDescriptor implements BindingDescriptor<CloseableHttpClient> {
     private static final int HTTP_CLIENT_TIMEOUT = 3000;
@@ -45,9 +48,19 @@ public class HttpClientBindingDescriptor implements BindingDescriptor<CloseableH
         return this.httpClient;
     }
 
+    @Nonnull
     @Override
     public Class<CloseableHttpClient> getType() {
         return CloseableHttpClient.class;
+    }
+
+    @Nonnull
+    @Override
+    public ClassDoc getDoc() {
+        return new ClassDoc(
+            getType().getCanonicalName(),
+            "https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/impl/client/CloseableHttpClient.html"
+        );
     }
 
     @Override

@@ -2,7 +2,8 @@ package ru.mail.jira.plugins.groovy.api.service;
 
 import com.atlassian.plugin.Plugin;
 import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
-import ru.mail.jira.plugins.groovy.api.script.BindingProvider;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingProvider;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 import ru.mail.jira.plugins.groovy.api.util.WithPluginLoader;
@@ -30,7 +31,10 @@ public interface ScriptService {
 
     CacheStatsDto getCacheStats();
 
+    @Deprecated
     Map<String, Class> getGlobalBindingTypes();
+
+    Map<String, BindingDescriptor> getGlobalBindings();
 
     void registerBindingProvider(BindingProvider bindingProvider);
 

@@ -1,4 +1,8 @@
-package ru.mail.jira.plugins.groovy.api.script;
+package ru.mail.jira.plugins.groovy.api.script.binding;
+
+import ru.mail.jira.plugins.groovy.api.dto.docs.ClassDoc;
+
+import javax.annotation.Nonnull;
 
 public class BindingDescriptorImpl<T> implements BindingDescriptor<T> {
     private final T object;
@@ -14,13 +18,20 @@ public class BindingDescriptorImpl<T> implements BindingDescriptor<T> {
         return object;
     }
 
+    @Nonnull
     @Override
     public Class<T> getType() {
         return type;
     }
 
+    @Nonnull
     @Override
-    public void dispose() throws Exception {
+    public ClassDoc getDoc() {
+        return null;
+    }
+
+    @Override
+    public void dispose() {
 
     }
 }

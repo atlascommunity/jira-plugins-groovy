@@ -18,7 +18,7 @@ import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectDto;
 import ru.mail.jira.plugins.groovy.api.e.UnableToLoadPluginException;
 import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
 import ru.mail.jira.plugins.groovy.api.repository.GlobalObjectRepository;
-import ru.mail.jira.plugins.groovy.api.script.BindingProvider;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingProvider;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.TestHelperService;

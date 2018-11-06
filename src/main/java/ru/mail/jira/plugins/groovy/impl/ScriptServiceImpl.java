@@ -20,13 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.script.*;
 import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingProvider;
 import ru.mail.jira.plugins.groovy.api.service.GlobalFunctionManager;
 import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.groovy.*;
 import ru.mail.jira.plugins.groovy.impl.groovy.statik.CompileStaticExtension;
 import ru.mail.jira.plugins.groovy.impl.groovy.statik.DeprecatedAstVisitor;
-import ru.mail.jira.plugins.groovy.api.script.BindingDescriptor;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
 import ru.mail.jira.plugins.groovy.impl.var.HttpClientBindingDescriptor;
 import ru.mail.jira.plugins.groovy.impl.var.LoggerBindingDescriptor;
 import ru.mail.jira.plugins.groovy.impl.var.TemplateEngineBindingDescriptor;
@@ -150,6 +151,19 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
             bindingProvider
                 .getBindings()
                 .forEach((k, v) -> result.put(k, v.getType()));
+        }
+
+        return result;
+    }
+
+    @Override
+    public Map<String, BindingDescriptor> getGlobalBindings() {
+        Map<String, BindingDescriptor> result = new HashMap<>(globalVariables);
+
+        for (BindingProvider bindingProvider : bindingProviders) {
+            bindingProvider
+                .getBindings()
+                .forEach(result::put);
         }
 
         return result;
