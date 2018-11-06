@@ -26,6 +26,7 @@ import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 
 import java.text.Collator;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -104,9 +105,17 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     @Override
     public PickerResultSet<PickerOption> getAllDirectoriesForPicker() {
-        List<PickerOption> options = Arrays
-            .stream(ao.find(ScriptDirectory.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(directory -> new PickerOption(ScriptUtil.getExpandedName(directory), String.valueOf(directory.getID()), null))
+        Map<Integer, ScriptDirectoryDto> directories = getAllDirectories()
+            .stream()
+            .collect(Collectors.toMap(
+                ScriptDirectoryDto::getId,
+                Function.identity()
+            ));
+
+        List<PickerOption> options = directories
+            .values()
+            .stream()
+            .map(directory -> new PickerOption(ScriptUtil.getExpandedName(directories, directory), String.valueOf(directory.getId()), null))
             .sorted(Comparator.comparing(PickerOption::getLabel, COLLATOR))
             .collect(Collectors.toList());
         return new PickerResultSet<>(options, true);
@@ -148,9 +157,16 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
     @Override
     public List<ScriptDescription> getAllScriptDescriptions(WorkflowScriptType type) {
+        Map<Integer, ScriptDirectoryDto> directories = getAllDirectories()
+            .stream()
+            .collect(Collectors.toMap(
+                ScriptDirectoryDto::getId,
+                Function.identity()
+            ));
+
         return Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(this::buildScriptDescription)
+            .map(script -> buildScriptDescription(directories, script))
             .filter(description -> description.getTypes().contains(type))
             .sorted(Comparator.comparing(ScriptDescription::getName, COLLATOR))
             .collect(Collectors.toList());
@@ -323,10 +339,10 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         return parseContext;
     }
 
-    private ScriptDescription buildScriptDescription(Script script) {
+    private ScriptDescription buildScriptDescription(Map<Integer, ScriptDirectoryDto> allDirectories, Script script) {
         ScriptDescription result = new ScriptDescription();
         result.setId(script.getID());
-        result.setName(ScriptUtil.getExpandedName(script));
+        result.setName(ScriptUtil.getExpandedName(allDirectories, script));
         result.setDescription(script.getDescription());
         result.setTypes(parseTypes(script.getTypes()));
 
