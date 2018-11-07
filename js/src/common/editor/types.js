@@ -23,3 +23,27 @@ export type MarkerType = {
     message: string,
     severity: 'error' | 'warning'
 };
+
+export type TypeDoc = {
+    className: string,
+    href: ?string
+};
+
+export type ParameterDoc = {
+    type: TypeDoc,
+    name: string
+};
+
+export type MethodDoc = {
+    name: string,
+    description: ?string,
+    returnType: TypeDoc,
+    parameters: $ReadOnlyArray<ParameterDoc>
+};
+
+export type ClassDoc = {
+    className: string,
+    href: ?string,
+    description: ?string,
+    methods: ?$ReadOnlyArray<MethodDoc>
+};

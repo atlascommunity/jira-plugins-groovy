@@ -31,11 +31,11 @@ import WarningIcon from '@atlaskit/icon/glyph/jira/failed-build-status';
 
 import {Resizable} from 'react-resizable';
 
-import type {BindingType, ReturnType, MarkerType} from './types';
-
 import {CodeMirror} from './CM';
+import {Binding} from './Binding';
+import {GlobalBindings} from './GlobalBindings';
 
-import {globalBindings} from '../bindings';
+import type {BindingType, ReturnType, MarkerType} from './types';
 
 import {CommonMessages} from '../../i18n/common.i18n';
 
@@ -241,7 +241,7 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                         <div style={{marginLeft: '4px'}}>
                             <InlineMessage type="info" placement="top-end">
                                 <div className="flex-column">
-                                    {globalBindings.map(binding => <Binding key={binding.name} binding={binding}/>)}
+                                    <GlobalBindings/>
                                     <hr className="full-width"/>
                                     {bindings.map(binding => <Binding key={binding.name} binding={binding}/>)}
                                     {returnTypes &&
@@ -296,30 +296,3 @@ export class Editor extends React.Component<EditorProps, EditorState> {
     }
 }
 
-type BindingProps = {
-    binding: BindingType
-};
-
-function Binding({binding}: BindingProps): Node {
-    return (
-        <div className="flex-row">
-            <div className="flex-none">{binding.name}</div>
-            <div className="flex-grow"/>
-            <div className="flex-none" style={{marginLeft: '5px'}}>
-                {binding.javaDoc
-                    ? (
-                        <a
-                            href={binding.javaDoc}
-                            title={binding.fullClassName}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {binding.className}
-                        </a>
-                    )
-                    : <abbr title={binding.fullClassName}>{binding.className}</abbr>
-                }
-            </div>
-        </div>
-    );
-}

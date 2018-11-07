@@ -30,7 +30,7 @@ public class TemplateEngineBindingDescriptor implements BindingDescriptor<Templa
     @Override
     public ClassDoc getDoc() {
         return new ClassDoc(
-            getType().getCanonicalName(),
+            true, getType().getCanonicalName(),
             "http://docs.groovy-lang.org/2.4.13/html/api/groovy/text/TemplateEngine.html"
         );
     }

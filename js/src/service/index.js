@@ -18,6 +18,7 @@ import {AdminScriptService} from './adminScript.service';
 import {JqlScriptService} from './jqlScript.service';
 import {WatcherService} from './watcher.service';
 import {GlobalObjectService} from './go.service';
+import {BindingService} from './binding.service';
 
 import {ErrorMessages} from '../i18n/common.i18n';
 
@@ -37,6 +38,7 @@ export const adminScriptService = new AdminScriptService();
 export const jqlScriptService = new JqlScriptService();
 export const watcherService = new WatcherService();
 export const globalObjectService = new GlobalObjectService();
+export const bindingService = new BindingService();
 
 export {getPluginBaseUrl, getBaseUrl, ajaxGet} from './ajaxHelper';
 

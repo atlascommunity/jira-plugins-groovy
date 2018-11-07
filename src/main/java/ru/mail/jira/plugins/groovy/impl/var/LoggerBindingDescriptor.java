@@ -29,7 +29,7 @@ public class LoggerBindingDescriptor implements BindingDescriptor<Logger> {
     @Override
     public ClassDoc getDoc() {
         return new ClassDoc(
-            getType().getCanonicalName(),
+            true, getType().getCanonicalName(),
             "https://www.slf4j.org/api/org/slf4j/Logger.html"
         );
     }

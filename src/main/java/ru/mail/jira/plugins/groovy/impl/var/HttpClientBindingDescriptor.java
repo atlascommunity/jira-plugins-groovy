@@ -58,7 +58,7 @@ public class HttpClientBindingDescriptor implements BindingDescriptor<CloseableH
     @Override
     public ClassDoc getDoc() {
         return new ClassDoc(
-            getType().getCanonicalName(),
+            true, getType().getCanonicalName(),
             "https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/impl/client/CloseableHttpClient.html"
         );
     }
