@@ -13,6 +13,8 @@ import java.util.List;
 @XmlRootElement
 public class ClassDoc {
     @XmlElement
+    private final boolean builtIn;
+    @XmlElement
     private final String className;
     @XmlElement
     private final String href;
@@ -21,14 +23,16 @@ public class ClassDoc {
     @XmlElement
     public final List<MethodDoc> methods;
 
-    public ClassDoc(String className, String href) {
+    public ClassDoc(boolean builtIn, String className, String href) {
+        this.builtIn = builtIn;
         this.className = className;
         this.href = href;
         this.description = null;
         this.methods = null;
     }
 
-    public ClassDoc(String className, String description, List<MethodDoc> methods) {
+    public ClassDoc(boolean builtIn, String className, String description, List<MethodDoc> methods) {
+        this.builtIn = builtIn;
         this.className = className;
         this.href = null;
         this.description = description;

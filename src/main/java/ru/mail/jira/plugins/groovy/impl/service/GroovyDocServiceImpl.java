@@ -85,7 +85,7 @@ public class GroovyDocServiceImpl implements GroovyDocService {
             ))
             .collect(Collectors.toList());
 
-        return new ClassDoc(doc.name(), processComment(doc.commentText()), methods);
+        return new ClassDoc(false, doc.name(), processComment(doc.commentText()), methods);
     }
 
     private static TypeDoc toTypeDoc(GroovyClassDoc classDoc, GroovyType groovyType) {
