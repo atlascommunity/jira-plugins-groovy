@@ -1,5 +1,5 @@
 //@flow
-import React, {Fragment, type Node} from 'react';
+import React, {type Node} from 'react';
 
 import memoizeOne from 'memoize-one';
 
@@ -16,14 +16,9 @@ import 'codemirror/addon/fold/comment-fold';
 
 
 import Button from '@atlaskit/button';
-import Lozenge from '@atlaskit/lozenge';
-import Tooltip from '@atlaskit/tooltip';
-import InlineMessage from '@atlaskit/inline-message';
-import {Label} from '@atlaskit/field-base';
 import Spinner from '@atlaskit/spinner';
 import {colors} from '@atlaskit/theme';
 
-import QuestionIcon from '@atlaskit/icon/glyph/question';
 import QuestionCircleIcon from '@atlaskit/icon/glyph/question-circle';
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
@@ -31,9 +26,8 @@ import WarningIcon from '@atlaskit/icon/glyph/jira/failed-build-status';
 
 import {Resizable} from 'react-resizable';
 
+import {Bindings} from './Bindings';
 import {CodeMirror} from './CM';
-import {Binding} from './Binding';
-import {GlobalBindings} from './GlobalBindings';
 
 import type {BindingType, ReturnType, MarkerType} from './types';
 
@@ -237,56 +231,9 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                             {CommonMessages.switchTheme}
                         </Button>
                     </div>
-                    { bindings &&
+                    {bindings &&
                         <div style={{marginLeft: '4px'}}>
-                            <InlineMessage type="info" placement="top-end">
-                                <div className="flex-column">
-                                    <GlobalBindings/>
-                                    <hr className="full-width"/>
-                                    {bindings.map(binding => <Binding key={binding.name} binding={binding}/>)}
-                                    {returnTypes &&
-                                        <Fragment>
-                                            <hr className="full-width"/>
-                                            <Label label={CommonMessages.returnTypes} isFirstChild={true}/>
-                                            {returnTypes.map((e, i) =>
-                                                <div className="flex-row" key={i}>
-                                                    {e.label &&
-                                                        <Fragment>
-                                                            <div className="flex-none">
-                                                                <Lozenge>{e.label}</Lozenge>
-                                                            </div>
-                                                            <div className="flex-grow"/>
-                                                        </Fragment>
-                                                    }
-                                                    {e.optional &&
-                                                        <div className="flex-vertical-middle">
-                                                            <Tooltip content="Optional">
-                                                                <QuestionIcon size="small" label="optional"/>
-                                                            </Tooltip>
-                                                        </div>
-                                                    }
-                                                    <div className="flex-none" style={{marginLeft: '5px'}}>
-                                                        {e.javaDoc
-                                                            ? (
-                                                                <a
-                                                                    href={e.javaDoc}
-                                                                    title={e.fullClassName}
-
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                >
-                                                                    {e.className}
-                                                                </a>
-                                                            )
-                                                            : <abbr title={e.fullClassName}>{e.className}</abbr>
-                                                        }
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </Fragment>
-                                    }
-                                </div>
-                            </InlineMessage>
+                            <Bindings returnTypes={returnTypes} bindings={bindings}/>
                         </div>
                     }
                     {validationState && <div style={{marginLeft: '4px'}}>{this._renderValidationIcon()}</div>}
