@@ -134,25 +134,16 @@ public class ScriptServiceIT {
                 ImmutableList.of(
                     new MethodDoc(
                         "getUserByName",
-                        "Returns user for current name<DL><DT><B>name:</B></DT><DD>user name</DD></DL>",
+                        "Returns user for current name <DL><DT><B>Parameters:</B></DT><DD><code>name</code> - user name</DD></DL><DL><DT><B>Returns:</B></DT><DD>user for name</DD></DL>",
                         new TypeDoc(
                             "com.atlassian.jira.user.ApplicationUser",
                             buildLink(
                                 "https://docs.atlassian.com/software/jira/docs/api/" + buildUtilsInfo.getVersion() + "/com/atlassian/jira/user/ApplicationUser.html",
-                                "com.atlassian.jira.user.ApplicationUser"
+                                "ApplicationUser"
                             )
                         ),
                         ImmutableList.of(
-                            new ParameterDoc(
-                                new TypeDoc(
-                                    "java.lang.String",
-                                    buildLink(
-                                        "https://docs.oracle.com/javase/8/docs/api/java/lang/String.html",
-                                        "java.lang.String"
-                                    )
-                                ),
-                                "name"
-                            )
+                            new ParameterDoc(getStringDoc(), "name")
                         )
                     ),
                     new MethodDoc(
@@ -160,6 +151,16 @@ public class ScriptServiceIT {
                         null,
                         new TypeDoc("void", "void"),
                         ImmutableList.of()
+                    ),
+                    new MethodDoc(
+                        "withPrimitiveType",
+                        null,
+                        new TypeDoc("void", "void"),
+                        ImmutableList.of(
+                            new ParameterDoc(getStringDoc(), "a"),
+                            new ParameterDoc(getStringDoc(), "b"),
+                            new ParameterDoc(new TypeDoc("int", "int"), "c")
+                        )
                     )
                 )
             ),
@@ -169,5 +170,15 @@ public class ScriptServiceIT {
 
     private static String buildLink(String url, String className) {
         return "<a href='" + url + "' title='" + className + "'>" + className + "</a>";
+    }
+
+    private static TypeDoc getStringDoc() {
+        return new TypeDoc(
+            "java.lang.String",
+            buildLink(
+                "https://docs.oracle.com/javase/8/docs/api/java/lang/String.html",
+                "String"
+            )
+        );
     }
 }

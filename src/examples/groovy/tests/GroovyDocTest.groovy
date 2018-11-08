@@ -14,13 +14,16 @@ class GroovyDocTest {
 
     /**
      * Returns user for current name
-     * @name user name
+     * @param name user name
+     * @return user for name
      */
     ApplicationUser getUserByName(String name) {
         return userManager.getUserByName(name)
     }
 
     void voidMethod() {}
+
+    void withPrimitiveType(String a, String b, int c) {}
 
     //these should be ignored
     private void privateMethod() {}
