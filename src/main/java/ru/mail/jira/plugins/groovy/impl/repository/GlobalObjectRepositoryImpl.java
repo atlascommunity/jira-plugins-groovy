@@ -23,6 +23,7 @@ import ru.mail.jira.plugins.groovy.util.RestFieldException;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -73,7 +74,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
 
     @Override
     public GlobalObjectDto create(ApplicationUser user, GlobalObjectForm form) {
-        validate(true, form);
+        validate(true, null, form);
 
         GlobalObject result = globalObjectDao.createScript(user, form);
 
@@ -84,7 +85,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
 
     @Override
     public GlobalObjectDto update(ApplicationUser user, int id, GlobalObjectForm form) {
-        validate(false, form);
+        validate(false, id, form);
 
         GlobalObject result = globalObjectDao.updateScript(user, id, form);
 
@@ -105,7 +106,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
         invalidationService.invalidateGlobalObjects();
     }
 
-    private void validate(boolean isNew, GlobalObjectForm form) {
+    private void validate(boolean isNew, Integer id, GlobalObjectForm form) {
         ValidationUtils.validateForm2(i18nHelper, isNew, form);
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
@@ -120,7 +121,8 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
             throw new ValidationException(e.getMessage(), "scriptBody");
         }
 
-        if (globalObjectDao.getByName(form.getName()) != null) {
+        GlobalObject existingDuplicate = globalObjectDao.getByName(form.getName());
+        if (existingDuplicate != null && (isNew || !Objects.equals(id, existingDuplicate.getID()))) {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.nameTaken"), "name");
         }
 
