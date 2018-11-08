@@ -77,10 +77,10 @@ public class GroovyDocServiceImpl implements GroovyDocService {
             .map(it -> new MethodDoc(
                 it.name(),
                 processComment(it.commentText()),
-                toTypeDoc(doc, it.returnType()),
+                toTypeDoc(doc, it.returnType(), null),
                 Arrays
                     .stream(it.parameters())
-                    .map(param -> new ParameterDoc(toTypeDoc(doc, param.type()), param.name()))
+                    .map(param -> new ParameterDoc(toTypeDoc(doc, param.type(), param.typeName()), param.name()))
                     .collect(Collectors.toList())
             ))
             .collect(Collectors.toList());
@@ -88,15 +88,15 @@ public class GroovyDocServiceImpl implements GroovyDocService {
         return new ClassDoc(false, doc.name(), processComment(doc.commentText()), methods);
     }
 
-    private static TypeDoc toTypeDoc(GroovyClassDoc classDoc, GroovyType groovyType) {
+    private static TypeDoc toTypeDoc(GroovyClassDoc classDoc, GroovyType groovyType, String fallbackString) {
         if (groovyType == null) {
-            return null;
+            return new TypeDoc(fallbackString, fallbackString);
         }
 
         String url = null;
 
         if (classDoc instanceof SimpleGroovyClassDoc) {
-            url = ((SimpleGroovyClassDoc) classDoc).getDocUrl(groovyType.qualifiedTypeName(), true);
+            url = ((SimpleGroovyClassDoc) classDoc).getDocUrl(groovyType.qualifiedTypeName(), false);
         }
 
         return new TypeDoc(groovyType.qualifiedTypeName(), url);
