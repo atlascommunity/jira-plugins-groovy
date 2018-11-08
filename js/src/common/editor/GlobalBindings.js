@@ -2,6 +2,7 @@
 import React, {Fragment} from 'react';
 
 import memoizeOne from 'memoize-one';
+import memoize from 'lodash/memoize';
 import orderBy from 'lodash/orderBy';
 
 import Spinner from '@atlaskit/spinner';
@@ -15,25 +16,41 @@ import {bindingService} from '../../service';
 
 const getBindings = memoizeOne(bindingService.getGlobalBindingTypes);
 
-type ItemType = ClassDoc & { key: string };
+type ItemType = ClassDoc & { key: string, classDoc: ClassDoc };
+
+type Props = {
+    onOpenDoc: (ClassDoc) => void
+};
 
 type State = {
     isReady: boolean,
     bindings: ?$ReadOnlyArray<ItemType>
 };
 
-export class GlobalBindings extends React.Component<{}, State> {
+export class GlobalBindings extends React.PureComponent<Props, State> {
     state = {
         isReady: false,
         bindings: null
     };
+
+    _openDoc = memoize(doc => () => this.props.onOpenDoc(doc));
 
     componentDidMount() {
         getBindings().then((bindings: {string: ClassDoc}) => {
             this.setState({
                 isReady: true,
                 bindings: orderBy(
-                    Object.keys(bindings).map(key => ({ ...bindings[key], key })),
+                    Object
+                        .keys(bindings)
+                        .map(key => ({
+                            ...bindings[key],
+                            ...(
+                                bindings[key].builtIn
+                                ? {}
+                                : {classDoc: bindings[key]}
+                            ),
+                            key
+                        })),
                     ['builtIn', 'key'], ['desc', 'asc']
                 )
             });
@@ -58,14 +75,16 @@ export class GlobalBindings extends React.Component<{}, State> {
             <Fragment>
                 {
                     bindings.map(
-                        binding =>
+                        ({key, className, href, classDoc}) =>
                             <Binding
-                                key={binding.key}
+                                key={key}
+                                onOpenDoc={classDoc ? this._openDoc(classDoc) : undefined}
                                 binding={{
-                                    name: binding.key,
-                                    className: extractShortClassName(binding.className),
-                                    fullClassName: binding.className,
-                                    javaDoc: binding.href || undefined
+                                    name: key,
+                                    className: extractShortClassName(className),
+                                    fullClassName: className,
+                                    javaDoc: href || undefined,
+                                    classDoc
                                 }}
                             />
                     )

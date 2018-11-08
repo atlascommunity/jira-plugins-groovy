@@ -1,20 +1,5 @@
 //@flow
 
-export type VariableType = {
-    className: string,
-    fullClassName: string,
-    javaDoc?: string
-};
-
-export type BindingType = VariableType & {
-    name: string
-};
-
-export type ReturnType = VariableType & {
-    label?: string,
-    optional?: boolean
-};
-
 export type MarkerType = {
     startRow: number,
     endRow: number,
@@ -26,7 +11,7 @@ export type MarkerType = {
 
 export type TypeDoc = {
     className: string,
-    href: ?string
+    link: ?string
 };
 
 export type ParameterDoc = {
@@ -42,8 +27,25 @@ export type MethodDoc = {
 };
 
 export type ClassDoc = {
+    builtIn: boolean,
     className: string,
     href: ?string,
     description: ?string,
     methods: ?$ReadOnlyArray<MethodDoc>
+};
+
+export type VariableType = {
+    className: string,
+    fullClassName: string,
+    javaDoc?: string,
+    classDoc?: ClassDoc
+};
+
+export type BindingType = VariableType & {
+    name: string
+};
+
+export type ReturnType = VariableType & {
+    label?: string,
+    optional?: boolean
 };
