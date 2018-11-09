@@ -66,6 +66,10 @@ export class NavigationControllerInternal extends React.PureComponent<Props> {
     }
 
     _onClick = (event: Event) => {
+        if (event.metaKey || event.altKey || event.ctrlKey || event.shiftKey || event.button !== 0 || event.defaultPrevented) {
+            return;
+        }
+
         //$FlowFixMe
         const {id} = event.currentTarget;
 
