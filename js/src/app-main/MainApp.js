@@ -55,10 +55,6 @@ export class MainApp extends React.PureComponent<{}> {
                         href="/audit"
                         title="Audit log"
                     />
-                    <PageCard
-                        href="/extras"
-                        title="Extras"
-                    />
                 </div>
             </Page>
         );

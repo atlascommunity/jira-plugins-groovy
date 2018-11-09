@@ -22,7 +22,6 @@ import {FieldsRoute} from '../app-fields';
 import {ScheduledRoute} from '../app-scheduled';
 import {JqlRoute} from '../app-jql';
 import {AuditLogRoute} from '../app-audit';
-import {ExtrasPage} from '../app-extras';
 
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
@@ -56,7 +55,6 @@ AJS.toInit(() => {
                         <Route path="/scheduled" component={ScheduledRoute}/>
                         <Route path="/jql" component={JqlRoute}/>
                         <Route path="/audit" component={AuditLogRoute}/>
-                        <Route path="/extras" component={ExtrasPage}/>
                         <Route component={NotFoundPage}/>
                     </Switch>
                     <NavigationController/>

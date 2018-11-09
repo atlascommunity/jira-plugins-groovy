@@ -16,8 +16,7 @@ const routeMap = {
     'mailru-groovy-fields-link': '/fields',
     'mailru-groovy-scheduled-link': '/scheduled',
     'mailru-groovy-jql-link': '/jql',
-    'mailru-groovy-audit-link': '/audit',
-    'mailru-groovy-extras-link': '/extras'
+    'mailru-groovy-audit-link': '/audit'
 };
 
 const titleMap = {
@@ -29,8 +28,7 @@ const titleMap = {
     '/fields': TitleMessages.fields,
     '/scheduled': TitleMessages.scheduled,
     '/jql': TitleMessages.jql,
-    '/audit': TitleMessages.audit,
-    '/extras': TitleMessages.extras
+    '/audit': TitleMessages.audit
 };
 
 type Props = {

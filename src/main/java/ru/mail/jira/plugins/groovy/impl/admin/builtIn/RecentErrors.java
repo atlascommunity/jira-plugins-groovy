@@ -169,7 +169,7 @@ public class RecentErrors implements BuiltInScript<List<ScriptExecutionSummary>>
 
     @Override
     public String getI18nKey() {
-        return "Recent errors";
+        return "ru.mail.jira.plugins.groovy.adminScripts.builtIn.recentErrors";
     }
 
     @Override

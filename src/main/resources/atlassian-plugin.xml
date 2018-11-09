@@ -306,16 +306,6 @@
         </condition>
     </web-item>
 
-    <web-item key="groovy-extras-menu-item" name="Groovy listeners menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
-        <description>Link to groovy extras page.</description>
-        <label key="ru.mail.jira.plugins.groovy.link.extras" />
-        <link linkId="mailru-groovy-extras-link">/plugins/servlet/my-groovy/extras</link>
-
-        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
-            <param name="permission">SYSTEM_ADMIN</param>
-        </condition>
-    </web-item>
-
     <customfield-type key="groovy-user-field" name="Groovy user field" class="ru.mail.jira.plugins.groovy.impl.cf.UserScriptedCFType">
         <description>
             Scripted user custom field type.
