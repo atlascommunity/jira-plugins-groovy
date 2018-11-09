@@ -65,7 +65,7 @@ export class NavigationControllerInternal extends React.PureComponent<Props> {
         this._updateLinks();
     }
 
-    _onClick = (event: Event) => {
+    _onClick = (event: MouseEvent) => {
         if (event.metaKey || event.altKey || event.ctrlKey || event.shiftKey || event.button !== 0 || event.defaultPrevented) {
             return;
         }
