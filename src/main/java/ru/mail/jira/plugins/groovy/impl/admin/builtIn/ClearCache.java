@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
+import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.api.service.admin.BuiltInScript;
-import ru.mail.jira.plugins.groovy.impl.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.impl.cf.FieldValueExtractor;
 
 import java.util.List;
@@ -38,6 +38,7 @@ public class ClearCache implements BuiltInScript<String> {
     public String run(ApplicationUser currentUser, Map<String, Object> params) throws Exception {
         scriptInvalidationService.invalidateAllFields();
         scriptInvalidationService.invalidateAll();
+        scriptInvalidationService.invalidateGlobalObjects();
         listenerRepository.invalidate();
 
         fieldConfigRepository.invalidateAll();
