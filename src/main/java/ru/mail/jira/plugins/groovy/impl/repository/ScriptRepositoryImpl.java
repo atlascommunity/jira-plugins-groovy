@@ -271,8 +271,13 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         }
 
         if (includeErrorCount) {
-            result.setErrorCount((long) executionRepository.getErrorCount(script.getID()));
-            result.setWarningCount((long) executionRepository.getWarningCount(script.getID()));
+            if (script.getUuid() != null) {
+                result.setErrorCount((long) executionRepository.getErrorCount(script.getUuid()));
+                result.setWarningCount((long) executionRepository.getWarningCount(script.getUuid()));
+            } else {
+                result.setErrorCount((long) executionRepository.getErrorCount(script.getID()));
+                result.setWarningCount((long) executionRepository.getWarningCount(script.getID()));
+            }
         }
 
         if (script.getParameters() != null) {

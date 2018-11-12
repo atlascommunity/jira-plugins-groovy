@@ -70,7 +70,7 @@ function ScriptParamValue({value, param}: ScriptParamValueProps): Node {
 }
 
 define('mailru/groovy/renderRegistryScript', (): any => {
-    return (element: Element, id: number, name: string, source: string, description: string, errorCount?: number, warningCount?: number, params: Array<ParamType>, paramValues: {[string]: any}) => {
+    return (element: Element, id: number, uuid: ?string, name: string, source: string, description: string, errorCount?: number, warningCount?: number, params: Array<ParamType>, paramValues: {[string]: any}) => {
         ReactDOM.render(
             <EditorThemeContext>
                 <Script
@@ -82,7 +82,9 @@ define('mailru/groovy/renderRegistryScript', (): any => {
                         id: id,
                         name: name,
                         scriptBody: source,
-                        description, errorCount, warningCount
+                        description, errorCount, warningCount,
+                        //$FlowFixMe
+                        ...(uuid ? { inline: true, id: uuid } : {})
                     }}
 
                     additionalButtons={[

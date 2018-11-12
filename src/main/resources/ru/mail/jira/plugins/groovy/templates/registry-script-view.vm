@@ -18,6 +18,7 @@ $webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.work
         renderRegistryScript(
             document.getElementById("mailru-groovy-script-react-container-$uuid"),
             "$script.id",
+            #if ($script.uuid) "$script.uuid" #else null #end,
             "$nameHtml",
             "$scriptHtml",
             #if ($script.description) "$descriptionHtml" #else null #end,
