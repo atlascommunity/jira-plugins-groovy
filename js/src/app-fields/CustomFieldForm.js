@@ -148,12 +148,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
     };
 
     _mutateValue = (field: FormFieldType, value: any) => {
-        this.setState((state: State): * => {
-            return {
-                values: state.values.set(field, value),
-                isModified: true
-            };
-        });
+        this.setState(state => ({ values: state.values.set(field, value), isModified: true }) );
     };
 
     _setObjectValue = (field: FormFieldType) => (value: any) => this._mutateValue(field, value);

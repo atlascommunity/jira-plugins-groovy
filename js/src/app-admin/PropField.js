@@ -126,7 +126,6 @@ export class PropField extends React.PureComponent<Props> {
                         shouldFitContainer={true}
                         type="text"
 
-                        //$FlowFixMe
                         value={value || ''}
                         onChange={this._textCallback}
                     />
@@ -139,7 +138,6 @@ export class PropField extends React.PureComponent<Props> {
                         shouldFitContainer={true}
                         enableResize="vertical"
 
-                        //$FlowFixMe
                         value={value || ''}
                         onChange={this._textCallback}
                     />
@@ -152,7 +150,6 @@ export class PropField extends React.PureComponent<Props> {
                         shouldFitContainer={true}
                         type="number"
 
-                        //$FlowFixMe
                         value={value || ''}
                         onChange={this._textCallback}
                     />
@@ -166,7 +163,6 @@ export class PropField extends React.PureComponent<Props> {
                         type="text"
 
                         pattern="[0-9.]+"
-                        //$FlowFixMe
                         value={value || ''}
                         onChange={this._textCallback}
                     />
@@ -178,7 +174,6 @@ export class PropField extends React.PureComponent<Props> {
                             label={label}
                             name={label}
 
-                            //$FlowFixMe
                             isChecked={value || false}
                             onChange={this._toggleCallback}
 

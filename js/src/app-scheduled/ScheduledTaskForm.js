@@ -218,12 +218,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
     };
 
     mutateValue = (field: FormFieldKey, value: any) => {
-        this.setState((state: State): * => {
-            return {
-                values: state.values.set(field, value),
-                isModified: true
-            };
-        });
+        this.setState( state => ({ values: state.values.set(field, value), isModified: true }) );
     };
 
     _setTextValue = (field: FormFieldKey) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);

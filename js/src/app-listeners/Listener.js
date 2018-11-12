@@ -29,13 +29,7 @@ import {listenerService} from '../service';
 
 
 const ConnectedWatchableScript = connect(
-    memoizeOne(
-        (state: *): * => {
-            return {
-                watches: state.watches
-            };
-        }
-    ),
+    memoizeOne( state => ({ watches: state.watches }) ),
     WatchActionCreators
 )(WatchableScript);
 
@@ -146,12 +140,5 @@ class ListenerInternal extends React.PureComponent<Props> {
 }
 
 export const Listener = connect(
-    memoizeOne(
-        (state: *): ConnectProps => {
-            return {
-                projects: state.projects,
-                eventTypes: state.eventTypes
-            };
-        }
-    )
+    memoizeOne( state => ({ projects: state.projects, eventTypes: state.eventTypes }) )
 )(ListenerInternal);

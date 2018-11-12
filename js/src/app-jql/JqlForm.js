@@ -39,15 +39,15 @@ const defaultLoader = () => Promise.resolve(
 
 const editLoader = (id: number) => jqlScriptService
     .getScript(id)
-    .then(({name, description, scriptBody}: JqlScriptType): * => {
-        return {
+    .then(
+        ({name, description, scriptBody}) => ({
             values: recordFactory({
                 description: description || '',
                 name, scriptBody
             }),
             name
-        };
-    });
+        })
+    );
 
 const onSubmit = (id: ?number, data: {[string]: any}): Promise<SubmitResult> => {
     const promise = id ? jqlScriptService.updateScript(id, data) : jqlScriptService.createScript(data);

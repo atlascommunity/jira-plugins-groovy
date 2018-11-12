@@ -46,8 +46,8 @@ type Props = {
 };
 
 export class ConditionPicker extends React.Component<Props> {
-    _onChange = (property: string): * => {
-        return (val: any) => {
+    _onChange = (property: string) =>
+        (val: any) => {
             const {value, onChange} = this.props;
 
             onChange({
@@ -55,7 +55,6 @@ export class ConditionPicker extends React.Component<Props> {
                 [property]: val
             });
         };
-    };
 
     _onTypeChange = (e: SyntheticEvent<HTMLInputElement>) => {
         const {value, onChange} = this.props;
@@ -67,8 +66,8 @@ export class ConditionPicker extends React.Component<Props> {
         }
     };
 
-    _onInputChange = (property: string): * => {
-        return (e: SyntheticEvent<HTMLInputElement>) => {
+    _onInputChange = (property: string) =>
+        (e: SyntheticEvent<HTMLInputElement>) => {
             const {value, onChange} = this.props;
 
             onChange({
@@ -76,7 +75,6 @@ export class ConditionPicker extends React.Component<Props> {
                 [property]: e.currentTarget.value
             });
         };
-    };
 
     render() {
         const {value, error, isDisabled} = this.props;

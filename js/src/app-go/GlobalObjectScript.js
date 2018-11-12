@@ -23,36 +23,16 @@ import {RouterLink} from '../common/ak/RouterLink';
 
 
 const ConnectedWatchableScript = connect(
-    memoizeOne(
-        (state: *): * => {
-            return {
-                watches: state.watches
-            };
-        }
-    ),
+    memoizeOne( state => ({ watches: state.watches }) ),
     WatchActionCreators
 )(WatchableScript);
 
 type Props = ScriptComponentProps<GlobalObjectScriptType>;
 
-type State = {
-    isRunning: boolean
-};
-
-export class GlobalObjectScript extends React.PureComponent<Props, State> {
+export class GlobalObjectScript extends React.PureComponent<Props> {
     static defaultProps = {
         collapsible: true
     };
-
-    state = {
-        isRunning: false
-    };
-
-    _toggleDialog = () => this.setState((state: State): * => {
-        return {
-            isRunning: !state.isRunning
-        };
-    });
 
     _delete = () => this.props.onDelete && this.props.onDelete(
         this.props.script.id,
@@ -75,8 +55,6 @@ export class GlobalObjectScript extends React.PureComponent<Props, State> {
 
     render() {
         const {script, collapsible, focused} = this.props;
-
-            /**/
 
         return (
             <ConnectedWatchableScript

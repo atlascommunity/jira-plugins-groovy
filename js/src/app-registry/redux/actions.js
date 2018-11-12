@@ -31,43 +31,43 @@ export const loadState = (
     scripts: KeyedEntities<RegistryScriptType>,
     scriptWatches: $ReadOnlyArray<number>,
     directoryWatches: $ReadOnlyArray<number>
-): * => ({
+) => ({
     type: LOAD_STATE,
     directories, scripts,
     scriptWatches, directoryWatches
 });
-export const loadUsage = (items: ScriptUsageItems): * => ({
+export const loadUsage = (items: ScriptUsageItems) => ({
     type: LOAD_USAGE,
     items
 });
 
-export const deleteScript = (id: number): * => ({
+export const deleteScript = (id: number) => ({
     type: DELETE_SCRIPT,
     id: id
 });
-export const moveScript = (src: number, dst: number, scriptId: number): * => ({
+export const moveScript = (src: number, dst: number, scriptId: number) => ({
     type: MOVE_SCRIPT,
     src, dst, scriptId
 });
 
-export const addDirectory =  (directory: RegistryDirectoryType): * => ({
+export const addDirectory =  (directory: RegistryDirectoryType) => ({
     type: ADD_DIRECTORY,
     directory: directory
 });
-export const updateDirectory = (directory: RegistryDirectoryType): * => ({
+export const updateDirectory = (directory: RegistryDirectoryType) => ({
     type: UPDATE_DIRECTORY,
     directory: directory
 });
-export const deleteDirectory = (id: number): * => ({
-        type: DELETE_DIRECTORY,
-        id: id
-    });
+export const deleteDirectory = (id: number) => ({
+    type: DELETE_DIRECTORY,
+    id: id
+});
 
-export const addWatch = (kind: 'script' | 'directory', id: number): * => ({
+export const addWatch = (kind: 'script' | 'directory', id: number) => ({
     type: ADD_WATCH,
     kind, id
 });
-export const removeWatch =  (kind: 'script' | 'directory', id: number): * => ({
+export const removeWatch =  (kind: 'script' | 'directory', id: number) => ({
     type: REMOVE_WATCH,
     kind, id
 });

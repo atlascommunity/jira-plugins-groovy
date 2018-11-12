@@ -20,13 +20,11 @@ const reorderedItemsSelector = createSelector(
 
 export const ConnectedAdminScriptPage = connect(
     memoizeOne(
-        ({watches, isReady, ...state}: *): * => {
-            return {
-                items: reorderedItemsSelector(state),
-                filter: state.filter,
-                watches, isReady
-            };
-        }
+        ({watches, isReady, ...state}) => ({
+            items: reorderedItemsSelector(state),
+            filter: state.filter,
+            watches, isReady
+        })
     ),
     { updateFilter }
 )(ScriptPage);
