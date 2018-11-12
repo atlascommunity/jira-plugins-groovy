@@ -12,6 +12,7 @@ import {colors} from '@atlaskit/theme';
 
 import FolderIcon from '@atlaskit/icon/glyph/folder';
 import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
+//$FlowFixMe
 import { Skeleton } from '@atlaskit/icon';
 
 import {DirectoryStateActionCreators, groupedDirsSelector, groupedScriptsSelector} from './redux';

@@ -4,10 +4,10 @@ import React, {type Node} from 'react';
 import SectionMessage from '@atlaskit/section-message';
 
 
-type MessageProps = {
+type MessageProps = {|
     title?: string,
     children?: Node
-};
+|};
 
 export function InfoMessage(props: MessageProps): Node {
     return (

@@ -14,9 +14,11 @@ export type LoaderOptionType<T: OldSelectValue> = {
     +label?: string
 };
 
-type Props<T: OldSelectValue> = FieldProps & MutableFieldProps<$ReadOnlyArray<OldSelectValue>> & {
+type Props<T: OldSelectValue> = {|
+    ...FieldProps,
+    ...MutableFieldProps<$ReadOnlyArray<OldSelectValue>>,
     loader: () => Promise<Array<LoaderOptionType<T>>>
-};
+|};
 
 type State<T: OldSelectValue> = {
     ready: boolean,

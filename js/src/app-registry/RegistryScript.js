@@ -28,13 +28,13 @@ import Script, {ScriptParameters} from '../common/script';
 import {RouterLink} from '../common/ak';
 
 
-type RegistryScriptConnectProps = {
+type RegistryScriptConnectProps = {|
     scriptWatches: Array<number>,
     addWatch: typeof addWatch,
     removeWatch: typeof removeWatch,
-};
+|};
 
-export type PublicRegistryScriptProps = {
+export type PublicRegistryScriptProps = {|
     script: RegistryScriptType,
     onDelete: DeleteCallback,
     title?: Node,
@@ -42,9 +42,12 @@ export type PublicRegistryScriptProps = {
     wrapperProps?: any,
     collapsible?: boolean,
     showParent?: boolean
-};
+|};
 
-export type RegistryScriptProps = PublicRegistryScriptProps & RegistryScriptConnectProps;
+export type RegistryScriptProps = {|
+    ...PublicRegistryScriptProps,
+    ...RegistryScriptConnectProps
+|};
 
 type RegistryScriptState = {
     showWorkflows: boolean,
@@ -100,7 +103,7 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
     _onDelete = () => this.props.onDelete(this.props.script.id, 'script', this.props.script.name);
 
     render() {
-        const {script, scriptWatches, wrapperProps, onDelete, showParent, ...props} = this.props;
+        const {script, scriptWatches, wrapperProps, onDelete, addWatch, removeWatch, showParent, ...props} = this.props;
         const {showWorkflows, waitingWatch} = this.state;
 
         const isWatching = scriptWatches.includes(script.id);
@@ -112,7 +115,12 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
                     {...props}
 
                     script={{
-                        ...script,
+                        id: script.id,
+                        name: script.name,
+                        description: script.description,
+                        scriptBody: script.scriptBody,
+                        errorCount: script.errorCount,
+                        warningCount: script.warningCount,
                         ...(script.uuid ? { inline: true, id: script.uuid } : {})
                     }}
                     changelogsLoader={this._getChangelogs}

@@ -64,7 +64,8 @@ type AdditionalField<T: ScriptFormType> = {
     component: ComponentType<AdditionalFieldProps<T>>
 };
 
-type Props<T: ScriptFormType> = DialogComponentProps & {
+type Props<T: ScriptFormType> = {|
+    ...DialogComponentProps,
     defaultLoader: () => Promise<ProvidedState<T>>,
     editLoader: (id: number) => Promise<ProvidedState<T>>,
     onSubmit: (id: ?number, data: DataType) => Promise<SubmitResult>,
@@ -81,7 +82,7 @@ type Props<T: ScriptFormType> = DialogComponentProps & {
     returnTo: string,
     returnTypes?: $ReadOnlyArray<ReturnType>,
     scriptType: StaticCheckScriptType
-};
+|};
 
 type State<T: ScriptFormType> = {
     values: ValuesType<T>,

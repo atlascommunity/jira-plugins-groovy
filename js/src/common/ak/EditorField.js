@@ -8,20 +8,25 @@ import type {FieldProps, MutableFieldProps, AkFormFieldProps} from '../types';
 
 import Editor, {EditorThemeContextConsumer} from '../editor';
 
-import type {CodeMirrorType, ValidationState} from '../editor';
+import type {CodeMirrorType, ValidationState, LinterType} from '../editor';
+
 
 import './EditorField.less';
 
 
-type EditorFieldProps = FieldProps & MutableFieldProps<string> & AkFormFieldProps & {
+type EditorFieldProps = {|
+    ...FieldProps,
+    ...MutableFieldProps<string>,
+    ...AkFormFieldProps,
     mode: string,
-    markers?: ?$ReadOnlyArray<MarkerType>,
+    markers?: $ReadOnlyArray<MarkerType>,
     bindings?: $ReadOnlyArray<BindingType>,
     returnTypes?: $ReadOnlyArray<ReturnType>,
     resizable?: boolean,
     validationState?: ValidationState,
-    editorDidMount?: (editor: CodeMirrorType) => void
-};
+    editorDidMount?: (editor: CodeMirrorType) => void,
+    linter?: LinterType,
+|};
 
 export class EditorField extends React.Component<EditorFieldProps> {
     static defaultProps = {
@@ -48,7 +53,7 @@ export class EditorField extends React.Component<EditorFieldProps> {
     };
 
     render() {
-        const {label, isRequired, isLabelHidden, mode, isInvalid, invalidMessage, ...props} = this.props;
+        const {value, label, isRequired, isLabelHidden, mode, shouldFitContainer, isInvalid, invalidMessage, isValidationHidden, ...props} = this.props;
 
         return (
             <div className="ak-editor">
@@ -58,6 +63,7 @@ export class EditorField extends React.Component<EditorFieldProps> {
                         <Editor
                             decorator={this._decorateEditor}
                             mode={mode}
+                            value={value || ''}
                             {...context}
                             {...props}
                         />

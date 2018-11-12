@@ -15,25 +15,29 @@ import {getPluginBaseUrl} from '../service';
 
 type SingleValueTypesEnum = 'USER' | 'GROUP' | 'CUSTOM_FIELD' | 'RESOLUTION';
 
-type CommonProps = {
+type CommonProps = {|
     label: string,
     isRequired: boolean,
     onChange: (value: any) => void,
-};
+|};
 
-type Props = (CommonProps & {
+type Props = {|
+    ...CommonProps,
     type: SingleValueTypesEnum,
     value: ?SingleValueType,
-}) | (CommonProps & {
+|} | {|
+    ...CommonProps,
     type: 'STRING' | 'TEXT' | 'LONG' | 'DOUBLE' | 'SCRIPT',
     value: ?string
-}) | (CommonProps & {
+|} | {|
+    ...CommonProps,
     type: 'BOOLEAN',
     value: boolean
-}) | (CommonProps & {
+|} | {|
+    ...CommonProps,
     type: 'MULTI_USER',
     value: ?$ReadOnlyArray<SingleValueType>
-});
+|};
 
 //todo: fix flow type issues
 export class PropField extends React.PureComponent<Props> {

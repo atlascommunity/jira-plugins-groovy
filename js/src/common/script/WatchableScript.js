@@ -19,14 +19,15 @@ import type {EntityType} from '../types';
 import Script from '.';
 
 
-type Props = ScriptProps & {
+type Props = {|
+    ...ScriptProps,
     entityId: number,
     entityType: EntityType,
     addWatch: typeof WatchActionCreators.addWatch,
     removeWatch: typeof WatchActionCreators.removeWatch,
     watches: Array<number>,
     isUnwatchable?: boolean
-};
+|};
 
 type State = {
     waitingWatch: boolean
@@ -63,11 +64,15 @@ export class WatchableScript extends React.PureComponent<Props, State> {
     };
 
     render() {
-        const {watches, entityId, entityType, dropdownItems, additionalButtons, onDelete, isUnwatchable, ...props} = this.props;
+        const {
+            watches, entityId, dropdownItems, additionalButtons, onDelete, isUnwatchable,
+            addWatch, removeWatch, entityType,
+            ...props
+        } = this.props;
         const {waitingWatch} = this.state;
 
         if (isUnwatchable) {
-            return <Script {...this.props}/>;
+            return <Script additionalButtons={additionalButtons} dropdownItems={dropdownItems} {...props}/>;
         }
 
         const dropdown = dropdownItems ? [...dropdownItems] : [];

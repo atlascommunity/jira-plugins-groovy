@@ -62,9 +62,10 @@ const ConnectedWatchableScript = connect(
     WatchActionCreators
 )(WatchableScript);
 
-type Props = ScriptComponentProps<ScheduledTaskType> & {
+type Props = {|
+    ...ScriptComponentProps<ScheduledTaskType>,
     updateItem: typeof updateItem
-};
+|};
 
 type State = {
     showRunDialog: boolean

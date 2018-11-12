@@ -19,10 +19,11 @@ type State = {|
 
 export type StaticCheckScriptType = 'CONSOLE' | 'WORKFLOW_GENERIC' | 'ADMIN_SCRIPT' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK' | 'LISTENER' | 'JQL' | 'GLOBAL_OBJECT';
 
-type Props = ElementConfig<typeof EditorField> & {
+type Props = {|
+    ...ElementConfig<typeof EditorField>,
     scriptType: StaticCheckScriptType,
     typeParams?: {[string]: string}
-};
+|};
 
 type AnnotationsType = $ReadOnlyArray<AnnotationType>;
 
@@ -35,7 +36,9 @@ export class CheckedEditorField extends React.Component<Props, State> {
     lastRequestedValue = null;
     cachedPromise = null;
 
-    _setEditor = (cm: CodeMirrorType) => this.cm = cm;
+    _setEditor = (cm: CodeMirrorType) => {
+        this.cm = cm;
+    };
 
     _checkScript = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => {
         const {scriptType, typeParams} = this.props;

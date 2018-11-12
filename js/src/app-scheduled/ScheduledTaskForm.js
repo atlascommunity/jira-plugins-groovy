@@ -84,11 +84,12 @@ const makeForm: RecordFactory<Form> = Record({
     description: null
 });
 
-type Props = DialogComponentProps & {
+type Props = {|
+    ...DialogComponentProps,
     updateItem: typeof updateItem,
     addItem: typeof addItem,
     history: RouterHistory
-};
+|};
 
 type State = {
     ready: boolean,

@@ -1,51 +1,53 @@
 //@flow
 
-export type MarkerType = {
+export type MarkerType = {|
     startRow: number,
     endRow: number,
     startCol: number,
     endCol: number,
     message: string,
     severity: 'error' | 'warning'
-};
+|};
 
-export type TypeDoc = {
+export type TypeDoc = {|
     className: string,
     link: ?string
-};
+|};
 
-export type ParameterDoc = {
+export type ParameterDoc = {|
     type: TypeDoc,
     name: string
-};
+|};
 
-export type MethodDoc = {
+export type MethodDoc = {|
     name: string,
     description: ?string,
     returnType: TypeDoc,
     parameters: $ReadOnlyArray<ParameterDoc>
-};
+|};
 
-export type ClassDoc = {
+export type ClassDoc = {|
     builtIn: boolean,
     className: string,
     href: ?string,
     description: ?string,
     methods: ?$ReadOnlyArray<MethodDoc>
-};
+|};
 
-export type VariableType = {
+export type VariableType = {|
     className: string,
     fullClassName: string,
     javaDoc?: string,
     classDoc?: ClassDoc
-};
+|};
 
-export type BindingType = VariableType & {
+export type BindingType = {|
+    ...VariableType,
     name: string
-};
+|};
 
-export type ReturnType = VariableType & {
+export type ReturnType = {|
+    ...VariableType,
     label?: string,
     optional?: boolean
-};
+|};

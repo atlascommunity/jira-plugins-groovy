@@ -18,7 +18,11 @@ import type {FieldProps, ErrorType, MutableTextFieldProps} from '../types';
 import type {JqlQueryValidationResult} from '../../service';
 
 
-type Props = FieldProps & MutableTextFieldProps<string, HTMLTextAreaElement>;
+type Props = {|
+    ...FieldProps,
+    ...MutableTextFieldProps<string, HTMLTextAreaElement>,
+    shouldFitContainer?: boolean
+|};
 
 type State = {
     validating: boolean,

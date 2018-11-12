@@ -14,18 +14,19 @@ export type DeleteI18n = {
     areYouSure: (name: string) => string
 };
 
-export type DeleteDialogProps = {
+export type DeleteDialogProps = {|
     id: number,
     name: string,
     onConfirm: () => Promise<void>
-};
+|};
 
-type Props = DeleteDialogProps & {
+type Props = {|
+    ...DeleteDialogProps,
     deleteItem: typeof deleteItem,
     onClose: VoidCallback,
     i18n: DeleteI18n,
     closeAfterDelete: boolean
-};
+|};
 
 type State = {
     waiting: boolean

@@ -62,6 +62,7 @@ export type RunInfoType = {
 };
 
 export type ScheduledTaskType = ScriptEntity & {
+    id: number,
     uuid: string,
     type: ScheduledTaskTypeEnum,
     enabled: boolean,

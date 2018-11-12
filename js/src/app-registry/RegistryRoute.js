@@ -4,6 +4,7 @@ import {Provider} from 'react-redux';
 import {Switch, Route} from 'react-router-dom';
 
 import {createStore, applyMiddleware} from 'redux';
+//$FlowFixMe
 import thunk from 'redux-thunk';
 
 import keyBy from 'lodash/keyBy';

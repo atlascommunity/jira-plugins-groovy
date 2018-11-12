@@ -17,13 +17,13 @@ import type {ScriptUsageType} from './types';
 import {focusOnRender} from '../common/script-list';
 
 
-type Props = {
+type Props = {|
     scriptUsage: ScriptUsageType
-};
+|};
 
-export class DraggableRegistryScriptInternal extends React.PureComponent<PublicRegistryScriptProps & Props> {
+export class DraggableRegistryScriptInternal extends React.PureComponent<{|...PublicRegistryScriptProps, ...Props|}> {
     render() {
-        const {script, scriptUsage} = this.props;
+        const {script, scriptUsage, ...otherProps} = this.props;
         const isUsed = !scriptUsage.ready || ((scriptUsage.items[script.id] || 0) > 0);
 
         return (
@@ -63,7 +63,8 @@ export class DraggableRegistryScriptInternal extends React.PureComponent<PublicR
                                 </div>
                             }
                             wrapperProps={{ ...provided.draggableProps, ref: provided.innerRef }}
-                            {...this.props}
+                            script={script}
+                            {...otherProps}
                         />
                     )}
                 </Draggable>

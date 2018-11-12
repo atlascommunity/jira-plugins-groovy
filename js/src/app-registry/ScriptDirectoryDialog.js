@@ -20,20 +20,25 @@ import {AsyncPicker, FormField} from '../common/ak';
 import type {SingleValueType} from '../common/ak/types';
 
 
-export type DialogParams = { isNew: boolean, id?: number, parentId?: ?number };
+export type DialogParams = {|
+    isNew: boolean,
+    id?: number,
+    parentId?: ?number
+|};
 
-type Props = DialogParams & {
+type Props = {|
+    ...DialogParams,
     addDirectory: typeof addDirectory,
     updateDirectory: typeof updateDirectory,
     onClose: VoidCallback
-};
+|};
 
-type State = {
+type State = {|
     name: string,
     parent: ?SingleValueType,
     directory: ?RegistryDirectoryType,
     error: *
-};
+|};
 
 export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, State> {
     state = {

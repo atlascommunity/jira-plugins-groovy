@@ -10,12 +10,15 @@ export type DeleteCallback = (id: number, type: EntityType, name: string) => voi
 
 export type WorkflowScriptType = 'CONDITION' | 'VALIDATOR' | 'FUNCTION';
 
-export type RegistryScriptType = ScriptEntityWithoutChangelogs & {
+export type RegistryScriptType = {|
+    ...ScriptEntityWithoutChangelogs,
+    id: number,
+    name: string,
     uuid: ?string,
     types: $ReadOnlyArray<WorkflowScriptType>,
+    directoryId: number,
     parentName?: string,
-    directoryId: number
-};
+|};
 
 export type RegistryDirectoryType = {
     id: number,
@@ -57,7 +60,7 @@ export type KeyedEntities<T> = {[number]: T | null | typeof undefined};
 
 export type GroupedEntities<T> = KeyedEntities<$ReadOnlyArray<T>>;
 
-export type FilterType = {
+export type FilterType = {|
     name: string,
     onlyUnused: boolean
-};
+|};

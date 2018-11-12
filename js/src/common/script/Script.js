@@ -31,13 +31,14 @@ import {CommonMessages} from '../../i18n/common.i18n';
 import {executionService} from '../../service';
 
 
-type DropdownItemType = {
+type DropdownItemType = {|
     label: string,
     onClick?: VoidCallback,
-    href?: string
-};
+    href?: string,
+    linkComponent?: Function
+|};
 
-export type ScriptProps = {
+export type ScriptProps = {|
     withChangelog: boolean,
     collapsible: boolean,
     headerless: boolean,
@@ -60,7 +61,7 @@ export type ScriptProps = {
     additionalPrimaryButtons?: Array<Element<any>>,
     dropdownItems?: Array<DropdownItemType>,
     additionalParameters?: Array<?ScriptParam>
-};
+|};
 
 type ScriptState = {
     showCode: boolean,

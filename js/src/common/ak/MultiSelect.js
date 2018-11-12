@@ -22,9 +22,12 @@ function getLookupMap<T: OldSelectValue>(items: $ReadOnlyArray<OldSelectItem<T>>
 
 let i: number = 0;
 
-type Props<T: OldSelectValue> = FieldProps & LoadableFieldProps & MutableFieldProps<$ReadOnlyArray<OldSelectValue>> & {
+type Props<T: OldSelectValue> = {|
+    ...FieldProps,
+    ...LoadableFieldProps,
+    ...MutableFieldProps<$ReadOnlyArray<OldSelectValue>>,
     items: $ReadOnlyArray<OldSelectItem<T>>,
-};
+|};
 
 type State<T: OldSelectValue> = {
     lookupMap: LookupMapType<T>

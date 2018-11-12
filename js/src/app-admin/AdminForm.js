@@ -26,11 +26,12 @@ type FormType = ScriptFormType & {
     html: boolean
 };
 
-type Props = DialogComponentProps & {
+type Props = {|
+    ...DialogComponentProps,
     history: RouterHistory,
     addItem: typeof addItem,
     updateItem: typeof updateItem
-};
+|};
 
 const recordFactory = Record({
     name: '',
@@ -109,7 +110,6 @@ class AdminFormInternal extends React.PureComponent<Props> {
             <ScriptForm
                 defaultLoader={defaultLoader}
                 editLoader={editLoader}
-                recordFactory={recordFactory}
 
                 onSubmit={onSubmit}
                 i18n={{

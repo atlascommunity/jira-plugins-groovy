@@ -24,6 +24,7 @@ import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
 import WarningIcon from '@atlaskit/icon/glyph/jira/failed-build-status';
 
+//$FlowFixMe
 import {Resizable} from 'react-resizable';
 
 import {Bindings} from './Bindings';
@@ -62,7 +63,7 @@ export type AnnotationType = {
 
 export type ValidationState = 'waiting' | 'valid' | 'checkFailed' | 'hasErrors' | 'hasWarnings';
 
-type LinterType = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => void;
+export type LinterType = (value: string, callback: ($ReadOnlyArray<AnnotationType>) => void) => void;
 
 type EditorProps = {|
     mode: string,
