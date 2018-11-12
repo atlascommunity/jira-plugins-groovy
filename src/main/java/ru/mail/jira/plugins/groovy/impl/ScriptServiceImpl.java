@@ -47,7 +47,6 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock(); //todo: remove?
     private final Map<String, ScriptClosure> globalFunctions = new HashMap<>();
     private final Map<String, BindingDescriptor> globalVariables = new HashMap<>();
-    private final Map<String, Class> globalVariableTypes = new HashMap<>();
     private final ParseContextHolder parseContextHolder = new ParseContextHolder();
     //assuming that all mutations happen only during initialization in single thread
     private final List<BindingProvider> bindingProviders = new ArrayList<>();
@@ -141,19 +140,6 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
             stats.evictionWeight(),
             scriptCache.estimatedSize()
         );
-    }
-
-    @Override
-    public Map<String, Class> getGlobalBindingTypes() {
-        Map<String, Class> result = new HashMap<>(globalVariableTypes);
-
-        for (BindingProvider bindingProvider : bindingProviders) {
-            bindingProvider
-                .getBindings()
-                .forEach((k, v) -> result.put(k, v.getType()));
-        }
-
-        return result;
     }
 
     @Override
@@ -353,9 +339,6 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         globalVariables.put("logger", new LoggerBindingDescriptor());
         globalVariables.put("log", new LoggerBindingDescriptor());
         globalVariables.put("templateEngine", new TemplateEngineBindingDescriptor(gcl));
-
-        globalVariables.forEach((key, var) -> globalVariableTypes.put(key, var.getType()));
-        globalVariableTypes.put("scriptType", ScriptType.class);
     }
 
     @Override
@@ -384,6 +367,6 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         }
 
         globalVariables.clear();
-        globalVariableTypes.clear();
+        bindingProviders.clear();
     }
 }
