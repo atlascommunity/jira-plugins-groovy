@@ -123,6 +123,7 @@ define('mailru/groovy/i18n-react', [], function() {
             scheduledTask: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.scheduledTask'),
             jqlFunction: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.jqlFunction'),
             adminScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.adminScript'),
+            globalObject: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.globalObject'),
             restore: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.restore'),
             noItems: AJS.I18n.getText('ru.mail.jira.plugins.groovy.audit.noItems')
         },

@@ -23,5 +23,6 @@ export const CategoryNameMessages: I18nMessages = {
     REST: i18n.audit.rest,
     CUSTOM_FIELD: i18n.audit.cf,
     SCHEDULED_TASK: i18n.audit.scheduledTask,
-    JQL_FUNCTION: i18n.audit.jqlFunction
+    JQL_FUNCTION: i18n.audit.jqlFunction,
+    GLOBAL_OBJECT: i18n.audit.globalObject
 };
