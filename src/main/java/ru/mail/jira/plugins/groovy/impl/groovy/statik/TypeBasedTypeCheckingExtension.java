@@ -4,6 +4,7 @@ import org.codehaus.groovy.ast.*;
 import org.codehaus.groovy.ast.expr.*;
 import org.codehaus.groovy.transform.stc.AbstractTypeCheckingExtension;
 import org.codehaus.groovy.transform.stc.StaticTypeCheckingVisitor;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.groovy.ParseContextHolder;
 
@@ -24,10 +25,14 @@ public class TypeBasedTypeCheckingExtension extends AbstractTypeCheckingExtensio
 
     @Override
     public boolean handleUnresolvedVariableExpression(VariableExpression vexp) {
-        Map<String, Class> globalTypes = scriptService.getGlobalBindingTypes();
-        Class type = globalTypes.get(vexp.getName());
+        Map<String, BindingDescriptor> globalBindings = scriptService.getGlobalBindings();
+        BindingDescriptor globalBinding = globalBindings.get(vexp.getName());
 
-        if (type == null) {
+        Class type = null;
+
+        if (globalBinding != null) {
+            type = globalBinding.getType();
+        } else {
             Map<String, Class> types = parseContextHolder.get().getTypes();
 
             if (types != null) {

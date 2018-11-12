@@ -31,9 +31,6 @@ public interface ScriptService {
 
     CacheStatsDto getCacheStats();
 
-    @Deprecated
-    Map<String, Class> getGlobalBindingTypes();
-
     Map<String, BindingDescriptor> getGlobalBindings();
 
     void registerBindingProvider(BindingProvider bindingProvider);
