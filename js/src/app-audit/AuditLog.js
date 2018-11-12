@@ -23,6 +23,7 @@ import type {AuditLogEntry, AuditLogData, AuditLogFilterType} from './types';
 import {
     adminScriptService,
     auditLogService,
+    globalObjectService,
     jqlScriptService,
     listenerService,
     registryService,
@@ -97,6 +98,8 @@ function getScriptLink(type: EntityType, id: ?number): ?string {
             return `rest/${id}/view`;
         case 'SCHEDULED_TASK':
             return `scheduled/${id}/view`;
+        case 'GLOBAL_OBJECT':
+            return `go/${id}/view`;
         default:
             return null;
     }
@@ -145,6 +148,9 @@ export class AuditLog extends React.Component<Props, State> {
                 break;
             case 'JQL_FUNCTION':
                 promise = jqlScriptService.restoreScript(id);
+                break;
+            case 'GLOBAL_OBJECT':
+                promise = globalObjectService.restoreScript(id);
                 break;
             default:
                 console.error('unknown category', category);

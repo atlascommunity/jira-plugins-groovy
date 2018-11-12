@@ -186,6 +186,11 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
                     name = function.getName();
                     deleted = function.isDeleted();
                     break;
+                case GLOBAL_OBJECT:
+                    GlobalObject globalObject = activeObjects.get(GlobalObject.class, entityId);
+                    name = globalObject.getName();
+                    deleted = globalObject.isDeleted();
+                    break;
             }
             result.setScriptName(name);
             result.setParentName(parentName);
