@@ -20,8 +20,10 @@ import com.querydsl.sql.SQLQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
+import ru.mail.jira.plugins.groovy.api.dto.directory.ScriptDirectoryDto;
 import ru.mail.jira.plugins.groovy.api.dto.execution.ScriptExecutionSummary;
 import ru.mail.jira.plugins.groovy.api.entity.EntityType;
+import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.service.admin.BuiltInScript;
 import ru.mail.jira.plugins.groovy.impl.repository.querydsl.QAbstractScript;
 import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
@@ -31,6 +33,7 @@ import ru.mail.jira.plugins.groovy.util.ScriptUtil;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -39,18 +42,21 @@ public class RecentErrors implements BuiltInScript<List<ScriptExecutionSummary>>
     private final DateTimeFormatter dateTimeFormatter;
     private final DatabaseAccessor databaseAccessor;
     private final CustomFieldHelper customFieldHelper;
+    private final ScriptRepository scriptRepository;
 
     @Autowired
     public RecentErrors(
         @ComponentImport ApplicationProperties applicationProperties,
         @ComponentImport DateTimeFormatter dateTimeFormatter,
         DatabaseAccessor databaseAccessor,
-        CustomFieldHelper customFieldHelper
+        CustomFieldHelper customFieldHelper,
+        ScriptRepository scriptRepository
     ) {
         this.applicationProperties = applicationProperties;
         this.dateTimeFormatter = dateTimeFormatter;
         this.databaseAccessor = databaseAccessor;
         this.customFieldHelper = customFieldHelper;
+        this.scriptRepository = scriptRepository;
     }
 
     @Override
@@ -63,6 +69,15 @@ public class RecentErrors implements BuiltInScript<List<ScriptExecutionSummary>>
         StringPath namePath = Expressions.stringPath("NAME");
         NumberExpression<Long> errorCountPath = QueryDslTables.SCRIPT_EXECUTION.count().as("errorCount");
         DateTimeExpression<Timestamp> lastErrorDatePath = QueryDslTables.SCRIPT_EXECUTION.DATE.max().as("lastErrorDate");
+        NumberPath<Integer> directoryIdPath = Expressions.numberPath(Integer.class, "DIRECTORY_ID");
+
+        Map<Integer, ScriptDirectoryDto> directories = scriptRepository
+            .getAllDirectories()
+            .stream()
+            .collect(Collectors.toMap(
+                ScriptDirectoryDto::getId,
+                Function.identity()
+            ));
 
         return databaseAccessor.run(connection -> {
             SQLQueryFactory queryFactory = connection.query();
@@ -78,7 +93,8 @@ public class RecentErrors implements BuiltInScript<List<ScriptExecutionSummary>>
                         QueryDslTables.FIELD_CONFIG.FIELD_CONFIG_ID.as("ENTITY_ID"),
                         Expressions.constant(""),
                         QueryDslTables.FIELD_CONFIG.UUID,
-                        Expressions.constant(EntityType.CUSTOM_FIELD.name())
+                        Expressions.constant(EntityType.CUSTOM_FIELD.name()),
+                        Expressions.as(Expressions.nullExpression(), directoryIdPath)
                     )
                     .from(QueryDslTables.FIELD_CONFIG)
             ).as("union");
@@ -91,6 +107,7 @@ public class RecentErrors implements BuiltInScript<List<ScriptExecutionSummary>>
                     idPath.min(),
                     namePath.min(),
                     entityTypePath.min(),
+                    directoryIdPath.min(),
                     errorCountPath,
                     lastErrorDatePath
                 )
@@ -134,11 +151,20 @@ public class RecentErrors implements BuiltInScript<List<ScriptExecutionSummary>>
                             result.setUrl(baseUrl + ScriptUtil.getPermalink(entityType, entityId));
                             result.setType(entityType);
 
-                            if (entityType != EntityType.CUSTOM_FIELD) {
+                            if (entityType == EntityType.REGISTRY_SCRIPT) {
+                                String name = row.get(3, String.class);
+                                Integer directoryId = row.get(5, Integer.class);
+
+                                result.setName(ScriptUtil.getExpandedName(directories, directories.get(directoryId)) +  "/" + name);
+                            } else if (entityType != EntityType.CUSTOM_FIELD) {
                                 result.setName(row.get(3, String.class));
                             } else {
-                                //todo: make sure that's correct id for field config
-                                result.setName(customFieldHelper.getFieldName((long) entityId));
+                                String fieldName = customFieldHelper.getFieldName((long) entityId);
+                                if (fieldName != null) {
+                                    result.setName(fieldName);
+                                } else {
+                                    result.setName("[unknown field]");
+                                }
                             }
                         }
                     } else {
@@ -152,12 +178,15 @@ public class RecentErrors implements BuiltInScript<List<ScriptExecutionSummary>>
     }
 
     private SQLQuery<Tuple> getAbstractScriptQuery(QAbstractScript abstractScript, EntityType entityType) {
+        NumberPath<Integer> directoryIdPath = Expressions.numberPath(Integer.class, "DIRECTORY_ID");
+
         return SQLExpressions
             .select(
                 abstractScript.ID.as("ENTITY_ID"),
                 abstractScript.NAME.as("NAME"),
                 abstractScript.UUID.as("UUID"),
-                Expressions.asString(Expressions.constantAs(entityType.name(), Expressions.stringPath("ENTITY_TYPE")))
+                Expressions.asString(Expressions.constantAs(entityType.name(), Expressions.stringPath("ENTITY_TYPE"))),
+                entityType == EntityType.REGISTRY_SCRIPT ? directoryIdPath : Expressions.as(Expressions.nullExpression(), directoryIdPath)
             )
             .from(abstractScript);
     }
