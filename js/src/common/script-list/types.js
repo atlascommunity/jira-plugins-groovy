@@ -15,10 +15,11 @@ export type ScriptComponentProps<T> = {|
     collapsible?: boolean
 |};
 
-export type DialogComponentProps = {
+export type DialogComponentProps = {|
     isNew: boolean,
-    id: ?number
-};
+    id: ?number,
+    isChecked?: boolean
+|};
 
 export type I18nType = {
     title: string,

@@ -60,6 +60,7 @@ export function ajaxPromise(url: string, method: HttpMethod, _params: any, data:
                         return;
                     }
 
+                    //$ExpectError : ignore sketchy number and
                     if (!(response.status && response.statusText)) {
                         reject({
                             message: 'Error occurred',

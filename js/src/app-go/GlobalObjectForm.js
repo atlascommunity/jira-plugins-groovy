@@ -19,11 +19,12 @@ import type {ProvidedState} from '../common/script-list/ScriptForm';
 import type {DialogComponentProps, ScriptForm as ScriptFormType} from '../common/script-list/types';
 
 
-type Props = DialogComponentProps & {
+type Props = {|
+    ...DialogComponentProps,
     history: RouterHistory,
     addItem: typeof addItem,
     updateItem: typeof updateItem
-};
+|};
 
 const recordFactory = Record({
     name: '',
@@ -90,7 +91,6 @@ class GlobalObjectFormInternal extends React.PureComponent<Props> {
             <ScriptForm
                 defaultLoader={defaultLoader}
                 editLoader={editLoader}
-                recordFactory={recordFactory}
 
                 onSubmit={onSubmit}
                 i18n={{

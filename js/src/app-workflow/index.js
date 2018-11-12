@@ -122,8 +122,6 @@ define('mailru/groovy/renderInlineScript', (): any => {
             <EditorThemeContext>
                 <Script
                     withChangelog={false}
-                    editable={false}
-                    deletable={false}
 
                     script={{
                         id: id,

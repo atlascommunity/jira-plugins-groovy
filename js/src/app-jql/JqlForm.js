@@ -23,11 +23,12 @@ const recordFactory = Record({
     comment: ''
 });
 
-type Props = DialogComponentProps & {
+type Props = {|
+    ...DialogComponentProps,
     history: RouterHistory,
     addItem: typeof addItem,
     updateItem: typeof updateItem
-};
+|};
 
 const defaultLoader = () => Promise.resolve(
     {

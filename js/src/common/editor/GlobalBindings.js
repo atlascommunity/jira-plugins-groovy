@@ -16,11 +16,15 @@ import {bindingService} from '../../service';
 
 const getBindings = memoizeOne(bindingService.getGlobalBindingTypes);
 
-type ItemType = ClassDoc & { key: string, classDoc: ClassDoc };
+type ItemType = {|
+    ...ClassDoc,
+    key: string,
+    classDoc: ClassDoc
+|};
 
-type Props = {
+type Props = {|
     onOpenDoc: (ClassDoc) => void
-};
+|};
 
 type State = {
     isReady: boolean,

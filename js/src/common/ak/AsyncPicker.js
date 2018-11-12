@@ -32,10 +32,15 @@ let i: number = 0;
 
 type ValueType = SingleValueType | $ReadOnlyArray<SingleValueType>;
 
-type Props<T: ValueType> = FieldProps & FormFieldProps & OptMutableFieldProps<T> & AkFormFieldProps & SelectProps & {
+type Props<T: ValueType> = {|
+    ...FieldProps,
+    ...FormFieldProps,
+    ...OptMutableFieldProps<T>,
+    ...AkFormFieldProps,
+    ...SelectProps,
     src: string,
     displayValue: boolean
-};
+|};
 
 type DataType = {
     complete: boolean,

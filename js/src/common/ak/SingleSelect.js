@@ -10,9 +10,12 @@ import type {OldSelectItem, OldSelectValue} from './types';
 import type {FieldProps, MutableFieldProps} from '../types';
 
 
-type SingleSelectProps<T: OldSelectValue> = FieldProps & MutableFieldProps<OldSelectItem<T>> & {
-    options: Array<OldSelectItem<T>>
-};
+type SingleSelectProps<T: OldSelectValue> = {|
+    ...FieldProps,
+    ...MutableFieldProps<OldSelectItem<T>>,
+    options: Array<OldSelectItem<T>>,
+    name?: string
+|};
 
 export class SingleSelect<T: OldSelectValue> extends React.PureComponent<SingleSelectProps<T>> {
     render() {

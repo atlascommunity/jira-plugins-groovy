@@ -22,26 +22,31 @@ export type IssueEventType = {
 
 export type ProjectType = any; //todo
 
-export type ScriptEntityWithoutChangelogs = {
+export type ScriptEntityWithoutChangelogs = {|
     id: number,
     name: string,
     description: ?string,
     errorCount?: number,
     warningCount?: number,
     scriptBody: string
-};
+|};
 
-export type ScriptEntity = ScriptEntityWithoutChangelogs & {
+export type ScriptEntity = {|
+    ...ScriptEntityWithoutChangelogs,
     changelogs: Array<ChangelogType>,
-};
+|};
 
-export type SelectProps = {};
+export type SelectProps = {|
+    isMulti?: boolean,
+    isClearable?: boolean,
+    delimiter?: string
+|};
 
-export type AkFormFieldProps = {
+export type AkFormFieldProps = {|
     isValidationHidden: boolean
-};
+|};
 
-export type FieldProps = {
+export type FieldProps = {|
     label?: string,
     isLabelHidden?: boolean,
 
@@ -49,31 +54,33 @@ export type FieldProps = {
     invalidMessage?: Node,
 
     isRequired?: boolean,
-    isDisabled?: boolean
-};
+    isDisabled?: boolean,
 
-export type LoadableFieldProps = {
+    shouldFitContainer?: boolean
+|};
+
+export type LoadableFieldProps = {|
     isLoading?: boolean
-};
+|};
 
-export type MutableFieldProps<T> = {
+export type MutableFieldProps<T> = {|
     value: ?T,
     onChange: (?T) => void
-};
+|};
 
-export type OptMutableFieldProps<T> = {
+export type OptMutableFieldProps<T> = {|
     value?: ?T,
     onChange?: (?T) => void
-};
+|};
 
-export type FormFieldProps = {
+export type FormFieldProps = {|
     name?: string
-};
+|};
 
-export type MutableTextFieldProps<T, FieldType> = {
+export type MutableTextFieldProps<T, FieldType> = {|
     value: T,
     onChange: (SyntheticEvent<FieldType>) => void
-};
+|};
 
 export type ScriptError = {
     message: string
