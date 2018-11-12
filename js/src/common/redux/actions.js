@@ -131,15 +131,15 @@ export function wholeObjectReducerFactory<T, Field>(field: Field, defaultValue: 
     };
 }
 
-export const addItem = (item: ItemType): * => ({
+export const addItem = (item: ItemType) => ({
     type: ADD_ITEM,
     item: item
 });
-export const updateItem = (item: ItemType): * => ({
+export const updateItem = (item: ItemType) => ({
     type: UPDATE_ITEM,
     item: item
 });
-export const deleteItem = (id: number): * => ({
+export const deleteItem = (id: number) => ({
     type: DELETE_ITEM,
     id: id
 });

@@ -84,8 +84,8 @@ export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectory
     render() {
         const {forceOpen, isOpen, directory, children, scripts, errorCount, warningCount, onCreate, onEdit, onDelete} = this.props;
 
-        let directories: * = null;
-        let scriptsEl: * = null;
+        let directories: ?Node = null;
+        let scriptsEl: ?$ReadOnlyArray<Node> = null;
 
         const hasChildren = (children.length + scripts.length) > 0;
         const open = (isOpen || forceOpen) && hasChildren;
@@ -196,7 +196,7 @@ const countExecutions = (
     scripts: {[?number]: ?$ReadOnlyArray<RegistryScriptType>},
     dirs: {[?number]: ?$ReadOnlyArray<RegistryDirectoryType>}
 ): number => {
-    let errors: * = 0;
+    let errors: number = 0;
     if (scripts[dirId]) {
         errors += scripts[dirId].map(script => script[field] || 0).reduce((a, b) => a + b, 0);
     }

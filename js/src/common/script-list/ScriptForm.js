@@ -117,12 +117,7 @@ export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>,
     }
 
     mutateValue = (field: ScriptFormField<T>, value: any) => {
-        this.setState((state: State<T>): * => {
-            return {
-                values: state.values.set(field, value),
-                isModified: true
-            };
-        });
+        this.setState( state => ({ values: state.values.set(field, value), isModified: true }) );
     };
 
     _setTextValue = (field: ScriptFormField<T>) => (event: SyntheticEvent<HTMLInputElement|HTMLTextAreaElement>) =>

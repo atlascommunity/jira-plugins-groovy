@@ -12,13 +12,11 @@ const itemsSelector = orderedItemsSelector();
 
 export const ConnectedScriptPage = connect(
     memoizeOne(
-        ({watches, isReady, ...state}: *): * => {
-            return {
-                items: itemsSelector(state),
-                filter: state.filter,
-                watches, isReady
-            };
-        }
+        ({watches, isReady, ...state}) => ({
+            items: itemsSelector(state),
+            filter: state.filter,
+            watches, isReady
+        })
     ),
     { updateFilter }
 )(ScriptPage);

@@ -212,12 +212,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
     };
 
     mutateValue = (field: FormFieldType, value: any) => {
-        this.setState((state: State): * => {
-            return {
-                values: state.values.set(field, value),
-                modified: true
-            };
-        });
+        this.setState( state => ({ values: state.values.set(field, value), modified: true }) );
     };
 
     _setTextValue = (field: FormFieldType) => (event: InputEvent) => this.mutateValue(field, event.currentTarget.value);
@@ -245,13 +240,13 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
         if (value) {
             const id = parseInt(value.value, 10);
             const {label} = value;
-            this.setState(({values}: *): * => {
-                return {
+            this.setState(
+                ({values}) => ({
                     values: values.set('directoryId', id),
                     parentName: label,
                     noParent: false
-                };
-            });
+                })
+            );
         }
     };
 

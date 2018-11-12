@@ -47,9 +47,9 @@ class ViewScheduledTaskInternal extends React.PureComponent<Props> {
                 >
                     {script ? script.name : 'Unknown script'}
                 </PageHeader>
-                {script ?
-                    <ScheduledTask script={script} collapsible={false}/> :
-                    <NotFoundPage/>
+                {script
+                    ? <ScheduledTask script={script} collapsible={false}/>
+                    : <NotFoundPage/>
                 }
             </Page>
         );

@@ -83,11 +83,7 @@ export class RunDialog extends React.PureComponent<Props, State> {
             }));
     };
 
-    _updateValue = memoizeOne((field: string) => (value: any) => this.setState((state: State): * => {
-        return {
-            values: state.values.set(field, value)
-        };
-    }));
+    _updateValue = memoizeOne(field => value => this.setState(state => ({ values: state.values.set(field, value) }) ));
 
     _renderFields = (): Node => {
         const {params} = this.props.script;

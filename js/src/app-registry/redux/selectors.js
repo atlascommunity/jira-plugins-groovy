@@ -118,7 +118,7 @@ export const filteredSelector = createSelector(
     }
 );
 
-const groupedSelector = (parentKey) => (entities: *) => groupBy(Object.values(entities), parentKey);
+const groupedSelector = parentKey => entities => groupBy(Object.values(entities), parentKey);
 
 const scriptsSelector = createSelector(
     [filteredSelector],

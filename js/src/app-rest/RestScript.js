@@ -26,13 +26,7 @@ import type {ScriptComponentProps} from '../common/script-list/types';
 
 
 const ConnectedWatchableScript = connect(
-    memoizeOne(
-        (state: *): * => {
-            return {
-                watches: state.watches
-            };
-        }
-    ),
+    memoizeOne( state => ({ watches: state.watches }) ),
     WatchActionCreators
 )(WatchableScript);
 

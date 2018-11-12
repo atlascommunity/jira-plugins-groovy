@@ -29,13 +29,7 @@ import {RouterLink} from '../common/ak/RouterLink';
 
 
 const ConnectedWatchableScript = connect(
-    memoizeOne(
-        (state: *): * => {
-            return {
-                watches: state.watches
-            };
-        }
-    ),
+    memoizeOne(state => ({ watches: state.watches }) ),
     WatchActionCreators
 )(WatchableScript);
 
@@ -54,11 +48,7 @@ export class AdminScript extends React.PureComponent<Props, State> {
         isRunning: false
     };
 
-    _toggleDialog = () => this.setState((state: State): * => {
-        return {
-            isRunning: !state.isRunning
-        };
-    });
+    _toggleDialog = () => this.setState(state => ({ isRunning: !state.isRunning }));
 
     _delete = () => this.props.onDelete && this.props.onDelete(
         this.props.script.id,

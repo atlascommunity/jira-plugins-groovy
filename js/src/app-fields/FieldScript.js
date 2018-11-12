@@ -24,13 +24,7 @@ import {RouterLink} from '../common/ak/RouterLink';
 
 
 const ConnectedWatchableScript = connect(
-    memoizeOne(
-        (state: *): * => {
-            return {
-                watches: state.watches
-            };
-        }
-    ),
+    memoizeOne(state => ({ watches: state.watches }) ),
     WatchActionCreators
 )(WatchableScript);
 

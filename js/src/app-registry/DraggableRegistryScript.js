@@ -75,10 +75,6 @@ export class DraggableRegistryScriptInternal extends React.PureComponent<{|...Pu
 
 export const DraggableRegistryScript = focusOnRender(
     connect(
-        memoizeOne(({scriptUsage}: *): * => {
-            return {
-                scriptUsage
-            };
-        })
+        memoizeOne( ({scriptUsage}) => ({ scriptUsage }) )
     )(DraggableRegistryScriptInternal)
 );

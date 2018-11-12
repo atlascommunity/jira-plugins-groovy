@@ -65,15 +65,7 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
         waitingWatch: false
     };
 
-    _toggleWorkflows = () => {
-        this.setState(
-            (state: RegistryScriptState): * => {
-                return {
-                    showWorkflows: !state.showWorkflows
-                };
-            }
-        );
-    };
+    _toggleWorkflows = () => this.setState( state => ({ showWorkflows: !state.showWorkflows }) );
 
     _toggleWatch = () => {
         const {script, scriptWatches, addWatch, removeWatch} = this.props;
@@ -201,11 +193,7 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
 
 export const RegistryScript = (
     connect(
-        memoizeOne(({scriptWatches}: *): * => {
-            return {
-                scriptWatches
-            };
-        }),
+        memoizeOne( ({scriptWatches}) => ({ scriptWatches }) ),
         { addWatch, removeWatch }
     )(RegistryScriptInternal)
 );

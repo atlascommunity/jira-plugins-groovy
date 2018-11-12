@@ -36,12 +36,7 @@ export const types: {[string]: ScheduledTaskTypeType} = {
 
 export const typeList: $ReadOnlyArray<KeyedScheduledTaskTypeType> = Object
     .keys(types)
-    .map((key: string): * => {
-        return {
-            ...(types[key]),
-            key
-        };
-    });
+    .map( key => ({ ...(types[key]), key }) );
 
 
 export type ScheduledTaskTypeEnum = 'BASIC_SCRIPT' | 'ISSUE_JQL_SCRIPT' | 'ISSUE_JQL_TRANSITION' | 'DOCUMENT_ISSUE_JQL_SCRIPT';

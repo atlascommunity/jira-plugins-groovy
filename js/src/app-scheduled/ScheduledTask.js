@@ -52,13 +52,7 @@ function getOutcomeLozengeAppearance(outcome: RunOutcomeType): * {
 }
 
 const ConnectedWatchableScript = connect(
-    memoizeOne(
-        (state: *): * => {
-            return {
-                watches: state.watches
-            };
-        }
-    ),
+    memoizeOne( state => ({ watches: state.watches }) ),
     WatchActionCreators
 )(WatchableScript);
 
@@ -96,11 +90,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
             .then(() => updateItem({...script, enabled}));
     };
 
-    _toggleRunNow = () => this.setState((state: State): * => {
-        return {
-            showRunDialog: !state.showRunDialog
-        };
-    });
+    _toggleRunNow = () => this.setState( state => ({ showRunDialog: !state.showRunDialog }) );
 
     _getParams = memoizeOne(
         (task: ScheduledTaskType): Array<?ScriptParam> => {
