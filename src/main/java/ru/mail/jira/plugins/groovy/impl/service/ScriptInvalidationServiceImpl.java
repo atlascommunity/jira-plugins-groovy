@@ -52,32 +52,36 @@ public class ScriptInvalidationServiceImpl implements LifecycleAware, ScriptInva
         this.messageConsumer = new MessageConsumer();
     }
 
-    @Override public void invalidate(String scriptId) {
+    @Override
+    public void invalidate(String scriptId) {
         logger.debug("sending invalidation message for {}", scriptId);
         clusterMessagingService.sendRemote(SCRIPT_INVALIDATION_CHANNEL, scriptId);
         scriptService.invalidate(scriptId);
     }
 
-    @Override public void invalidateAll() {
+    @Override
+    public void invalidateAll() {
         logger.debug("sending invalidation message for all");
         clusterMessagingService.sendRemote(SCRIPT_INVALIDATION_CHANNEL, "");
         scriptService.invalidateAll();
     }
 
-    @Override public void invalidateField(long fieldId) {
+    @Override
+    public void invalidateField(long fieldId) {
         logger.debug("sending invalidation message for field {}", fieldId);
         clusterMessagingService.sendRemote(FIELD_INVALIDATION_CHANNEL, String.valueOf(fieldId));
         fieldValueCache.invalidateField(fieldId);
     }
 
-    @Override public void invalidateAllFields() {
+    @Override
+    public void invalidateAllFields() {
         logger.debug("sending invalidation message for all fields");
         clusterMessagingService.sendRemote(FIELD_INVALIDATION_CHANNEL, "");
         fieldValueCache.invalidateAll();
     }
 
-    //todo: возможно, можно без сильной боли инвалидировать только конкретный скрипт (есть ли в этом смысл?)
-    @Override public void invalidateGlobalObjects() {
+    @Override
+    public void invalidateGlobalObjects() {
         clusterMessagingService.sendRemote(GLOBAL_OBJECTS_CHANNEL, "");
         globalObjectsBindingProvider.refresh();
     }
