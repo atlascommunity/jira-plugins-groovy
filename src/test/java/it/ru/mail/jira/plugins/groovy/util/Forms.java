@@ -9,12 +9,16 @@ public final class Forms {
     private Forms() {}
 
     public static GlobalObjectForm globalObject(String sourcePath) throws IOException {
+        return globalObjectFromSource(FileUtil.readArquillianExample(sourcePath));
+    }
+
+    public static GlobalObjectForm globalObjectFromSource(String source) {
         long ts = System.currentTimeMillis();
         String globalObjectName = "testObject" + ts;
 
         GlobalObjectForm form = new GlobalObjectForm();
         form.setName(globalObjectName);
-        form.setScriptBody(FileUtil.readArquillianExample(sourcePath));
+        form.setScriptBody(source);
 
         return form;
     }
