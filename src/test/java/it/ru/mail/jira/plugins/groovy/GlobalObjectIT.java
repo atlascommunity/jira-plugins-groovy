@@ -9,7 +9,6 @@ import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectDto;
@@ -31,7 +30,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-//todo: make IT using same class name
 @RunWith(Arquillian.class)
 public class GlobalObjectIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
@@ -58,15 +56,27 @@ public class GlobalObjectIT {
         return ArquillianUtil.prepareArchive(archive, requiredScripts);
     }
 
-    @Before
-    public void beforeEach() throws IOException {
+    private GlobalObjectForm uniqueForm() throws IOException {
         long ts = System.currentTimeMillis();
         globalObjectName = "testObject" + ts;
 
         GlobalObjectForm form = new GlobalObjectForm();
         form.setName(globalObjectName);
         form.setScriptBody(FileUtil.readArquillianExample("tests/go/GlobalObject").replaceAll("\\$TS\\$", String.valueOf(ts)));
+        return form;
+    }
 
+    private GlobalObjectForm nonUniqueForm() throws IOException {
+        long ts = System.currentTimeMillis();
+        globalObjectName = "testObject" + ts;
+
+        GlobalObjectForm form = new GlobalObjectForm();
+        form.setName(globalObjectName);
+        form.setScriptBody(FileUtil.readArquillianExample("tests/go/GlobalObject"));
+        return form;
+    }
+
+    private void createObject(GlobalObjectForm form) {
         GlobalObjectDto globalObjectDto = globalObjectRepository.create(userHelper.getAdmin(), form);
 
         globalObjectId = globalObjectDto.getId();
@@ -97,7 +107,9 @@ public class GlobalObjectIT {
     }
 
     @Test
-    public void typeShouldMatch() {
+    public void typeShouldMatch() throws IOException {
+        createObject(uniqueForm());
+
         BindingDescriptor<?> binding = findCurrentScriptBinding();
 
         assertThat(binding.getValue(null), instanceOf(binding.getType()));
@@ -105,6 +117,8 @@ public class GlobalObjectIT {
 
     @Test
     public void shouldWork() throws Exception {
+        createObject(uniqueForm());
+
         Object result = scriptService.executeScript(null, createScript(), ScriptType.CONSOLE, ImmutableMap.of());
 
         assertEquals(userHelper.getAdmin(), result);
@@ -113,6 +127,8 @@ public class GlobalObjectIT {
 
     @Test
     public void staticShouldWork() throws Exception {
+        createObject(uniqueForm());
+
         Object result = scriptService.executeScriptStatic(null, createScript(), ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
 
         assertEquals(userHelper.getAdmin(), result);
@@ -120,6 +136,48 @@ public class GlobalObjectIT {
 
     @Test
     public void checkType() throws Exception {
+        createObject(uniqueForm());
+
+        BindingDescriptor<?> binding = findCurrentScriptBinding();
+
+        Object result = scriptService.executeScriptStatic(null, globalObjectName + ".class", ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
+
+        assertEquals(binding.getType(), result);
+    }
+
+
+    @Test
+    public void typeShouldMatch2() throws IOException {
+        createObject(nonUniqueForm());
+
+        BindingDescriptor<?> binding = findCurrentScriptBinding();
+
+        assertThat(binding.getValue(null), instanceOf(binding.getType()));
+    }
+
+    @Test
+    public void shouldWork2() throws Exception {
+        createObject(nonUniqueForm());
+
+        Object result = scriptService.executeScript(null, createScript(), ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertEquals(userHelper.getAdmin(), result);
+    }
+
+
+    @Test
+    public void staticShouldWork2() throws Exception {
+        createObject(nonUniqueForm());
+
+        Object result = scriptService.executeScriptStatic(null, createScript(), ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
+
+        assertEquals(userHelper.getAdmin(), result);
+    }
+
+    @Test
+    public void checkType2() throws Exception {
+        createObject(nonUniqueForm());
+
         BindingDescriptor<?> binding = findCurrentScriptBinding();
 
         Object result = scriptService.executeScriptStatic(null, globalObjectName + ".class", ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
