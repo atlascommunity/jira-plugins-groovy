@@ -35,7 +35,6 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private volatile Map<String, BindingDescriptor<?>> objects = ImmutableMap.of();
     private volatile Map<String, Class> types = ImmutableMap.of();
-    private volatile boolean incomplete = false;
 
     private final ScriptService scriptService;
     private final GlobalObjectDao globalObjectDao;
@@ -117,13 +116,11 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                         ImmutableMap.of(
                             "type", ScriptType.GLOBAL_OBJECT.name()
                         ));
-                    incomplete = true;
                 }
             }
 
             this.objects = objects;
             this.types = types;
-            this.incomplete = incomplete;
 
             logger.info("loaded global object cache (incomplete: {})", incomplete);
 
@@ -133,19 +130,6 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
     @Override
     public Map<String, BindingDescriptor<?>> getBindings() {
-        if (incomplete) {
-            Lock wLock = rwLock.writeLock();
-            wLock.lock();
-            try {
-                if (incomplete) {
-                    unsafeLoadCaches();
-                }
-                return this.objects;
-            } finally {
-                wLock.unlock();
-            }
-        }
-
         Lock rLock = rwLock.readLock();
         rLock.lock();
         try {

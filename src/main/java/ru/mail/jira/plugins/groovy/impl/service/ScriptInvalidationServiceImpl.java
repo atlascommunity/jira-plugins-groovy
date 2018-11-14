@@ -7,6 +7,7 @@ import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.event.PluginEventManager;
 import com.atlassian.plugin.event.events.PluginDisabledEvent;
 import com.atlassian.plugin.event.events.PluginDisablingEvent;
+import com.atlassian.plugin.event.events.PluginEnabledEvent;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
@@ -112,6 +113,11 @@ public class ScriptInvalidationServiceImpl implements LifecycleAware, ScriptInva
     @EventListener
     public void onPluginUnloaded(PluginDisabledEvent event) {
         flushPluginDependenants(event.getPlugin());
+    }
+
+    @EventListener
+    public void onPluginEnabled(PluginEnabledEvent event) {
+        globalObjectsBindingProvider.refresh();
     }
 
     private void flushPluginDependenants(Plugin plugin) {
