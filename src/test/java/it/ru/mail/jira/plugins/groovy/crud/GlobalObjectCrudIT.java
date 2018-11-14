@@ -36,9 +36,18 @@ public class GlobalObjectCrudIT {
     @Inject
     private ChangeLogHelper changeLogHelper;
 
+    private Integer scriptId;
+
     @BeforeDeployment
     public static Archive<?> prepareArchive(Archive<?> archive) {
         return ArquillianUtil.prepareArchive(archive);
+    }
+
+    @Test
+    public void afterEach() {
+        if (scriptId != null) {
+            globalObjectRepository.delete(userHelper.getAdmin(), scriptId);
+        }
     }
 
     private GlobalObjectForm createForm() {
@@ -48,7 +57,11 @@ public class GlobalObjectCrudIT {
     private GlobalObjectDto createScript(GlobalObjectForm form) {
         assertNotNull(form);
 
-        return globalObjectRepository.create(userHelper.getAdmin(), form);
+        GlobalObjectDto result = globalObjectRepository.create(userHelper.getAdmin(), form);
+
+        scriptId = result.getId();
+
+        return result;
     }
 
     private GlobalObjectDto createScript() {
