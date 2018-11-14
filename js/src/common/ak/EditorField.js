@@ -20,7 +20,7 @@ type EditorFieldProps = {|
     ...AkFormFieldProps,
     mode: string,
     markers?: $ReadOnlyArray<MarkerType>,
-    bindings?: $ReadOnlyArray<BindingType>,
+    bindings?: ?$ReadOnlyArray<BindingType>,
     returnTypes?: $ReadOnlyArray<ReturnType>,
     resizable?: boolean,
     validationState?: ValidationState,
