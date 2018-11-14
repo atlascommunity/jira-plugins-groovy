@@ -5,6 +5,7 @@ import it.ru.mail.jira.plugins.groovy.util.*;
 import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectDto;
@@ -43,7 +44,7 @@ public class GlobalObjectCrudIT {
         return ArquillianUtil.prepareArchive(archive);
     }
 
-    @Test
+    @After
     public void afterEach() {
         if (scriptId != null) {
             globalObjectRepository.delete(userHelper.getAdmin(), scriptId);
