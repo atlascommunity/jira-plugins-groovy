@@ -12,7 +12,6 @@ import {addItem, updateItem} from '../common/redux';
 import {globalObjectService} from '../service';
 
 import {RegistryMessages} from '../i18n/registry.i18n';
-import {ReturnTypes} from '../common/bindings';
 import {ScriptForm, type SubmitResult} from '../common/script-list/ScriptForm';
 
 import type {ProvidedState} from '../common/script-list/ScriptForm';
@@ -80,11 +79,6 @@ const onSubmit = (id: ?number, data: {[string]: any}): Promise<SubmitResult> => 
         );
 };
 
-const returnTypes = [{
-    ...ReturnTypes.string,
-    optional: true
-}];
-
 class GlobalObjectFormInternal extends React.PureComponent<Props> {
     render() {
         return (
@@ -99,8 +93,8 @@ class GlobalObjectFormInternal extends React.PureComponent<Props> {
                     parentName: 'Global objects'
                 }}
                 scriptType="GLOBAL_OBJECT"
-                returnTypes={returnTypes}
                 returnTo="/go/"
+                bindings={null}
 
                 {...this.props}
             />

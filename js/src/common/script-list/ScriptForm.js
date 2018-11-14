@@ -24,12 +24,10 @@ import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
 
 import type {StaticCheckScriptType} from '../ak';
 import type {ItemType} from '../redux';
-import type {ReturnType} from '../editor/types';
+import type {BindingType, ReturnType} from '../editor/types';
 
 import './ScriptForm.less';
 
-
-const bindings = [ Bindings.currentUser ];
 
 type ErrorType = {
     field: ?string,
@@ -80,6 +78,7 @@ type Props<T: ScriptFormType> = {|
     additionalFields: $ReadOnlyArray<AdditionalField<T>>,
     history: RouterHistory,
     returnTo: string,
+    bindings: ?$ReadOnlyArray<BindingType>,
     returnTypes?: $ReadOnlyArray<ReturnType>,
     scriptType: StaticCheckScriptType
 |};
@@ -98,7 +97,8 @@ export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>,
         //$FlowFixMe: toJS() issue
         valuesTransformer: (values: ValuesType<T>): DataType => values.toJS(),
         additionalFields: [],
-        isChecked: false
+        isChecked: false,
+        bindings: [ Bindings.currentUser ]
     };
 
     constructor(props: *) {
@@ -184,7 +184,7 @@ export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>,
     }
 
     render() {
-        const {i18n, isNew, id, additionalFields, returnTypes, scriptType, returnTo} = this.props;
+        const {i18n, isNew, id, additionalFields, bindings, returnTypes, scriptType, returnTo} = this.props;
         const {values, isModified, isLoadingState, isSubmitting, error, name} = this.state;
 
         let content: Node = null;

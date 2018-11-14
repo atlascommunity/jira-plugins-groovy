@@ -75,7 +75,7 @@ type EditorProps = {|
     toggleTheme: () => void,
 
     markers?: $ReadOnlyArray<MarkerType>,
-    bindings?: $ReadOnlyArray<BindingType>,
+    bindings?: ?$ReadOnlyArray<BindingType>,
     returnTypes?: $ReadOnlyArray<ReturnType>,
     readOnly?: boolean,
     decorated?: boolean,
