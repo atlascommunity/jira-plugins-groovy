@@ -13,7 +13,7 @@ import type {GlobalObjectScriptType} from './types';
 
 import {WatchActionCreators} from '../common/redux';
 
-import {adminScriptService} from '../service';
+import {globalObjectService} from '../service';
 
 import {WatchableScript} from '../common/script/WatchableScript';
 
@@ -37,7 +37,7 @@ export class GlobalObjectScript extends React.PureComponent<Props> {
     _delete = () => this.props.onDelete && this.props.onDelete(
         this.props.script.id,
         this.props.script.name,
-        () => adminScriptService.deleteScript(this.props.script.id)
+        () => globalObjectService.deleteScript(this.props.script.id)
     );
 
     _getScript = memoizeOne(
@@ -59,7 +59,7 @@ export class GlobalObjectScript extends React.PureComponent<Props> {
         return (
             <ConnectedWatchableScript
                 entityId={script.id}
-                entityType="ADMIN_SCRIPT"
+                entityType="GLOBAL_OBJECT"
 
                 script={this._getScript(script)}
                 withChangelog={true}
