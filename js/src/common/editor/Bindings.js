@@ -43,7 +43,7 @@ export class Bindings extends React.PureComponent<Props, State> {
             <Fragment>
                 {viewingDoc && <ClassDocViewer classDoc={viewingDoc} onClose={this._closeDoc}/>}
                 <InlineMessage type="info" placement="top-end">
-                    <div className="flex-column">
+                    <div className="flex-column Bindings">
                         <GlobalBindings onOpenDoc={this._viewDoc}/>
                         <hr className="full-width"/>
                         {bindings.map(binding => <Binding key={binding.name} binding={binding}/>)}
