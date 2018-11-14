@@ -95,7 +95,7 @@ public class FieldValueExtractor {
                                 logger.trace("invalidating stale value of field {} for issue {}", field.getId(), issue.getKey());
                             }
                             cache.get().invalidate(key);
-                            getCachedValue(key, field, issue, lastModified, script, tType);
+                            cachedValue = getCachedValue(key, field, issue, lastModified, script, tType);
                         }
 
                         return cachedValue;
