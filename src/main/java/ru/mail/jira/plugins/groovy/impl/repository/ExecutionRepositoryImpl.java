@@ -87,9 +87,11 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
                     connection
                         .select(SCRIPT_EXECUTION.SCRIPT_ID, SCRIPT_EXECUTION.ID.count())
                         .from(SCRIPT_EXECUTION)
+                        .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.INLINE_ID.eq(REGISTRY_SCRIPT.UUID))
                         .where(
                             SCRIPT_EXECUTION.SCRIPT_ID.isNotNull(),
-                            SCRIPT_EXECUTION.SUCCESSFUL.isFalse()
+                            SCRIPT_EXECUTION.SUCCESSFUL.isFalse(),
+                            REGISTRY_SCRIPT.UUID.isNull()
                         )
                         .groupBy(SCRIPT_EXECUTION.SCRIPT_ID)
                         .fetch()
@@ -119,9 +121,11 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
                 connection
                     .select(SCRIPT_EXECUTION.SCRIPT_ID, SCRIPT_EXECUTION.ID.count())
                     .from(SCRIPT_EXECUTION)
+                    .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.INLINE_ID.eq(REGISTRY_SCRIPT.UUID))
                     .where(
                         SCRIPT_EXECUTION.SCRIPT_ID.isNotNull(),
                         SCRIPT_EXECUTION.SUCCESSFUL.isTrue(),
+                        REGISTRY_SCRIPT.UUID.isNull(),
                         SCRIPT_EXECUTION.TIME.goe(WARNING_THRESHOLD)
                     )
                     .groupBy(SCRIPT_EXECUTION.SCRIPT_ID)
