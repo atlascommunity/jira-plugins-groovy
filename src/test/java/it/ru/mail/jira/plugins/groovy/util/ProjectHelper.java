@@ -18,6 +18,9 @@ import org.junit.Assert;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 @Named
 public class ProjectHelper {
     @ComponentImport
@@ -52,6 +55,10 @@ public class ProjectHelper {
                 .withProjectTemplateKey(projectTemplate.getKey().getKey())
                 .build()
         );
+
+        if (!projectValidationResult.isValid()) {
+            fail(projectValidationResult.getErrorCollection().toString());
+        }
         return projectService.createProject(projectValidationResult);
     }
 

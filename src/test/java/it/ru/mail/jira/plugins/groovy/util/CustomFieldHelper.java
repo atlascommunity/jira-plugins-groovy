@@ -35,6 +35,13 @@ public class CustomFieldHelper {
         );
     }
 
+    public CustomField createUserField() throws GenericEntityException {
+        return createField(
+            "ru.mail.jira.plugins.groovy:groovy-user-field",
+            "com.atlassian.jira.plugin.system.customfieldtypes:userpickergroupsearcher"
+        );
+    }
+
     public CustomField createField(String typeKey, String searcherKey) throws GenericEntityException {
         CustomFieldType type = customFieldManager.getCustomFieldType(typeKey);
         CustomFieldSearcher searcher = customFieldManager.getCustomFieldSearcher(searcherKey);
