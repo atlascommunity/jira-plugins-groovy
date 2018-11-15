@@ -80,7 +80,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
 
     @Override
     public JqlFunctionScriptDto createScript(ApplicationUser user, JqlFunctionForm form) {
-        validateScriptForm(true, form);
+        validateScriptForm(true, null, form);
 
         JqlFunctionScript script = ao.create(
             JqlFunctionScript.class,
@@ -111,7 +111,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         //todo: consider disabling rename
         JqlFunctionScript script = ao.get(JqlFunctionScript.class, id);
 
-        validateScriptForm(false, form);
+        validateScriptForm(false, id, form);
 
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
@@ -155,11 +155,18 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         auditService.addAuditLogAndNotify(user, action, EntityType.JQL_FUNCTION, script, diff, description);
     }
 
-    private void validateScriptForm(boolean isNew, JqlFunctionForm form) {
+    private void validateScriptForm(boolean isNew, Integer id, JqlFunctionForm form) {
         ValidationUtils.validateForm2(i18nHelper, isNew, form);
 
-        if (builtInNames.contains(form.getName().toLowerCase())) {
+        String lowerName = form.getName().toLowerCase();
+        if (builtInNames.contains(lowerName)) {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.nameTaken"), "name");
+        }
+        JqlFunctionScript[] existingScripts = ao.find(JqlFunctionScript.class, Query.select().where("LOWER_NAME = ?", lowerName));
+        if (existingScripts.length > 0) {
+            if (isNew || existingScripts[0].getID() != id) {
+                throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.nameTaken"), "name");
+            }
         }
         //todo: also validate for system and other plugin function names
 
