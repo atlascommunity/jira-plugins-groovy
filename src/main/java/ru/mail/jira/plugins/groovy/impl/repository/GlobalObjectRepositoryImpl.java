@@ -19,7 +19,6 @@ import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.Const;
-import ru.mail.jira.plugins.groovy.util.RestFieldException;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 
 import java.util.List;
@@ -110,7 +109,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
         ValidationUtils.validateForm2(i18nHelper, isNew, form);
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
+            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
 
         Class scriptClass = scriptService.parseClassStatic(form.getScriptBody(), true, ImmutableMap.of());
@@ -127,7 +126,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
         }
 
         if (!Const.GLOBAL_OBJECT_NAME_PATTERN.matcher(form.getName()).matches()) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.incorrectGlobalObjectName"), "name");
+            throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.incorrectGlobalObjectName"), "name");
         }
     }
 

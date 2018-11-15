@@ -1,5 +1,6 @@
 package ru.mail.jira.plugins.groovy.util;
 
+@Deprecated
 public class RestFieldException extends IllegalArgumentException {
     private final String field;
 
