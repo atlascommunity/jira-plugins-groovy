@@ -12,6 +12,9 @@ import PageHeader from '@atlaskit/page-header';
 import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
+import {colors} from '@atlaskit/theme';
+
+import WarningIcon from '@atlaskit/icon/glyph/warning';
 
 import type {RestScriptType} from './types';
 
@@ -300,7 +303,16 @@ export class RestFormInternal extends React.Component<Props, State> {
                         isInvalid={errorField === 'groups'}
                         invalidMessage={errorField === 'groups' ? errorMessage : ''}
                     />
-
+                    {(values.get('groups').length === 0)
+                        ? (
+                            <div className="ak-description">
+                                <WarningIcon size="small" label="" primaryColor={colors.Y300}/>
+                                {' '}
+                                {RestMessages.noGroups}
+                            </div>
+                        )
+                        : null
+                    }
                     <FormField
                         label={FieldMessages.scriptCode}
                         isRequired={true}

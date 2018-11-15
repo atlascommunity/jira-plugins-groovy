@@ -134,6 +134,7 @@ define('mailru/groovy/i18n-react', [], function() {
             createScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.createScript'),
             deleteScript: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.deleteScript'),
             noScripts: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.noScripts'),
+            noGroups: AJS.I18n.getText('ru.mail.jira.plugins.groovy.rest.noGroups')
         },
         dialog: {
             notReady: AJS.I18n.getText('ru.mail.jira.plugins.groovy.dialog.notReady')

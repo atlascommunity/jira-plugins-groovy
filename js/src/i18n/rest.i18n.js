@@ -11,5 +11,6 @@ export const RestMessages: I18nMessages = {
     createScript: i18n.rest.createScript,
     updateScript: i18n.rest.updateScript,
     deleteScript: i18n.rest.deleteScript,
-    noScripts: i18n.rest.noScripts
+    noScripts: i18n.rest.noScripts,
+    noGroups: i18n.rest.noGroups
 };
