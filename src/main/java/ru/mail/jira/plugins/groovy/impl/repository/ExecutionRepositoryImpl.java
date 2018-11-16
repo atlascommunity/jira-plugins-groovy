@@ -10,6 +10,9 @@ import com.atlassian.pocketknife.api.querydsl.DatabaseAccessor;
 import com.atlassian.pocketknife.api.querydsl.util.OnRollback;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.atlassian.util.concurrent.ThreadFactories;
+import com.querydsl.core.types.dsl.*;
+import com.querydsl.sql.SQLExpressions;
+import com.querydsl.sql.Union;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.slf4j.Logger;
@@ -26,7 +29,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static ru.mail.jira.plugins.groovy.util.QueryDslTables.REGISTRY_SCRIPT;
 import static ru.mail.jira.plugins.groovy.util.QueryDslTables.SCRIPT_EXECUTION;
@@ -80,72 +82,70 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
         });
     }
 
+    private Union<Integer> buildUnionScriptQuery(NumberPath<Integer> scriptId, BooleanExpression whereClause) {
+        return SQLExpressions.unionAll(
+            SQLExpressions
+                .select(REGISTRY_SCRIPT.ID.as(scriptId))
+                .from(REGISTRY_SCRIPT)
+                .join(SCRIPT_EXECUTION)
+                .on(
+                    SCRIPT_EXECUTION.SCRIPT_ID.eq(REGISTRY_SCRIPT.ID),
+                    REGISTRY_SCRIPT.UUID.isNull()
+                )
+                .where(whereClause),
+            SQLExpressions
+                .select(REGISTRY_SCRIPT.ID.as(scriptId))
+                .from(REGISTRY_SCRIPT)
+                .join(SCRIPT_EXECUTION)
+                .on(SCRIPT_EXECUTION.INLINE_ID.eq(REGISTRY_SCRIPT.UUID))
+                .where(whereClause)
+        );
+    }
+
     @Override
     public Map<Integer, Long> getRegistryErrorCount() {
+        NumberPath<Integer> scriptId = Expressions.numberPath(Integer.class, "scriptId");
+
         return databaseAccessor.run(connection ->
-                Stream.concat(
-                    connection
-                        .select(SCRIPT_EXECUTION.SCRIPT_ID, SCRIPT_EXECUTION.ID.count())
-                        .from(SCRIPT_EXECUTION)
-                        .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.SCRIPT_ID.eq(REGISTRY_SCRIPT.ID))
-                        .where(
-                            REGISTRY_SCRIPT.UUID.isNull(),
-                            SCRIPT_EXECUTION.SUCCESSFUL.isFalse()
-                        )
-                        .groupBy(SCRIPT_EXECUTION.SCRIPT_ID)
-                        .fetch()
-                        .stream(),
-                    connection
-                        .select(REGISTRY_SCRIPT.ID, SCRIPT_EXECUTION.ID.count())
-                        .from(SCRIPT_EXECUTION)
-                        .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.INLINE_ID.eq(REGISTRY_SCRIPT.UUID))
-                        .where(SCRIPT_EXECUTION.SUCCESSFUL.isFalse())
-                        .groupBy(REGISTRY_SCRIPT.ID)
-                        .fetch()
-                        .stream()
-                )
-                .collect(Collectors.toMap(
-                    tuple -> tuple.get(0, Integer.class),
-                    tuple -> tuple.get(1, Long.class),
-                    (a, b) -> a + b
-                )),
+                connection
+                    .select(scriptId, Wildcard.count)
+                    .from(buildUnionScriptQuery(scriptId, SCRIPT_EXECUTION.SUCCESSFUL.isFalse()).as("temp"))
+                    .groupBy(scriptId)
+                    .fetch()
+                    .stream()
+                    .collect(Collectors.toMap(
+                        tuple -> tuple.get(0, Integer.class),
+                        tuple -> tuple.get(1, Long.class),
+                        (a, b) -> a + b
+                    )),
             OnRollback.NOOP
         );
     }
 
     @Override
     public Map<Integer, Long> getRegistryWarningCount() {
+        NumberPath<Integer> scriptId = Expressions.numberPath(Integer.class, "scriptId");
+
         return databaseAccessor.run(connection ->
-            Stream.concat(
                 connection
-                    .select(SCRIPT_EXECUTION.SCRIPT_ID, SCRIPT_EXECUTION.ID.count())
-                    .from(SCRIPT_EXECUTION)
-                    .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.SCRIPT_ID.eq(REGISTRY_SCRIPT.ID))
-                    .where(
-                        REGISTRY_SCRIPT.UUID.isNull(),
-                        SCRIPT_EXECUTION.SUCCESSFUL.isTrue(),
-                        SCRIPT_EXECUTION.TIME.goe(WARNING_THRESHOLD)
+                    .select(scriptId, Wildcard.count)
+                    .from(
+                        buildUnionScriptQuery(
+                            scriptId,
+                            Expressions.allOf(
+                                SCRIPT_EXECUTION.SUCCESSFUL.isTrue(),
+                                SCRIPT_EXECUTION.TIME.goe(WARNING_THRESHOLD)
+                            )
+                        ).as("temp")
                     )
-                    .groupBy(SCRIPT_EXECUTION.SCRIPT_ID)
-                    .fetch()
-                    .stream(),
-                connection
-                    .select(REGISTRY_SCRIPT.ID, SCRIPT_EXECUTION.ID.count())
-                    .from(SCRIPT_EXECUTION)
-                    .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.INLINE_ID.eq(REGISTRY_SCRIPT.UUID))
-                    .where(
-                        SCRIPT_EXECUTION.SUCCESSFUL.isTrue(),
-                        SCRIPT_EXECUTION.TIME.goe(WARNING_THRESHOLD)
-                    )
-                    .groupBy(REGISTRY_SCRIPT.ID)
+                    .groupBy(scriptId)
                     .fetch()
                     .stream()
-                )
-                .collect(Collectors.toMap(
-                    tuple -> tuple.get(0, Integer.class),
-                    tuple -> tuple.get(1, Long.class),
-                    (a, b) -> a + b
-                )),
+                    .collect(Collectors.toMap(
+                        tuple -> tuple.get(0, Integer.class),
+                        tuple -> tuple.get(1, Long.class),
+                        (a, b) -> a + b
+                    )),
             OnRollback.NOOP
         );
     }
