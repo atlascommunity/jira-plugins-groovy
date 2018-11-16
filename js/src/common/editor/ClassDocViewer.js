@@ -1,8 +1,6 @@
 //@flow
 import React, {Fragment} from 'react';
 
-import memoize from 'lodash/memoize';
-
 import Modal from '@atlaskit/modal-dialog';
 import {DynamicTableStateless} from '@atlaskit/dynamic-table';
 
