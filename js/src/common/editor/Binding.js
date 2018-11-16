@@ -1,6 +1,7 @@
 //@flow
 import React from 'react';
 
+import Button from '@atlaskit/button';
 import Tooltip from '@atlaskit/tooltip';
 
 import type {BindingType} from './types';
@@ -32,7 +33,7 @@ export class Binding extends React.PureComponent<BindingProps> {
                                 </a>
                             )
                             : binding.classDoc && onOpenDoc
-                                ? <a href="#" onClick={onOpenDoc}>{binding.className}</a>
+                                ? <Button appearance="link" spacing="none" onClick={onOpenDoc}>{binding.className}</Button>
                                 : <abbr>{binding.className}</abbr>
                         }
                     </Tooltip>
