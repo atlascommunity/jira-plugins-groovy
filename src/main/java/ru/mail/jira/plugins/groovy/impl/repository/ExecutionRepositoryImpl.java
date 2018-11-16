@@ -87,11 +87,10 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
                     connection
                         .select(SCRIPT_EXECUTION.SCRIPT_ID, SCRIPT_EXECUTION.ID.count())
                         .from(SCRIPT_EXECUTION)
-                        .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.INLINE_ID.eq(REGISTRY_SCRIPT.UUID))
+                        .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.SCRIPT_ID.eq(REGISTRY_SCRIPT.ID))
                         .where(
-                            SCRIPT_EXECUTION.SCRIPT_ID.isNotNull(),
-                            SCRIPT_EXECUTION.SUCCESSFUL.isFalse(),
-                            REGISTRY_SCRIPT.UUID.isNull()
+                            REGISTRY_SCRIPT.UUID.isNull(),
+                            SCRIPT_EXECUTION.SUCCESSFUL.isFalse()
                         )
                         .groupBy(SCRIPT_EXECUTION.SCRIPT_ID)
                         .fetch()
@@ -121,11 +120,10 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
                 connection
                     .select(SCRIPT_EXECUTION.SCRIPT_ID, SCRIPT_EXECUTION.ID.count())
                     .from(SCRIPT_EXECUTION)
-                    .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.INLINE_ID.eq(REGISTRY_SCRIPT.UUID))
+                    .join(REGISTRY_SCRIPT).on(SCRIPT_EXECUTION.SCRIPT_ID.eq(REGISTRY_SCRIPT.ID))
                     .where(
-                        SCRIPT_EXECUTION.SCRIPT_ID.isNotNull(),
-                        SCRIPT_EXECUTION.SUCCESSFUL.isTrue(),
                         REGISTRY_SCRIPT.UUID.isNull(),
+                        SCRIPT_EXECUTION.SUCCESSFUL.isTrue(),
                         SCRIPT_EXECUTION.TIME.goe(WARNING_THRESHOLD)
                     )
                     .groupBy(SCRIPT_EXECUTION.SCRIPT_ID)
