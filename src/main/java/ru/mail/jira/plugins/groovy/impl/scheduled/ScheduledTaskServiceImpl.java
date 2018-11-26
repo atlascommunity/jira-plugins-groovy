@@ -431,6 +431,12 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                         } else {
                             if (isMutableIssue) {
                                 issueBinding = issueManager.getIssueObject(issue.getId());
+
+                                if (issueBinding == null) {
+                                    logger.error("Issue with key {} doesn't exist", issue.getKey());
+                                    errors++;
+                                    continue;
+                                }
                             }
 
                             Exception error = runScript(task, ImmutableMap.of("issue", issueBinding), false);
