@@ -6,6 +6,7 @@ import com.atlassian.jira.issue.customfields.CustomFieldUtils;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.config.FieldConfig;
 import com.atlassian.jira.issue.fields.config.manager.FieldConfigManager;
+import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
@@ -74,6 +75,8 @@ public class FieldPreviewService {
         if (!(customField.getCustomFieldType() instanceof ScriptedCFType)) {
             throw new ValidationException("Invalid custom field type");
         }
+
+        FieldLayoutItem fieldLayoutItem = fieldLayoutManager.getFieldLayout(issue).getFieldLayoutItem(customField);
         ScriptedCFType type = ((ScriptedCFType) customField.getCustomFieldType());
 
         FieldScriptDto script = new FieldScriptDto();
@@ -92,22 +95,27 @@ public class FieldPreviewService {
         long t = System.currentTimeMillis();
 
         Map<String, Object> velocityParams = new HashMap<>();
+
         velocityParams.putAll(
             CustomFieldUtils.buildParams(
                 customField,
                 fieldConfig,
                 issue,
-                fieldLayoutManager.getFieldLayout(issue).getFieldLayoutItem(customField),
+                fieldLayoutItem,
                 result.getValue(),
                 null, null, null
             )
         );
+        //remove dynamic params of current config
+        HashMap<String, Object> dynamicParams = new HashMap<>();
+        type.fillDynamicVelocityParams(dynamicParams, issue, customField, fieldLayoutItem);
+        dynamicParams.keySet().forEach(velocityParams::remove);
 
         type.fillStaticVelocityParams(velocityParams);
 
         velocityParams.put("value", result.getValue());
         velocityParams.put("template", configForm.getTemplate());
-        if (result.getVelocityParams() != null) {
+        if (result.getVelocityParams() != null && configForm.isVelocityParamsEnabled()) {
             velocityParams.putAll(result.getVelocityParams());
         }
 
