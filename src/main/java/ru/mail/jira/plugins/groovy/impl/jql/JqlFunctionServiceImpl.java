@@ -13,12 +13,13 @@ import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
 import ru.mail.jira.plugins.groovy.api.repository.JqlFunctionRepository;
 import ru.mail.jira.plugins.groovy.api.service.JqlFunctionService;
 import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.util.*;
 
 @Component
 @ExportAsDevService
-public class JqlFunctionServiceImpl implements JqlFunctionService {
+public class JqlFunctionServiceImpl implements JqlFunctionService, PluginLifecycleAware {
     private static final String LOCK_KEY = "ru.mail.jira.groovy.jqlFunction";
 
     private final ClusterLockService lockService;
@@ -42,6 +43,7 @@ public class JqlFunctionServiceImpl implements JqlFunctionService {
         this.builtInFunctions = builtInFunctions.orElse(ImmutableList.of());
     }
 
+    @Override
     public void onStart() {
         ClusterLock lock = lockService.getLockForName(LOCK_KEY);
 
@@ -59,8 +61,14 @@ public class JqlFunctionServiceImpl implements JqlFunctionService {
         }
     }
 
+    @Override
     public void onStop() {
         moduleManager.unregisterAll();
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 101;
     }
 
     @Override

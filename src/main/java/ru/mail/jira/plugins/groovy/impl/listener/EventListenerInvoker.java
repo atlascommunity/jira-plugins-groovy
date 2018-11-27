@@ -18,11 +18,12 @@ import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.util.Set;
 
 @Component
-public class EventListenerInvoker {
+public class EventListenerInvoker implements PluginLifecycleAware {
     private final Logger logger = LoggerFactory.getLogger(EventListenerInvoker.class);
 
     private final EventPublisher eventPublisher;
@@ -44,12 +45,19 @@ public class EventListenerInvoker {
         this.executionRepository = executionRepository;
     }
 
+    @Override
     public void onStart() {
         eventPublisher.register(this);
     }
 
+    @Override
     public void onStop() {
         eventPublisher.unregister(this);
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 200;
     }
 
     @EventListener

@@ -4,11 +4,9 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.adapter.jackson.ObjectMapper;
 import com.atlassian.jira.cluster.ClusterInfo;
 import com.atlassian.jira.datetime.DateTimeFormatter;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.pocketknife.api.querydsl.DatabaseAccessor;
 import com.atlassian.pocketknife.api.querydsl.util.OnRollback;
-import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.atlassian.util.concurrent.ThreadFactories;
 import com.querydsl.core.types.dsl.*;
 import com.querydsl.sql.SQLExpressions;
@@ -22,6 +20,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.dto.execution.ScriptExecutionDto;
 import ru.mail.jira.plugins.groovy.api.entity.ScriptExecution;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -35,8 +34,7 @@ import static ru.mail.jira.plugins.groovy.util.QueryDslTables.SCRIPT_EXECUTION;
 
 //todo: consider deleting executions when their count > 50
 @Component
-@ExportAsService(LifecycleAware.class)
-public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAware {
+public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifecycleAware {
     private final Logger logger = LoggerFactory.getLogger(ExecutionRepositoryImpl.class);
     private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(
         ThreadFactories.namedThreadFactory("MAILRU_GROOVY_BG_THREAD")
@@ -284,5 +282,10 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, LifecycleAw
     @Override
     public void onStop() {
         executorService.shutdown();
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 1001;
     }
 }

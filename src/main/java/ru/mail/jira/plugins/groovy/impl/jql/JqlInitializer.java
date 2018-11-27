@@ -15,9 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 @Component
-public class JqlInitializer {
+public class JqlInitializer implements PluginLifecycleAware {
     private final Logger logger = LoggerFactory.getLogger(JqlInitializer.class);
 
     private final CustomFieldManager customFieldManager;
@@ -32,6 +33,7 @@ public class JqlInitializer {
         this.managedConfigurationItemService = managedConfigurationItemService;
     }
 
+    @Override
     public void onStart() {
         boolean fieldExists = customFieldManager
             .getCustomFieldObjects()
@@ -68,5 +70,11 @@ public class JqlInitializer {
         }
     }
 
+    @Override
     public void onStop() {}
+
+    @Override
+    public int getInitOrder() {
+        return 100;
+    }
 }

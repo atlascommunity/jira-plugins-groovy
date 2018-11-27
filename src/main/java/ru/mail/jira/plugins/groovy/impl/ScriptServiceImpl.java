@@ -2,7 +2,6 @@ package ru.mail.jira.plugins.groovy.impl;
 
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
-import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
@@ -24,6 +23,7 @@ import ru.mail.jira.plugins.groovy.api.script.binding.BindingProvider;
 import ru.mail.jira.plugins.groovy.api.service.GlobalFunctionManager;
 import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 import ru.mail.jira.plugins.groovy.impl.groovy.*;
 import ru.mail.jira.plugins.groovy.impl.groovy.statik.CompileStaticExtension;
 import ru.mail.jira.plugins.groovy.impl.groovy.statik.DeprecatedAstVisitor;
@@ -40,9 +40,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-@ExportAsService({ScriptService.class, LifecycleAware.class})
+@ExportAsService({ScriptService.class})
 @Component
-public class ScriptServiceImpl implements ScriptService, LifecycleAware {
+public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     private final Logger logger = LoggerFactory.getLogger(ScriptServiceImpl.class);
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock(); //todo: remove?
     private final Map<String, ScriptClosure> globalFunctions = new HashMap<>();
@@ -368,5 +368,10 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
         globalVariables.clear();
         bindingProviders.clear();
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 10;
     }
 }

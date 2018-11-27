@@ -10,7 +10,6 @@ import com.atlassian.plugin.event.events.PluginDisablingEvent;
 import com.atlassian.plugin.event.events.PluginEnabledEvent;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.google.common.primitives.Longs;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,12 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 import ru.mail.jira.plugins.groovy.impl.cf.FieldValueCache;
 import ru.mail.jira.plugins.groovy.impl.groovy.var.GlobalObjectsBindingProvider;
 
 @Component
-@ExportAsService({LifecycleAware.class, ScriptInvalidationService.class})
-public class ScriptInvalidationServiceImpl implements LifecycleAware, ScriptInvalidationService {
+@ExportAsService({ScriptInvalidationService.class})
+public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, ScriptInvalidationService {
     private static final String SCRIPT_INVALIDATION_CHANNEL = "ru.mail.groovy.si";
     private static final String FIELD_INVALIDATION_CHANNEL = "ru.mail.groovy.fi";
     private static final String GLOBAL_OBJECTS_CHANNEL = "ru.mail.groovy.go";
@@ -103,6 +103,11 @@ public class ScriptInvalidationServiceImpl implements LifecycleAware, ScriptInva
         this.clusterMessagingService.unregisterListener(GLOBAL_OBJECTS_CHANNEL, this.messageConsumer);
 
         pluginEventManager.unregister(this);
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 12;
     }
 
     @EventListener

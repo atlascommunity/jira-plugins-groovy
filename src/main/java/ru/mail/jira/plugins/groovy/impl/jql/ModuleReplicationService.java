@@ -2,9 +2,7 @@ package ru.mail.jira.plugins.groovy.impl.jql;
 
 import com.atlassian.jira.cluster.ClusterMessageConsumer;
 import com.atlassian.jira.cluster.ClusterMessagingService;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.google.common.primitives.Ints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
 import ru.mail.jira.plugins.groovy.api.repository.JqlFunctionRepository;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 @Component
-@ExportAsService(LifecycleAware.class)
-public class ModuleReplicationService implements LifecycleAware, ClusterMessageConsumer {
+public class ModuleReplicationService implements PluginLifecycleAware, ClusterMessageConsumer {
     private static final String JQL_CHANNEL = "ru.mail.groovy.jql";
 
     private final Logger logger = LoggerFactory.getLogger(ModuleReplicationService.class);
@@ -43,6 +41,11 @@ public class ModuleReplicationService implements LifecycleAware, ClusterMessageC
     @Override
     public void onStop() {
         clusterMessagingService.unregisterListener(JQL_CHANNEL, this);
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 102;
     }
 
     public void registerModule(int id) {

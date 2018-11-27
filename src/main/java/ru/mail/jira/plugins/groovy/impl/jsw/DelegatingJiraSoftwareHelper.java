@@ -15,14 +15,13 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.events.PluginEnabledEvent;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.Query;
-import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 import ru.mail.jira.plugins.groovy.util.ObjectUtil;
 import ru.mail.jira.plugins.groovy.util.PluginComponentUtil;
 
@@ -30,8 +29,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Component
-@ExportAsService(LifecycleAware.class)
-public class DelegatingJiraSoftwareHelper implements LifecycleAware, JiraSoftwareHelper {
+public class DelegatingJiraSoftwareHelper implements PluginLifecycleAware, JiraSoftwareHelper {
     private static final String GREENHOPPER_KEY = "com.pyxis.greenhopper.jira";
 
     private final Logger logger = LoggerFactory.getLogger(DelegatingJiraSoftwareHelper.class);
@@ -44,7 +42,6 @@ public class DelegatingJiraSoftwareHelper implements LifecycleAware, JiraSoftwar
     public DelegatingJiraSoftwareHelper(@ComponentImport EventPublisher eventPublisher, @ComponentImport PluginAccessor pluginAccessor) {
         this.eventPublisher = eventPublisher;
         this.pluginAccessor = pluginAccessor;
-        this.eventPublisher.register(this);
     }
 
     @EventListener
@@ -59,12 +56,19 @@ public class DelegatingJiraSoftwareHelper implements LifecycleAware, JiraSoftwar
     @Override
     public void onStart() {
         createDelegate(pluginAccessor.getPlugin(GREENHOPPER_KEY));
+
+        this.eventPublisher.register(this);
     }
 
     @Override
     public void onStop() {
         this.eventPublisher.unregister(this);
         logger.info("JSW helper destroyed");
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 0;
     }
 
     private void createDelegate(Plugin plugin) {

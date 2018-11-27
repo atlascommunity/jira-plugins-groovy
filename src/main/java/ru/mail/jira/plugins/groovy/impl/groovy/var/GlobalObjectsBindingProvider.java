@@ -20,7 +20,7 @@ import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
-import ru.mail.jira.plugins.groovy.util.init.PluginLifecycleAware;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -155,6 +155,6 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
     @Override
     public int getInitOrder() {
-        return 0;
+        return 11;
     }
 }
