@@ -41,7 +41,7 @@ import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryParser;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.AbstractCommentQueryFunction;
 import ru.mail.jira.plugins.groovy.util.AntlrUtil;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
-import ru.mail.jira.plugins.groovy.util.compat.JiraCompatibilityHelper;
+import ru.mail.jira.plugins.groovy.util.compat.ArchivingHelper;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -62,7 +62,7 @@ public abstract class AbstractEntityQueryParser {
     private final GroupManager groupManager;
     private final UserManager userManager;
 
-    private final JiraCompatibilityHelper jiraCompatibilityHelper;
+    private final ArchivingHelper archivingHelper;
 
     private final boolean isLocalDate;
     private final String createdField;
@@ -80,7 +80,7 @@ public abstract class AbstractEntityQueryParser {
         UserKeyService userKeyService,
         GroupManager groupManager,
         UserManager userManager,
-        JiraCompatibilityHelper jiraCompatibilityHelper,
+        ArchivingHelper archivingHelper,
         boolean isLocalDate, String createdField, String authorField, String bodyField,
         String levelField, String roleLevelField
     ) {
@@ -93,7 +93,7 @@ public abstract class AbstractEntityQueryParser {
         this.groupManager = groupManager;
         this.userManager = userManager;
 
-        this.jiraCompatibilityHelper = jiraCompatibilityHelper;
+        this.archivingHelper = archivingHelper;
 
         this.isLocalDate = isLocalDate;
         this.createdField = createdField;
@@ -231,7 +231,7 @@ public abstract class AbstractEntityQueryParser {
                     if (role != null) {
                         BooleanQuery projectsQuery = new BooleanQuery();
                         for (Project project : projects) {
-                            if (jiraCompatibilityHelper.isProjectArchived(project)) {
+                            if (archivingHelper.isProjectArchived(project)) {
                                 logger.warn("Project {} is archived", project.getKey());
                                 continue;
                             }

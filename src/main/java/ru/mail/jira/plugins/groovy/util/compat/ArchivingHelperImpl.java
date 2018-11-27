@@ -5,6 +5,6 @@ import com.atlassian.jira.project.Project;
 public class ArchivingHelperImpl implements ArchivingHelper {
     @Override
     public boolean isProjectArchived(Project project) {
-        return false;
+        return project.isArchived();
     }
 }
