@@ -9,17 +9,18 @@ import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class ValuesFunctionAdapter extends ScriptedFunctionAdapter<ScriptedJqlValuesFunction> {
-    public ValuesFunctionAdapter(String key, String functionName, ScriptedJqlValuesFunction delegate) {
-        super(key, functionName, delegate);
+    public ValuesFunctionAdapter(String key, String functionName, Supplier<ScriptedJqlValuesFunction> delegateSupplier) {
+        super(key, functionName, delegateSupplier);
     }
 
     @Nonnull
     @Override
     public List<QueryLiteral> getValues(@Nonnull QueryCreationContext queryCreationContext, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
         return ClassLoaderUtil.runInContext(() ->
-            delegate.getValues(queryCreationContext, functionOperand, terminalClause)
+            getDelegate().getValues(queryCreationContext, functionOperand, terminalClause)
         );
     }
 }

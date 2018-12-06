@@ -20,6 +20,7 @@ import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.JqlFunctionRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
+import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.Const;
@@ -38,6 +39,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
     private final ExecutionRepository executionRepository;
     private final ChangelogHelper changelogHelper;
     private final AuditService auditService;
+    private final SingletonFactory singletonFactory;
 
     @Autowired
     public JqlFunctionRepositoryImpl(
@@ -47,6 +49,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         ExecutionRepository executionRepository,
         ChangelogHelper changelogHelper,
         AuditService auditService,
+        SingletonFactory singletonFactory,
         Optional<List<CustomFunction>> builtInFunctions
     ) {
         this.ao = ao;
@@ -55,6 +58,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         this.executionRepository = executionRepository;
         this.changelogHelper = changelogHelper;
         this.auditService = auditService;
+        this.singletonFactory = singletonFactory;
 
         builtInNames = builtInFunctions
             .map(it -> it
@@ -178,6 +182,12 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
 
         if (!ScriptedJqlFunction.class.isAssignableFrom(functionClass)) {
             throw new ValidationException("Must implement ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction", "scriptBody");
+        }
+
+        try {
+            singletonFactory.getConstructorArguments(functionClass);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException(e.getMessage(), "scriptBody");
         }
     }
 

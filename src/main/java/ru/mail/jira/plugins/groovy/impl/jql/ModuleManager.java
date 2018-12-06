@@ -8,6 +8,7 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.pocketknife.api.querydsl.util.OnRollback;
 import com.google.common.collect.ImmutableMap;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.dom4j.tree.DefaultElement;
@@ -23,9 +24,12 @@ import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlQueryFunction;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlValuesFunction;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
+import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.impl.jql.function.QueryFunctionAdapter;
+import ru.mail.jira.plugins.groovy.impl.jql.function.ScriptedFunctionAdapter;
 import ru.mail.jira.plugins.groovy.impl.jql.function.ValuesFunctionAdapter;
 import ru.mail.jira.plugins.groovy.util.Const;
+import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -33,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 
 @Component
 public class ModuleManager {
@@ -46,6 +51,7 @@ public class ModuleManager {
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final PluginAccessor pluginAccessor;
     private final BundleContext bundleContext;
+    private final SingletonFactory singletonFactory;
     private final ScriptService scriptService;
 
     @Autowired
@@ -53,11 +59,13 @@ public class ModuleManager {
         @ComponentImport JiraAuthenticationContext jiraAuthenticationContext,
         @ComponentImport PluginAccessor pluginAccessor,
         BundleContext bundleContext,
+        SingletonFactory singletonFactory,
         ScriptService scriptService
     ) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.pluginAccessor = pluginAccessor;
         this.bundleContext = bundleContext;
+        this.singletonFactory = singletonFactory;
         this.scriptService = scriptService;
     }
 
@@ -66,26 +74,26 @@ public class ModuleManager {
             Class scriptClass = scriptService.parseClassStatic(script.getScriptBody(), false, ImmutableMap.of());
 
             if (ScriptedJqlFunction.class.isAssignableFrom(scriptClass)) {
-                if (Arrays.stream(scriptClass.getConstructors()).anyMatch(it -> it.getParameterCount() == 0)) {
-                    Object functionInstance = scriptClass.getConstructor().newInstance();
+                Supplier supplier = () -> ClassLoaderUtil.runInContext(
+                    () -> singletonFactory.createInstance(
+                        scriptService.parseClassStatic(script.getScriptBody(), false, ImmutableMap.of())
+                    )
+                );
 
-                    if (functionInstance instanceof ScriptedJqlValuesFunction) {
-                        return new ValuesFunctionAdapter(
-                            getScriptModuleKey(script.getId()),
-                            script.getName(),
-                            (ScriptedJqlValuesFunction) functionInstance
-                        );
-                    } else if (functionInstance instanceof ScriptedJqlQueryFunction) {
-                        return new QueryFunctionAdapter(
-                            getScriptModuleKey(script.getId()),
-                            script.getName(),
-                            (ScriptedJqlQueryFunction) functionInstance
-                        );
-                    } else {
-                        logger.error("Constructed object is not instance of ScriptedJqlFunction {} ({})", script.getName(), script.getId());
-                    }
+                if (ScriptedJqlValuesFunction.class.isAssignableFrom(scriptClass)) {
+                    return new ValuesFunctionAdapter(
+                        getScriptModuleKey(script.getId()),
+                        script.getName(),
+                        supplier
+                    );
+                } else if (ScriptedJqlQueryFunction.class.isAssignableFrom(scriptClass)) {
+                    return new QueryFunctionAdapter(
+                        getScriptModuleKey(script.getId()),
+                        script.getName(),
+                        supplier
+                    );
                 } else {
-                    logger.error("Did not find noargs constructor for {} ({})", script.getName(), script.getId());
+                    logger.error("Constructed object is not instance of ScriptedJqlFunction {} ({})", script.getName(), script.getId());
                 }
             }
         } catch (Exception e) {
@@ -154,11 +162,8 @@ public class ModuleManager {
                     logger.debug("unregistering function with name: {}", functionName);
 
                     CustomFunction function = allFunctions.remove(functionName.toLowerCase());
-                    if (function instanceof ValuesFunctionAdapter) {
-                        ScriptedJqlFunction delegate = ((ValuesFunctionAdapter) function).getDelegate();
-                        if (delegate != null) {
-                            InvokerHelper.removeClass(delegate.getClass());
-                        }
+                    if (function instanceof ScriptedFunctionAdapter) {
+                        ((ScriptedFunctionAdapter) function).reset();
                     }
                 } catch (IllegalStateException e) {
                     logger.debug("already unregistered", e);
@@ -197,6 +202,22 @@ public class ModuleManager {
                     logger.debug("already unregistered", e);
                 } catch (Exception e) {
                     logger.error("unable to unregister {}", serviceRegistration);
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void resetDelegates() {
+        Lock lock = this.lock.readLock();
+
+        lock.lock();
+
+        try {
+            for (CustomFunction function : allFunctions.values()) {
+                if (function instanceof ScriptedFunctionAdapter) {
+                    ((ScriptedFunctionAdapter) function).reset();
                 }
             }
         } finally {

@@ -21,6 +21,7 @@ import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 import ru.mail.jira.plugins.groovy.impl.cf.FieldValueCache;
 import ru.mail.jira.plugins.groovy.impl.groovy.var.GlobalObjectsBindingProvider;
+import ru.mail.jira.plugins.groovy.impl.jql.ModuleManager;
 
 @Component
 @ExportAsService({ScriptInvalidationService.class})
@@ -36,6 +37,7 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
     private final FieldValueCache fieldValueCache;
     private final MessageConsumer messageConsumer;
     private final GlobalObjectsBindingProvider globalObjectsBindingProvider;
+    private final ModuleManager moduleManager;
 
     @Autowired
     public ScriptInvalidationServiceImpl(
@@ -43,13 +45,15 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
         @ComponentImport PluginEventManager pluginEventManager,
         ScriptService scriptService,
         FieldValueCache fieldValueCache,
-        GlobalObjectsBindingProvider globalObjectsBindingProvider
+        GlobalObjectsBindingProvider globalObjectsBindingProvider,
+        ModuleManager moduleManager
     ) {
         this.clusterMessagingService = clusterMessagingService;
         this.pluginEventManager = pluginEventManager;
         this.scriptService = scriptService;
         this.fieldValueCache = fieldValueCache;
         this.globalObjectsBindingProvider = globalObjectsBindingProvider;
+        this.moduleManager = moduleManager;
         this.messageConsumer = new MessageConsumer();
     }
 
@@ -126,9 +130,11 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
     }
 
     private void flushPluginDependenants(Plugin plugin) {
+        logger.info("Flushing dependants for plugin {}", plugin.getKey());
         scriptService.onPluginDisable(plugin);
         globalObjectsBindingProvider.refresh();
-        //todo: invalidate listeners & jql with dependencies on plugins
+        moduleManager.resetDelegates();
+        //todo: invalidate listeners with dependencies on plugins
     }
 
     private class MessageConsumer implements ClusterMessageConsumer {

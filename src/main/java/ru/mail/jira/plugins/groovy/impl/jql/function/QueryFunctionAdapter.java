@@ -13,10 +13,11 @@ import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class QueryFunctionAdapter extends ScriptedFunctionAdapter<ScriptedJqlQueryFunction> implements CustomQueryFunction {
-    public QueryFunctionAdapter(String key, String functionName, ScriptedJqlQueryFunction delegate) {
-        super(key, functionName, delegate);
+    public QueryFunctionAdapter(String key, String functionName, Supplier<ScriptedJqlQueryFunction> delegateSupplier) {
+        super(key, functionName, delegateSupplier);
     }
 
     @Nonnull
@@ -31,7 +32,7 @@ public class QueryFunctionAdapter extends ScriptedFunctionAdapter<ScriptedJqlQue
         if (terminalClause.getOperand() instanceof FunctionOperand) {
             return new QueryFactoryResult(
                 ClassLoaderUtil.runInContext(() ->
-                    delegate.getQuery(queryCreationContext, ((FunctionOperand) terminalClause.getOperand()))
+                    getDelegate().getQuery(queryCreationContext, ((FunctionOperand) terminalClause.getOperand()))
                 ),
                 terminalClause.getOperator() == Operator.NOT_IN
             );
