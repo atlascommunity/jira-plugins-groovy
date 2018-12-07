@@ -14,7 +14,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.apache.lucene.search.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.impl.jql.indexers.ExtraFieldsIndexer;
+import ru.mail.jira.plugins.groovy.impl.jql.indexers.LastUpdatedByIndexer;
 import ru.mail.jira.plugins.groovy.util.compat.ArchivingHelper;
 
 @Component
@@ -41,7 +41,7 @@ public class LastUpdatedQueryParser extends AbstractEntityQueryParser {
             userManager,
             archivingHelper,
             false,
-            null, ExtraFieldsIndexer.LAST_UPDATED_BY_FIELD, null, null, null
+            null, LastUpdatedByIndexer.LAST_UPDATED_BY_FIELD, null, null, null
         );
     }
 

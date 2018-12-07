@@ -1,8 +1,6 @@
 package ru.mail.jira.plugins.groovy.impl.jql.indexers;
 
 import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.changehistory.ChangeHistory;
-import com.atlassian.jira.issue.changehistory.ChangeHistoryManager;
 import com.atlassian.jira.issue.index.indexers.FieldIndexer;
 import com.atlassian.jira.issue.index.indexers.impl.IssueLinkIndexer;
 import com.atlassian.jira.issue.link.Direction;
@@ -14,25 +12,20 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
 import java.util.Collection;
-import java.util.List;
 
 import static com.atlassian.jira.issue.link.Direction.IN;
 import static com.atlassian.jira.issue.link.Direction.OUT;
 
 @Scanned
-public class ExtraFieldsIndexer implements FieldIndexer {
+public class LinksIndexer implements FieldIndexer {
     public static final String LINKS_FIELD = "mrg_links";
-    public static final String LAST_UPDATED_BY_FIELD = "mrg_lastupd";
 
     private final IssueLinkManager issueLinkManager;
-    private final ChangeHistoryManager changeHistoryManager;
 
-    public ExtraFieldsIndexer(
-        @ComponentImport IssueLinkManager issueLinkManager,
-        @ComponentImport ChangeHistoryManager changeHistoryManager
+    public LinksIndexer(
+        @ComponentImport IssueLinkManager issueLinkManager
     ) {
         this.issueLinkManager = issueLinkManager;
-        this.changeHistoryManager = changeHistoryManager;
     }
 
     @Override
@@ -56,18 +49,6 @@ public class ExtraFieldsIndexer implements FieldIndexer {
 
         addLinkField(document, issueLinkManager.getInwardLinks(issueId), IN);
         addLinkField(document, issueLinkManager.getOutwardLinks(issueId), OUT);
-
-        List<ChangeHistory> changeHistories = changeHistoryManager.getChangeHistories(issue);
-
-        if (changeHistories.size() > 0) {
-            ChangeHistory lastHistory = changeHistories.get(changeHistories.size() - 1);
-
-            document.add(new Field(
-                LAST_UPDATED_BY_FIELD,
-                lastHistory.getAuthorKey(),
-                Field.Store.YES, Field.Index.NOT_ANALYZED
-            ));
-        }
     }
 
     private void addLinkField(Document document, Collection<IssueLink> issueLinks, Direction direction) {

@@ -11,7 +11,6 @@ import com.atlassian.jira.issue.customfields.searchers.renderer.CustomFieldRende
 import com.atlassian.jira.issue.customfields.searchers.transformer.CustomFieldInputHelper;
 import com.atlassian.jira.issue.customfields.searchers.transformer.ExactTextCustomFieldSearchInputTransformer;
 import com.atlassian.jira.issue.fields.CustomField;
-import com.atlassian.jira.issue.index.indexers.FieldIndexer;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.search.searchers.information.SearcherInformation;
 import com.atlassian.jira.issue.search.searchers.renderer.SearchRenderer;
@@ -23,7 +22,8 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import ru.mail.jira.plugins.groovy.impl.jql.indexers.ExtraFieldsIndexer;
+import ru.mail.jira.plugins.groovy.impl.jql.indexers.LastUpdatedByIndexer;
+import ru.mail.jira.plugins.groovy.impl.jql.indexers.LinksIndexer;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -56,8 +56,6 @@ public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher 
 
     @Override
     public void init(CustomField field) {
-        FieldIndexer indexer = new ExtraFieldsIndexer(issueLinkManager, changeHistoryManager);
-
         this.customFieldSearcherClauseHandler = new SimpleCustomFieldSearcherClauseHandler(
             new ExactTextCustomFieldValidator(),
             clauseQueryFactory,
@@ -66,7 +64,12 @@ public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher 
         );
 
         this.searcherInformation = new CustomFieldSearcherInformation(
-            field.getId(), field.getNameKey(), ImmutableList.of(indexer), new AtomicReference<>(field)
+            field.getId(), field.getNameKey(),
+            ImmutableList.of(
+                new LastUpdatedByIndexer(changeHistoryManager),
+                new LinksIndexer(issueLinkManager)
+            ),
+            new AtomicReference<>(field)
         );
 
         this.searchInputTransformer = new ExactTextCustomFieldSearchInputTransformer(
