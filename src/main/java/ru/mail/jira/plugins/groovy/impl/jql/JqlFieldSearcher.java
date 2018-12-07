@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.impl.jql;
 
 import com.atlassian.jira.JiraDataTypeImpl;
+import com.atlassian.jira.issue.changehistory.ChangeHistoryManager;
 import com.atlassian.jira.issue.customfields.SingleValueCustomFieldValueProvider;
 import com.atlassian.jira.issue.customfields.searchers.AbstractInitializationCustomFieldSearcher;
 import com.atlassian.jira.issue.customfields.searchers.CustomFieldSearcherClauseHandler;
@@ -22,7 +23,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import ru.mail.jira.plugins.groovy.impl.jql.indexers.CustomIssueLinkIndexer;
+import ru.mail.jira.plugins.groovy.impl.jql.indexers.ExtraFieldsIndexer;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -31,6 +32,7 @@ public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher 
     private final FieldVisibilityManager fieldVisibilityManager;
     private final CustomFieldInputHelper customFieldInputHelper;
     private final IssueLinkManager issueLinkManager;
+    private final ChangeHistoryManager changeHistoryManager;
     private final CustomClauseQueryFactory clauseQueryFactory;
 
     private CustomFieldSearcherClauseHandler customFieldSearcherClauseHandler;
@@ -42,17 +44,19 @@ public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher 
         @ComponentImport FieldVisibilityManager fieldVisibilityManager,
         @ComponentImport CustomFieldInputHelper customFieldInputHelper,
         @ComponentImport IssueLinkManager issueLinkManager,
+        @ComponentImport ChangeHistoryManager changeHistoryManager,
         CustomClauseQueryFactory clauseQueryFactory
     ) {
         this.fieldVisibilityManager = fieldVisibilityManager;
         this.customFieldInputHelper = customFieldInputHelper;
         this.issueLinkManager = issueLinkManager;
+        this.changeHistoryManager = changeHistoryManager;
         this.clauseQueryFactory = clauseQueryFactory;
     }
 
     @Override
     public void init(CustomField field) {
-        FieldIndexer indexer = new CustomIssueLinkIndexer(issueLinkManager);
+        FieldIndexer indexer = new ExtraFieldsIndexer(issueLinkManager, changeHistoryManager);
 
         this.customFieldSearcherClauseHandler = new SimpleCustomFieldSearcherClauseHandler(
             new ExactTextCustomFieldValidator(),

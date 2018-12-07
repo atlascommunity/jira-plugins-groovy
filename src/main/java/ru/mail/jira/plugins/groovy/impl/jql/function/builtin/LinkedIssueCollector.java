@@ -8,7 +8,7 @@ import org.apache.lucene.document.SetBasedFieldSelector;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Scorer;
-import ru.mail.jira.plugins.groovy.impl.jql.indexers.CustomIssueLinkIndexer;
+import ru.mail.jira.plugins.groovy.impl.jql.indexers.ExtraFieldsIndexer;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class LinkedIssueCollector extends Collector {
     private static final FieldSelector fieldSelector = new SetBasedFieldSelector(
-        ImmutableSet.of(DocumentConstants.ISSUE_ID, DocumentConstants.ISSUE_KEY, CustomIssueLinkIndexer.FIELD_KEY),
+        ImmutableSet.of(DocumentConstants.ISSUE_ID, DocumentConstants.ISSUE_KEY, ExtraFieldsIndexer.LINKS_FIELD),
         ImmutableSet.of()
     );
 
@@ -38,7 +38,7 @@ public class LinkedIssueCollector extends Collector {
     public void collect(int i) throws IOException {
         Document document = reader.document(i, fieldSelector);
 
-        for (String value : document.getValues(CustomIssueLinkIndexer.FIELD_KEY)) {
+        for (String value : document.getValues(ExtraFieldsIndexer.LINKS_FIELD)) {
             if (filter.test(value)) {
                 issueIds.add(value.substring(value.indexOf("i:") + 2));
             }
