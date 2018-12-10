@@ -64,10 +64,13 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
         if (getMinimumNumberOfExpectedArguments() == 2) {
             argsOffset = 1;
 
-            Integer maxIterations = Ints.tryParse(args.get(1));
+            String maxIterationsValue = args.get(1);
+            Integer maxIterations = Ints.tryParse(maxIterationsValue);
 
             if (maxIterations == null) {
-                messageSet.addErrorMessage("Not a number - \"" + args.get(1) + "\"");
+                messageSet.addErrorMessage("Not a number - \"" + maxIterationsValue + "\"");
+            } else if (maxIterations < 1) {
+                messageSet.addErrorMessage("Invalid value 0 \"" + maxIterationsValue + "\"");
             }
         }
 
@@ -97,29 +100,17 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
             maxIterations = Ints.tryParse(args.get(1));
         }
 
+        List<String> prefixes = null;
+        BooleanQuery linkQuery = new BooleanQuery();
+
         if (args.size() == (1 + argsOffset)) {
-            BooleanQuery booleanQuery = new BooleanQuery();
-            List<String> prefixes = issueLinkTypeManager
+            prefixes = issueLinkTypeManager
                 .getIssueLinkTypes()
                 .stream()
                 .map(IssueLinkType::getId)
                 .map(IssueLinkIndexer::createValue)
-                .peek(it -> booleanQuery.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, it)), BooleanClause.Occur.SHOULD))
+                .peek(it -> linkQuery.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, it)), BooleanClause.Occur.SHOULD))
                 .collect(Collectors.toList());
-
-            LinkedIssueCollector collector = createCollector(prefixes);
-
-            //initial iteration
-            doSearch(jqlQuery, booleanQuery, collector, user);
-
-            Set<String> result = collector.getIssueIds();
-
-            collectRecursiveLinks(user, prefixes, result, maxIterations);
-
-            return new QueryFactoryResult(
-                new ConstantScoreQuery(new IssueIdFilter(result)),
-                terminalClause.getOperator() == Operator.NOT_IN
-            );
         } else {
             String linkTypeName = args.get(1 + argsOffset);
             Pair<IssueLinkType, LinkDirection> linkType = findLinkType(linkTypeName);
@@ -127,47 +118,41 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
             if (linkType != null) {
                 LinkDirection linkDirection = linkType.right();
 
-                List<String> prefixes = new ArrayList<>();
+                prefixes = new ArrayList<>();
 
-                org.apache.lucene.search.Query query;
                 if (linkDirection == LinkDirection.BOTH) {
-                    BooleanQuery booleanQuery = new BooleanQuery();
-
-                    booleanQuery.add(getQuery(user, linkType.left(), Direction.IN, jqlQuery), BooleanClause.Occur.SHOULD);
-                    booleanQuery.add(getQuery(user, linkType.left(), Direction.OUT, jqlQuery), BooleanClause.Occur.SHOULD);
+                    linkQuery.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.left().getId(), Direction.IN))), BooleanClause.Occur.SHOULD);
+                    linkQuery.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.left().getId(), Direction.OUT))), BooleanClause.Occur.SHOULD);
 
                     prefixes.add(IssueLinkIndexer.createValue(linkType.left().getId()));
-
-                    query = booleanQuery;
                 } else {
                     Direction direction = linkDirection == LinkDirection.IN ? Direction.IN : Direction.OUT;
 
-                    query = getQuery(user, linkType.left(), direction, jqlQuery);
+                    linkQuery.add(
+                        new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.left().getId(), direction))),
+                        BooleanClause.Occur.MUST
+                    );
 
                     prefixes.add(IssueLinkIndexer.createValue(linkType.left().getId(), direction));
                 }
-
-                IssueIdCollector issueIdCollector = new IssueIdCollector();
-
-                IndexSearcher searcher = searchProviderFactory.getSearcher(SearchProviderFactory.ISSUE_INDEX);
-
-                try {
-                    searcher.search(query, issueIdCollector);
-                } catch (IOException e) {
-                    logger.warn("exception while search", e);
-                }
-
-                Set<String> result = issueIdCollector.getIssueIds();
-
-                collectRecursiveLinks(user, prefixes, result, maxIterations);
-
-                return new QueryFactoryResult(new ConstantScoreQuery(new IssueIdFilter(result)), terminalClause.getOperator() == Operator.NOT_IN);
             } else {
                 logger.error("Link type \"{}\" wasn't found", linkTypeName);
             }
         }
 
-        return QueryFactoryResult.createFalseResult();
+        LinkedIssueCollector collector = createCollector(prefixes);
+
+        //initial iteration
+        doSearch(jqlQuery, linkQuery, collector, user);
+
+        Set<String> result = collector.getIssueIds();
+
+        collectRecursiveLinks(linkQuery, user, prefixes, result, maxIterations);
+
+        return new QueryFactoryResult(
+            new ConstantScoreQuery(new IssueIdFilter(result)),
+            terminalClause.getOperator() == Operator.NOT_IN
+        );
     }
 
     private LinkedIssueCollector createCollector(List<String> prefixes) {
@@ -181,7 +166,7 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
         });
     }
 
-    private void collectRecursiveLinks(ApplicationUser user, List<String> prefixes, Set<String> result, int maxIterations) {
+    private void collectRecursiveLinks(org.apache.lucene.search.Query linksQuery, ApplicationUser user, List<String> prefixes, Set<String> result, int maxIterations) {
         Set<String> nextIssueIds = result;
 
         int iteration = 1;
@@ -191,7 +176,12 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
             }
 
             LinkedIssueCollector iterationCollector = createCollector(prefixes);
-            doSearch(JqlQueryBuilder.newBuilder().buildQuery(), new ConstantScoreQuery(new IssueIdFilter(nextIssueIds)), iterationCollector, user);
+
+            BooleanQuery query = new BooleanQuery();
+            query.add(new ConstantScoreQuery(new IssueIdFilter(nextIssueIds)), BooleanClause.Occur.MUST);
+            query.add(linksQuery, BooleanClause.Occur.MUST);
+
+            doSearch(JqlQueryBuilder.newBuilder().buildQuery(), query, iterationCollector, user);
 
             nextIssueIds = iterationCollector.getIssueIds();
             //remove all previously found issues to avoid infinite loop when there's cycled dependency
