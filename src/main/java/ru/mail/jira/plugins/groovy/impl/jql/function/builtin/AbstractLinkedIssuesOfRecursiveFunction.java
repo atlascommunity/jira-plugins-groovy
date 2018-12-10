@@ -9,6 +9,7 @@ import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.SearchProviderFactory;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
+import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
@@ -113,7 +114,7 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
 
             Set<String> result = collector.getIssueIds();
 
-            collectRecursiveLinks(booleanQuery, prefixes, result, maxIterations);
+            collectRecursiveLinks(user, prefixes, result, maxIterations);
 
             return new QueryFactoryResult(
                 new ConstantScoreQuery(new IssueIdFilter(result)),
@@ -158,7 +159,7 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
 
                 Set<String> result = issueIdCollector.getIssueIds();
 
-                collectRecursiveLinks(new MatchAllDocsQuery(), prefixes, result, maxIterations);
+                collectRecursiveLinks(user, prefixes, result, maxIterations);
 
                 return new QueryFactoryResult(new ConstantScoreQuery(new IssueIdFilter(result)), terminalClause.getOperator() == Operator.NOT_IN);
             } else {
@@ -180,28 +181,23 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
         });
     }
 
-    private void collectRecursiveLinks(org.apache.lucene.search.Query query, List<String> prefixes, Set<String> result, int maxIterations) {
+    private void collectRecursiveLinks(ApplicationUser user, List<String> prefixes, Set<String> result, int maxIterations) {
         Set<String> nextIssueIds = result;
-
-        IndexSearcher searcher = searchProviderFactory.getSearcher(SearchProviderFactory.ISSUE_INDEX);
 
         int iteration = 1;
         while (true) {
-            LinkedIssueCollector iterationCollector = createCollector(prefixes);
-            try {
-                searcher.search(query, new IssueIdFilter(nextIssueIds), iterationCollector);
-            } catch (IOException e) {
-                logger.warn("Exception while search", e);
+            if (nextIssueIds.size() == 0 || iteration++ == maxIterations) {
+                break;
             }
+
+            LinkedIssueCollector iterationCollector = createCollector(prefixes);
+            doSearch(JqlQueryBuilder.newBuilder().buildQuery(), new ConstantScoreQuery(new IssueIdFilter(nextIssueIds)), iterationCollector, user);
 
             nextIssueIds = iterationCollector.getIssueIds();
             //remove all previously found issues to avoid infinite loop when there's cycled dependency
             nextIssueIds.removeAll(result);
 
             result.addAll(nextIssueIds);
-            if (nextIssueIds.size() == 0 || iteration++ == maxIterations) {
-                break;
-            }
         }
     }
 
