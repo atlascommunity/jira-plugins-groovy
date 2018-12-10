@@ -1,10 +1,8 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.link.Direction;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
-import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
@@ -25,12 +23,11 @@ public abstract class AbstractEpicFunction extends AbstractIssueLinkFunction {
 
     protected AbstractEpicFunction(
         IssueLinkTypeManager issueLinkTypeManager,
-        SearchProvider searchProvider,
-        SearchService searchService,
         PluginAccessor pluginAccessor,
+        SearchHelper searchHelper,
         String functionName, int minimumArgs
     ) {
-        super(issueLinkTypeManager, searchProvider, searchService, functionName, minimumArgs);
+        super(issueLinkTypeManager, searchHelper, functionName, minimumArgs);
 
         this.pluginAccessor = pluginAccessor;
     }
@@ -46,7 +43,7 @@ public abstract class AbstractEpicFunction extends AbstractIssueLinkFunction {
             return QueryFactoryResult.createFalseResult();
         }
 
-        Query jqlQuery = getQuery(user, args.get(0));
+        Query jqlQuery = searchHelper.getQuery(user, args.get(0));
 
         if (jqlQuery == null) {
             return QueryFactoryResult.createFalseResult();
@@ -60,7 +57,7 @@ public abstract class AbstractEpicFunction extends AbstractIssueLinkFunction {
         }
 
         return new QueryFactoryResult(
-            getQuery(user, epicLinkType, getDirection(), jqlQuery),
+            getQuery(epicLinkType, getDirection(), jqlQuery, queryCreationContext),
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }
@@ -87,7 +84,7 @@ public abstract class AbstractEpicFunction extends AbstractIssueLinkFunction {
             messageSet.addErrorMessage("Epic link type doesn't exist");
         }
 
-        validateJql(messageSet, user, functionOperand.getArgs().get(0));
+        searchHelper.validateJql(messageSet, user, functionOperand.getArgs().get(0));
     }
 
     @Nonnull

@@ -1,12 +1,10 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.index.indexers.impl.IssueLinkIndexer;
 import com.atlassian.jira.issue.link.Direction;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
-import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
@@ -38,17 +36,16 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
     @Autowired
     public LinkedIssuesOfFunction(
         @ComponentImport IssueLinkTypeManager issueLinkTypeManager,
-        @ComponentImport SearchProvider searchProvider,
-        @ComponentImport SearchService searchService
+        SearchHelper searchHelper
     ) {
-        super(issueLinkTypeManager, searchProvider, searchService, "linkedIssuesOf", 1);
+        super(issueLinkTypeManager, searchHelper, "linkedIssuesOf", 1);
     }
 
     @Override
     protected void validate(MessageSet messageSet, ApplicationUser applicationUser, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
         List<String> args = functionOperand.getArgs();
 
-        validateJql(messageSet, applicationUser, args.get(0));
+        searchHelper.validateJql(messageSet, applicationUser, args.get(0));
 
         if (args.size() == 2) {
             validateLinkType(messageSet, args.get(1));
@@ -62,7 +59,7 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
         FunctionOperand operand = (FunctionOperand) terminalClause.getOperand();
         List<String> args = operand.getArgs();
 
-        Query jqlQuery = getQuery(user, args.get(0));
+        Query jqlQuery = searchHelper.getQuery(user, args.get(0));
 
         if (jqlQuery == null) {
             return QueryFactoryResult.createFalseResult();
@@ -87,7 +84,7 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
                 return false;
             });
 
-            doSearch(jqlQuery, booleanQuery, collector, user);
+            searchHelper.doSearch(jqlQuery, booleanQuery, collector, queryCreationContext);
 
             return new QueryFactoryResult(
                 new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())),
@@ -104,12 +101,12 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
                 if (linkDirection == LinkDirection.BOTH) {
                     BooleanQuery booleanQuery = new BooleanQuery();
 
-                    booleanQuery.add(getQuery(user, linkType.left(), Direction.IN, jqlQuery), BooleanClause.Occur.SHOULD);
-                    booleanQuery.add(getQuery(user, linkType.left(), Direction.OUT, jqlQuery), BooleanClause.Occur.SHOULD);
+                    booleanQuery.add(getQuery(linkType.left(), Direction.IN, jqlQuery, queryCreationContext), BooleanClause.Occur.SHOULD);
+                    booleanQuery.add(getQuery(linkType.left(), Direction.OUT, jqlQuery, queryCreationContext), BooleanClause.Occur.SHOULD);
 
                     result = booleanQuery;
                 } else {
-                    result = getQuery(user, linkType.left(), linkDirection == LinkDirection.IN ? Direction.IN : Direction.OUT, jqlQuery);
+                    result = getQuery(linkType.left(), linkDirection == LinkDirection.IN ? Direction.IN : Direction.OUT, jqlQuery, queryCreationContext);
                 }
 
                 return new QueryFactoryResult(result, terminalClause.getOperator() == Operator.NOT_IN);

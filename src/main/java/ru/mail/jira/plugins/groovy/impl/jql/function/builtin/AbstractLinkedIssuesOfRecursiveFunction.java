@@ -1,13 +1,10 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.index.indexers.impl.IssueLinkIndexer;
 import com.atlassian.jira.issue.link.Direction;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
-import com.atlassian.jira.issue.search.SearchProvider;
-import com.atlassian.jira.issue.search.SearchProviderFactory;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.jql.operand.QueryLiteral;
@@ -27,10 +24,8 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mail.jira.plugins.groovy.util.lucene.IssueIdCollector;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -39,25 +34,19 @@ import java.util.stream.Collectors;
 public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIssueLinkFunction {
     private final Logger logger = LoggerFactory.getLogger(AbstractLinkedIssuesOfRecursiveFunction.class);
 
-    private final SearchProviderFactory searchProviderFactory;
-
     public AbstractLinkedIssuesOfRecursiveFunction(
         @ComponentImport IssueLinkTypeManager issueLinkTypeManager,
-        @ComponentImport SearchProvider searchProvider,
-        @ComponentImport SearchService searchService,
-        @ComponentImport SearchProviderFactory searchProviderFactory,
+        SearchHelper searchHelper,
         String functionName, int minimumArgs
     ) {
-        super(issueLinkTypeManager, searchProvider, searchService, functionName, minimumArgs);
-        this.searchProviderFactory = searchProviderFactory;
+        super(issueLinkTypeManager, searchHelper, functionName, minimumArgs);
     }
 
     @Override
     protected void validate(MessageSet messageSet, ApplicationUser applicationUser, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
         List<String> args = functionOperand.getArgs();
 
-        validateJql(messageSet, applicationUser, args.get(0));
-
+        searchHelper.validateJql(messageSet, applicationUser, args.get(0));
 
         int argsOffset = 0;
 
@@ -86,7 +75,7 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
         FunctionOperand operand = (FunctionOperand) terminalClause.getOperand();
         List<String> args = operand.getArgs();
 
-        Query jqlQuery = getQuery(user, args.get(0));
+        Query jqlQuery = searchHelper.getQuery(user, args.get(0));
 
         if (jqlQuery == null) {
             return QueryFactoryResult.createFalseResult();
@@ -143,11 +132,11 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
         LinkedIssueCollector collector = createCollector(prefixes);
 
         //initial iteration
-        doSearch(jqlQuery, linkQuery, collector, user);
+        searchHelper.doSearch(jqlQuery, linkQuery, collector, queryCreationContext);
 
         Set<String> result = collector.getIssueIds();
 
-        collectRecursiveLinks(linkQuery, user, prefixes, result, maxIterations);
+        collectRecursiveLinks(linkQuery, prefixes, result, queryCreationContext, maxIterations);
 
         return new QueryFactoryResult(
             new ConstantScoreQuery(new IssueIdFilter(result)),
@@ -166,7 +155,7 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
         });
     }
 
-    private void collectRecursiveLinks(org.apache.lucene.search.Query linksQuery, ApplicationUser user, List<String> prefixes, Set<String> result, int maxIterations) {
+    private void collectRecursiveLinks(org.apache.lucene.search.Query linksQuery, List<String> prefixes, Set<String> result, QueryCreationContext qcc, int maxIterations) {
         Set<String> nextIssueIds = result;
 
         int iteration = 1;
@@ -181,7 +170,7 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
             query.add(new ConstantScoreQuery(new IssueIdFilter(nextIssueIds)), BooleanClause.Occur.MUST);
             query.add(linksQuery, BooleanClause.Occur.MUST);
 
-            doSearch(JqlQueryBuilder.newBuilder().buildQuery(), query, iterationCollector, user);
+            searchHelper.doSearch(JqlQueryBuilder.newBuilder().buildQuery(), query, iterationCollector, qcc);
 
             nextIssueIds = iterationCollector.getIssueIds();
             //remove all previously found issues to avoid infinite loop when there's cycled dependency

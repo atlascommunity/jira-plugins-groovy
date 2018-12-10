@@ -1,12 +1,9 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.bc.project.component.ProjectComponentManager;
 import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.index.DocumentConstants;
-import com.atlassian.jira.issue.search.SearchException;
-import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.constants.SystemSearchConstants;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.ClauseInformation;
@@ -52,28 +49,25 @@ import java.util.stream.Collectors;
 public class IssueFieldMatch extends AbstractBuiltInQueryFunction {
     private final Logger logger = LoggerFactory.getLogger(IssueFieldMatch.class);
     private final FieldManager fieldManager;
-    private final SearchProvider searchProvider;
-    private final SearchService searchService;
     private final VersionManager versionManager;
     private final ProjectComponentManager projectComponentManager;
     private final ProjectManager projectManager;
+    private final SearchHelper searchHelper;
 
     @Autowired
     public IssueFieldMatch(
         @ComponentImport FieldManager fieldManager,
-        @ComponentImport SearchProvider searchProvider,
-        @ComponentImport SearchService searchService,
         @ComponentImport VersionManager versionManager,
         @ComponentImport ProjectComponentManager projectComponentManager,
-        @ComponentImport ProjectManager projectManager
+        @ComponentImport ProjectManager projectManager,
+        SearchHelper searchHelper
     ) {
         super("issueFieldMatch", 3);
         this.fieldManager = fieldManager;
-        this.searchProvider = searchProvider;
-        this.searchService = searchService;
         this.versionManager = versionManager;
         this.projectComponentManager = projectComponentManager;
         this.projectManager = projectManager;
+        this.searchHelper = searchHelper;
     }
 
     @Nonnull
@@ -87,11 +81,7 @@ public class IssueFieldMatch extends AbstractBuiltInQueryFunction {
         FunctionOperand operand = (FunctionOperand) terminalClause.getOperand();
         List<String> args = operand.getArgs();
 
-        Query query = getQuery(applicationUser, args.get(0), messageSet);
-
-        if (query == null) {
-            return;
-        }
+        searchHelper.validateJql(messageSet, applicationUser, args.get(0));
 
         Field field = fieldManager.getField(args.get(1));
 
@@ -118,7 +108,7 @@ public class IssueFieldMatch extends AbstractBuiltInQueryFunction {
         String field = args.get(1);
         String patternString = args.get(2);
 
-        Query query = getQuery(user, queryString, null);
+        Query query = searchHelper.getQuery(user, queryString);
 
         if (query == null) {
             logger.warn("invalid query");
@@ -168,48 +158,24 @@ public class IssueFieldMatch extends AbstractBuiltInQueryFunction {
                 booleanQuery.add(new TermQuery(new Term(indexField, entityId)), BooleanClause.Occur.SHOULD);
             }
 
-            IssueIdCollector issueIdCollector = new IssueIdCollector();
+            IssueIdCollector collector = new IssueIdCollector();
 
-            try {
-                searchProvider.search(query, user, issueIdCollector, booleanQuery);
-            } catch (SearchException e) {
-                logger.error("Caught exception while searching", e);
-            }
+            searchHelper.doSearch(query, booleanQuery, collector, queryCreationContext);
 
             return new QueryFactoryResult(
-                new ConstantScoreQuery(new IssueIdFilter(issueIdCollector.getIssueIds())),
+                new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())),
                 terminalClause.getOperator() == Operator.NOT_IN
             );
         }
 
         PatternCollector collector = new PatternCollector(pattern, indexField);
 
-        try {
-            searchProvider.search(query, user, collector);
-        } catch (SearchException e) {
-            logger.warn("Caught exception while searching", e);
-        }
+        searchHelper.doSearch(query, new MatchAllDocsQuery(), collector, queryCreationContext);
 
         return new QueryFactoryResult(
             new ConstantScoreQuery(new IssueIdFilter(collector.issueIds)),
             terminalClause.getOperator() == Operator.NOT_IN
         );
-    }
-
-    private Query getQuery(ApplicationUser user, String queryString, MessageSet messageSet) {
-        SearchService.ParseResult queryResult = searchService.parseQuery(user, queryString);
-
-        if (!queryResult.isValid()) {
-            if (messageSet != null) {
-                messageSet.addMessageSet(queryResult.getErrors());
-            } else {
-                logger.error("\"{}\" query is not valid {}", queryString, queryResult.getErrors());
-            }
-
-            return null;
-        }
-
-        return queryResult.getQuery();
     }
 
     private static class PatternCollector extends Collector {

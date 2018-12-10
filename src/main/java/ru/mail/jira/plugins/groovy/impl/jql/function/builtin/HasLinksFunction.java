@@ -1,12 +1,10 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.index.indexers.impl.IssueLinkIndexer;
 import com.atlassian.jira.issue.link.Direction;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
-import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
@@ -38,10 +36,9 @@ public class HasLinksFunction extends AbstractIssueLinkFunction {
     @Autowired
     public HasLinksFunction(
         @ComponentImport IssueLinkTypeManager issueLinkTypeManager,
-        @ComponentImport SearchProvider searchProvider,
-        @ComponentImport SearchService searchService
+        SearchHelper searchHelper
     ) {
-        super(issueLinkTypeManager, searchProvider, searchService, "hasLinks", 0);
+        super(issueLinkTypeManager, searchHelper, "hasLinks", 0);
     }
 
     @Nonnull

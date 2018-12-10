@@ -2,8 +2,6 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.index.DocumentConstants;
-import com.atlassian.jira.issue.search.SearchException;
-import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.SearchProviderFactory;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
@@ -38,22 +36,22 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
     private final Logger logger = LoggerFactory.getLogger(LastCommentFunction.class);
     private final QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator;
     private final SearchProviderFactory searchProviderFactory;
-    private final SearchProvider searchProvider;
     private final SearchService searchService;
+    private final SearchHelper searchHelper;
 
     @Autowired
     public LastCommentFunction(
         @ComponentImport SearchProviderFactory searchProviderFactory,
-        @ComponentImport SearchProvider searchProvider,
         @ComponentImport SearchService searchService,
         CommentQueryParser commentQueryParser,
-        QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator
+        QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator,
+        SearchHelper searchHelper
     ) {
         super(commentQueryParser, "lastComment", 1);
         this.searchProviderFactory = searchProviderFactory;
-        this.searchProvider = searchProvider;
         this.searchService = searchService;
         this.queryPermissionDecorator = queryPermissionDecorator;
+        this.searchHelper = searchHelper;
     }
 
     @Override
@@ -96,11 +94,8 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
                 com.atlassian.query.Query issueQuery = getQuery(user, queryString, null);
 
                 IssueIdCollector issueIdCollector = new IssueIdCollector();
-                try {
-                    searchProvider.search(issueQuery, user, issueIdCollector);
-                } catch (SearchException e) {
-                    logger.error("caught exception while searching", e);
-                }
+
+                searchHelper.doSearch(issueQuery, new MatchAllDocsQuery(), issueIdCollector, queryCreationContext);
 
                 String[] issueIds = issueIdCollector.getIssueIds().toArray(new String[0]);
                 if (issueIds.length > 0) {

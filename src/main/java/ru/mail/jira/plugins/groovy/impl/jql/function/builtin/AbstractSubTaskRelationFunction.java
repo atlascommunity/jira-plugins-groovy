@@ -1,11 +1,9 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.link.Direction;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
-import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
@@ -23,13 +21,13 @@ import java.util.List;
 public abstract class AbstractSubTaskRelationFunction extends AbstractSubTaskFunction {
     protected AbstractSubTaskRelationFunction(
         IssueLinkTypeManager issueLinkTypeManager,
-        SearchProvider searchProvider,
-        SearchService searchService,
         SubTaskManager subTaskManager,
+        SearchHelper searchHelper,
         String functionName
     ) {
         super(
-            issueLinkTypeManager, searchProvider, searchService, subTaskManager, functionName, 1
+            issueLinkTypeManager, subTaskManager, searchHelper,
+            functionName, 1
         );
     }
 
@@ -37,7 +35,7 @@ public abstract class AbstractSubTaskRelationFunction extends AbstractSubTaskFun
     protected void validate(MessageSet messageSet, ApplicationUser user, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
         validateSubTask(messageSet);
 
-        validateJql(messageSet, user, functionOperand.getArgs().get(0));
+        searchHelper.validateJql(messageSet, user, functionOperand.getArgs().get(0));
     }
 
     @Nonnull
@@ -52,7 +50,7 @@ public abstract class AbstractSubTaskRelationFunction extends AbstractSubTaskFun
             return QueryFactoryResult.createFalseResult();
         }
 
-        Query jqlQuery = getQuery(user, args.get(0));
+        Query jqlQuery = searchHelper.getQuery(user, args.get(0));
 
         if (jqlQuery == null) {
             return QueryFactoryResult.createFalseResult();
@@ -66,7 +64,7 @@ public abstract class AbstractSubTaskRelationFunction extends AbstractSubTaskFun
         }
 
         return new QueryFactoryResult(
-            getQuery(user, subTaskLinkType, getDirection(), jqlQuery),
+            getQuery(subTaskLinkType, getDirection(), jqlQuery, queryCreationContext),
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }

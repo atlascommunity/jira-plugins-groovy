@@ -3,8 +3,6 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin.jsw;
 import com.atlassian.greenhopper.model.rapid.RapidView;
 import com.atlassian.greenhopper.service.sprint.Sprint;
 import com.atlassian.jira.issue.fields.CustomField;
-import com.atlassian.jira.issue.search.SearchException;
-import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.jql.operand.QueryLiteral;
@@ -12,7 +10,6 @@ import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import com.atlassian.query.operator.Operator;
@@ -23,6 +20,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.AbstractBuiltInQueryFunction;
+import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.SearchHelper;
 import ru.mail.jira.plugins.groovy.impl.jsw.JiraSoftwareHelper;
 
 import javax.annotation.Nonnull;
@@ -31,19 +29,18 @@ import java.util.*;
 public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQueryFunction {
     private final Logger logger = LoggerFactory.getLogger(AbstractSprintHistoryFunction.class);
 
-    private final SearchProvider searchProvider;
     private final JiraSoftwareHelper jiraSoftwareHelper;
+    private final SearchHelper searchHelper;
     private final boolean added;
 
     public AbstractSprintHistoryFunction(
-        @ComponentImport SearchProvider searchProvider,
         JiraSoftwareHelper jiraSoftwareHelper,
-        String functionName,
-        boolean added
+        SearchHelper searchHelper,
+        String functionName, boolean added
     ) {
         super(functionName, 1);
-        this.searchProvider = searchProvider;
         this.jiraSoftwareHelper = jiraSoftwareHelper;
+        this.searchHelper = searchHelper;
         this.added = added;
     }
 
@@ -138,11 +135,8 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
         }
 
         SprintHistoryCollector collector = new SprintHistoryCollector(sprintField, startDates, added);
-        try {
-            searchProvider.search(rapidViewQuery, user, collector, luceneQuery);
-        } catch (SearchException e) {
-            logger.error("error while searching", e);
-        }
+
+        searchHelper.doSearch(rapidViewQuery, luceneQuery, collector, queryCreationContext);
 
         return new QueryFactoryResult(
             new ConstantScoreQuery(new IssueIdFilter(collector.getIssues())),

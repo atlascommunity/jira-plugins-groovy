@@ -3,7 +3,6 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 import com.atlassian.core.util.DateUtils;
 import com.atlassian.core.util.DurationUtils;
 import com.atlassian.core.util.InvalidDurationException;
-import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.config.LocaleManager;
 import com.atlassian.jira.datetime.LocalDate;
 import com.atlassian.jira.issue.CustomFieldManager;
@@ -12,8 +11,6 @@ import com.atlassian.jira.issue.fields.DateField;
 import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.index.DocumentConstants;
-import com.atlassian.jira.issue.search.SearchException;
-import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
@@ -72,27 +69,24 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
 
     private final FieldManager fieldManager;
     private final LocaleManager localeManager;
-    private final SearchService searchService;
-    private final SearchProvider searchProvider;
     private final TimeZoneManager timeZoneManager;
     private final CustomFieldManager customFieldManager;
+    private final SearchHelper searchHelper;
 
     @Autowired
     public DateCompareFunction(
         @ComponentImport FieldManager fieldManager,
         @ComponentImport LocaleManager localeManager,
-        @ComponentImport SearchService searchService,
-        @ComponentImport SearchProvider searchProvider,
         @ComponentImport TimeZoneManager timeZoneManager,
-        @ComponentImport CustomFieldManager customFieldManager
+        @ComponentImport CustomFieldManager customFieldManager,
+        SearchHelper searchHelper
     ) {
         super("dateCompare", 2);
         this.fieldManager = fieldManager;
         this.localeManager = localeManager;
-        this.searchService = searchService;
-        this.searchProvider = searchProvider;
         this.timeZoneManager = timeZoneManager;
         this.customFieldManager = customFieldManager;
+        this.searchHelper = searchHelper;
     }
 
     @Override
@@ -102,11 +96,7 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
         String queryString = args.get(0);
         String compareQueryString = args.get(1);
 
-        SearchService.ParseResult parseResult = searchService.parseQuery(user, queryString);
-
-        if (!parseResult.isValid()) {
-            messageSet.addMessageSet(parseResult.getErrors());
-        }
+        searchHelper.validateJql(messageSet, user, queryString);
 
         parseQuery(messageSet, user, compareQueryString);
     }
@@ -123,14 +113,7 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
         String queryString = args.get(0);
         String compareQueryString = args.get(1);
 
-        SearchService.ParseResult parseResult = searchService.parseQuery(user, queryString);
-
-        if (!parseResult.isValid()) {
-            logger.error("invalid query \"{}\": ", queryString, parseResult.getErrors());
-            return QueryFactoryResult.createFalseResult();
-        }
-
-        Query query = parseResult.getQuery();
+        Query query = searchHelper.getQuery(user, queryString);
 
         DateCompareQuery dateCompareQuery = parseQuery(messageSet, user, compareQueryString);
 
@@ -158,11 +141,7 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
             BooleanClause.Occur.MUST
         );
 
-        try {
-            searchProvider.search(query, user, collector, luceneQuery);
-        } catch (SearchException e) {
-            logger.error("caught exception while searching", e);
-        }
+        searchHelper.doSearch(query, luceneQuery, collector, queryCreationContext);
 
         return new QueryFactoryResult(
             new ConstantScoreQuery(new IssueIdFilter(collector.issueIds)),

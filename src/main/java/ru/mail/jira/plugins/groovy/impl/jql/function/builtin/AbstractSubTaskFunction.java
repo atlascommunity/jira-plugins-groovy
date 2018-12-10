@@ -1,10 +1,8 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
-import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.util.MessageSet;
 
 public abstract class AbstractSubTaskFunction extends AbstractIssueLinkFunction {
@@ -12,12 +10,11 @@ public abstract class AbstractSubTaskFunction extends AbstractIssueLinkFunction 
 
     protected AbstractSubTaskFunction(
         IssueLinkTypeManager issueLinkTypeManager,
-        SearchProvider searchProvider,
-        SearchService searchService,
         SubTaskManager subTaskManager,
+        SearchHelper searchHelper,
         String functionName, int minimumArgs
     ) {
-        super(issueLinkTypeManager, searchProvider, searchService, functionName, minimumArgs);
+        super(issueLinkTypeManager, searchHelper, functionName, minimumArgs);
         this.subTaskManager = subTaskManager;
     }
 

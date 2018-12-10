@@ -1,13 +1,11 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.index.indexers.impl.IssueLinkIndexer;
 import com.atlassian.jira.issue.link.Direction;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
-import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
@@ -31,12 +29,11 @@ public class HasSubTasksFunction extends AbstractSubTaskFunction {
     @Autowired
     protected HasSubTasksFunction(
         @ComponentImport IssueLinkTypeManager issueLinkTypeManager,
-        @ComponentImport SearchProvider searchProvider,
-        @ComponentImport SearchService searchService,
-        @ComponentImport SubTaskManager subTaskManager
+        @ComponentImport SubTaskManager subTaskManager,
+        SearchHelper searchHelper
     ) {
         super(
-            issueLinkTypeManager, searchProvider, searchService, subTaskManager,
+            issueLinkTypeManager, subTaskManager, searchHelper,
             "hasSubTasks", 0
         );
     }
