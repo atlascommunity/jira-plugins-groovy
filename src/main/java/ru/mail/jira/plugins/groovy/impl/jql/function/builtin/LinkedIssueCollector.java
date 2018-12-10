@@ -1,29 +1,23 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.jira.issue.index.DocumentConstants;
-import com.google.common.collect.ImmutableSet;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.SetBasedFieldSelector;
+import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.issue.search.JiraDocValues;
+import com.atlassian.jira.issue.search.ReaderCache;
+import com.atlassian.jira.issue.search.parameters.lucene.JiraBytesRef;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Scorer;
 import ru.mail.jira.plugins.groovy.impl.jql.indexers.LinksIndexer;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 public class LinkedIssueCollector extends Collector {
-    private static final FieldSelector fieldSelector = new SetBasedFieldSelector(
-        ImmutableSet.of(DocumentConstants.ISSUE_ID, DocumentConstants.ISSUE_KEY, LinksIndexer.LINKS_FIELD),
-        ImmutableSet.of()
-    );
-
     private final Set<String> issueIds = new HashSet<>();
     private final Filter filter;
 
-    private IndexReader reader;
+    private final ReaderCache readerCache = ComponentAccessor.getComponent(ReaderCache.class);
+    private JiraDocValues docValues;
 
     public LinkedIssueCollector(Filter filter) {
         this.filter = filter;
@@ -35,10 +29,11 @@ public class LinkedIssueCollector extends Collector {
     }
 
     @Override
-    public void collect(int i) throws IOException {
-        Document document = reader.document(i, fieldSelector);
+    public void collect(int i) {
+        JiraBytesRef[] values = this.docValues.getDocValues(i);
 
-        for (String value : document.getValues(LinksIndexer.LINKS_FIELD)) {
+        for (JiraBytesRef byteValue : values) {
+            String value = byteValue.utf8ToString();
             if (filter.test(value)) {
                 issueIds.add(value.substring(value.indexOf("i:") + 2));
             }
@@ -47,7 +42,7 @@ public class LinkedIssueCollector extends Collector {
 
     @Override
     public void setNextReader(IndexReader indexReader, int docBase) {
-        this.reader = indexReader;
+        docValues = readerCache.getDocValues(indexReader, LinksIndexer.LINKS_FIELD);
     }
 
     @Override
