@@ -9,6 +9,10 @@ import net.java.ao.schema.Unique;
 
 @Table("FIELD_CONFIG")
 public interface FieldScript extends Entity {
+    @StringLength(StringLength.UNLIMITED)
+    void setDescription(String description);
+    String getDescription();
+
     @NotNull
     @Unique
     Long getFieldConfigId();

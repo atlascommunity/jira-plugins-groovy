@@ -66,6 +66,7 @@ public class FieldConfigDaoImpl implements FieldConfigDao {
             new DBParam("FIELD_CONFIG_ID", configId),
             new DBParam("UUID", UUID.randomUUID().toString()),
             new DBParam("SCRIPT_BODY", form.getScriptBody()),
+            new DBParam("DESCRIPTION", form.getDescription()),
             new DBParam("CACHEABLE", form.isCacheable()),
             new DBParam("TEMPLATE", form.getTemplate()),
             new DBParam("VELOCITY_PARAMS_ENABLED", form.isVelocityParamsEnabled())
@@ -114,6 +115,7 @@ public class FieldConfigDaoImpl implements FieldConfigDao {
 
         fieldScript.setCacheable(form.isCacheable());
         fieldScript.setScriptBody(form.getScriptBody());
+        fieldScript.setDescription(form.getDescription());
         fieldScript.setUuid(UUID.randomUUID().toString());
         fieldScript.setTemplate(form.getTemplate());
         fieldScript.setVelocityParamsEnabled(form.isVelocityParamsEnabled());

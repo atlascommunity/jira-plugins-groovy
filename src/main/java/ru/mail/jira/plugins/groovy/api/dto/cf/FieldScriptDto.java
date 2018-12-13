@@ -17,6 +17,8 @@ public class FieldScriptDto {
     @XmlElement
     private String scriptBody;
     @XmlElement
+    private String description;
+    @XmlElement
     private String template;
     @XmlElement
     private boolean cacheable;

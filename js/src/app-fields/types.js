@@ -5,6 +5,7 @@ import type {ChangelogType} from '../common/script/types';
 export type FieldConfig = {
     id: number,
     name: string,
+    description: ?string,
     uuid: string,
     customFieldName: string,
     contextName: string,

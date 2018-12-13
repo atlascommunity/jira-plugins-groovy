@@ -37,6 +37,7 @@ const bindings = [ Bindings.issue ];
 const bindingsWithVelocity = [ Bindings.issue, Bindings.velocityParams ];
 
 type Form = {|
+    description: ?string,
     comment: string,
     scriptBody: string,
     cacheable: boolean,
@@ -47,6 +48,7 @@ type Form = {|
 type FormFieldType = $Keys<Form>;
 
 const makeForm: RecordFactory<Form> = Record({
+    description: '',
     comment: '',
     scriptBody: '',
     template: '',
@@ -81,6 +83,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
         this.state = {
             values: makeForm({
                 scriptBody: fieldConfig.scriptBody,
+                description: fieldConfig.description,
                 cacheable: fieldConfig.cacheable,
                 template: fieldConfig.template || '',
                 velocityParamsEnabled: fieldConfig.velocityParamsEnabled,
@@ -222,6 +225,24 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                 <Prompt when={isModified && !waiting} message="Are you sure you want to leave?"/>
 
                 <div className="flex-column">
+
+                    <FormField
+                        label={FieldMessages.description}
+
+                        isInvalid={errorField === 'description'}
+                        invalidMessage={errorMessage || ''}
+                    >
+                        <FieldTextAreaStateless
+                            shouldFitContainer={true}
+                            minimumRows={5}
+
+                            disabled={waiting}
+
+                            value={values.get('description') || ''}
+                            onChange={this._setTextValue('description')}
+                        />
+                    </FormField>
+
                     <FormField
                         label={FieldMessages.options}
 

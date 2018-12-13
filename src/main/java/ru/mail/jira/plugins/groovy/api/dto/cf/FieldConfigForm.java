@@ -13,6 +13,8 @@ import java.util.Objects;
 @XmlRootElement
 public class FieldConfigForm {
     @XmlElement
+    private String description;
+    @XmlElement
     private String scriptBody;
     @XmlElement
     private String template;

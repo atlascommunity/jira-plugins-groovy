@@ -44,6 +44,7 @@ export class FieldScript extends React.PureComponent<Props> {
                     name: script.name,
                     inline: true,
                     scriptBody: script.scriptBody,
+                    description: script.description,
                     changelogs: script.changelogs,
                     errorCount: script.errorCount,
                     warningCount: script.warningCount

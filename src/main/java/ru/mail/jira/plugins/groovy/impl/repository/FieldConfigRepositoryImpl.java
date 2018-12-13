@@ -169,6 +169,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
         return new FieldScriptDto(
             fieldScript.getUuid(),
             fieldScript.getScriptBody(),
+            fieldScript.getDescription(),
             fieldScript.getTemplate(),
             fieldScript.getCacheable(),
             fieldScript.isVelocityParamsEnabled()
@@ -180,6 +181,14 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
+        }
+
+        String description = StringUtils.trimToNull(form.getDescription());
+        form.setDescription(description);
+        if (description != null) {
+            if (form.getDescription().length() > 10000) {
+                throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.valueTooLong"), "description");
+            }
         }
 
         String comment = StringUtils.trimToNull(form.getComment());
@@ -245,6 +254,7 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             result.setScriptBody(fieldScript.getScriptBody());
             result.setUuid(fieldScript.getUuid());
             result.setFieldScriptId(fieldScript.getID());
+            result.setDescription(fieldScript.getDescription());
 
             if (isTemplated) {
                 result.setTemplate(fieldScript.getTemplate());
