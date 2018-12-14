@@ -203,12 +203,23 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
 
         logger.debug("created class");
 
-        HashMap<String, Object> bindings = new HashMap<>(externalBindings);
-        bindings.put("scriptType", type);
+        HashMap<String, Object> bindings = new HashMap<>();
 
         for (BindingProvider bindingProvider : bindingProviders) {
             bindingProvider.getBindings().forEach((name, value) -> bindings.put(name, value.getValue(scriptId)));
         }
+
+        bindings.put("scriptType", type);
+
+        for (Map.Entry<String, ScriptClosure> entry : globalFunctions.entrySet()) {
+            bindings.put(entry.getKey(), entry.getValue());
+        }
+
+        for (Map.Entry<String, BindingDescriptor> entry : globalVariables.entrySet()) {
+            bindings.put(entry.getKey(), entry.getValue().getValue(scriptId));
+        }
+
+        bindings.putAll(externalBindings);
 
         for (ScriptInjection injection : compiledScript.getParseContext().getInjections()) {
             if (injection.getPlugin() != null) {
@@ -228,14 +239,6 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
             }
 
             throw new RuntimeException("Unable to resolve injection: " + injection);
-        }
-
-        for (Map.Entry<String, ScriptClosure> entry : globalFunctions.entrySet()) {
-            bindings.put(entry.getKey(), entry.getValue());
-        }
-
-        for (Map.Entry<String, BindingDescriptor> entry : globalVariables.entrySet()) {
-            bindings.put(entry.getKey(), entry.getValue().getValue(scriptId));
         }
 
         logger.debug("initialized bindings");

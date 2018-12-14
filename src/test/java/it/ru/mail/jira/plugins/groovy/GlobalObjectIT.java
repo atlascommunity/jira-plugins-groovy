@@ -33,7 +33,9 @@ import static org.junit.Assert.assertThat;
 @RunWith(Arquillian.class)
 public class GlobalObjectIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
-        "tests/go/GlobalObject"
+        "tests/go/GlobalObject",
+        "tests/go/admin-param-go",
+        "tests/go/injection-go"
     );
 
     @Inject
@@ -183,5 +185,36 @@ public class GlobalObjectIT {
         Object result = scriptService.executeScriptStatic(null, globalObjectName + ".class", ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
 
         assertEquals(binding.getType(), result);
+    }
+
+    @Test
+    public void shouldNotBreakParams() throws Exception {
+        createObject(nonUniqueForm());
+
+        Object result = scriptService.executeScript(
+            null,
+            FileUtil.readArquillianExample("tests/go/admin-param-go").replaceAll("\\$goName", globalObjectName),
+            ScriptType.ADMIN_SCRIPT,
+            ImmutableMap.of(globalObjectName, userHelper.getUser("testUser123"))
+        );
+
+        assertEquals("testUser123", result);
+    }
+
+    @Test
+    public void shouldNotBreakInjections() throws Exception {
+        createObject(nonUniqueForm());
+
+        Object result = userHelper.runAsUser(
+            userHelper.getUser("testUser123"),
+            () -> scriptService.executeScript(
+                null,
+                FileUtil.readArquillianExample("tests/go/injection-go").replaceAll("\\$goName", globalObjectName),
+                ScriptType.ADMIN_SCRIPT,
+                ImmutableMap.of()
+            )
+        );
+
+        assertEquals("testUser123", result);
     }
 }
