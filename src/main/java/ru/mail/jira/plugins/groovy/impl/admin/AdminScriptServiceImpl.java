@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.groovy.impl.admin;
 
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +100,7 @@ public class AdminScriptServiceImpl implements AdminScriptService {
 
         Map<String, Object> result = new HashMap<>();
         for (ScriptParamDto param : params) {
-            result.put(param.getName(), scriptParamFactory.getParamObject(param, rawValues.get(param.getName())));
+            result.put(param.getName(), scriptParamFactory.getParamObject(param, StringUtils.trimToNull(rawValues.get(param.getName()))));
         }
         return result;
     }
