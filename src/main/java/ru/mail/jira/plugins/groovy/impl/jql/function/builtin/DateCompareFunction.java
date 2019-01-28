@@ -11,13 +11,11 @@ import com.atlassian.jira.issue.fields.DateField;
 import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.index.DocumentConstants;
-import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
 import com.atlassian.jira.timezone.TimeZoneManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.util.LuceneUtils;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -33,8 +31,6 @@ import lombok.Getter;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.SetBasedFieldSelector;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
@@ -46,6 +42,7 @@ import ru.mail.jira.plugins.groovy.impl.jql.antlr.*;
 import ru.mail.jira.plugins.groovy.util.AntlrUtil;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.FieldUtil;
+import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -127,7 +124,7 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
             timeZoneManager.getTimeZoneforUser(user).toZoneId()
         );
 
-        BooleanQuery luceneQuery = new BooleanQuery();
+        BooleanQuery.Builder luceneQuery = new BooleanQuery.Builder();
         luceneQuery.add(
             new TermQuery(new Term(
                 DocumentConstants.ISSUE_NON_EMPTY_FIELD_IDS, dateCompareQuery.getLeftField()
@@ -141,10 +138,10 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
             BooleanClause.Occur.MUST
         );
 
-        searchHelper.doSearch(query, luceneQuery, collector, queryCreationContext);
+        searchHelper.doSearch(query, luceneQuery.build(), collector, queryCreationContext);
 
         return new QueryFactoryResult(
-            new ConstantScoreQuery(new IssueIdFilter(collector.issueIds)),
+            QueryUtil.createIssueIdQuery(collector.issueIds),
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }

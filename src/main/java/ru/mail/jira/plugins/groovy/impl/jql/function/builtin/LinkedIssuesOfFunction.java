@@ -5,7 +5,6 @@ import com.atlassian.jira.issue.index.indexers.impl.IssueLinkIndexer;
 import com.atlassian.jira.issue.link.Direction;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
-import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
@@ -66,7 +65,7 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
         }
 
         if (args.size() == 1) {
-            BooleanQuery booleanQuery = new BooleanQuery();
+            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
             List<String> prefixes = issueLinkTypeManager
                 .getIssueLinkTypes()
                 .stream()
@@ -84,7 +83,7 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
                 return false;
             });
 
-            searchHelper.doSearch(jqlQuery, booleanQuery, collector, queryCreationContext);
+            searchHelper.doSearch(jqlQuery, booleanQuery.build(), collector, queryCreationContext);
 
             return new QueryFactoryResult(
                 new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())),
@@ -99,12 +98,12 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
 
                 org.apache.lucene.search.Query result;
                 if (linkDirection == LinkDirection.BOTH) {
-                    BooleanQuery booleanQuery = new BooleanQuery();
+                    BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
 
                     booleanQuery.add(getQuery(linkType.left(), Direction.IN, jqlQuery, queryCreationContext), BooleanClause.Occur.SHOULD);
                     booleanQuery.add(getQuery(linkType.left(), Direction.OUT, jqlQuery, queryCreationContext), BooleanClause.Occur.SHOULD);
 
-                    result = booleanQuery;
+                    result = booleanQuery.build();
                 } else {
                     result = getQuery(linkType.left(), linkDirection == LinkDirection.IN ? Direction.IN : Direction.OUT, jqlQuery, queryCreationContext);
                 }

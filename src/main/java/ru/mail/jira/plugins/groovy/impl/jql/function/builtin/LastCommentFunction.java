@@ -3,12 +3,8 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.search.SearchProviderFactory;
-import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
-import com.atlassian.jira.jql.query.QueryCreationContext;
-import com.atlassian.jira.jql.query.QueryCreationContextImpl;
-import com.atlassian.jira.jql.query.QueryFactoryResult;
-import com.atlassian.jira.jql.query.QueryProjectRoleAndGroupPermissionsDecorator;
+import com.atlassian.jira.jql.query.*;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -35,6 +31,7 @@ import java.util.*;
 public class LastCommentFunction extends AbstractCommentQueryFunction {
     private final Logger logger = LoggerFactory.getLogger(LastCommentFunction.class);
     private final QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator;
+    private final IssueIdJoinQueryFactory issueIdJoinQueryFactory;
     private final SearchProviderFactory searchProviderFactory;
     private final SearchService searchService;
     private final SearchHelper searchHelper;
@@ -45,12 +42,14 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         @ComponentImport SearchService searchService,
         CommentQueryParser commentQueryParser,
         QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator,
+        @ComponentImport IssueIdJoinQueryFactory issueIdJoinQueryFactory,
         SearchHelper searchHelper
     ) {
         super(commentQueryParser, "lastComment", 1);
         this.searchProviderFactory = searchProviderFactory;
         this.searchService = searchService;
         this.queryPermissionDecorator = queryPermissionDecorator;
+        this.issueIdJoinQueryFactory = issueIdJoinQueryFactory;
         this.searchHelper = searchHelper;
     }
 
@@ -85,7 +84,7 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
 
         logger.debug("starting search");
 
-        Filter filter = null;
+        Query joinQuery = null;
         if (withSubquery) {
             String queryString = StringUtils.trimToEmpty(args.get(0));
 
@@ -99,7 +98,7 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
 
                 String[] issueIds = issueIdCollector.getIssueIds().toArray(new String[0]);
                 if (issueIds.length > 0) {
-                    filter = new FieldCacheTermsFilter(DocumentConstants.ISSUE_ID, issueIds);
+                    joinQuery = new FieldCacheTermsFilter(DocumentConstants.ISSUE_ID, issueIds);
                 } else {
                     return QueryFactoryResult.createFalseResult();
                 }
@@ -116,7 +115,7 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
                     queryCreationContext,
                     DocumentConstants.COMMENT_LEVEL, DocumentConstants.COMMENT_LEVEL_ROLE
                 ),
-                filter, lastCommentIdCollector
+                joinQuery, lastCommentIdCollector
             );
         } catch (IOException e) {
             logger.error("caught exception while searching", e);
