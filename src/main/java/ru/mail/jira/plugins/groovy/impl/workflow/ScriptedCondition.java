@@ -37,7 +37,7 @@ public class ScriptedCondition extends AbstractJiraCondition {
         if (result instanceof Boolean) {
             return (boolean) result;
         } else {
-            logger.error("Script condition must return boolean value");
+            logger.warn("Script condition {} must return boolean value", script.getId() != null ? script.getId() : script.getUuid());
         }
 
         return false;
