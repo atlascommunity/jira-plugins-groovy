@@ -152,6 +152,13 @@ public class WorkflowHelper {
                 type,
                 bindings
             );
+
+            if (type == ScriptType.WORKFLOW_CONDITION) {
+                if (!(result instanceof Boolean)) {
+                    result = false;
+                    throw new RuntimeException("Condition must return boolean type");
+                }
+            }
         } catch (WorkflowException e) {
             rethrow = e;
         } catch (Exception e) {
