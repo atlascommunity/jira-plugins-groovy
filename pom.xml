@@ -206,7 +206,7 @@
         <dependency>
             <groupId>com.atlassian.pocketknife</groupId>
             <artifactId>atlassian-pocketknife-querydsl</artifactId>
-            <version>4.4.1</version>
+            <version>5.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>
