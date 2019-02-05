@@ -341,6 +341,7 @@
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             <!-- spring imports -->
                             org.springframework.aop,
+                            org.springframework.core,
                             <!-- jira stuff -->
                             com.atlassian.jira.plugin.webfragment.conditions,
                             com.atlassian.jira.issue.customfields.searchers,

@@ -33,7 +33,7 @@ public class WorkLoggedFunction extends AbstractBuiltInQueryFunction {
 
     @Autowired
     public WorkLoggedFunction(
-        @ComponentImport IssueIdJoinQueryFactory issueIdJoinQueryFactory,
+        IssueIdJoinQueryFactory issueIdJoinQueryFactory,
         WorkLogQueryParser workLogQueryParser
     ) {
         super("workLogged", 1);

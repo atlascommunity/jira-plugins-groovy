@@ -28,4 +28,8 @@
             <value>com.atlassian.jira.jql.operand.JqlOperandResolver</value>
         </osgi:interfaces>
     </osgi:reference>
+
+    <bean class="com.atlassian.jira.jql.query.IssueIdJoinQueryFactory">
+        <constructor-arg index="0" ref="searchProviderFactory"/>
+    </bean>
 </beans>
