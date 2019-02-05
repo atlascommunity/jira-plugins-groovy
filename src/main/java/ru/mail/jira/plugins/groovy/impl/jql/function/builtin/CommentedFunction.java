@@ -1,7 +1,6 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
 import com.atlassian.jira.issue.search.SearchProviderFactory;
-import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryCreationContextImpl;
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.CommentQueryParser;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.QueryParseResult;
 import ru.mail.jira.plugins.groovy.util.lucene.IssueIdCollector;
+import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class CommentedFunction extends AbstractCommentQueryFunction {
         }
 
         return new QueryFactoryResult(
-            new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())),
+            QueryUtil.createIssueIdQuery(collector.getIssueIds()),
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }

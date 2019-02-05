@@ -3,7 +3,6 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin.jsw;
 import com.atlassian.greenhopper.model.rapid.RapidView;
 import com.atlassian.greenhopper.service.sprint.Sprint;
 import com.atlassian.jira.issue.fields.CustomField;
-import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
@@ -22,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.AbstractBuiltInQueryFunction;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.SearchHelper;
 import ru.mail.jira.plugins.groovy.impl.jsw.JiraSoftwareHelper;
+import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -111,7 +111,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
         Query luceneQuery = null;
 
         if (args.size() == 1) {
-            BooleanQuery sprintsQuery = new BooleanQuery();
+            BooleanQuery.Builder sprintsQuery = new BooleanQuery.Builder();
 
             for (Sprint sprint : jiraSoftwareHelper.findActiveSprintsByBoard(user, rapidView)) {
                 if (sprint.getStartDate() != null) {
@@ -121,7 +121,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
                 }
             }
 
-            luceneQuery = sprintsQuery;
+            luceneQuery = sprintsQuery.build();
         } else if (args.size() == 2) {
             Optional<Sprint> sprint = jiraSoftwareHelper.findSprint(user, rapidView, args.get(1));
 
@@ -139,7 +139,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
         searchHelper.doSearch(rapidViewQuery, luceneQuery, collector, queryCreationContext);
 
         return new QueryFactoryResult(
-            new ConstantScoreQuery(new IssueIdFilter(collector.getIssues())),
+            QueryUtil.createIssueIdQuery(collector.getIssues()),
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }

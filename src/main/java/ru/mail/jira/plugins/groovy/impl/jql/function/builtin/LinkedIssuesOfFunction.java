@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -86,7 +87,7 @@ public class LinkedIssuesOfFunction extends AbstractIssueLinkFunction {
             searchHelper.doSearch(jqlQuery, booleanQuery.build(), collector, queryCreationContext);
 
             return new QueryFactoryResult(
-                new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())),
+                QueryUtil.createIssueIdQuery(collector.getIssueIds()),
                 terminalClause.getOperator() == Operator.NOT_IN
             );
         } else {

@@ -1,10 +1,11 @@
 package ru.mail.jira.plugins.groovy.util.lucene;
 
 import com.atlassian.jira.issue.index.DocumentConstants;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.FieldCache;
+import org.apache.lucene.index.DocValues;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.search.Scorer;
+import org.apache.lucene.search.SimpleCollector;
 
 import java.io.IOException;
 import java.util.Set;
@@ -12,12 +13,11 @@ import java.util.TreeSet;
 
 /**
  * Collect Issue Ids for subquery searchers. Pretty much copy of Jira's IssueIdCollector
- *
- * @since v6.1
  */
-public class IssueIdCollector extends Collector {
+//todo: maybe implement collector for documents where issueId isn't DocValues
+public class IssueIdCollector extends SimpleCollector {
     private Set<String> issueIds;
-    private String[] docIdToIssueId;
+    private SortedDocValues docValues;
 
     public IssueIdCollector() {
         this.issueIds = new TreeSet<>();
@@ -28,21 +28,23 @@ public class IssueIdCollector extends Collector {
     }
 
     @Override
-    public void collect(final int docId) {
-        issueIds.add(docIdToIssueId[docId]);
-    }
-
-    @Override
-    public void setNextReader(final IndexReader reader, final int docBase) throws IOException {
-        docIdToIssueId = FieldCache.DEFAULT.getStrings(reader, DocumentConstants.ISSUE_ID);
-    }
-
-    @Override
-    public boolean acceptsDocsOutOfOrder() {
-        return true;
+    public void collect(final int docId) throws IOException {
+        if (docValues.advanceExact(docId)) {
+            issueIds.add(docValues.binaryValue().utf8ToString());
+        }
     }
 
     public Set<String> getIssueIds() {
         return issueIds;
+    }
+
+    @Override
+    protected void doSetNextReader(LeafReaderContext context) throws IOException {
+        docValues = DocValues.getSorted(context.reader(), DocumentConstants.ISSUE_ID);
+    }
+
+    @Override
+    public boolean needsScores() {
+        return false;
     }
 }

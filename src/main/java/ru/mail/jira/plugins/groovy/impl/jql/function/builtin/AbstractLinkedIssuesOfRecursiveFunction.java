@@ -5,7 +5,6 @@ import com.atlassian.jira.issue.index.indexers.impl.IssueLinkIndexer;
 import com.atlassian.jira.issue.link.Direction;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
-import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
@@ -24,6 +23,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
         }
 
         List<String> prefixes = null;
-        BooleanQuery linkQuery = new BooleanQuery();
+        BooleanQuery.Builder linkQueryBuilder = new BooleanQuery.Builder();
 
         if (args.size() == (1 + argsOffset)) {
             prefixes = issueLinkTypeManager
@@ -98,7 +98,7 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
                 .stream()
                 .map(IssueLinkType::getId)
                 .map(IssueLinkIndexer::createValue)
-                .peek(it -> linkQuery.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, it)), BooleanClause.Occur.SHOULD))
+                .peek(it -> linkQueryBuilder.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, it)), BooleanClause.Occur.SHOULD))
                 .collect(Collectors.toList());
         } else {
             String linkTypeName = args.get(1 + argsOffset);
@@ -110,14 +110,14 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
                 prefixes = new ArrayList<>();
 
                 if (linkDirection == LinkDirection.BOTH) {
-                    linkQuery.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.left().getId(), Direction.IN))), BooleanClause.Occur.SHOULD);
-                    linkQuery.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.left().getId(), Direction.OUT))), BooleanClause.Occur.SHOULD);
+                    linkQueryBuilder.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.left().getId(), Direction.IN))), BooleanClause.Occur.SHOULD);
+                    linkQueryBuilder.add(new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.left().getId(), Direction.OUT))), BooleanClause.Occur.SHOULD);
 
                     prefixes.add(IssueLinkIndexer.createValue(linkType.left().getId()));
                 } else {
                     Direction direction = linkDirection == LinkDirection.IN ? Direction.IN : Direction.OUT;
 
-                    linkQuery.add(
+                    linkQueryBuilder.add(
                         new TermQuery(new Term(DocumentConstants.ISSUE_LINKS, IssueLinkIndexer.createValue(linkType.left().getId(), direction))),
                         BooleanClause.Occur.MUST
                     );
@@ -131,6 +131,8 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
 
         LinkedIssueCollector collector = createCollector(prefixes);
 
+        BooleanQuery linkQuery = linkQueryBuilder.build();
+
         //initial iteration
         searchHelper.doSearch(jqlQuery, linkQuery, collector, queryCreationContext);
 
@@ -139,7 +141,7 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
         collectRecursiveLinks(linkQuery, prefixes, result, queryCreationContext, maxIterations);
 
         return new QueryFactoryResult(
-            new ConstantScoreQuery(new IssueIdFilter(result)),
+            QueryUtil.createIssueIdQuery(result),
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }
@@ -166,11 +168,11 @@ public abstract class AbstractLinkedIssuesOfRecursiveFunction extends AbstractIs
 
             LinkedIssueCollector iterationCollector = createCollector(prefixes);
 
-            BooleanQuery query = new BooleanQuery();
-            query.add(new ConstantScoreQuery(new IssueIdFilter(nextIssueIds)), BooleanClause.Occur.MUST);
+            BooleanQuery.Builder query = new BooleanQuery.Builder();
+            query.add(QueryUtil.createIssueIdQuery(nextIssueIds), BooleanClause.Occur.MUST);
             query.add(linksQuery, BooleanClause.Occur.MUST);
 
-            searchHelper.doSearch(JqlQueryBuilder.newBuilder().buildQuery(), query, iterationCollector, qcc);
+            searchHelper.doSearch(JqlQueryBuilder.newBuilder().buildQuery(), query.build(), iterationCollector, qcc);
 
             nextIssueIds = iterationCollector.getIssueIds();
             //remove all previously found issues to avoid infinite loop when there's cycled dependency

@@ -3,6 +3,7 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.search.SearchProviderFactory;
+import com.atlassian.jira.issue.statistics.util.FieldDocumentHitCollector;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.*;
 import com.atlassian.jira.user.ApplicationUser;
@@ -12,8 +13,9 @@ import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.CommentQueryParser;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.QueryParseResult;
 import ru.mail.jira.plugins.groovy.util.lucene.IssueIdCollector;
+import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -31,7 +34,6 @@ import java.util.*;
 public class LastCommentFunction extends AbstractCommentQueryFunction {
     private final Logger logger = LoggerFactory.getLogger(LastCommentFunction.class);
     private final QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator;
-    private final IssueIdJoinQueryFactory issueIdJoinQueryFactory;
     private final SearchProviderFactory searchProviderFactory;
     private final SearchService searchService;
     private final SearchHelper searchHelper;
@@ -42,14 +44,12 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         @ComponentImport SearchService searchService,
         CommentQueryParser commentQueryParser,
         QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator,
-        @ComponentImport IssueIdJoinQueryFactory issueIdJoinQueryFactory,
         SearchHelper searchHelper
     ) {
         super(commentQueryParser, "lastComment", 1);
         this.searchProviderFactory = searchProviderFactory;
         this.searchService = searchService;
         this.queryPermissionDecorator = queryPermissionDecorator;
-        this.issueIdJoinQueryFactory = issueIdJoinQueryFactory;
         this.searchHelper = searchHelper;
     }
 
@@ -96,9 +96,9 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
 
                 searchHelper.doSearch(issueQuery, new MatchAllDocsQuery(), issueIdCollector, queryCreationContext);
 
-                String[] issueIds = issueIdCollector.getIssueIds().toArray(new String[0]);
-                if (issueIds.length > 0) {
-                    joinQuery = new FieldCacheTermsFilter(DocumentConstants.ISSUE_ID, issueIds);
+                Set<String> issueIds = issueIdCollector.getIssueIds();
+                if (issueIds.size() > 0) {
+                    joinQuery = QueryUtil.createIssueIdQuery(issueIds);
                 } else {
                     return QueryFactoryResult.createFalseResult();
                 }
@@ -110,28 +110,31 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         LastCommentIdCollector lastCommentIdCollector = new LastCommentIdCollector();
 
         try {
-            searcher.search(
-                queryPermissionDecorator.createPermissionQuery(
-                    queryCreationContext,
-                    DocumentConstants.COMMENT_LEVEL, DocumentConstants.COMMENT_LEVEL_ROLE
-                ),
-                joinQuery, lastCommentIdCollector
+            Query query;
+
+            Query permissionQuery = queryPermissionDecorator.createPermissionQuery(
+                queryCreationContext,
+                DocumentConstants.COMMENT_LEVEL, DocumentConstants.COMMENT_LEVEL_ROLE
             );
+
+            if (joinQuery != null) {
+                query = new BooleanQuery.Builder()
+                    .add(permissionQuery, BooleanClause.Occur.MUST)
+                    .add(joinQuery, BooleanClause.Occur.MUST)
+                    .build();
+            } else {
+                query = permissionQuery;
+            }
+            searcher.search(query, lastCommentIdCollector);
         } catch (IOException e) {
             logger.error("caught exception while searching", e);
         }
 
-        String[] commentIds = lastCommentIdCollector
-            .lastCommentIds
-            .values()
-            .stream()
-            .distinct()
-            .map(String::valueOf)
-            .toArray(String[]::new);
+        Set<String> commentIds = new HashSet<>(lastCommentIdCollector.lastCommentIds.values());
 
-        logger.debug("collected last comments: {}", commentIds.length);
+        logger.debug("collected last comments: {}", commentIds.size());
 
-        if (commentIds.length == 0) {
+        if (commentIds.size() == 0) {
             return QueryFactoryResult.createFalseResult();
         }
 
@@ -144,12 +147,17 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
 
         logger.debug("constructed comment query");
 
+        BooleanQuery commentQuery = new BooleanQuery
+            .Builder()
+            .add(parseResult.getQuery(), BooleanClause.Occur.MUST)
+            .add(QueryUtil.createMultiTermQuery(DocumentConstants.COMMENT_ID, commentIds), BooleanClause.Occur.MUST)
+            .build();
+
         IssueIdCollector collector = new IssueIdCollector();
 
         try {
             searcher.search(
-                parseResult.getQuery(),
-                new FieldCacheTermsFilter(DocumentConstants.COMMENT_ID, commentIds),
+                commentQuery,
                 collector
             );
         } catch (IOException e) {
@@ -159,7 +167,7 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         logger.debug("search complete");
 
         return new QueryFactoryResult(
-            new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())),
+            QueryUtil.createIssueIdQuery(collector.getIssueIds()),
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }
@@ -186,21 +194,20 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         return queryResult.getQuery();
     }
 
-    private class LastCommentIdCollector extends Collector {
+    private class LastCommentIdCollector extends FieldDocumentHitCollector {
         private Map<String, String> lastCommentIds = new HashMap<>();
         private Map<String, String> lastDates = new HashMap<>();
-        private String[] issueIds;
-        private String[] commentIds;
-        private String[] commentDates;
 
         @Override
-        public void setScorer(Scorer scorer) {}
+        protected Set<String> getFieldsToLoad() {
+            return ImmutableSet.of(DocumentConstants.ISSUE_ID, DocumentConstants.COMMENT_ID, DocumentConstants.COMMENT_CREATED);
+        }
 
         @Override
-        public void collect(int i) {
-            String issue = issueIds[i];
-            String commentId = commentIds[i];
-            String date = commentDates[i];
+        public void collect(Document document) {
+            String issue = document.get(DocumentConstants.ISSUE_ID);
+            String commentId = document.get(DocumentConstants.COMMENT_ID);
+            String date = document.get(DocumentConstants.COMMENT_CREATED);
 
             String lastDate = lastDates.get(issue);
 
@@ -208,18 +215,6 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
                 lastCommentIds.put(issue, commentId);
                 lastDates.put(issue, date);
             }
-        }
-
-        @Override
-        public void setNextReader(IndexReader indexReader, int i) throws IOException {
-            issueIds = FieldCache.DEFAULT.getStrings(indexReader, DocumentConstants.ISSUE_ID);
-            commentIds = FieldCache.DEFAULT.getStrings(indexReader, DocumentConstants.COMMENT_ID);
-            commentDates = FieldCache.DEFAULT.getStrings(indexReader, DocumentConstants.COMMENT_CREATED);
-        }
-
-        @Override
-        public boolean acceptsDocsOutOfOrder() {
-            return true;
         }
     }
 }

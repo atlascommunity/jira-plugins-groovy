@@ -1,53 +1,33 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.issue.search.JiraDocValues;
-import com.atlassian.jira.issue.search.ReaderCache;
-import com.atlassian.jira.issue.search.parameters.lucene.JiraBytesRef;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.Scorer;
+import com.atlassian.jira.issue.statistics.util.FieldDocumentHitCollector;
+import com.google.common.collect.ImmutableSet;
+import org.apache.lucene.document.Document;
 import ru.mail.jira.plugins.groovy.impl.jql.indexers.LinksIndexer;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class LinkedIssueCollector extends Collector {
+public class LinkedIssueCollector extends FieldDocumentHitCollector {
     private final Set<String> issueIds = new HashSet<>();
     private final Filter filter;
-
-    private final ReaderCache readerCache = ComponentAccessor.getComponent(ReaderCache.class);
-    private JiraDocValues docValues;
 
     public LinkedIssueCollector(Filter filter) {
         this.filter = filter;
     }
 
     @Override
-    public void setScorer(Scorer scorer) {
-
+    protected Set<String> getFieldsToLoad() {
+        return ImmutableSet.of(LinksIndexer.LINKS_FIELD);
     }
 
     @Override
-    public void collect(int i) {
-        JiraBytesRef[] values = this.docValues.getDocValues(i);
-
-        for (JiraBytesRef byteValue : values) {
-            String value = byteValue.utf8ToString();
+    public void collect(Document document) {
+        for (String value : document.getValues(LinksIndexer.LINKS_FIELD)) {
             if (filter.test(value)) {
                 issueIds.add(value.substring(value.indexOf("i:") + 2));
             }
         }
-    }
-
-    @Override
-    public void setNextReader(IndexReader indexReader, int docBase) {
-        docValues = readerCache.getDocValues(indexReader, LinksIndexer.LINKS_FIELD);
-    }
-
-    @Override
-    public boolean acceptsDocsOutOfOrder() {
-        return true;
     }
 
     public Set<String> getIssueIds() {

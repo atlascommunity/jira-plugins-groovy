@@ -3,23 +3,25 @@ package ru.mail.jira.plugins.groovy.impl.jql.indexers;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.changehistory.ChangeHistory;
 import com.atlassian.jira.issue.changehistory.ChangeHistoryManager;
-import com.atlassian.jira.issue.index.indexers.FieldIndexer;
+import com.atlassian.jira.issue.index.indexers.impl.UserFieldIndexer;
+import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 
 import java.util.List;
 
 @Scanned
-public class LastUpdatedByIndexer implements FieldIndexer {
+public class LastUpdatedByIndexer extends UserFieldIndexer {
     public static final String LAST_UPDATED_BY_FIELD = "mrg_lastupd";
 
     private final ChangeHistoryManager changeHistoryManager;
 
     public LastUpdatedByIndexer(
-        @ComponentImport ChangeHistoryManager changeHistoryManager
+        @ComponentImport ChangeHistoryManager changeHistoryManager,
+        @ComponentImport FieldVisibilityManager fieldVisibilityManager
     ) {
+        super(fieldVisibilityManager);
         this.changeHistoryManager = changeHistoryManager;
     }
 
@@ -46,11 +48,7 @@ public class LastUpdatedByIndexer implements FieldIndexer {
             ChangeHistory lastHistory = changeHistories.get(changeHistories.size() - 1);
 
             if (lastHistory.getAuthorKey() != null) {
-                document.add(new Field(
-                    LAST_UPDATED_BY_FIELD,
-                    lastHistory.getAuthorKey(),
-                    Field.Store.YES, Field.Index.NOT_ANALYZED
-                ));
+                this.indexUserKey(document, this.getDocumentFieldId(), lastHistory.getAuthorKey(), issue);// 22
             }
         }
     }

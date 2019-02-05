@@ -8,8 +8,11 @@ import com.atlassian.jira.issue.link.IssueLink;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import org.apache.lucene.document.BinaryDocValuesField;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.util.BytesRef;
 
 import java.util.Collection;
 
@@ -55,11 +58,13 @@ public class LinksIndexer implements FieldIndexer {
         for (IssueLink issueLink : issueLinks) {
             Long otherIssue = direction == Direction.OUT ? issueLink.getDestinationId() : issueLink.getSourceId();
 
-            document.add(new Field(
+            String value = IssueLinkIndexer.createValue(issueLink.getLinkTypeId(), direction, otherIssue);
+            document.add(new StringField(
                 LINKS_FIELD,
-                IssueLinkIndexer.createValue(issueLink.getLinkTypeId(), direction, otherIssue),
-                Field.Store.YES, Field.Index.NOT_ANALYZED
+                value,
+                Field.Store.YES
             ));
+            document.add(new BinaryDocValuesField(LINKS_FIELD, new BytesRef(value)));
         }
     }
 }

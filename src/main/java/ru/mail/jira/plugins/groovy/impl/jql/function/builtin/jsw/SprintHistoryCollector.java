@@ -3,11 +3,10 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin.jsw;
 import com.atlassian.greenhopper.customfield.sprint.SprintHistoryEntry;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.index.DocumentConstants;
+import com.atlassian.jira.issue.statistics.util.FieldDocumentHitCollector;
+import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.Scorer;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -16,31 +15,29 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-class SprintHistoryCollector extends Collector {
+class SprintHistoryCollector extends FieldDocumentHitCollector {
     @Getter
     private final Set<String> issues = new HashSet<>();
 
     private final CustomField sprintField;
     private final Map<Long, DateTime> startDates;
     private final boolean collectAddition;
-
-    private IndexReader indexReader;
+    private final Set<String> fieldsToLoad;
 
     SprintHistoryCollector(CustomField sprintField, Map<Long, DateTime> startDates, boolean collectAddition) {
         this.sprintField = sprintField;
         this.startDates = startDates;
         this.collectAddition = collectAddition;
+        this.fieldsToLoad = ImmutableSet.of(DocumentConstants.ISSUE_ID, sprintField.getId() + "_changes");
     }
 
     @Override
-    public void setScorer(Scorer scorer) {
-
+    protected Set<String> getFieldsToLoad() {
+        return fieldsToLoad;
     }
 
     @Override
-    public void collect(int doc) throws IOException {
-        Document document = indexReader.document(doc);
-
+    public void collect(Document document) throws IOException {
         String[] values = document.getValues(sprintField.getId() + "_changes");
         if (values != null) {
             Map<Long, DateTime> lastAdditionDates = new HashMap<>();
@@ -69,15 +66,5 @@ class SprintHistoryCollector extends Collector {
                 }
             }
         }
-    }
-
-    @Override
-    public void setNextReader(IndexReader reader, int docBase) {
-        indexReader = reader;
-    }
-
-    @Override
-    public boolean acceptsDocsOutOfOrder() {
-        return true;
     }
 }

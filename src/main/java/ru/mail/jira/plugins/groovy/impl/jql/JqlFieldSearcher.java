@@ -66,7 +66,7 @@ public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher 
         this.searcherInformation = new CustomFieldSearcherInformation(
             field.getId(), field.getNameKey(),
             ImmutableList.of(
-                new LastUpdatedByIndexer(changeHistoryManager),
+                new LastUpdatedByIndexer(changeHistoryManager, fieldVisibilityManager),
                 new LinksIndexer(issueLinkManager)
             ),
             new AtomicReference<>(field)
