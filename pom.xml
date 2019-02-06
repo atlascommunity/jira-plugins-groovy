@@ -506,18 +506,18 @@
     </build>
 
     <properties>
-        <jira.version>8.0.0-m0030</jira.version>
+        <jira.version>8.0.0-m0033</jira.version>
         <jira.oldest.version>7.3.0</jira.oldest.version>
         <jira.latest.version>7.12.1</jira.latest.version>
         <jira.lts.version>7.6.8</jira.lts.version>
 
-        <gh.version>8.0.0-DAILY20190121095156</gh.version>
+        <gh.version>8.0.0-DAILY20190122023019</gh.version>
         <amps.version>6.3.14</amps.version>
         <ao.version>1.5.0</ao.version>
         <junit.version>5.2.0</junit.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
-        <quick.reload.version>2.0.0</quick.reload.version>
+        <quick.reload.version>3.0.0</quick.reload.version>
         <groovy.version>2.4.15</groovy.version>
 
         <shutdownTimeout>60000</shutdownTimeout>
