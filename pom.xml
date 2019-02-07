@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.mail.jira.plugins</groupId>
     <artifactId>groovy</artifactId>
-    <version>1.17.7</version>
+    <version>1.17.8</version>
     <organization>
         <name>Mail.Ru Group</name>
         <url>https://mail.ru</url>
@@ -53,13 +53,7 @@
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-annotation</artifactId>
             <version>${atlassian.spring.scanner.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.plugin</groupId>
-            <artifactId>atlassian-spring-scanner-runtime</artifactId>
-            <version>${atlassian.spring.scanner.version}</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -310,14 +304,12 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-jira-plugin</artifactId>
+                <artifactId>jira-maven-plugin</artifactId>
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
-                    <enableQuickReload>true</enableQuickReload>
-                    <enableFastdev>false</enableFastdev>
                     <jvmArgs>-Xmx2048m -Datlassian.mail.senddisabled=false</jvmArgs>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
@@ -354,13 +346,6 @@
                     <allowGoogleTracking>false</allowGoogleTracking>
                     <skipManifestValidation>true</skipManifestValidation>
                     <extractDependencies>false</extractDependencies>
-                    <pluginArtifacts>
-                        <pluginArtifact>
-                            <groupId>com.atlassian.labs.plugins</groupId>
-                            <artifactId>quickreload</artifactId>
-                            <version>${quick.reload.version}</version>
-                        </pluginArtifact>
-                    </pluginArtifacts>
 
                     <products>
                         <product>
@@ -512,12 +497,10 @@
         <jira.lts.version>7.6.8</jira.lts.version>
 
         <gh.version>8.0.0-DAILY20190122023019</gh.version>
-        <amps.version>6.3.14</amps.version>
+        <amps.version>8.0.0</amps.version>
         <ao.version>1.5.0</ao.version>
         <junit.version>5.2.0</junit.version>
-        <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
-        <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
-        <quick.reload.version>3.0.0</quick.reload.version>
+        <atlassian.spring.scanner.version>2.1.7</atlassian.spring.scanner.version>
         <groovy.version>2.4.15</groovy.version>
 
         <shutdownTimeout>60000</shutdownTimeout>
