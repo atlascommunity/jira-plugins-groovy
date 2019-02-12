@@ -347,6 +347,14 @@
                     <skipManifestValidation>true</skipManifestValidation>
                     <extractDependencies>false</extractDependencies>
 
+                    <pluginArtifacts>
+                        <pluginArtifact>
+                            <groupId>com.atlassian.labs.plugins</groupId>
+                            <artifactId>quickreload</artifactId>
+                            <version>${quick.reload.version}</version>
+                        </pluginArtifact>
+                    </pluginArtifacts>
+
                     <products>
                         <product>
                             <id>jira</id>
@@ -491,17 +499,18 @@
     </build>
 
     <properties>
-        <jira.version>8.0.0-m0033</jira.version>
+        <jira.version>8.0.0</jira.version>
         <jira.oldest.version>7.3.0</jira.oldest.version>
         <jira.latest.version>7.12.1</jira.latest.version>
         <jira.lts.version>7.6.8</jira.lts.version>
+        <quick.reload.version>3.0.0</quick.reload.version>
 
         <gh.version>8.0.0-DAILY20190122023019</gh.version>
         <amps.version>8.0.0</amps.version>
         <ao.version>1.5.0</ao.version>
         <junit.version>5.2.0</junit.version>
         <atlassian.spring.scanner.version>2.1.7</atlassian.spring.scanner.version>
-        <groovy.version>2.4.15</groovy.version>
+        <groovy.version>2.5.6</groovy.version>
 
         <shutdownTimeout>60000</shutdownTimeout>
 
@@ -510,58 +519,6 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-
-    <profiles>
-        <profile>
-            <id>groovy-next</id>
-
-            <properties>
-                <groovy.version>2.5.3</groovy.version>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-macro</artifactId>
-                    <version>${groovy.version}</version>
-                    <classifier>indy</classifier>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-datetime</artifactId>
-                    <version>${groovy.version}</version>
-                    <classifier>indy</classifier>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
-
-            <repositories>
-                <repository>
-                    <id>oss-jfrog-artifactory-snapshots</id>
-                    <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
-
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>always</updatePolicy>
-                        <checksumPolicy>warn</checksumPolicy>
-                    </snapshots>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                </repository>
-            </repositories>
-        </profile>
-    </profiles>
 
     <pluginRepositories>
         <pluginRepository>
