@@ -203,12 +203,18 @@
             <version>18.0</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>3.0.2</version>
-            <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
@@ -327,13 +333,14 @@
                             com.atlassian.jira.issue.customfields.searchers,
                             com.atlassian.jira.jql.operand,
                             <!-- required for spring lifecycle annotations -->
-                            javax.annotation,
+                            <!--javax.annotation,-->
                             <!-- exclude stuff for querydsl pocketknife -->
                             !net.sf.cglib.proxy,
                             !org.jvnet.hudson.annotation_indexer,
                             <!-- everything else -->
                             *;resolution:=optional
                         </Import-Package>
+                        <Require-Bundle>org.apache.felix.framework</Require-Bundle>
                         <DynamicImport-Package>
                             com.atlassian.greenhopper.*
                         </DynamicImport-Package>

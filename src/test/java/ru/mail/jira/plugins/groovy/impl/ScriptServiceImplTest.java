@@ -202,7 +202,6 @@ class ScriptServiceImplTest {
 
     //JD-318
     @Test
-    @Disabled //todo: enable after JD-203
     public void stcGetAtObjectBugTest() throws Exception {
         scriptService.parseScriptStatic(FileUtil.readExample("tests/stc-getat-object-failure"), ImmutableMap.of());
     }
