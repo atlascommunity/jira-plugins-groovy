@@ -67,7 +67,8 @@ const makeForm: RecordFactory<Form> = Record({
         type: null,
         typeIds: [],
         projectIds: [],
-        className: null
+        className: null,
+        pluginKey: null
     }
 });
 
