@@ -18,6 +18,8 @@ public class ConditionDescriptor {
     @XmlElement
     private String className;
     @XmlElement
+    private String pluginKey;
+    @XmlElement
     private Set<Long> projectIds;
     @XmlElement
     private Set<Long> typeIds;

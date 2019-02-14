@@ -61,6 +61,12 @@ class ListenerInternal extends React.PureComponent<Props> {
             ];
 
             if (condition.type === 'CLASS_NAME') {
+                if (condition.pluginKey) {
+                    params.push({
+                        label: FieldMessages.pluginKey,
+                        value: condition.pluginKey
+                    });
+                }
                 params.push({
                     label: FieldMessages.name,
                     value: condition.className
