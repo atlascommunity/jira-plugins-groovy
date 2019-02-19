@@ -30,7 +30,7 @@ export class ClassDocViewer extends React.PureComponent<Props> {
 
         return (
             <Modal
-                width="large"
+                width="x-large"
                 autoFocus={false}
 
                 heading={classDoc.className}
@@ -58,7 +58,7 @@ export class ClassDocViewer extends React.PureComponent<Props> {
                                 cells: [
                                     {
                                         content: (
-                                            <code className="myGroovyDoc">
+                                            <code className="myGroovyDoc returnType">
                                                 {renderType(method.returnType)}
                                             </code>
                                         )
@@ -79,7 +79,7 @@ export class ClassDocViewer extends React.PureComponent<Props> {
                                                     )}
                                                     {')'}
                                                 </code>
-                                                {method.description && <div dangerouslySetInnerHTML={{__html: method.description}}/>}
+                                                {method.description && <div className="docDescription" dangerouslySetInnerHTML={{__html: method.description}}/>}
                                             </div>
                                         )
                                     }
