@@ -108,7 +108,7 @@ export class RegistryPicker extends React.Component<RegistryPickerProps, Registr
                 return (
                     <AsyncPicker
                         label={label}
-                        isRequired={true}
+                        isRequired={isRequired}
                         isMulti={true}
 
                         name={inputName}
