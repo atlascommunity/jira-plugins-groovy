@@ -46,7 +46,8 @@ public class GroovyDocServiceImpl implements GroovyDocService {
         docLinks = ImmutableList.of(
             linkArgument("java.,org.xml.,javax.,org.xml.", "https://docs.oracle.com/javase/8/docs/api/"),
             linkArgument("groovy.,org.codehaus.groovy.", "http://docs.groovy-lang.org/latest/html/api/"),
-            linkArgument("com.atlassian.jira.", "https://docs.atlassian.com/software/jira/docs/api/" + buildUtilsInfo.getVersion() + "/")
+            linkArgument("com.atlassian.jira.", "https://docs.atlassian.com/software/jira/docs/api/" + buildUtilsInfo.getVersion() + "/"),
+            linkArgument("com.atlassian.crowd.", "https://docs.atlassian.com/atlassian-crowd/current/")
         );
     }
 
