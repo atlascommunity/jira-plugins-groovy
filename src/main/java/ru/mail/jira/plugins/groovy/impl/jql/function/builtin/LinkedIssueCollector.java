@@ -1,37 +1,53 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
-import com.atlassian.jira.issue.statistics.util.FieldDocumentHitCollector;
-import com.google.common.collect.ImmutableSet;
-import org.apache.lucene.document.Document;
-import ru.mail.jira.plugins.groovy.impl.jql.indexers.LinksIndexer;
+import com.atlassian.jira.issue.index.DocumentConstants;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.index.SortedSetDocValues;
+import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.search.SimpleCollector;
+import org.apache.lucene.util.BytesRef;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LinkedIssueCollector extends FieldDocumentHitCollector {
+public class LinkedIssueCollector extends SimpleCollector {
     private final Set<String> issueIds = new HashSet<>();
     private final Filter filter;
+    private SortedSetDocValues docValues;
 
     public LinkedIssueCollector(Filter filter) {
         this.filter = filter;
     }
 
-    @Override
-    protected Set<String> getFieldsToLoad() {
-        return ImmutableSet.of(LinksIndexer.LINKS_FIELD);
+    public Set<String> getIssueIds() {
+        return this.issueIds;
     }
 
     @Override
-    public void collect(Document document) {
-        for (String value : document.getValues(LinksIndexer.LINKS_FIELD)) {
-            if (filter.test(value)) {
-                issueIds.add(value.substring(value.indexOf("i:") + 2));
+    protected void doSetNextReader(LeafReaderContext context) throws IOException {
+        docValues = context.reader().getSortedSetDocValues(DocumentConstants.ISSUE_LINKS);
+    }
+
+    @Override
+    public void collect(int doc) throws IOException {
+        if (docValues.advanceExact(doc)) {
+            TermsEnum termsEnum = docValues.termsEnum();
+
+            BytesRef term;
+            while ((term = termsEnum.next()) != null) {
+                String value = term.utf8ToString();
+
+                if (filter.test(value)) {
+                    issueIds.add(value.substring(value.indexOf("i:") + 2));
+                }
             }
         }
     }
 
-    public Set<String> getIssueIds() {
-        return this.issueIds;
+    @Override
+    public boolean needsScores() {
+        return false;
     }
 
     public interface Filter {
