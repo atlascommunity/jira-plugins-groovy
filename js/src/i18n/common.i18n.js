@@ -32,7 +32,8 @@ export const FieldMessages: I18nMessages = {
     groups: i18n.fields.groups,
     issue: i18n.fields.issue,
     options: i18n.fields.options,
-    template: i18n.fields.template
+    template: i18n.fields.template,
+    pluginKey: i18n.fields.pluginKey
 };
 
 export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction, confirmDelete: I18nFunction }) = {

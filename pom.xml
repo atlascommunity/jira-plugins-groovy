@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.mail.jira.plugins</groupId>
     <artifactId>groovy</artifactId>
-    <version>1.17.8</version>
+    <version>1.18.0-jira8</version>
     <organization>
-        <name>Mail.Ru Group</name>
-        <url>https://mail.ru</url>
+        <name>AtlasTeam</name>
+        <url>https://atlasteam.ru/</url>
     </organization>
     <name>MyGroovy</name>
-    <description>Mail.Ru Groovy plugin.</description>
+    <description>AtlasTeam Groovy plugin.</description>
     <packaging>atlassian-plugin</packaging>
     <dependencies>
         <dependency>

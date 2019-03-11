@@ -46,12 +46,13 @@ public class GroovyDocServiceImpl implements GroovyDocService {
         docLinks = ImmutableList.of(
             linkArgument("java.,org.xml.,javax.,org.xml.", "https://docs.oracle.com/javase/8/docs/api/"),
             linkArgument("groovy.,org.codehaus.groovy.", "http://docs.groovy-lang.org/latest/html/api/"),
-            linkArgument("com.atlassian.jira.", "https://docs.atlassian.com/software/jira/docs/api/" + buildUtilsInfo.getVersion() + "/")
+            linkArgument("com.atlassian.jira.", "https://docs.atlassian.com/software/jira/docs/api/" + buildUtilsInfo.getVersion() + "/"),
+            linkArgument("com.atlassian.crowd.", "https://docs.atlassian.com/atlassian-crowd/current/")
         );
     }
 
     @Override
-    public ClassDoc parseDocs(String source) throws Exception {
+    public ClassDoc parseDocs(String canonicalName, String className, String source) throws Exception {
         SourceBuffer sourceBuffer = new SourceBuffer();
         GroovyRecognizer parser = getGroovyParser(source, sourceBuffer);
 
@@ -59,7 +60,7 @@ public class GroovyDocServiceImpl implements GroovyDocService {
 
         AST ast = parser.getAST();
 
-        SimpleGroovyClassDocAssembler visitor = new SimpleGroovyClassDocAssembler("DefaultPackage", "DocClass.groovy", sourceBuffer, docLinks, new Properties(), true);
+        SimpleGroovyClassDocAssembler visitor = new SimpleGroovyClassDocAssembler("", className + ".groovy", sourceBuffer, docLinks, new Properties(), true);
         AntlrASTProcessor traverser = new SourceCodeTraversal(visitor);
         traverser.process(ast);
         Map<String, GroovyClassDoc> docs = visitor.getGroovyClassDocs();
@@ -85,7 +86,7 @@ public class GroovyDocServiceImpl implements GroovyDocService {
             ))
             .collect(Collectors.toList());
 
-        return new ClassDoc(false, doc.name(), processComment(doc.commentText()), methods);
+        return new ClassDoc(false, canonicalName, processComment(doc.commentText()), methods);
     }
 
     private static TypeDoc toTypeDoc(GroovyClassDoc classDoc, GroovyType groovyType, String fallbackString) {

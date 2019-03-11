@@ -125,7 +125,7 @@ public class ScriptServiceIT {
 
     @Test
     public void docGenerationShouldWork() throws Exception {
-        ClassDoc generatedDoc = groovyDocService.parseDocs(FileUtil.readArquillianExample("tests/GroovyDocTest"));
+        ClassDoc generatedDoc = groovyDocService.parseDocs("GroovyDocTest", "GroovyDocTest", FileUtil.readArquillianExample("tests/GroovyDocTest"));
 
         assertEquals(
             new ClassDoc(

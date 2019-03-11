@@ -29,7 +29,8 @@ define('mailru/groovy/i18n-react', [], function() {
             groups: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.groups'),
             issue: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.issue'),
             options: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.options'),
-            template: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.template')
+            template: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.template'),
+            pluginKey: AJS.I18n.getText('ru.mail.jira.plugins.groovy.fields.pluginKey')
         },
         common: {
             loading: AJS.I18n.getText('ru.mail.jira.plugins.groovy.common.loading'),

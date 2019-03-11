@@ -7,6 +7,7 @@ import com.atlassian.cache.CacheManager;
 import com.atlassian.cache.CacheSettingsBuilder;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
+import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableList;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dao.ListenerDao;
 import ru.mail.jira.plugins.groovy.api.entity.*;
+import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.util.*;
 import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
@@ -51,6 +53,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     private final ScriptService scriptService;
     private final ExecutionRepository executionRepository;
     private final DelegatingClassLoader classLoader;
+    private final InjectionResolver injectionResolver;
 
     @Autowired
     public EventListenerRepositoryImpl(
@@ -62,7 +65,8 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         ChangelogHelper changelogHelper,
         ScriptService scriptService,
         ExecutionRepository executionRepository,
-        DelegatingClassLoader classLoader
+        DelegatingClassLoader classLoader,
+        InjectionResolver injectionResolver
     ) {
         cache = cacheManager.getCache(EventListenerRepositoryImpl.class.getCanonicalName() + ".cache",
             new EventListenerCacheLoader(),
@@ -80,6 +84,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         this.scriptService = scriptService;
         this.executionRepository = executionRepository;
         this.classLoader = classLoader;
+        this.injectionResolver = injectionResolver;
     }
 
     @Override
@@ -182,13 +187,16 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         if (condition.getType() == ConditionType.CLASS_NAME) {
             condition.setClassName(StringUtils.trimToNull(condition.getClassName()));
+            condition.setPluginKey(StringUtils.trimToNull(condition.getPluginKey()));
 
-            if (condition.getClassName() == null) {
+            String className = condition.getClassName();
+
+            if (className == null) {
                 throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "condition.className");
             }
 
             try {
-                classLoader.getJiraClassLoader().loadClass(condition.getClassName());
+                loadConditionClass(condition);
             } catch (ClassNotFoundException e) {
                 throw new RestFieldException("Unable to resolve class: " + e.getMessage(), "condition.className");
             }
@@ -210,15 +218,34 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
     private ScriptedEventListener buildEventListener(Listener listener) throws ClassNotFoundException {
         ConditionDescriptor descriptor = jsonMapper.read(listener.getCondition(), ConditionDescriptor.class);
-        if (descriptor.getClassName() != null) {
-            descriptor.setClassInstance(classLoader.getJiraClassLoader().loadClass(descriptor.getClassName()));
+
+        String className = descriptor.getClassName();
+        if (className != null) {
+            descriptor.setClassInstance(loadConditionClass(descriptor));
         }
+
         return new ScriptedEventListener(
             listener.getID(),
             listener.getScriptBody(),
             listener.getUuid(),
             descriptor
         );
+    }
+
+    private Class<?> loadConditionClass(ConditionDescriptor descriptor) throws ClassNotFoundException {
+        String pluginKey = descriptor.getPluginKey();
+        String className = descriptor.getClassName();
+
+        if (pluginKey == null) {
+            return classLoader.getJiraClassLoader().loadClass(className);
+        } else {
+            Plugin plugin = injectionResolver.getPlugin(pluginKey);
+
+            if (plugin == null) {
+                throw new ClassNotFoundException("Plugin \"" + pluginKey + "\" isn't active.");
+            }
+            return plugin.getClassLoader().loadClass(className);
+        }
     }
 
     private class EventListenerCacheLoader implements CacheLoader<String, List<ScriptedEventListener>> {

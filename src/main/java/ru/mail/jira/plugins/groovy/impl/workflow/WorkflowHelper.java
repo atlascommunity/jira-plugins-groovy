@@ -152,6 +152,15 @@ public class WorkflowHelper {
                 type,
                 bindings
             );
+
+            if (type == ScriptType.WORKFLOW_CONDITION) {
+                if (!(result instanceof Boolean)) {
+                    result = false;
+                    success = false;
+                    error = "Condition must return boolean type";
+                    logger.warn("Condition script {} didn't return boolean type for issue {}", id, issue.getKey());
+                }
+            }
         } catch (WorkflowException e) {
             rethrow = e;
         } catch (Exception e) {

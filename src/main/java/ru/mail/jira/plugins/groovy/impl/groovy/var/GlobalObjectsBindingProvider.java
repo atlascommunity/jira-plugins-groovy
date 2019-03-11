@@ -98,7 +98,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                         globalObject.getName(),
                         new LazyDocBindingDescriptorImpl(object, object.getClass(), () -> {
                             try {
-                                return groovyDocService.parseDocs(globalObject.getScriptBody());
+                                return groovyDocService.parseDocs(objectClass.getCanonicalName(), objectClass.getSimpleName(), globalObject.getScriptBody());
                             } catch (Exception e) {
                                 logger.error("Unable to parse doc for global object {}", globalObject.getName(), e);
                                 return null;

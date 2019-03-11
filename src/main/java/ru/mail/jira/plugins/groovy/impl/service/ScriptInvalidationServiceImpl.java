@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
@@ -38,6 +39,7 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
     private final MessageConsumer messageConsumer;
     private final GlobalObjectsBindingProvider globalObjectsBindingProvider;
     private final ModuleManager moduleManager;
+    private final EventListenerRepository listenerRepository;
 
     @Autowired
     public ScriptInvalidationServiceImpl(
@@ -46,14 +48,15 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
         ScriptService scriptService,
         FieldValueCache fieldValueCache,
         GlobalObjectsBindingProvider globalObjectsBindingProvider,
-        ModuleManager moduleManager
-    ) {
+        ModuleManager moduleManager,
+        EventListenerRepository listenerRepository) {
         this.clusterMessagingService = clusterMessagingService;
         this.pluginEventManager = pluginEventManager;
         this.scriptService = scriptService;
         this.fieldValueCache = fieldValueCache;
         this.globalObjectsBindingProvider = globalObjectsBindingProvider;
         this.moduleManager = moduleManager;
+        this.listenerRepository = listenerRepository;
         this.messageConsumer = new MessageConsumer();
     }
 
@@ -134,6 +137,7 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
         scriptService.onPluginDisable(plugin);
         globalObjectsBindingProvider.refresh();
         moduleManager.resetDelegates();
+        listenerRepository.invalidate();
         //todo: invalidate listeners with dependencies on plugins
     }
 

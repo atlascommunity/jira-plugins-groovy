@@ -6,14 +6,16 @@ export type ConditionType = {
     type: 'CLASS_NAME' | 'ISSUE',
     typeIds: $ReadOnlyArray<string>,
     projectIds: $ReadOnlyArray<string>,
-    className: ?string
+    className: ?string,
+    pluginKey: ?string
 };
 
 export type ConditionInputType = {
     type: ?'CLASS_NAME' | 'ISSUE',
     typeIds: $ReadOnlyArray<string>,
     projectIds: $ReadOnlyArray<string>,
-    className: ?string
+    className: ?string,
+    pluginKey: ?string
 };
 
 export type ListenerType = ScriptEntity & {

@@ -7,6 +7,7 @@ import com.atlassian.jira.datetime.DateTimeStyle;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.pocketknife.api.querydsl.DatabaseAccessor;
+import com.atlassian.pocketknife.api.querydsl.schema.DialectProvider;
 import com.atlassian.pocketknife.api.querydsl.util.OnRollback;
 import com.google.common.collect.ImmutableList;
 import com.querydsl.core.Tuple;
@@ -83,18 +84,18 @@ public class RecentErrors implements BuiltInScript<List<ScriptExecutionSummary>>
             SQLQueryFactory queryFactory = connection.query();
 
             Expression<Tuple> union = SQLExpressions.unionAll(
+                getAbstractScriptQuery(QueryDslTables.REGISTRY_SCRIPT, EntityType.REGISTRY_SCRIPT),
                 getAbstractScriptQuery(QueryDslTables.JQL_FUNCTION, EntityType.JQL_FUNCTION),
                 getAbstractScriptQuery(QueryDslTables.LISTENER, EntityType.LISTENER),
                 getAbstractScriptQuery(QueryDslTables.REST, EntityType.REST),
                 getAbstractScriptQuery(QueryDslTables.SCHEDULED_TASK, EntityType.SCHEDULED_TASK),
-                getAbstractScriptQuery(QueryDslTables.REGISTRY_SCRIPT, EntityType.REGISTRY_SCRIPT),
                 SQLExpressions
                     .select(
                         QueryDslTables.FIELD_CONFIG.FIELD_CONFIG_ID.as("ENTITY_ID"),
                         Expressions.constant(""),
                         QueryDslTables.FIELD_CONFIG.UUID,
                         Expressions.constant(EntityType.CUSTOM_FIELD.name()),
-                        Expressions.as(Expressions.nullExpression(), directoryIdPath)
+                        Expressions.nullExpression()
                     )
                     .from(QueryDslTables.FIELD_CONFIG)
             ).as("union");
@@ -121,8 +122,11 @@ public class RecentErrors implements BuiltInScript<List<ScriptExecutionSummary>>
                         )
                 )
                 .where(QueryDslTables.SCRIPT_EXECUTION.SUCCESSFUL.isFalse())
-                .groupBy(QueryDslTables.SCRIPT_EXECUTION.SCRIPT_ID, QueryDslTables.SCRIPT_EXECUTION.INLINE_ID)
-                .orderBy(new OrderSpecifier<>(Order.ASC, Expressions.nullExpression()));
+                .groupBy(QueryDslTables.SCRIPT_EXECUTION.SCRIPT_ID, QueryDslTables.SCRIPT_EXECUTION.INLINE_ID);
+
+            if (connection.getDialectConfig().getDatabaseInfo().getSupportedDatabase() == DialectProvider.SupportedDatabase.MYSQL) {
+                query = query.orderBy(new OrderSpecifier<>(Order.ASC, Expressions.nullExpression()));
+            }
 
             //work around for h2
             query.setUseLiterals(true);
@@ -186,7 +190,7 @@ public class RecentErrors implements BuiltInScript<List<ScriptExecutionSummary>>
                 abstractScript.NAME.as("NAME"),
                 abstractScript.UUID.as("UUID"),
                 Expressions.asString(Expressions.constantAs(entityType.name(), Expressions.stringPath("ENTITY_TYPE"))),
-                entityType == EntityType.REGISTRY_SCRIPT ? directoryIdPath : Expressions.as(Expressions.nullExpression(), directoryIdPath)
+                entityType == EntityType.REGISTRY_SCRIPT ? directoryIdPath : Expressions.nullExpression()
             )
             .from(abstractScript);
     }

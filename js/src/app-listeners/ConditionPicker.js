@@ -92,8 +92,27 @@ export class ConditionPicker extends React.Component<Props> {
         if (value.type) {
             switch (value.type) {
                 case 'CLASS_NAME':
-                    paramEl = (
+                    paramEl = [
                         <FormField
+                            key="pluginKey"
+
+                            label={FieldMessages.pluginKey}
+
+                            isInvalid={errorField === 'condition.pluginKey'}
+                            invalidMessage={errorField === 'condition.pluginKey' ? errorMessage : null}
+                        >
+                            <FieldTextStateless
+                                key="pluginKey"
+                                shouldFitContainer={true}
+                                disabled={isDisabled}
+
+                                value={value.pluginKey || ''}
+                                onChange={this._onInputChange('pluginKey')}
+                            />
+                        </FormField>,
+                        <FormField
+                            key="className"
+
                             label={ListenerTypeMessages.CLASS_NAME}
                             isRequired={true}
 
@@ -109,7 +128,7 @@ export class ConditionPicker extends React.Component<Props> {
                                 onChange={this._onInputChange('className')}
                             />
                         </FormField>
-                    );
+                    ];
                     break;
                 case 'ISSUE':
                     paramEl = [
