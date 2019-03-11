@@ -6,11 +6,11 @@
     <artifactId>groovy</artifactId>
     <version>1.18.0</version>
     <organization>
-        <name>Mail.Ru Group</name>
-        <url>https://mail.ru</url>
+        <name>AtlasTeam</name>
+        <url>https://atlasteam.ru/</url>
     </organization>
     <name>MyGroovy</name>
-    <description>Mail.Ru Groovy plugin.</description>
+    <description>AtlasTeam Groovy plugin.</description>
     <packaging>atlassian-plugin</packaging>
     <dependencies>
         <dependency>
