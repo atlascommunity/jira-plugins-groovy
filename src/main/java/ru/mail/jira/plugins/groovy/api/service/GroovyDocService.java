@@ -5,5 +5,5 @@ import ru.mail.jira.plugins.groovy.api.util.WithPluginLoader;
 
 public interface GroovyDocService {
     @WithPluginLoader
-    ClassDoc parseDocs(String source) throws Exception;
+    ClassDoc parseDocs(String canonicalName, String className, String source) throws Exception;
 }
