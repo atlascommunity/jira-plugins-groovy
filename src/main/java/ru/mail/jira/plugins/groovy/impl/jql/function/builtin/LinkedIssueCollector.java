@@ -3,13 +3,13 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedSetDocValues;
-import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.SimpleCollector;
-import org.apache.lucene.util.BytesRef;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.apache.lucene.index.SortedSetDocValues.NO_MORE_ORDS;
 
 public class LinkedIssueCollector extends SimpleCollector {
     private final Set<String> issueIds = new HashSet<>();
@@ -32,11 +32,10 @@ public class LinkedIssueCollector extends SimpleCollector {
     @Override
     public void collect(int doc) throws IOException {
         if (docValues.advanceExact(doc)) {
-            TermsEnum termsEnum = docValues.termsEnum();
+            long ord;
 
-            BytesRef term;
-            while ((term = termsEnum.next()) != null) {
-                String value = term.utf8ToString();
+            while ((ord = docValues.nextOrd()) != NO_MORE_ORDS) {
+                String value = docValues.lookupOrd(ord).utf8ToString();
 
                 if (filter.test(value)) {
                     issueIds.add(value.substring(value.indexOf("i:") + 2));
