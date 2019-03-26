@@ -355,18 +355,18 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                             invalidMessage={errorField === fieldName ? errorMessage : ''}
                         />
                         {workflow &&
-                        <AsyncPicker
-                            label={FieldMessages.workflowAction}
-                            isRequired={true}
-                            isDisabled={waiting}
+                            <AsyncPicker
+                                label={FieldMessages.workflowAction}
+                                isRequired={true}
+                                isDisabled={waiting}
 
-                            src={`${getPluginBaseUrl()}/jira-api/workflowActionPicker/${workflow.value}`}
-                            value={values.get('issueWorkflowActionId')}
-                            onChange={this._setObjectValue('issueWorkflowActionId')}
+                                src={`${getPluginBaseUrl()}/jira-api/workflowActionPicker/${workflow.value}`}
+                                value={values.get('issueWorkflowActionId')}
+                                onChange={this._setObjectValue('issueWorkflowActionId')}
 
-                            isInvalid={errorField === fieldName}
-                            invalidMessage={errorField === fieldName ? errorMessage : ''}
-                        />
+                                isInvalid={errorField === fieldName}
+                                invalidMessage={errorField === fieldName ? errorMessage : ''}
+                            />
                         }
                     </div>
                 );
