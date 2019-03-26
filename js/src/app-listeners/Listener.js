@@ -6,6 +6,8 @@ import {connect} from 'react-redux';
 import memoizeOne from 'memoize-one';
 
 import Button from '@atlaskit/button';
+import Lozenge from '@atlaskit/lozenge';
+
 import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import type {ConditionType, ListenerType} from './types';
@@ -52,8 +54,14 @@ class ListenerInternal extends React.PureComponent<Props> {
     );
 
     _getParams = memoizeOne(
-        (projects: ObjectMap, eventTypes: ObjectMap, condition: ConditionType): Array<?ScriptParam> => {
+        (projects: ObjectMap, eventTypes: ObjectMap, condition: ConditionType, initialized: boolean): Array<?ScriptParam> => {
             const params = [
+                {
+                    label: 'Status',
+                    value: initialized
+                        ? <Lozenge appearance="success">Initialized</Lozenge>
+                        : <Lozenge appearance="removed">Not initialized</Lozenge>
+                },
                 {
                     label: FieldMessages.type,
                     value: ListenerTypeMessages[condition.type]
@@ -139,7 +147,7 @@ class ListenerInternal extends React.PureComponent<Props> {
                     />
                 ]}
             >
-                <ScriptParameters params={this._getParams(projects, eventTypes, script.condition)}/>
+                <ScriptParameters params={this._getParams(projects, eventTypes, script.condition, script.initialized)}/>
             </ConnectedWatchableScript>
         );
     }
