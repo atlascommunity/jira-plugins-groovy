@@ -155,6 +155,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         result.setScriptBody(listener.getScriptBody());
         result.setUuid(listener.getUuid());
         result.setCondition(jsonMapper.read(listener.getCondition(), ConditionDescriptor.class));
+        result.setAlwaysTrack(listener.isAlwaysTrack() != null ? listener.isAlwaysTrack() : false);
 
         if (includeChangelogs) {
             result.setChangelogs(changelogHelper.collect(listener.getChangelogs()));
@@ -225,10 +226,13 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             descriptor.setClassInstance(loadConditionClass(descriptor));
         }
 
+        boolean alwaysTrack = listener.isAlwaysTrack() != null ? listener.isAlwaysTrack() : false;
+
         return new ScriptedEventListener(
             listener.getID(),
             listener.getScriptBody(),
             listener.getUuid(),
+            alwaysTrack,
             descriptor
         );
     }

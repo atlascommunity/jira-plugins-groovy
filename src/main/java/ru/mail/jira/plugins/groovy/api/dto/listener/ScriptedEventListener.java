@@ -9,5 +9,6 @@ public class ScriptedEventListener {
     private final int id;
     private final String script;
     private final String uuid;
+    private final boolean alwaysTrack;
     private final ConditionDescriptor condition;
 }
