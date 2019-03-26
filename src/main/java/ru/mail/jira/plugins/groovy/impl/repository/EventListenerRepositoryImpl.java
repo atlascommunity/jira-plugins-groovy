@@ -11,6 +11,7 @@ import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
@@ -259,7 +260,8 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
                         try {
                             return buildEventListener(listener);
                         } catch (ClassNotFoundException e) {
-                            logger.error("unable to load class for condition", e);
+                            logger.error("unable to load class for listener", e);
+                            executionRepository.trackInline(listener.getUuid(), 0, false, ExceptionHelper.writeExceptionToString(e), ImmutableMap.of());
                             return null;
                         }
                     })
