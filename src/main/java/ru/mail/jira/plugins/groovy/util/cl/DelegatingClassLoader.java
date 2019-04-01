@@ -56,7 +56,13 @@ public class DelegatingClassLoader extends ClassLoader {
     }
 
     public void unloadPlugin(String key) {
-        classLoaders.remove(key);
+        Lock wLock = rwLock.writeLock();
+        wLock.lock();
+        try {
+            classLoaders.remove(key);
+        } finally {
+            wLock.unlock();
+        }
     }
 
     @Override
