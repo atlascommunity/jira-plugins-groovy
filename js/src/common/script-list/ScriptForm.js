@@ -251,6 +251,7 @@ export class ScriptForm<T: ScriptFormType> extends React.PureComponent<Props<T>,
                         invalidMessage={errorMessage || ''}
                     >
                         <CheckedEditorField
+                            resizable={true}
                             isDisabled={isSubmitting}
 
                             scriptType={scriptType}
