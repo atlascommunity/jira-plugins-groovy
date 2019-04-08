@@ -40,8 +40,6 @@ export class JqlInput extends React.Component<Props, State> {
     };
 
     _validate = (query: string) => {
-        //todo: track requestId
-
         this.setState({
             validating: true
         });
@@ -57,19 +55,25 @@ export class JqlInput extends React.Component<Props, State> {
                 });
             })
             .catch(({response}: ErrorType) => {
-                if (response.data) {
-                    this.setState({
-                        validating: false,
-                        isInvalid: true,
-                        invalidMessage: (
-                            <div className="flex flex-column">
-                                {response.data.errorMessages.map((message, i) =>
-                                    <div key={i}>{message}</div>)
-                                }
-                            </div>
-                        ),
-                        issues: null
-                    });
+                const data = response.data;
+                if (data) {
+                    this.setState(
+                        (_state, {value}: Props): $Shape<State> => {
+                            if (query === value) {
+                                return {
+                                    validating: false,
+                                    isInvalid: true,
+                                    invalidMessage: (
+                                        <div className="flex flex-column">
+                                            {data.errorMessages.map((message, i) => <div key={i}>{message}</div>)}
+                                        </div>
+                                    ),
+                                    issues: null
+                                };
+                            }
+
+                            return {};
+                        });
                 }
             });
     };
