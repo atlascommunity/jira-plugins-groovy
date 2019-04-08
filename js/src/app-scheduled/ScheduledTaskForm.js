@@ -288,6 +288,7 @@ export class ScheduledTaskFormInternal extends React.PureComponent<Props, State>
                         key={fieldName}
 
                         label={FieldMessages.scriptCode}
+                        resizable={true}
                         isRequired={true}
                         isDisabled={waiting}
 

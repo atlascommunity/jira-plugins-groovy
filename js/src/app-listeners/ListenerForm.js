@@ -306,6 +306,8 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                         invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
                     >
                         <CheckedEditorField
+                            resizable={true}
+
                             isDisabled={waiting}
 
                             scriptType="LISTENER"
