@@ -4,12 +4,8 @@ import com.atlassian.beehive.ClusterLock;
 import com.atlassian.beehive.ClusterLockService;
 import com.atlassian.jira.cluster.ClusterInfo;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
-import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import io.sentry.Sentry;
 import io.sentry.event.EventBuilder;
-import io.sentry.event.User;
-import io.sentry.event.UserBuilder;
 import io.sentry.event.interfaces.ExceptionInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,12 +13,12 @@ import ru.mail.jira.plugins.groovy.api.script.PluginModule;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.PluginDataService;
 import ru.mail.jira.plugins.groovy.api.service.SentryService;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.util.Map;
 
 @Component
-@ExportAsService(LifecycleAware.class)
-public class SentryServiceImpl implements SentryService, LifecycleAware {
+public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
     private static final String LOCK_KEY = "ru.mail.jira.groovy.sentry";
 
     private final ClusterLockService clusterLockService;
@@ -94,13 +90,18 @@ public class SentryServiceImpl implements SentryService, LifecycleAware {
 
     @Override
     public void onStart() {
-        if (pluginDataService.isSentryEnabled()) {
-            Sentry.init(pluginDataService.getSentryDsn());
-        }
+        pluginDataService
+            .getSentryDsn()
+            .ifPresent(Sentry::init);
     }
 
     @Override
     public void onStop() {
         Sentry.close();
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 0;
     }
 }
