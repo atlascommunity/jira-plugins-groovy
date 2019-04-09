@@ -522,7 +522,7 @@
         <jira.lts.version>7.6.8</jira.lts.version>
 
         <gh.version>7.10.0-DAILY20180821023118</gh.version>
-        <amps.version>8.0.0</amps.version>
+        <amps.version>8.0.1</amps.version>
         <ao.version>1.5.0</ao.version>
         <junit.version>5.2.0</junit.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
