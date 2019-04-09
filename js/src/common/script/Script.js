@@ -6,6 +6,7 @@ import Spinner from '@atlaskit/spinner';
 import Badge from '@atlaskit/badge';
 import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
 import {colors} from '@atlaskit/theme';
+import EmptyState from '@atlaskit/empty-state';
 
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
@@ -43,6 +44,7 @@ export type ScriptProps = {|
     collapsible: boolean,
     headerless: boolean,
     focused: boolean,
+    noCode: boolean,
 
     script: ?ScriptType,
     changelogsLoader?: () => Promise<$ReadOnlyArray<ChangelogType>>,
@@ -83,7 +85,8 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         collapsible: true,
         withChangelog: false,
         headerless: false,
-        focused: false
+        focused: false,
+        noCode: false
     };
 
     state = {
@@ -172,7 +175,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
     render() {
         const {
             script, template, title, scriptName, children, collapsible, withChangelog, onEdit, onDelete,
-            additionalButtons, additionalPrimaryButtons, additionalParameters, dropdownItems, headerless, focused
+            additionalButtons, additionalPrimaryButtons, additionalParameters, dropdownItems, headerless, focused, noCode
         } = this.props;
         const {activeSource, showCode, changelogsReady, changelogs, executions, executionsReady, onlyLastExecutions} = this.state;
 
@@ -216,21 +219,33 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                 }
             }
 
+            let editorEl: Node;
+
+            if (noCode && activeSource.id === 'current') {
+                editorEl = (
+                    <EmptyState header="No code"/>
+                );
+            } else {
+                editorEl = (
+                    <EditorThemeContextConsumer>
+                        {context =>
+                            <Editor
+                                readOnly={true}
+                                mode={activeSource.id === 'current' ? 'groovy' : 'diff'}
+                                value={activeSource.id === 'current' ? script && script.scriptBody : activeSource.source}
+                                {...context}
+                            />
+                        }
+                    </EditorThemeContextConsumer>
+                );
+            }
+
             codeBlock = (
                 <div className="flex-row editor">
                     {changelogsNode}
                     <div className="flex-grow flex-column">
                         <div style={{overflow: 'hidden'}}>
-                            <EditorThemeContextConsumer>
-                                {context =>
-                                    <Editor
-                                        readOnly={true}
-                                        mode={activeSource.id === 'current' ? 'groovy' : 'diff'}
-                                        value={activeSource.id === 'current' ? script && script.scriptBody : activeSource.source}
-                                        {...context}
-                                    />
-                                }
-                            </EditorThemeContextConsumer>
+                            {editorEl}
                         </div>
                         {templateBlock}
                     </div>
