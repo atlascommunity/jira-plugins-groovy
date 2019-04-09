@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {MultiSelect} from './MultiSelect';
 
@@ -14,9 +14,11 @@ export type LoaderOptionType<T: OldSelectValue> = {
     +label?: string
 };
 
-type Props<T: OldSelectValue> = FieldProps & MutableFieldProps<$ReadOnlyArray<OldSelectValue>> & {
+type Props<T: OldSelectValue> = {|
+    ...FieldProps,
+    ...MutableFieldProps<$ReadOnlyArray<OldSelectValue>>,
     loader: () => Promise<Array<LoaderOptionType<T>>>
-};
+|};
 
 type State<T: OldSelectValue> = {
     ready: boolean,
@@ -55,17 +57,23 @@ export class AsyncLoadingMultiSelect<T: OldSelectValue = string> extends React.P
             });
     }
 
-    render(): React.Node {
-        return <MultiSelect
-            label={this.props.label}
-            isRequired={this.props.isRequired}
-            shouldFitContainer={true}
+    render() {
+        const {label, isRequired, isDisabled, value, onChange} = this.props;
+        const {ready, options} = this.state;
 
-            isLoading={!this.state.ready}
-            items={this.state.options}
+        return (
+            <MultiSelect
+                label={label}
+                isRequired={isRequired}
+                isDisabled={isDisabled}
+                shouldFitContainer={true}
 
-            onChange={this.props.onChange}
-            value={this.props.value}
-        />;
+                isLoading={!ready}
+                items={options}
+
+                onChange={onChange}
+                value={value}
+            />
+        );
     }
 }

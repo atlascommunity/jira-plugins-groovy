@@ -23,6 +23,7 @@ public interface ScriptExecution extends Entity {
     Timestamp getDate();
     void setDate(Timestamp date);
 
+    @Indexed
     @NotNull
     Boolean isSuccessful();
     void setSuccessful(Boolean successful);

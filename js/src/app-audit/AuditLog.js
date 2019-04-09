@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Element} from 'react';
 
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
@@ -9,27 +9,34 @@ import Lozenge from '@atlaskit/lozenge';
 import Button from '@atlaskit/button';
 import {DynamicTableStateless} from '@atlaskit/dynamic-table';
 import Pagination from '@atlaskit/pagination';
+import Breadcrumbs from '@atlaskit/breadcrumbs';
 
 import type {RowType} from '@atlaskit/dynamic-table/dist/cjs/types';
 
 import UndoIcon from '@atlaskit/icon/glyph/undo';
 
 import {ActionIcon} from './ActionIcon';
+import {AuditLogFilter} from './AuditLogFilter';
 
-import type {AuditLogEntry, AuditLogData} from './types';
+import type {AuditLogEntry, AuditLogData, AuditLogFilterType} from './types';
 
 import {
     adminScriptService,
     auditLogService,
+    globalObjectService,
+    jqlScriptService,
     listenerService,
     registryService,
     restService,
     scheduledTaskService
-} from '../service/services';
-import {CommonMessages, FieldMessages, TitleMessages} from '../i18n/common.i18n';
+} from '../service';
+import {CommonMessages, FieldMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {AuditMessages, CategoryNameMessages} from '../i18n/audit.i18n';
 
-import type {EntityType} from '../common/types';
+import {InfoMessage, RouterLink} from '../common/ak';
+import {ScrollToTop} from '../common/ScrollToTop';
+import {withRoot} from '../common/script-list/breadcrumbs';
+import {type EntityType} from '../common/types';
 
 
 const tableHead = {
@@ -66,11 +73,37 @@ type Props = {
 };
 
 type State = {
+    filter: AuditLogFilterType,
     offset: number,
     isReady: boolean,
     rows: Array<RowType>,
     data: AuditLogData
 };
+
+function getScriptLink(type: EntityType, id: ?number): ?string {
+    if (!id) {
+        return null;
+    }
+
+    switch(type) {
+        case 'REGISTRY_SCRIPT':
+            return `/registry/script/view/${id}`;
+        case 'CUSTOM_FIELD':
+            return `fields/${id}/view`;
+        case 'ADMIN_SCRIPT':
+            return `admin-scripts/${id}/view`;
+        case 'LISTENER':
+            return `listeners/${id}/view`;
+        case 'REST':
+            return `rest/${id}/view`;
+        case 'SCHEDULED_TASK':
+            return `scheduled/${id}/view`;
+        case 'GLOBAL_OBJECT':
+            return `go/${id}/view`;
+        default:
+            return null;
+    }
+}
 
 export class AuditLog extends React.Component<Props, State> {
     state = {
@@ -84,6 +117,11 @@ export class AuditLog extends React.Component<Props, State> {
             size: 0,
             isLast: true,
             values: []
+        },
+        filter: {
+            users: [],
+            categories: [],
+            actions: []
         }
     };
 
@@ -108,6 +146,12 @@ export class AuditLog extends React.Component<Props, State> {
             case 'SCHEDULED_TASK':
                 promise = scheduledTaskService.restore(id);
                 break;
+            case 'JQL_FUNCTION':
+                promise = jqlScriptService.restoreScript(id);
+                break;
+            case 'GLOBAL_OBJECT':
+                promise = globalObjectService.restoreScript(id);
+                break;
             default:
                 console.error('unknown category', category);
         }
@@ -117,7 +161,7 @@ export class AuditLog extends React.Component<Props, State> {
 
             promise
                 .then(
-                    () => this._loadList(this.state.offset),
+                    () => this._loadList(this.state.offset, this.state.filter),
                     (error: *) => {
                         this.setState({ isReady: true });
                         throw error;
@@ -126,16 +170,18 @@ export class AuditLog extends React.Component<Props, State> {
         }
     };
 
-    _loadList(offset: number) {
+    _loadList(offset: number, filter: AuditLogFilterType) {
         this.setState({
             isReady: false
         });
 
         auditLogService
-            .getAuditLogPage(offset)
+            .getAuditLogPage(offset, filter.users.map(it => it.value), filter.categories, filter.actions)
             .then(data => this.setState({
                 data,
                 rows: data.values.map((value: AuditLogEntry): RowType => {
+                    const link = getScriptLink(value.category, value.scriptId);
+
                     return {
                         key: value.id.toString(10),
                         cells: [
@@ -170,7 +216,7 @@ export class AuditLog extends React.Component<Props, State> {
                                             </div>
                                         }
                                         <div className={value.deleted ? 'crossed-text' : ''}>
-                                            {value.scriptName}
+                                            {link && !value.deleted ? <RouterLink href={link}>{value.scriptName}</RouterLink> : value.scriptName}
                                         </div>
                                     </div>
                                 )
@@ -196,13 +242,17 @@ export class AuditLog extends React.Component<Props, State> {
             }));
     }
 
-    _goToPage = (page: number) => this._loadList(this.state.data.limit * (page-1));
+    _goToPage = (page: number) => this._loadList(this.state.data.limit * (page-1), this.state.filter);
+
+    _updateFilter = (filter: AuditLogFilterType) => {
+        this.setState({ filter }, () => this._loadList(0, filter));
+    };
 
     componentDidMount() {
-        this._loadList(0);
+        this._loadList(0, this.state.filter);
     }
 
-    _renderPagination(): React.Node {
+    _renderPagination(): Element<typeof Pagination> {
         const {data} = this.state;
 
         return (
@@ -219,24 +269,37 @@ export class AuditLog extends React.Component<Props, State> {
         );
     }
 
-    render(): React.Node {
-        const {isReady, rows} = this.state;
+    render() {
+        const {isReady, rows, filter} = this.state;
 
-        return <Page>
-            <PageHeader>
-                {TitleMessages.audit}
-            </PageHeader>
+        return (
+            <Page>
+                <PageHeader
+                    bottomBar={
+                        <div className="flex-row">
+                            <AuditLogFilter value={filter} onChange={this._updateFilter}/>
+                        </div>
+                    }
 
-            <div className="page-content">
-                {this._renderPagination()}
-                <DynamicTableStateless
-                    head={tableHead}
-                    isLoading={!isReady}
-                    rows={rows}
-                />
-                {this._renderPagination()}
-            </div>
-        </Page>;
+                    breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
+                >
+                    {PageTitleMessages.audit}
+                </PageHeader>
+                <ScrollToTop/>
+
+                <div className="page-content">
+                    {this._renderPagination()}
+                    <DynamicTableStateless
+                        head={tableHead}
+                        emptyView={<InfoMessage title={AuditMessages.noItems}/>}
+
+                        isLoading={!isReady}
+                        rows={rows}
+                    />
+                    {this._renderPagination()}
+                </div>
+            </Page>
+        );
     }
 }
 

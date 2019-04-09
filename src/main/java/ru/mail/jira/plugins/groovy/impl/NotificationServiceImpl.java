@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.notification.NotificationDto;
 import ru.mail.jira.plugins.groovy.api.service.NotificationService;
+import ru.mail.jira.plugins.groovy.util.ScriptUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +49,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendNotifications(NotificationDto notificationDto, List<ApplicationUser> recipients) {
+        String permalink = ScriptUtil.getPermalink(notificationDto.getEntityType(), notificationDto.getEntityId());
+
         for (ApplicationUser recipient : recipients) {
             if (!permissionHelper.isAdmin(recipient)) {
                 continue;
@@ -71,6 +74,7 @@ public class NotificationServiceImpl implements NotificationService {
             params.put("user", recipient);
             params.put("locale", locale);
             params.put("i18nResolver", i18nResolver);
+            params.put("permalink", permalink);
 
             MailQueueItem email = new EmailBuilder(new Email(recipient.getEmailAddress()), new NotificationRecipient(recipient))
                 .withSubject(subject)

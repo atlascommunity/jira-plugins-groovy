@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import javax.annotation.Nullable;
 import java.time.LocalDate;
@@ -17,7 +18,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class OldExecutionDeletionScheduler {
+public class OldExecutionDeletionScheduler implements PluginLifecycleAware {
     private static final JobRunnerKey JOB_RUNNER_KEY = JobRunnerKey.of("ru.mail.jira.groovy.jobRunner");
     private static final JobId JOB_ID = JobId.of("ru.mail.jira.groovy.deleteOldExecutions");
 
@@ -38,6 +39,7 @@ public class OldExecutionDeletionScheduler {
         this.executionRepository = executionRepository;
     }
 
+    @Override
     public void onStart() {
         schedulerService.registerJobRunner(JOB_RUNNER_KEY, new OldExecutionDeletionJobRunner());
 
@@ -62,8 +64,14 @@ public class OldExecutionDeletionScheduler {
         }
     }
 
+    @Override
     public void onStop() {
         schedulerService.unregisterJobRunner(JOB_RUNNER_KEY);
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 1000;
     }
 
     public class OldExecutionDeletionJobRunner implements JobRunner {

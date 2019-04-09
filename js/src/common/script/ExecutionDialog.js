@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 
@@ -8,7 +8,7 @@ import type {ExecutionType} from './types';
 import type {VoidCallback} from '../types';
 
 import {CommonMessages, FieldMessages} from '../../i18n/common.i18n';
-import {StaticField} from '../ak/StaticField';
+import {StaticField} from '../ak';
 
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
     execution: ExecutionType
 };
 
-export function ExecutionDialog({onClose, execution}: Props): React.Node {
+export function ExecutionDialog({onClose, execution}: Props): Node {
     const bindings = execution.extraParams;
 
     return (<ModalDialog

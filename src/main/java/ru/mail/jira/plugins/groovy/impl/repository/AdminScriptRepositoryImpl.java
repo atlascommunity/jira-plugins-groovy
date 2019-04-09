@@ -16,7 +16,7 @@ import ru.mail.jira.plugins.groovy.api.repository.AdminScriptRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
-import ru.mail.jira.plugins.groovy.impl.groovy.ParseContext;
+import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 import ru.mail.jira.plugins.groovy.util.*;
 
 import java.util.Arrays;
@@ -71,6 +71,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
             new DBParam("DESCRIPTION", form.getDescription()),
             new DBParam("UUID", UUID.randomUUID().toString()),
             new DBParam("SCRIPT_BODY", form.getScriptBody()),
+            new DBParam("HTML", form.isHtml()),
             new DBParam("PARAMETERS", parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null),
             new DBParam("DELETED", false)
         );
@@ -79,7 +80,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
 
         String comment = form.getComment();
         if (comment == null) {
-            comment = "Created.";
+            comment = Const.CREATED_COMMENT;
         }
 
         changelogHelper.addChangelog(AdminScriptChangelog.class, script.getID(), user.getKey(), diff, comment);
@@ -109,6 +110,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
         script.setName(form.getName());
         script.setDescription(form.getDescription());
         script.setScriptBody(form.getScriptBody());
+        script.setHtml(form.isHtml());
         script.setParameters(parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null);
 
         script.save();
@@ -161,6 +163,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
         result.setName(script.getName());
         result.setDescription(script.getDescription());
         result.setScriptBody(script.getScriptBody());
+        result.setHtml(script.isHtml());
         result.setDeleted(script.isDeleted());
         result.setParams(script.getParameters() != null ? jsonMapper.read(script.getParameters(), Const.PARAM_LIST_TYPE_REF) : null);
 
@@ -170,6 +173,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
 
         if (includeErrorCount) {
             result.setErrorCount(executionRepository.getErrorCount(script.getUuid()));
+            result.setWarningCount(executionRepository.getWarningCount(script.getUuid()));
         }
 
         return result;

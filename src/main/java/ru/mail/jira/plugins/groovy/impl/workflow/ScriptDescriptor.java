@@ -9,6 +9,7 @@ import java.util.Map;
 @AllArgsConstructor @NoArgsConstructor
 public class ScriptDescriptor {
     private String id;
+    private String uuid;
     private boolean fromRegistry;
     private String scriptBody;
     private Map<String, Object> params;

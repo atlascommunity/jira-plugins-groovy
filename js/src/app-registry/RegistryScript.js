@@ -1,46 +1,53 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
+
 import memoizeOne from 'memoize-one';
 
-import Button from '@atlaskit/button';
+import Button, {defaultProps as defaultButtonProps} from '@atlaskit/button';
 import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
 import Lozenge from '@atlaskit/lozenge';
 
 import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
-import {RegistryActionCreators} from './registry.reducer';
+import {addWatch, removeWatch} from './redux';
 
 import {WorkflowsDialog} from './WorkflowsDialog';
-import type {DeleteCallback, EditCallback, RegistryScriptType, WatcherCallback} from './types';
+import type {DeleteCallback, RegistryScriptType} from './types';
 
-import {CommonMessages} from '../i18n/common.i18n';
+import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
-import {registryService, watcherService} from '../service/services';
+import {registryService, watcherService} from '../service';
 
-import Script from '../common/script';
+import Script, {ScriptParameters} from '../common/script';
+import {RouterLink} from '../common/ak';
 
 
-type RegistryScriptConnectProps = {
+type RegistryScriptConnectProps = {|
     scriptWatches: Array<number>,
-    addWatch: WatcherCallback,
-    removeWatch: WatcherCallback,
-};
+    addWatch: typeof addWatch,
+    removeWatch: typeof removeWatch,
+|};
 
-export type PublicRegistryScriptProps = {
+export type PublicRegistryScriptProps = {|
     script: RegistryScriptType,
-    onEdit: EditCallback,
     onDelete: DeleteCallback,
-    title?: React.Node,
-    children?: React.Node,
-    wrapperProps?: any
-};
+    title?: Node,
+    children?: Node,
+    wrapperProps?: any,
+    collapsible?: boolean,
+    showParent?: boolean
+|};
 
-export type RegistryScriptProps = PublicRegistryScriptProps & RegistryScriptConnectProps;
+export type RegistryScriptProps = {|
+    ...PublicRegistryScriptProps,
+    ...RegistryScriptConnectProps
+|};
 
 type RegistryScriptState = {
     showWorkflows: boolean,
@@ -48,20 +55,17 @@ type RegistryScriptState = {
 };
 
 class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, RegistryScriptState> {
+    static defaultProps = {
+        collapsible: true,
+        showParent: false
+    };
+
     state = {
         showWorkflows: false,
         waitingWatch: false
     };
 
-    _toggleWorkflows = () => {
-        this.setState(
-            (state: RegistryScriptState): * => {
-                return {
-                    showWorkflows: !state.showWorkflows
-                };
-            }
-        );
-    };
+    _toggleWorkflows = () => this.setState( state => ({ showWorkflows: !state.showWorkflows }) );
 
     _toggleWatch = () => {
         const {script, scriptWatches, addWatch, removeWatch} = this.props;
@@ -70,9 +74,9 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
 
         this.setState({ waitingWatch: true });
 
-        const promise = isWatching ?
-            watcherService.stopWatching('REGISTRY_SCRIPT', script.id) :
-            watcherService.startWatching('REGISTRY_SCRIPT', script.id);
+        const promise = isWatching
+            ? watcherService.stopWatching('REGISTRY_SCRIPT', script.id)
+            : watcherService.startWatching('REGISTRY_SCRIPT', script.id);
 
         promise.then(
             () => {
@@ -88,11 +92,10 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
 
     _getChangelogs = () => registryService.getScriptChangelogs(this.props.script.id);
 
-    _onEdit = () => this.props.onEdit(this.props.script.id, 'script');
     _onDelete = () => this.props.onDelete(this.props.script.id, 'script', this.props.script.name);
 
-    render(): React.Node {
-        const {script, scriptWatches, wrapperProps, onEdit, onDelete, ...props} = this.props;
+    render() {
+        const {script, scriptWatches, wrapperProps, onDelete, addWatch, removeWatch, showParent, ...props} = this.props;
         const {showWorkflows, waitingWatch} = this.state;
 
         const isWatching = scriptWatches.includes(script.id);
@@ -103,13 +106,28 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
                 <Script
                     {...props}
 
-                    script={{...script}}
+                    script={{
+                        id: script.id,
+                        name: script.name,
+                        description: script.description,
+                        scriptBody: script.scriptBody,
+                        errorCount: script.errorCount,
+                        warningCount: script.warningCount,
+                        ...(script.uuid ? { inline: true, id: script.uuid } : {})
+                    }}
                     changelogsLoader={this._getChangelogs}
 
                     withChangelog={true}
 
-                    onEdit={this._onEdit}
                     additionalButtons={[
+                        <Button
+                            key="edit"
+                            appearance="subtle"
+                            iconBefore={<EditFilledIcon label=""/>}
+
+                            component={RouterLink}
+                            href={`/registry/script/edit/${script.id}`}
+                        />,
                         <Button
                             key="watch"
                             appearance="subtle"
@@ -125,11 +143,18 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
 
                             triggerType="button"
                             triggerButtonProps={{
+                                ...defaultButtonProps,
                                 appearance: 'subtle',
                                 iconBefore: <MoreVerticalIcon label=""/>
                             }}
                         >
                             <DropdownItemGroup>
+                                <DropdownItem
+                                    href={`/registry/script/view/${script.id}`}
+                                    linkComponent={RouterLink}
+                                >
+                                    {CommonMessages.permalink}
+                                </DropdownItem>
                                 <DropdownItem onClick={this._toggleWorkflows}>
                                     {RegistryMessages.findWorkflows}
                                 </DropdownItem>
@@ -140,28 +165,35 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
                         </DropdownMenu>
                     ]}
                 >
-                    <div className="flex-row" style={{marginBottom: '5px'}}>
-                        {script.types.map(type =>
-                            <div style={{marginRight: '5px'}} key={type}>
-                                <Lozenge appearance="new" isBold={true}>{type}</Lozenge>
-                            </div>
-                        )}
-                    </div>
+                    <ScriptParameters params={[
+                        showParent
+                            ? {
+                                label: FieldMessages.parentName,
+                                value: script.parentName
+                            }
+                            : null,
+                        {
+                            label: FieldMessages.type,
+                            value: (
+                                <div className="flex-row">
+                                    {script.types.map(type =>
+                                        <div style={{marginRight: '5px'}} key={type}>
+                                            <Lozenge appearance="new" isBold={true}>{type}</Lozenge>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        }
+                    ]}/>
                 </Script>
             </div>
         );
     }
 }
 
-export const RegistryScript =
+export const RegistryScript = (
     connect(
-        memoizeOne(({scriptWatches}: *): * => {
-            return {
-                scriptWatches
-            };
-        }),
-        {
-            addWatch: RegistryActionCreators.addWatch,
-            removeWatch: RegistryActionCreators.removeWatch
-        }
-    )(RegistryScriptInternal);
+        memoizeOne( ({scriptWatches}) => ({ scriptWatches }) ),
+        { addWatch, removeWatch }
+    )(RegistryScriptInternal)
+);

@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 
@@ -7,10 +7,10 @@ import './FieldError.less';
 
 
 type FieldErrorProps = {
-    error: React.Node
+    error: Node
 };
 
-export function FieldError({error}: FieldErrorProps): React.Node {
+export function FieldError({error}: FieldErrorProps): Node {
     return (
         <div className="FieldError">
             <ErrorIcon label="error icon" role="presentation" />

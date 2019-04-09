@@ -1,58 +1,69 @@
 //@flow
-import * as React from 'react';
+import React, {type ComponentType, type Element} from 'react';
 
-import Button from '@atlaskit/button';
 import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
+import Breadcrumbs from '@atlaskit/breadcrumbs';
+import {FieldTextStateless} from '@atlaskit/field-text';
 
 import {ScriptList} from './ScriptList';
 
-import type {FullDialogComponentProps, DialogComponentProps, ScriptComponentProps, I18nType} from './types';
+import {withRoot} from './breadcrumbs';
+import {ConnectedDeleteDialog} from './DeleteDialog';
 
+import type {ScriptComponentProps, I18nType} from './types';
+import type {DeleteDialogProps} from './DeleteDialog';
+
+import {updateFilter} from '../redux';
 import type {ItemType} from '../redux';
 
 
-type Props<T> = {
+type Props<T> = {|
     i18n: I18nType,
     isReady: boolean,
+    filter: string,
     items: Array<T>,
-    ScriptComponent: React.ComponentType<ScriptComponentProps<T>>,
-    DialogComponent?: React.ComponentType<FullDialogComponentProps>,
+    updateFilter: typeof updateFilter,
 
-    isCreateDisabled: boolean
-};
+    ScriptComponent: ComponentType<ScriptComponentProps<T>>,
+
+    actions?: Element<any>,
+|};
 
 type State = {
-    editProps: ?DialogComponentProps
+    deleteProps: ?DeleteDialogProps
 };
 
 export class ScriptPage<T: ItemType> extends React.PureComponent<Props<T>, State> {
-    static defaultProps = {
-        isCreateDisabled: false
-    };
-
     state = {
         editProps: null,
         deleteProps: null
     };
 
-    _triggerCreate = () => this.setState({ editProps: {isNew: true, id: null} });
+    _updateFilter = (e: SyntheticEvent<HTMLInputElement>) => this.props.updateFilter(e.currentTarget.value);
 
-    _triggerEdit = (id: number) => this.setState({ editProps: {isNew: false, id} });
+    _triggerDelete = (id: number, name: string, onConfirm: () => Promise<void>) => this.setState({ deleteProps: {id, name, onConfirm} });
 
-    _closeEdit = () => this.setState({ editProps: null });
+    _closeDelete = () => this.setState({ deleteProps: null });
 
-    render(): React.Node {
-        const {isReady, items, i18n, DialogComponent, ScriptComponent, isCreateDisabled} = this.props;
-        const {editProps} = this.state;
+    render() {
+        const {isReady, filter, items, i18n, ScriptComponent, actions} = this.props;
+        const {deleteProps} = this.state;
 
         return (
             <Page>
                 <PageHeader
-                    actions={
-                        !isCreateDisabled ? <Button appearance="primary" onClick={this._triggerCreate} isDisabled={!isReady}>
-                            {i18n.addItem}
-                        </Button> : undefined
+                    actions={actions}
+                    breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
+                    bottomBar={
+                        <FieldTextStateless
+                            isLabelHidden
+                            compact
+                            label="hidden"
+                            placeholder="Filter"
+                            value={filter}
+                            onChange={this._updateFilter}
+                        />
                     }
                 >
                     {i18n.title}
@@ -65,11 +76,11 @@ export class ScriptPage<T: ItemType> extends React.PureComponent<Props<T>, State
 
                         i18n={i18n}
                         ScriptComponent={ScriptComponent}
-                        onEdit={this._triggerEdit}
+                        onDelete={this._triggerDelete}
                     />
                 </div>
 
-                {editProps && DialogComponent ? <DialogComponent {...editProps} onClose={this._closeEdit}/> : null}
+                {deleteProps && <ConnectedDeleteDialog {...deleteProps} i18n={i18n.delete} onClose={this._closeDelete}/>}
             </Page>
         );
     }

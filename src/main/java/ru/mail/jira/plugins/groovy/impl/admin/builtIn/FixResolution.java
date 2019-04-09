@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class FixResolution implements BuiltInScript {
+public class FixResolution implements BuiltInScript<String> {
     private final SearchService searchService;
     private final IssueManager issueManager;
 
@@ -77,11 +77,16 @@ public class FixResolution implements BuiltInScript {
     }
 
     @Override
+    public boolean isHtml() {
+        return false;
+    }
+
+    @Override
     public List<ScriptParamDto> getParams() {
         return ImmutableList.of(
-            new ScriptParamDto("jql", "Query", ParamType.STRING),
-            new ScriptParamDto("resolution", "Resolution", ParamType.RESOLUTION),
-            new ScriptParamDto("sendEmail", "Send email", ParamType.BOOLEAN)
+            new ScriptParamDto("jql", "Query", ParamType.STRING, false),
+            new ScriptParamDto("resolution", "Resolution", ParamType.RESOLUTION, false),
+            new ScriptParamDto("sendEmail", "Send email", ParamType.BOOLEAN, false)
         );
     }
 }

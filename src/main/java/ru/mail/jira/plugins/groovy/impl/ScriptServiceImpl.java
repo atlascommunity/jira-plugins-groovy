@@ -1,36 +1,37 @@
 package ru.mail.jira.plugins.groovy.impl;
 
-import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.util.JiraUtils;
-import com.atlassian.plugin.ModuleDescriptor;
 import com.atlassian.plugin.Plugin;
-import com.atlassian.plugin.PluginAccessor;
-import com.atlassian.plugin.event.PluginEventListener;
-import com.atlassian.plugin.event.PluginEventManager;
-import com.atlassian.plugin.event.events.PluginDisablingEvent;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import groovy.lang.Binding;
-import groovy.lang.GroovyClassLoader;
-import groovy.lang.Script;
-import org.codehaus.groovy.control.CompilerConfiguration;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
+import com.google.common.collect.ImmutableMap;
+import groovy.lang.*;
+import org.codehaus.groovy.ast.ClassNode;
+import org.codehaus.groovy.control.*;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
+import org.codehaus.groovy.control.messages.WarningMessage;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.codehaus.groovy.tools.GroovyClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.script.*;
+import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingProvider;
+import ru.mail.jira.plugins.groovy.api.service.GlobalFunctionManager;
+import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.api.script.ScriptType;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 import ru.mail.jira.plugins.groovy.impl.groovy.*;
-import ru.mail.jira.plugins.groovy.impl.var.GlobalVariable;
-import ru.mail.jira.plugins.groovy.impl.var.HttpClientGlobalVariable;
-import ru.mail.jira.plugins.groovy.impl.var.LoggerGlobalVariable;
-import ru.mail.jira.plugins.groovy.impl.var.TemplateEngineGlobalVariable;
-import ru.mail.jira.plugins.groovy.util.DelegatingClassLoader;
+import ru.mail.jira.plugins.groovy.impl.groovy.statik.CompileStaticExtension;
+import ru.mail.jira.plugins.groovy.impl.groovy.statik.DeprecatedAstVisitor;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
+import ru.mail.jira.plugins.groovy.impl.var.HttpClientBindingDescriptor;
+import ru.mail.jira.plugins.groovy.impl.var.LoggerBindingDescriptor;
+import ru.mail.jira.plugins.groovy.impl.var.TemplateEngineBindingDescriptor;
+import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 
 import java.io.IOException;
 import java.util.*;
@@ -39,61 +40,124 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-@ExportAsService({ScriptService.class, LifecycleAware.class})
+@ExportAsService({ScriptService.class})
 @Component
-public class ScriptServiceImpl implements ScriptService, LifecycleAware {
+public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     private final Logger logger = LoggerFactory.getLogger(ScriptServiceImpl.class);
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock(); //todo: remove?
     private final Map<String, ScriptClosure> globalFunctions = new HashMap<>();
-    private final Map<String, GlobalVariable> globalVariables = new HashMap<>();
+    private final Map<String, BindingDescriptor> globalVariables = new HashMap<>();
     private final ParseContextHolder parseContextHolder = new ParseContextHolder();
+    //assuming that all mutations happen only during initialization in single thread
+    private final List<BindingProvider> bindingProviders = new ArrayList<>();
     private final Cache<String, CompiledScript> scriptCache = Caffeine
         .newBuilder()
-        .maximumSize(500)
+        .maximumSize(1000)
         .expireAfterAccess(1, TimeUnit.HOURS)
+        .recordStats()
         .build();
 
-    private final PluginAccessor pluginAccessor;
-    private final PluginEventManager pluginEventManager;
-    private final GlobalFunctionManagerImpl globalFunctionManager;
+    private final InjectionResolver injectionResolver;
+    private final GlobalFunctionManager globalFunctionManager;
     private final DelegatingClassLoader classLoader;
     private final GroovyClassLoader gcl;
+    private final CompilerConfiguration compilerConfiguration;
 
     @Autowired
     public ScriptServiceImpl(
-        @ComponentImport PluginAccessor pluginAccessor,
-        @ComponentImport PluginEventManager pluginEventManager,
-        GlobalFunctionManagerImpl globalFunctionManager,
+        InjectionResolver injectionResolver,
+        GlobalFunctionManager globalFunctionManager,
         DelegatingClassLoader classLoader
     ) {
-        this.pluginAccessor = pluginAccessor;
-        this.pluginEventManager = pluginEventManager;
+        this.injectionResolver = injectionResolver;
         this.globalFunctionManager = globalFunctionManager;
         this.classLoader = classLoader;
-        CompilerConfiguration config = new CompilerConfiguration()
+        this.compilerConfiguration = new CompilerConfiguration()
             .addCompilationCustomizers(
-                //todo: later new ASTTransformationCustomizer(CompileStatic.class),
+                new CompileStaticExtension(parseContextHolder, this),
                 new ImportCustomizer().addStarImports("ru.mail.jira.plugins.groovy.api.script"),
                 new WithPluginGroovyExtension(parseContextHolder),
-                new LoadClassesExtension(parseContextHolder, pluginAccessor, classLoader),
+                new LoadClassesExtension(parseContextHolder, injectionResolver, classLoader),
                 new InjectionExtension(parseContextHolder),
                 new ParamExtension(parseContextHolder)
             );
-        config.setTolerance(10);
+        this.compilerConfiguration.setWarningLevel(WarningMessage.LIKELY_ERRORS);
+        this.compilerConfiguration.setTolerance(10);
+        this.compilerConfiguration.setOptimizationOptions(ImmutableMap.of(
+            CompilerConfiguration.INVOKEDYNAMIC, Boolean.TRUE
+        ));
         this.gcl = new GroovyClassLoader(
             classLoader,
-            config
+            this.compilerConfiguration
         );
     }
 
     @Override
     public Object executeScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> bindings) throws Exception {
-        return doExecuteScript(scriptId, scriptString, type, bindings);
+        return doExecuteScript(scriptId, scriptString, type, bindings, false, null);
+    }
+
+    @Override
+    public Object executeScriptStatic(String scriptId, String scriptString, ScriptType type, Map<String, Object> bindings, Map<String, Class> types) throws Exception {
+        return doExecuteScript(scriptId, scriptString, type, bindings, true, types);
     }
 
     @Override
     public ParseContext parseScript(String script) {
-        return parseClass(script, true).getParseContext();
+        CompiledScript result = parseClass(script, true, false, null);
+        InvokerHelper.removeClass(result.getScriptClass());
+        return result.getParseContext();
+    }
+
+    @Override
+    public ParseContext parseScriptStatic(String script, Map<String, Class> types) {
+        CompiledScript result = parseClass(script, true, true, types);
+        InvokerHelper.removeClass(result.getScriptClass());
+        return result.getParseContext();
+    }
+
+    @Override
+    public Class parseClass(String classBody, boolean extended) {
+        return parseClass(classBody, extended, false, null).getScriptClass();
+    }
+
+    @Override
+    public Class parseClassStatic(String classBody, boolean extended, Map<String, Class> types) {
+        return parseClass(classBody, extended, true, types).getScriptClass();
+    }
+
+    @Override
+    public CacheStatsDto getCacheStats() {
+        CacheStats stats = scriptCache.stats();
+
+        return new CacheStatsDto(
+            stats.hitCount(),
+            stats.missCount(),
+            stats.loadSuccessCount(),
+            stats.loadFailureCount(),
+            stats.totalLoadTime(),
+            stats.evictionCount(),
+            stats.evictionWeight(),
+            scriptCache.estimatedSize()
+        );
+    }
+
+    @Override
+    public Map<String, BindingDescriptor> getGlobalBindings() {
+        Map<String, BindingDescriptor> result = new HashMap<>(globalVariables);
+
+        for (BindingProvider bindingProvider : bindingProviders) {
+            bindingProvider
+                .getBindings()
+                .forEach(result::put);
+        }
+
+        return result;
+    }
+
+    @Override
+    public void registerBindingProvider(BindingProvider bindingProvider) {
+        bindingProviders.add(bindingProvider);
     }
 
     @Override
@@ -107,30 +171,26 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         gcl.clearCache();
     }
 
-    private Object doExecuteScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> externalBindings) throws Exception {
-        //todo: r lock
-
+    private Object doExecuteScript(
+        String scriptId, String scriptString, ScriptType type, Map<String, Object> externalBindings,
+        boolean compileStatic, Map<String, Class> types
+    ) throws Exception {
         logger.debug("started execution");
 
         CompiledScript compiledScript = null;
 
-        boolean scriptIdPresent = scriptId != null;
-        if (scriptIdPresent) {
-            compiledScript = scriptCache.getIfPresent(scriptId);
+        if (scriptId != null) {
+            compiledScript = scriptCache.get(scriptId, ignore -> parseClass(scriptString, false, compileStatic, types));
         }
 
         if (compiledScript == null) {
-            compiledScript = parseClass(scriptString, false);
-
-            if (scriptIdPresent) {
-                scriptCache.put(scriptId, compiledScript);
-            }
+            compiledScript = parseClass(scriptString, false, compileStatic, types);
         }
 
         //make sure that plugin classes can be loaded for cached scripts
         Set<Plugin> plugins = new HashSet<>();
         for (String pluginKey : compiledScript.getParseContext().getPlugins()) {
-            Plugin plugin = pluginAccessor.getPlugin(pluginKey);
+            Plugin plugin = injectionResolver.getPlugin(pluginKey);
 
             if (plugin == null) {
                 throw new RuntimeException("Plugin " + pluginKey + " couldn't be loaded");
@@ -143,29 +203,34 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
         logger.debug("created class");
 
-        HashMap<String, Object> bindings = new HashMap<>(externalBindings);
+        HashMap<String, Object> bindings = new HashMap<>();
+
+        for (BindingProvider bindingProvider : bindingProviders) {
+            bindingProvider.getBindings().forEach((name, value) -> bindings.put(name, value.getValue(scriptId)));
+        }
+
         bindings.put("scriptType", type);
+
+        for (Map.Entry<String, ScriptClosure> entry : globalFunctions.entrySet()) {
+            bindings.put(entry.getKey(), entry.getValue());
+        }
+
+        for (Map.Entry<String, BindingDescriptor> entry : globalVariables.entrySet()) {
+            bindings.put(entry.getKey(), entry.getValue().getValue(scriptId));
+        }
+
+        bindings.putAll(externalBindings);
 
         for (ScriptInjection injection : compiledScript.getParseContext().getInjections()) {
             if (injection.getPlugin() != null) {
-                Plugin plugin = pluginAccessor.getPlugin(injection.getPlugin());
-                Class pluginClass = plugin.getClassLoader().loadClass(injection.getClassName());
-                Object component = ComponentAccessor.getOSGiComponentInstanceOfType(pluginClass);
-
-                if (component == null) {
-                    List<ModuleDescriptor> modules = plugin.getModuleDescriptorsByModuleClass(pluginClass);
-                    if (modules.size() > 0) {
-                        component = modules.get(0).getModule();
-                    }
-                }
+                Object component = injectionResolver.resolvePluginInjection(injection.getPlugin(), injection.getClassName());
 
                 if (component != null) {
                     bindings.put(injection.getVariableName(), component);
                     continue;
                 }
             } else {
-                Class componentClass = JiraUtils.class.getClassLoader().loadClass(injection.getClassName());
-                Object component = ComponentAccessor.getComponent(componentClass);
+                Object component = injectionResolver.resolveStandardInjection(injection.getClassName());
 
                 if (component != null) {
                     bindings.put(injection.getVariableName(), component);
@@ -174,14 +239,6 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
             }
 
             throw new RuntimeException("Unable to resolve injection: " + injection);
-        }
-
-        for (Map.Entry<String, ScriptClosure> entry : globalFunctions.entrySet()) {
-            bindings.put(entry.getKey(), entry.getValue());
-        }
-
-        for (Map.Entry<String, GlobalVariable> entry : globalVariables.entrySet()) {
-            bindings.put(entry.getKey(), entry.getValue().getValue());
         }
 
         logger.debug("initialized bindings");
@@ -200,9 +257,8 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         }
     }
 
-    @PluginEventListener
-    public void onPluginUnloaded(PluginDisablingEvent event) {
-        String pluginKey = event.getPlugin().getKey();
+    public void onPluginDisable(Plugin plugin) {
+        String pluginKey = plugin.getKey();
 
         Lock lock = rwLock.writeLock();
         lock.lock();
@@ -214,12 +270,56 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         }
     }
 
-    private CompiledScript parseClass(String script, boolean extended) {
+    private CompiledScript parseClass(String script, boolean extended, boolean compileStatic, Map<String, Class> types) {
         logger.debug("parsing script");
         try {
             parseContextHolder.get().setExtended(extended);
+            parseContextHolder.get().setCompileStatic(compileStatic);
+            parseContextHolder.get().setTypes(types);
 
-            Class scriptClass = gcl.parseClass(script);
+            Class scriptClass = null;
+            if (compileStatic) {
+                String fileName = "script" + System.currentTimeMillis() + Math.abs(script.hashCode()) + ".groovy";
+                CompilationUnit compilationUnit = new CompilationUnit(compilerConfiguration, null, gcl);
+                SourceUnit sourceUnit = compilationUnit.addSource(fileName, script);
+                compilationUnit.compile(Phases.CLASS_GENERATION);
+
+                if (extended) {
+                    DeprecatedAstVisitor astVisitor = new DeprecatedAstVisitor();
+
+                    for (Object aClass : compilationUnit.getAST().getClasses()) {
+                        astVisitor.visitClass((ClassNode) aClass);
+                    }
+
+                    parseContextHolder.get().setWarnings(astVisitor.getWarnings());
+                }
+
+                GroovyClassLoader.InnerLoader innerLoader = new GroovyClassLoader.InnerLoader(gcl);
+
+                String mainClass = sourceUnit.getAST().getMainClassName();
+                for (Object aClass : compilationUnit.getClasses()) {
+                    if (aClass instanceof GroovyClass) {
+                        GroovyClass groovyClass = (GroovyClass) aClass;
+
+                        BytecodeProcessor bytecodePostprocessor = compilerConfiguration.getBytecodePostprocessor();
+
+                        byte[] byteCode = groovyClass.getBytes();
+                        if (bytecodePostprocessor != null) {
+                            byteCode = bytecodePostprocessor.processBytecode(groovyClass.getName(), byteCode);
+                        }
+
+                        Class clazz = innerLoader.defineClass(groovyClass.getName(), byteCode);
+
+                        if (groovyClass.getName().equals(mainClass)) {
+                            scriptClass = clazz;
+                        }
+                    }
+                }
+
+                //todo: we might have an issue if some script (parsed by gcl) created class with name Xxx and there's global object with same class name
+            } else {
+                scriptClass = gcl.parseClass(script);
+            }
 
             logger.debug("parsed script");
             return new CompiledScript(
@@ -234,16 +334,14 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
 
     @Override
     public void onStart() {
-        pluginEventManager.register(this);
-
         for (Map.Entry<String, String> entry : globalFunctionManager.getGlobalFunctions().entrySet()) {
-            globalFunctions.put(entry.getKey(), new ScriptClosure(parseClass(entry.getValue(), false).getScriptClass()));
+            globalFunctions.put(entry.getKey(), new ScriptClosure(parseClass(entry.getValue(), false, false, null).getScriptClass()));
         }
 
-        globalVariables.put("httpClient", new HttpClientGlobalVariable());
-        globalVariables.put("logger", new LoggerGlobalVariable());
-        globalVariables.put("log", new LoggerGlobalVariable());
-        globalVariables.put("templateEngine", new TemplateEngineGlobalVariable(gcl));
+        globalVariables.put("httpClient", new HttpClientBindingDescriptor());
+        globalVariables.put("logger", new LoggerBindingDescriptor());
+        globalVariables.put("log", new LoggerBindingDescriptor());
+        globalVariables.put("templateEngine", new TemplateEngineBindingDescriptor(gcl));
     }
 
     @Override
@@ -251,8 +349,6 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         //clear everything, just in case
 
         logger.info("cleaning up");
-
-        pluginEventManager.unregister(this);
 
         invalidateAll();
 
@@ -265,7 +361,7 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
             logger.error("unable to close gcl", e);
         }
 
-        for (Map.Entry<String, GlobalVariable> entry : globalVariables.entrySet()) {
+        for (Map.Entry<String, BindingDescriptor> entry : globalVariables.entrySet()) {
             try {
                 entry.getValue().dispose();
             } catch (Exception e) {
@@ -274,5 +370,11 @@ public class ScriptServiceImpl implements ScriptService, LifecycleAware {
         }
 
         globalVariables.clear();
+        bindingProviders.clear();
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 10;
     }
 }

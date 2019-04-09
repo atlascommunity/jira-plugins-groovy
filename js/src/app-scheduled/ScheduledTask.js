@@ -1,20 +1,20 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
 
 import memoizeOne from 'memoize-one';
 
 import Avatar from '@atlaskit/avatar';
+import Button from '@atlaskit/button';
 import Lozenge from '@atlaskit/lozenge';
-import InlineDialog from '@atlaskit/inline-dialog';
+import Tooltip from '@atlaskit/tooltip';
 import {ToggleStateless} from '@atlaskit/toggle';
 import {colors} from '@atlaskit/theme';
 
-import type {Appearances} from '@atlaskit/lozenge/dist/cjs/Lozenge/index';
-
 import ErrorIcon from '@atlaskit/icon/glyph/error';
 import InfoIcon from '@atlaskit/icon/glyph/info';
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import {RunNowDialog} from './RunNowDialog';
 import {types} from './types';
@@ -23,18 +23,19 @@ import type {RunOutcomeType, ScheduledTaskType} from './types';
 
 import {ScriptParameters} from '../common/script';
 
-import {scheduledTaskService} from '../service/services';
+import {scheduledTaskService} from '../service';
 
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
-import {FieldMessages} from '../i18n/common.i18n';
-import {ItemActionCreators, WatchActionCreators} from '../common/redux';
+import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
+import {updateItem, WatchActionCreators} from '../common/redux';
 
 import type {ScriptParam} from '../common/script/ScriptParameters';
 import {WatchableScript} from '../common/script/WatchableScript';
 import type {ScriptComponentProps} from '../common/script-list/types';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
-function getOutcomeLozengeAppearance(outcome: RunOutcomeType): Appearances {
+function getOutcomeLozengeAppearance(outcome: RunOutcomeType): * {
     switch(outcome) {
         case 'SUCCESS':
             return 'success';
@@ -51,50 +52,33 @@ function getOutcomeLozengeAppearance(outcome: RunOutcomeType): Appearances {
 }
 
 const ConnectedWatchableScript = connect(
-    memoizeOne(
-        (state: *): * => {
-            return {
-                watches: state.watches
-            };
-        }
-    ),
+    memoizeOne( state => ({ watches: state.watches }) ),
     WatchActionCreators
 )(WatchableScript);
 
-const {updateItem, deleteItem} = ItemActionCreators;
-
-type Props = ScriptComponentProps<ScheduledTaskType> & {
-    updateItem: typeof updateItem,
-    deleteItem: typeof deleteItem,
-};
+type Props = {|
+    ...ScriptComponentProps<ScheduledTaskType>,
+    updateItem: typeof updateItem
+|};
 
 type State = {
-    showStatusInfo: boolean,
     showRunDialog: boolean
 };
 
 export class ScheduledTaskInternal extends React.Component<Props, State> {
+    static defaultProps = {
+        collapsible: true
+    };
+
     state = {
-        showStatusInfo: false,
         showRunDialog: false
     };
 
-    _edit = () => this.props.onEdit(this.props.script.id);
-
-    _delete = () => {
-        const {script} = this.props;
-
-        // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${script.name}"?`)) {
-            scheduledTaskService
-                .doDelete(script.id)
-                .then(() => this.props.deleteItem(script.id));
-        }
-    };
-
-    _showStatusInfo = () => this.setState({ showStatusInfo: true });
-
-    _hideStatusInfo = () => this.setState({ showStatusInfo: false });
+    _delete = () => this.props.onDelete && this.props.onDelete(
+        this.props.script.id,
+        this.props.script.name,
+        () => scheduledTaskService.doDelete(this.props.script.id)
+    );
 
     _toggleEnabled = () => {
         const {script, updateItem} = this.props;
@@ -106,14 +90,10 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
             .then(() => updateItem({...script, enabled}));
     };
 
-    _toggleRunNow = () => this.setState((state: State): * => {
-        return {
-            showRunDialog: !state.showRunDialog
-        };
-    });
+    _toggleRunNow = () => this.setState( state => ({ showRunDialog: !state.showRunDialog }) );
 
     _getParams = memoizeOne(
-        (task: ScheduledTaskType): Array<ScriptParam> => {
+        (task: ScheduledTaskType): Array<?ScriptParam> => {
             const params = [
                 {
                     label: FieldMessages.schedule,
@@ -149,13 +129,13 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                 });
             }
 
-            if ((task.type === 'ISSUE_JQL_TRANSITION') && task.transitionOptions) {
+            const {transitionOptions} = task;
+            if ((task.type === 'ISSUE_JQL_TRANSITION') && transitionOptions) {
                 params.push({
                     label: ScheduledTaskMessages.transitionOptions,
                     value: Object
-                        .keys(task.transitionOptions)
-                        .filter(key => task.transitionOptions[key])
-                        //$FlowFixMe
+                        .keys(transitionOptions)
+                        .filter(key => transitionOptions[key])
                         .map(key => ScheduledTaskMessages.transitionOption[key])
                         .join(', ') || 'None'
                 });
@@ -165,38 +145,43 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
         }
     );
 
-    render(): React.Node {
-        const {script} = this.props;
-        const {showStatusInfo, showRunDialog} = this.state;
+    render() {
+        const {script, collapsible, focused} = this.props;
+        const {showRunDialog} = this.state;
         const {lastRunInfo} = script;
 
         const outcome = lastRunInfo ? lastRunInfo.outcome : 'NOT_RAN';
 
         const isError = outcome === 'FAILED';
-        const lastRun = lastRunInfo ?
-            <div className="flex-column">
-                <strong>{ScheduledTaskMessages.lastRun}{':'}</strong>
-                <div>
-                    {lastRunInfo.startDate}{' - '}{lastRunInfo.duration/1000}{'s'}
+        const lastRun = lastRunInfo
+            ? (
+                <div className="flex-column">
+                    <strong>{ScheduledTaskMessages.lastRun}{':'}</strong>
+                    <div>
+                        {lastRunInfo.startDate}{' - '}{lastRunInfo.duration/1000}{'s'}
+                    </div>
+                    {lastRunInfo.message && <div className="flex-row">
+                        <div style={{color: isError ? colors.R400 : colors.P300}}>
+                            {isError ? <ErrorIcon size="small"/> : <InfoIcon size="small"/>}
+                        </div>
+                        <div className="TaskRunMessage">
+                            {lastRunInfo.message}
+                        </div>
+                    </div>}
                 </div>
-                {lastRunInfo.message && <div className="flex-row">
-                    <div style={{color: isError ? colors.R400 : colors.P300}}>
-                        {isError ? <ErrorIcon size={'medium'}/> : <InfoIcon size={'medium'}/>}
-                    </div>
-                    <div className="TaskRunMessage">
-                        {lastRunInfo.message}
-                    </div>
-                </div>}
-            </div> : '';
+            )
+            : '';
 
-        const popup = <div className="flex-column">
-            <div>
-                <strong>{ScheduledTaskMessages.nextRun}{':'}</strong>
-                <div>{script.nextRunDate || 'unavailable'}</div>
+        const popup = (
+            <div className="flex-column">
+                <div>
+                    <strong>{ScheduledTaskMessages.nextRun}{':'}</strong>
+                    <div>{script.nextRunDate || 'unavailable'}</div>
+                </div>
+                {lastRun}
             </div>
-            {lastRun}
-        </div>;
-        let titleEl: React.Node = (
+        );
+        let titleEl: Node = (
             <div className="flex-row space-between">
                 <div className="flex-vertical-middle">
                     <ToggleStateless
@@ -211,34 +196,42 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                     </span>
                 </div>
                 <div className="flex-vertical-middle">
-                    <InlineDialog
+                    <Tooltip
                         content={popup}
-                        isOpen={showStatusInfo}
-                        respondsTo="hover"
-                        alignment="bottom center"
+                        placement="bottom"
                     >
                         <div
                             className="flex-vertical-middle"
-                            onMouseEnter={this._showStatusInfo}
-                            onMouseLeave={this._hideStatusInfo}
                         >
                             <Lozenge appearance={getOutcomeLozengeAppearance(outcome)} isBold={true}>
                                 {outcome}
                             </Lozenge>
                         </div>
-                    </InlineDialog>
+                    </Tooltip>
                 </div>
             </div>
         );
 
-        const scriptObject = (script.type !== 'ISSUE_JQL_TRANSITION') ? {
-            id: script.uuid,
-            name: script.name,
-            scriptBody: script.scriptBody,
-            inline: true,
-            changelogs: script.changelogs,
-            description: script.description
-        } : null;
+        const isJqlTransition = script.type === 'ISSUE_JQL_TRANSITION';
+
+        const scriptObject = (
+            !isJqlTransition
+            ? {
+                id: script.uuid,
+                name: script.name,
+                scriptBody: script.scriptBody,
+                inline: true,
+                changelogs: script.changelogs,
+                description: script.description
+            }
+            : {
+                id: script.uuid,
+                name: script.name,
+                inline: true,
+                changelogs: script.changelogs,
+                description: script.description
+            }
+        );
 
         return (
             <ConnectedWatchableScript
@@ -246,16 +239,35 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                 entityType="SCHEDULED_TASK"
 
                 withChangelog={true}
+                collapsible={collapsible}
+                focused={focused}
+                noCode={isJqlTransition}
+
                 script={scriptObject}
                 title={titleEl}
-                onEdit={this._edit}
                 onDelete={this._delete}
 
                 dropdownItems={[
                     {
+                        label: CommonMessages.permalink,
+                        href: `/scheduled/${script.id}/view`,
+                        linkComponent: RouterLink
+                    },
+                    {
                         label: ScheduledTaskMessages.runNow,
                         onClick: this._toggleRunNow
                     }
+                ]}
+
+                additionalButtons={[
+                    <Button
+                        key="edit"
+                        appearance="subtle"
+                        iconBefore={<EditFilledIcon label=""/>}
+
+                        component={RouterLink}
+                        href={`/scheduled/${script.id}/edit`}
+                    />
                 ]}
             >
                 {script.type === 'ISSUE_JQL_TRANSITION' && script.description &&
@@ -274,5 +286,5 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
 
 export const ScheduledTask = connect(
     null,
-    { updateItem, deleteItem }
+    { updateItem }
 )(ScheduledTaskInternal);

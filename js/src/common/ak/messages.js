@@ -1,66 +1,39 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
-import {colors} from '@atlaskit/theme';
-
-import InfoIcon from '@atlaskit/icon/glyph/info';
-import ErrorIcon from '@atlaskit/icon/glyph/error';
-import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
-
-import './messages.less';
+import SectionMessage from '@atlaskit/section-message';
 
 
-type MessageProps = {
-    title: React.Node,
-    children?: React.Node
-};
+type MessageProps = {|
+    title?: string,
+    children?: Node
+|};
 
-type BaseMessageProps = MessageProps & {
-    icon: React.Node,
-    className: string
-};
-
-function Message({title, children, icon, className}: BaseMessageProps): React.Node {
+export function InfoMessage(props: MessageProps): Node {
     return (
-        <div className={className}>
-            <div className="Icon">
-                {icon}
-            </div>
-            <div className="Body">
-                <div className="Title">
-                    {title}
-                </div>
-                {children}
-            </div>
-        </div>
-    );
-}
-
-export function InfoMessage(props: MessageProps): React.Node {
-    return (
-        <Message
+        <SectionMessage
             className="InfoMessage"
-            icon={<InfoIcon label="info" primaryColor={colors.P300} size="medium"/>}
+            appearance="info"
             {...props}
         />
     );
 }
 
-export function ErrorMessage(props: MessageProps): React.Node {
+export function ErrorMessage(props: MessageProps): Node {
     return (
-        <Message
+        <SectionMessage
             className="ErrorMessage"
-            icon={<ErrorIcon label="error" primaryColor={colors.R300} size="medium"/>}
+            appearance="error"
             {...props}
         />
     );
 }
 
-export function SuccessMessage(props: MessageProps): React.Node {
+export function SuccessMessage(props: MessageProps): Node {
     return (
-        <Message
+        <SectionMessage
             className="SuccessMessage"
-            icon={<CheckCircleIcon label="error" primaryColor={colors.G300} size="medium"/>}
+            appearance="confirmation"
             {...props}
         />
     );

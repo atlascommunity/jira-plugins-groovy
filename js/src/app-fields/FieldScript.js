@@ -1,45 +1,80 @@
 //@flow
-import * as React from 'react';
+import React, {Fragment} from 'react';
+import {Link} from 'react-router-dom';
+import {connect} from 'react-redux';
+
+import memoizeOne from 'memoize-one';
+
+import Button from '@atlaskit/button';
+
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import type {FieldConfigItem} from './types';
 
-import {getBaseUrl} from '../service/ajaxHelper';
-import {Script} from '../common/script/Script';
+import {getBaseUrl} from '../service';
 
 import {JiraMessages, FieldMessages, ErrorMessages, CommonMessages} from '../i18n/common.i18n';
-import {FieldError} from '../common/ak/FieldError';
+import {ErrorMessage} from '../common/ak/messages';
 import {ScriptParameters} from '../common/script';
+import {WatchableScript} from '../common/script/WatchableScript';
+import {WatchActionCreators} from '../common/redux';
+
+import type {ScriptComponentProps} from '../common/script-list/types';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
-type Props = {
-    script: FieldConfigItem,
-    onEdit: any //ignored
-};
+const ConnectedWatchableScript = connect(
+    memoizeOne(state => ({ watches: state.watches }) ),
+    WatchActionCreators
+)(WatchableScript);
+
+type Props = ScriptComponentProps<FieldConfigItem>;
 
 export class FieldScript extends React.PureComponent<Props> {
-    render(): React.Node {
-        const {script} = this.props;
+    render() {
+        const {script, collapsible, focused} = this.props;
 
         return (
-            <Script
+            <ConnectedWatchableScript
+                entityId={script.id}
+                entityType="CUSTOM_FIELD"
+
                 script={{
                     id: script.uuid,
-                    name: `${script.customFieldName} - ${script.contextName}`,
+                    name: script.name,
                     inline: true,
                     scriptBody: script.scriptBody,
+                    description: script.description,
                     changelogs: script.changelogs,
-                    errorCount: script.errorCount
+                    errorCount: script.errorCount,
+                    warningCount: script.warningCount
                 }}
-                template={script.needsTemplate ? {
-                    body: script.template || ''
-                } : undefined}
+                template={script.needsTemplate
+                    ? {
+                        body: script.template || ''
+                    }
+                    : undefined
+                }
 
                 withChangelog={true}
+                collapsible={collapsible}
+                focused={focused}
+
+                scriptName={
+                    <Fragment>
+                        {script.customFieldName}
+                        {' '}
+                        <span className="muted-text">
+                            {script.contextName}
+                        </span>
+                    </Fragment>
+                }
 
                 dropdownItems={[
                     {
-                        label: `${JiraMessages.edit} ${CommonMessages.script}`,
-                        href: `${getBaseUrl()}/plugins/servlet/my-groovy/custom-field?fieldConfigId=${script.id}`
+                        label: CommonMessages.permalink,
+                        href: `/fields/${script.id}/view`,
+                        linkComponent: RouterLink
                     },
                     {
                         label: `${JiraMessages.edit} ${FieldMessages.customField}`,
@@ -50,8 +85,19 @@ export class FieldScript extends React.PureComponent<Props> {
                         href: `${getBaseUrl()}/secure/admin/ConfigureCustomField!default.jspa?customFieldId=${script.customFieldId}`
                     }
                 ]}
+
+                additionalButtons={[
+                    <Button
+                        key="edit"
+                        appearance="subtle"
+                        iconBefore={<EditFilledIcon label=""/>}
+
+                        component={Link}
+                        to={`/fields/${script.id}/edit`}
+                    />
+                ]}
             >
-                {!script.uuid && <FieldError error={ErrorMessages.notConfigured}/>}
+                {!script.uuid && <ErrorMessage title={ErrorMessages.notConfigured}/>}
                 <ScriptParameters
                     params={[
                         {
@@ -66,9 +112,15 @@ export class FieldScript extends React.PureComponent<Props> {
                             label: FieldMessages.cacheable,
                             value: script.cacheable ? CommonMessages.yes : CommonMessages.no
                         },
+                        script.needsTemplate
+                            ? {
+                                label: 'Velocity params',
+                                value: script.velocityParamsEnabled ? CommonMessages.yes : CommonMessages.no
+                            }
+                            : null
                     ]}
                 />
-            </Script>
+            </ConnectedWatchableScript>
         );
     }
 }

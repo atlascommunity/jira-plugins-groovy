@@ -12,158 +12,15 @@
     <!-- add our i18n resource -->
     <resource type="i18n" name="i18n" location="ru.mail.jira.plugins.groovy.i18n"/>
 
-    <!-- react resources -->
-    <web-resource key="react-common">
+    <web-resource key="react-i18n">
         <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
 
-        <!--todo: remove unused -->
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <dependency>com.atlassian.auiplugin:dialog2</dependency>
-        <dependency>com.atlassian.auiplugin:aui-experimental-tooltips</dependency>
-        <dependency>com.atlassian.auiplugin:aui-select</dependency>
-        <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+        <dependency>jira.webresources:almond</dependency>
 
         <resource type="download" name="i18n.js" location="/ru/mail/jira/plugins/groovy/i18n.js"/>
-        <resource type="download" name="common.css" location="/ru/mail/jira/plugins/groovy/css/common.css"/>
-        <resource type="download" name="common.css.smap" location="/ru/mail/jira/plugins/groovy/css/common.css.smap"/>
-        <resource type="download" name="common.js" location="/ru/mail/jira/plugins/groovy/js/common.js"/>
-        <resource type="download" name="common.js.smap" location="/ru/mail/jira/plugins/groovy/js/common.js.smap"/>
     </web-resource>
-
-    <web-resource key="workflow" name="groovy workflow Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="workflow.css" location="/ru/mail/jira/plugins/groovy/css/workflow.css"/>
-        <resource type="download" name="workflow.css.smap" location="/ru/mail/jira/plugins/groovy/css/workflow.css.smap"/>
-        <resource type="download" name="workflow.js" location="/ru/mail/jira/plugins/groovy/js/workflow.js"/>
-        <resource type="download" name="workflow.js.smap" location="/ru/mail/jira/plugins/groovy/js/workflow.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.workflow</context>
-    </web-resource>
-
-    <web-resource key="console-resources" name="groovy console Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="console.css" location="/ru/mail/jira/plugins/groovy/css/console.css"/>
-        <resource type="download" name="console.css.smap" location="/ru/mail/jira/plugins/groovy/css/console.css.smap"/>
-
-        <resource type="download" name="console.js" location="/ru/mail/jira/plugins/groovy/js/console.js"/>
-        <resource type="download" name="console.js.smap" location="/ru/mail/jira/plugins/groovy/js/console.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.console</context>
-    </web-resource>
-
-    <web-resource key="admin-scripts-resources" name="groovy console Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="admin.css" location="/ru/mail/jira/plugins/groovy/css/admin.css"/>
-        <resource type="download" name="admin.css.smap" location="/ru/mail/jira/plugins/groovy/css/admin.css.smap"/>
-
-        <resource type="download" name="admin.js" location="/ru/mail/jira/plugins/groovy/js/admin.js"/>
-        <resource type="download" name="admin.js.smap" location="/ru/mail/jira/plugins/groovy/js/admin.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.admin-scripts</context>
-    </web-resource>
-
-    <web-resource key="registry-resources" name="groovy script registry Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="repository.css" location="/ru/mail/jira/plugins/groovy/css/repository.css"/>
-        <resource type="download" name="repository.css.smap" location="/ru/mail/jira/plugins/groovy/css/repository.css.smap"/>
-
-        <resource type="download" name="repository.js" location="/ru/mail/jira/plugins/groovy/js/repository.js"/>
-        <resource type="download" name="repository.js.smap" location="/ru/mail/jira/plugins/groovy/js/repository.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.registry</context>
-    </web-resource>
-
-    <web-resource key="listeners-resources" name="groovy listeners Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="listeners.css" location="/ru/mail/jira/plugins/groovy/css/listeners.css"/>
-        <resource type="download" name="listeners.css.smap" location="/ru/mail/jira/plugins/groovy/css/listeners.css.smap"/>
-
-        <resource type="download" name="listeners.js" location="/ru/mail/jira/plugins/groovy/js/listeners.js"/>
-        <resource type="download" name="listeners.js.smap" location="/ru/mail/jira/plugins/groovy/js/listeners.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.listeners</context>
-    </web-resource>
-
-    <web-resource key="audit-resources" name="groovy audit Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="audit.css" location="/ru/mail/jira/plugins/groovy/css/audit.css"/>
-        <resource type="download" name="audit.css.smap" location="/ru/mail/jira/plugins/groovy/css/audit.css.smap"/>
-
-        <resource type="download" name="audit.js" location="/ru/mail/jira/plugins/groovy/js/audit.js"/>
-        <resource type="download" name="audit.js.smap" location="/ru/mail/jira/plugins/groovy/js/audit.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.audit</context>
-    </web-resource>
-
-    <web-resource key="rest-resources" name="groovy rest Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="rest.css" location="/ru/mail/jira/plugins/groovy/css/rest.css"/>
-        <resource type="download" name="rest.css.smap" location="/ru/mail/jira/plugins/groovy/css/rest.css.smap"/>
-
-        <resource type="download" name="rest.js" location="/ru/mail/jira/plugins/groovy/js/rest.js"/>
-        <resource type="download" name="rest.js.smap" location="/ru/mail/jira/plugins/groovy/js/rest.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.rest</context>
-    </web-resource>
-
-    <web-resource key="fields-resources" name="groovy fields Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="fields.css" location="/ru/mail/jira/plugins/groovy/css/fields.css"/>
-        <resource type="download" name="fields.css.smap" location="/ru/mail/jira/plugins/groovy/css/fields.css.smap"/>
-
-        <resource type="download" name="fields.js" location="/ru/mail/jira/plugins/groovy/js/fields.js"/>
-        <resource type="download" name="fields.js.smap" location="/ru/mail/jira/plugins/groovy/js/fields.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.fields</context>
-    </web-resource>
-
-    <web-resource key="cf-resources" name="groovy custom field Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="cf.css" location="/ru/mail/jira/plugins/groovy/css/cf.css"/>
-        <resource type="download" name="cf.css.smap" location="/ru/mail/jira/plugins/groovy/css/cf.css.smap"/>
-
-        <resource type="download" name="cf.js" location="/ru/mail/jira/plugins/groovy/js/cf.js"/>
-        <resource type="download" name="cf.js.smap" location="/ru/mail/jira/plugins/groovy/js/cf.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.cf</context>
-    </web-resource>
-
-    <web-resource key="scheduled-resources" name="groovy scheduled Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="scheduled.css" location="/ru/mail/jira/plugins/groovy/css/scheduled.css"/>
-        <resource type="download" name="scheduled.css.smap" location="/ru/mail/jira/plugins/groovy/css/scheduled.css.smap"/>
-
-        <resource type="download" name="scheduled.js" location="/ru/mail/jira/plugins/groovy/js/scheduled.js"/>
-        <resource type="download" name="scheduled.js.smap" location="/ru/mail/jira/plugins/groovy/js/scheduled.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.scheduled</context>
-    </web-resource>
-
-    <web-resource key="extras-resources" name="groovy extras Web Resources">
-        <dependency>ru.mail.jira.plugins.groovy:react-common</dependency>
-
-        <resource type="download" name="extras.css" location="/ru/mail/jira/plugins/groovy/css/extras.css"/>
-        <resource type="download" name="extras.css.smap" location="/ru/mail/jira/plugins/groovy/css/extras.css.smap"/>
-
-        <resource type="download" name="extras.js" location="/ru/mail/jira/plugins/groovy/js/extras.js"/>
-        <resource type="download" name="extras.js.smap" location="/ru/mail/jira/plugins/groovy/js/extras.js.smap"/>
-
-        <context>ru.mail.jira.plugins.groovy.extras</context>
-    </web-resource>
-
-    <!-- end of resources -->
 
     <rest key="groovyRest" path="/my-groovy" version="1.0">
         <description>Groovy rest module</description>
@@ -184,12 +41,16 @@
         <entity>ru.mail.jira.plugins.groovy.api.entity.AuditLogEntry</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestScript</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestChangelog</entity>
-        <entity>ru.mail.jira.plugins.groovy.api.entity.FieldConfig</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.FieldScript</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.ScheduledTask</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.ScheduledTaskChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.AdminScript</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.AdminScriptChangelog</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.JqlFunctionScript</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.JqlFunctionScriptChangelog</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.GlobalObject</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.GlobalObjectChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.Watcher</entity>
     </ao>
 
@@ -370,7 +231,7 @@
     <web-item key="groovy-admin-scripts-menu-item" name="Groovy admin scripts menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy admin scripts.</description>
         <label key="ru.mail.jira.plugins.groovy.link.adminScripts" />
-        <link linkId="mailru-groovy-console-link">/plugins/servlet/my-groovy/admin-scripts</link>
+        <link linkId="mailru-groovy-admin-scripts-link">/plugins/servlet/my-groovy/admin-scripts</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -400,7 +261,7 @@
     <web-item key="groovy-rest-menu-item" name="Groovy rest menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy rest page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.rest" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/rest</link>
+        <link linkId="mailru-groovy-rest-link">/plugins/servlet/my-groovy/rest</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -410,7 +271,7 @@
     <web-item key="groovy-fields-menu-item" name="Groovy fields menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
         <description>Link to groovy fields page.</description>
         <label key="ru.mail.jira.plugins.groovy.link.fields" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/fields</link>
+        <link linkId="mailru-groovy-fields-link">/plugins/servlet/my-groovy/fields</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -427,20 +288,30 @@
         </condition>
     </web-item>
 
-    <web-item key="groovy-audit-menu-item" name="Groovy audit menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
-        <description>Link to groovy audit page.</description>
-        <label key="ru.mail.jira.plugins.groovy.link.audit" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/audit</link>
+    <web-item key="groovy-jql-menu-item" name="Groovy jql menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy JQL page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.jql" />
+        <link linkId="mailru-groovy-jql-link">/plugins/servlet/my-groovy/jql</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
         </condition>
     </web-item>
 
-    <web-item key="groovy-extras-menu-item" name="Groovy listeners menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
-        <description>Link to groovy extras page.</description>
-        <label key="ru.mail.jira.plugins.groovy.link.extras" />
-        <link linkId="mailru-groovy-listeners-link">/plugins/servlet/my-groovy/extras</link>
+    <web-item key="groovy-go-menu-item" name="Groovy global objects menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy global objects page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.go" />
+        <link linkId="mailru-groovy-go-link">/plugins/servlet/my-groovy/go</link>
+
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">SYSTEM_ADMIN</param>
+        </condition>
+    </web-item>
+
+    <web-item key="groovy-audit-menu-item" name="Groovy audit menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
+        <description>Link to groovy audit page.</description>
+        <label key="ru.mail.jira.plugins.groovy.link.audit" />
+        <link linkId="mailru-groovy-audit-link">/plugins/servlet/my-groovy/audit</link>
 
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
             <param name="permission">SYSTEM_ADMIN</param>
@@ -542,4 +413,20 @@
         <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="daterange"/>
         <valid-searcher package="com.atlassian.jira.plugin.system.customfieldtypes" key="userpickergroupsearcher"/>
     </customfield-type>
+
+    <customfield-type
+            key="groovy-jql-field"
+            name="Groovy jql function field"
+            class="ru.mail.jira.plugins.groovy.impl.jql.JqlFunctionCFType"
+
+            managed-access-level="locked"
+    />
+
+    <customfield-searcher
+        key="groovy-jql-searcher"
+        name="Groovy JQL searcher"
+        class="ru.mail.jira.plugins.groovy.impl.jql.JqlFieldSearcher"
+    >
+        <valid-customfield-type package="ru.mail.jira.plugins.groovy" key="groovy-jql-field"/>
+    </customfield-searcher>
 </atlassian-plugin>

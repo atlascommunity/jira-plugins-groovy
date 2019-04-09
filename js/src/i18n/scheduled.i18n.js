@@ -9,6 +9,7 @@ export const ScheduledTaskMessages: {[string]: string, transitionOption: *, runN
     noTasks: i18n.scheduled.noTasks,
     addTask: i18n.scheduled.addTask,
     editTask: i18n.scheduled.editTask,
+    deleteTask: i18n.scheduled.deleteTask,
     runAs: i18n.scheduled.runAs,
     runNow: i18n.scheduled.runNow,
     runNowConfirm: i18n.scheduled.runNowConfirm,

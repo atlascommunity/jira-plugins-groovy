@@ -1,6 +1,7 @@
 //@flow
 // eslint-disable-next-line import/no-extraneous-dependencies
 import AJS from 'AJS';
+import $ from 'jquery';
 
 import type {ErrorType, ErrorDataType, HttpMethod} from '../common/types';
 
@@ -33,11 +34,11 @@ export function ajaxPut(url: string, data: any): Promise<any> {
 }
 
 export function ajaxPromise(url: string, method: HttpMethod, _params: any, data: any): Promise<any> {
-    return new Promise((resolve: PromiseCallback, reject: PromiseRejectCallback): void => {
-        return AJS.$
+    return new Promise((resolve: PromiseCallback, reject: PromiseRejectCallback) => {
+        $
             .ajax({
                 url: url,
-                type: method,
+                type: (method: string),
                 contentType: method !== 'GET' ? 'application/json' : undefined,
                 dataType: 'json',
                 data: method !== 'GET' && method !== 'DELETE' ? JSON.stringify(data) : undefined
@@ -47,6 +48,19 @@ export function ajaxPromise(url: string, method: HttpMethod, _params: any, data:
                     resolve(data);
                 },
                 (response: JQueryXHR) => {
+                    if (response.status === 401 && response.responseText) {
+                        //assuming 401 means that websudo session is expired
+                        AJS.flag({
+                            type: 'error',
+                            body: JSON.parse(response.responseText).message
+                                + '<ul class="aui-nav-actions-list">'
+                                + '<li><a href="javascript:location.reload()">Reload page</a></li>'
+                                + '</ul>',
+                        });
+                        return;
+                    }
+
+                    //$ExpectError : ignore sketchy number and
                     if (!(response.status && response.statusText)) {
                         reject({
                             message: 'Error occurred',

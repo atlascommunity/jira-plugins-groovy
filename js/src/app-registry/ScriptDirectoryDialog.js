@@ -1,69 +1,91 @@
 //@flow
-import React, {type Node} from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 import {FieldTextStateless} from '@atlaskit/field-text';
 
-import {RegistryActionCreators} from './registry.reducer';
-import type {BasicRegistryDirectoryType} from './types';
+import {addDirectory, updateDirectory} from './redux';
+import type {RegistryDirectoryType} from './types';
 
 import {ErrorMessage} from '../common/ak/messages';
 
-import {registryService} from '../service/services';
+import {registryService, getPluginBaseUrl} from '../service';
 
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
+import type {VoidCallback} from '../common/types';
+import {AsyncPicker, FormField} from '../common/ak';
+import type {SingleValueType} from '../common/ak/types';
 
 
-type Props = {
-    addDirectory: typeof RegistryActionCreators.addDirectory,
-    updateDirectory: typeof RegistryActionCreators.updateDirectory
-};
+export type DialogParams = {|
+    isNew: boolean,
+    id?: number,
+    parentId?: ?number
+|};
 
-type State = {
-    active: boolean,
+type Props = {|
+    ...DialogParams,
+    addDirectory: typeof addDirectory,
+    updateDirectory: typeof updateDirectory,
+    onClose: VoidCallback
+|};
+
+type State = {|
     name: string,
-    parentId: ?number,
-    id: ?number,
-    directory: ?BasicRegistryDirectoryType,
+    parent: ?SingleValueType,
+    directory: ?RegistryDirectoryType,
     error: *
-};
+|};
 
-//todo: declarative activation
 export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, State> {
     state = {
-        active: false,
         name: '',
-        parentId: null,
-        id: null,
+        parent: null,
         directory: null,
         error: null
     };
 
-    activateCreate = (parentId: number) => {
-        this.setState({
-            active: true,
-            name: '',
-            parentId: parentId,
-            id: null,
-            error: null
-        });
-    };
+    componentDidMount() {
+        const {isNew, id, parentId} = this.props;
 
-    activateEdit = (id: number) => {
-        registryService
-            .getDirectory(id)
-            .then(data => this.setState({
-                active: true,
-                id: id,
-                parentId: null,
-                name: data.name,
-                error: null,
-                directory: data
-            }));
-    };
+        if (!isNew) {
+            registryService
+                //$FlowFixMe id will be non-null here
+                .getDirectory(id)
+                .then(data => this.setState({
+                    name: data.name,
+                    parent: data.parentId
+                        ? {
+                            value: data.parentId,
+                            label: data.parentName ? data.parentName : data.parentId.toString()
+                        }
+                        : null,
+                    error: null,
+                    directory: data
+                }));
+        } else {
+            if (parentId) {
+                registryService
+                    .getDirectory(parentId)
+                    .then(parent => this.setState({
+                        name: '',
+                        parent: {
+                            value: parent.id,
+                            label: parent.fullName ? parent.fullName : parent.id.toString()
+                        },
+                        error: null
+                    }));
+            } else {
+                this.setState({
+                    name: '',
+                    error: null
+                });
+            }
+        }
+    }
 
     _handleError = (error: *) => {
         const {response} = error;
@@ -76,45 +98,47 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
     };
 
     _onSubmit = () => {
-        const {id, name, parentId} = this.state;
+        const {id, isNew, updateDirectory, addDirectory, onClose} = this.props;
+        const {name, parent} = this.state;
 
         const data = {
             name: name,
-            parentId: parentId || undefined
+            parentId: (parent && parent.value) || undefined
         };
 
-        if (id) {
+        if (!isNew && id) {
             registryService
                 .updateDirectory(id, data)
                 .then(
-                    (result: BasicRegistryDirectoryType) => {
-                        this.props.updateDirectory(result);
-                        this.setState({active: false});
+                    (result: RegistryDirectoryType) => {
+                        updateDirectory(result);
+                        onClose();
                     },
                     this._handleError);
         } else {
             registryService
                 .createDirectory(data)
                 .then(
-                    (result: BasicRegistryDirectoryType) => {
-                        this.props.addDirectory({
+                    (result: RegistryDirectoryType) => {
+                        addDirectory({
                             ...result,
                             children: [],
                             scripts: []
                         });
-                        this.setState({active: false});
+                        onClose();
                     },
                     this._handleError
                 );
         }
     };
 
-    _close = () => this.setState({active: false});
-
     _setName = (event: SyntheticEvent<HTMLInputElement>) => this.setState({ name: event.currentTarget.value });
 
-    render(): Node {
-        const {error, directory} = this.state;
+    _setParent = (value: ?SingleValueType) => this.setState({ parent: value });
+
+    render() {
+        const {onClose, isNew} = this.props;
+        const {error, directory, parent} = this.state;
 
         let errorMessage: * = null;
         let errorField: ?string = null;
@@ -124,55 +148,64 @@ export class ScriptDirectoryDialogInternal extends React.PureComponent<Props, St
         }
 
         return (
-            <div>
-                {this.state.active ?
-                    <ModalDialog
-                        width="medium"
+            <ModalDialog
+                width="medium"
 
-                        isHeadingMultiline={false}
-                        heading={this.state.id ? `${RegistryMessages.editDirectory}: ${directory ? directory.name : ''}` : RegistryMessages.addDirectory}
+                scrollBehavior="outside"
+                autoFocus={false}
 
-                        onClose={this._close}
-                        actions={[
-                            {
-                                text: this.state.id ? CommonMessages.update : CommonMessages.create,
-                                onClick: this._onSubmit
-                            },
-                            {
-                                text: CommonMessages.cancel,
-                                onClick: this._close
-                            }
-                        ]}
+                isHeadingMultiline={false}
+                heading={isNew ? RegistryMessages.addDirectory : `${RegistryMessages.editDirectory}: ${directory ? directory.name : ''}`}
+
+                onClose={onClose}
+                actions={[
+                    {
+                        text: isNew ? CommonMessages.create : CommonMessages.update,
+                        onClick: this._onSubmit
+                    },
+                    {
+                        text: CommonMessages.cancel,
+                        onClick: onClose
+                    }
+                ]}
+            >
+                {error && !errorField && <ErrorMessage title={errorMessage || undefined}/>}
+                <div className="flex-column">
+                    <FormField
+                        label={FieldMessages.parentName}
+
+                        isInvalid={errorField === 'parentId'}
+                        invalidMessage={errorMessage || ''}
                     >
-                        {error && !errorField && <ErrorMessage title={errorMessage}/>}
-                        <div className="flex-column">
-                            <FieldTextStateless
-                                shouldFitContainer={true}
-                                required={true}
-                                maxLength={32}
+                        <AsyncPicker
+                            src={`${getPluginBaseUrl()}/registry/directory/picker`}
+                            isClearable={true}
 
-                                isInvalid={errorField === 'name'}
-                                invalidMessage={errorMessage}
+                            value={parent}
+                            onChange={this._setParent}
 
-                                label={FieldMessages.name}
-                                value={this.state.name}
-                                onChange={this._setName}
-                            />
-                        </div>
-                    </ModalDialog>
-                    : null}
-            </div>
+                            label=""
+                        />
+                    </FormField>
+                    <FieldTextStateless
+                        shouldFitContainer={true}
+                        required={true}
+                        maxLength={32}
+
+                        isInvalid={errorField === 'name'}
+                        invalidMessage={errorMessage}
+
+                        label={FieldMessages.name}
+                        value={this.state.name}
+                        onChange={this._setName}
+                    />
+                </div>
+            </ModalDialog>
         );
     }
 }
 
 export const ScriptDirectoryDialog = connect(
-    null,
-    //$FlowFixMe
-    {
-        addDirectory: RegistryActionCreators.addDirectory,
-        updateDirectory: RegistryActionCreators.updateDirectory
-    },
-    null,
-    {withRef: true}
+    () => ({}),
+    { addDirectory, updateDirectory }
 )(ScriptDirectoryDialogInternal);

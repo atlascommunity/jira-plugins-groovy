@@ -1,10 +1,12 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
-import ErrorIcon from '@atlaskit/icon/glyph/error';
-import EditorSuccessIcon from '@atlaskit/icon/glyph/editor/success';
 import Tooltip from '@atlaskit/tooltip';
 import {colors} from '@atlaskit/theme';
+
+import ErrorIcon from '@atlaskit/icon/glyph/error';
+import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
+import WarningIcon from '@atlaskit/icon/glyph/warning';
 
 import {ExecutionDialog} from './ExecutionDialog';
 import type {ExecutionType} from './types';
@@ -33,7 +35,7 @@ export class ExecutionBar extends React.PureComponent<ExecutionBarProps, Executi
 
     _hideExecution = () => this.setState({ displayedExecution: null });
 
-    render(): React.Node {
+    render() {
         const {displayedExecution} = this.state;
 
         return (
@@ -53,7 +55,20 @@ type ExecutionItemProps = {
 };
 
 class ExecutionItem extends React.PureComponent<ExecutionItemProps> {
-    render(): React.Node {
+    _getIcon = (): Node => {
+        const {execution} = this.props;
+
+        if (!execution.success) {
+            return <ErrorIcon label="error" size="small" primaryColor={colors.R300}/>;
+        }
+        if (execution.slow) {
+            return <WarningIcon label="warning" size="small" primaryColor={colors.Y300}/>;
+        }
+
+        return <CheckCircleIcon label="success" size="small" primaryColor={colors.G300}/>;
+    };
+
+    render() {
         const execution = this.props.execution;
         const params = execution.extraParams || {};
 
@@ -72,10 +87,7 @@ class ExecutionItem extends React.PureComponent<ExecutionItemProps> {
                 }
             >
                 <div className="executionItem" onClick={this.props.onClick}>
-                    {execution.success ?
-                        <EditorSuccessIcon label="success" size="small" primaryColor={colors.G300}/> :
-                        <ErrorIcon label="error" size="small" primaryColor={colors.R300}/>
-                    }
+                    {this._getIcon()}
                 </div>
             </Tooltip>
         );

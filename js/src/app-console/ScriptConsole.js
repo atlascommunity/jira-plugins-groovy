@@ -1,20 +1,20 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import Button from '@atlaskit/button';
+import {Checkbox} from '@atlaskit/checkbox';
 
 import type {ConsoleResult} from './types';
 
 import {ConsoleMessages} from '../i18n/console.i18n';
 
-import {consoleService} from '../service/services';
-import {getMarkers} from '../common/error';
+import {consoleService} from '../service';
 import {Bindings} from '../common/bindings';
 
-import './ScriptConsole.less';
-import {EditorField} from '../common/ak/EditorField';
+import {CheckedEditorField, ErrorMessage} from '../common/ak';
 import {CommonMessages} from '../i18n/common.i18n';
-import {ErrorMessage} from '../common/ak/messages';
+
+import './ScriptConsole.less';
 
 
 const bindings = [Bindings.currentUser];
@@ -25,25 +25,40 @@ type Props = {
 
 type State = {
     script: ?string,
+    isHtml: boolean,
     output: ?ConsoleResult,
     error: ?*,
     waiting: boolean,
-    modified: boolean
 };
 
 export class ScriptConsole extends React.Component<Props, State> {
     state = {
         script: '',
+        isHtml: false,
         output: null,
         error: null,
-        waiting: false,
-        modified: false
+        waiting: false
     };
 
-    _scriptChange = (script: ?string) => this.setState({
-        script: script,
-        modified: true
-    });
+    _scriptChange = (script: ?string) => {
+        this.setState({
+            script: script
+        });
+
+        try {
+            if (sessionStorage) {
+                if (script) {
+                    sessionStorage.setItem('my-groovy-console-script', script);
+                } else {
+                    sessionStorage.removeItem('my-groovy-console-script');
+                }
+            }
+        } catch (e) {
+            console.error('unable to save script', e);
+        }
+    };
+
+    _toggleHtml = () => this.setState(({isHtml}) => ({ isHtml: !isHtml }));
 
     _submit = () => {
         this.setState({ waiting: true });
@@ -55,7 +70,6 @@ export class ScriptConsole extends React.Component<Props, State> {
                     output,
                     error: null,
                     waiting: false,
-                    modified: false
                 }),
                 (err: *) => {
                     const {response} = err;
@@ -65,13 +79,11 @@ export class ScriptConsole extends React.Component<Props, State> {
                             error: response.data,
                             output: null,
                             waiting: false,
-                            modified: false
                         });
                     } else {
                         this.setState({
                             output: null,
                             waiting: false,
-                            modified: false
                         });
 
                         throw err;
@@ -80,18 +92,24 @@ export class ScriptConsole extends React.Component<Props, State> {
             );
     };
 
-    render(): React.Node {
-        const {script, output, error, waiting, modified} = this.state;
+    componentDidMount() {
+        if (sessionStorage) {
+            const script = sessionStorage.getItem('my-groovy-console-script');
+
+            if (script) {
+                this.setState({ script });
+            }
+        }
+    }
+
+    render() {
+        const {script, isHtml, output, error, waiting} = this.state;
 
         let errorMessage: * = null;
-        let markers: * = null;
 
         if (error) {
             if (error.field === 'script' && Array.isArray(error.error)) {
                 const errors = error.error.filter(e => e);
-                if (!modified) {
-                    markers = getMarkers(errors);
-                }
                 errorMessage = errors
                     .map(error => error.message)
                     .map(error => <p key={error}>{error}</p>);
@@ -102,37 +120,60 @@ export class ScriptConsole extends React.Component<Props, State> {
 
         return (
             <div className="ScriptConsole">
-                <EditorField
+                <CheckedEditorField
                     label={CommonMessages.script}
+                    scriptType="CONSOLE"
 
                     resizable={true}
-                    markers={markers}
                     bindings={bindings}
 
                     value={script}
                     onChange={this._scriptChange}
                 />
+                <Checkbox
+                    label={CommonMessages.renderAsHtml}
+
+                    isChecked={isHtml}
+                    onChange={this._toggleHtml}
+                />
                 <br/>
                 <div>
-                    <Button appearance="primary" isDisabled={waiting} onClick={this._submit}>{ConsoleMessages.execute}</Button>
+                    <Button
+                        appearance="primary"
+                        isDisabled={waiting}
+                        isLoading={waiting}
+                        onClick={this._submit}
+                    >
+                        {ConsoleMessages.execute}
+                    </Button>
                 </div>
                 <br/>
                 {!waiting && <div className="result">
-                    {output ?
-                        <div>
-                            <strong>{ConsoleMessages.executedIn(output.time.toString())}</strong>
-                            <pre>{output.result}</pre>
-                        </div>
-                    : null}
-                    {error ?
-                        <ErrorMessage title={errorMessage}>
-                            <pre style={{overflowX: 'auto'}}>
-                                {error['stack-trace']}
-                            </pre>
-                        </ErrorMessage>
-                    : null}
+                    {
+                        output
+                        ? (
+                            <div>
+                                <strong>{ConsoleMessages.executedIn(output.time.toString())}</strong>
+                                {isHtml
+                                    ? <div dangerouslySetInnerHTML={{ __html: output.result }}/>
+                                    : <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{output.result}</pre>
+                                }
+                            </div>
+                        )
+                        : null
+                    }
+                    {
+                        error
+                        ? (
+                            <ErrorMessage title={errorMessage || undefined}>
+                                <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>
+                                    {error['stack-trace']}
+                                </pre>
+                            </ErrorMessage>
+                        )
+                        : null
+                    }
                 </div>}
-                {waiting && <div className="aui-icon aui-icon-wait"/>}
             </div>
         );
     }

@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.groovy.impl.groovy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 
 public class ParseContextHolder {
     private final Logger logger = LoggerFactory.getLogger(ParseContextHolder.class);

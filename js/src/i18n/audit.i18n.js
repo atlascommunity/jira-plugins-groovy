@@ -11,7 +11,8 @@ export const AuditMessages: I18nMessages = {
     action: i18n.audit.action,
     description: i18n.audit.description,
     script: i18n.audit.script,
-    restore: i18n.audit.restore
+    restore: i18n.audit.restore,
+    noItems: i18n.audit.noItems
 };
 
 export const CategoryNameMessages: I18nMessages = {
@@ -21,5 +22,7 @@ export const CategoryNameMessages: I18nMessages = {
     LISTENER: i18n.audit.listener,
     REST: i18n.audit.rest,
     CUSTOM_FIELD: i18n.audit.cf,
-    SCHEDULED_TASK: i18n.audit.scheduledTask
+    SCHEDULED_TASK: i18n.audit.scheduledTask,
+    JQL_FUNCTION: i18n.audit.jqlFunction,
+    GLOBAL_OBJECT: i18n.audit.globalObject
 };

@@ -8,14 +8,13 @@ import com.atlassian.jira.issue.fields.rest.json.JsonData;
 import com.atlassian.jira.issue.fields.rest.json.JsonType;
 import com.atlassian.jira.issue.fields.rest.json.JsonTypeBuilder;
 import com.atlassian.jira.util.velocity.NumberTool;
-import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 
 public class NumberCFType extends ScriptedCFType<Double, Double> {
-    protected NumberCFType(FieldConfigRepository configRepository, FieldValueExtractor valueExtractor) {
-        super(configRepository, valueExtractor, Double.class);
+    protected NumberCFType(FieldValueExtractor valueExtractor) {
+        super(valueExtractor, Double.class);
     }
 
     @Override

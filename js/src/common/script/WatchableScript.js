@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import Button from '@atlaskit/button';
 
@@ -8,7 +8,7 @@ import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
 
 import type {ScriptProps} from './Script';
 
-import {watcherService} from '../../service/services';
+import {watcherService} from '../../service';
 
 import {CommonMessages} from '../../i18n/common.i18n';
 
@@ -16,17 +16,18 @@ import {WatchActionCreators} from '../redux';
 
 import type {EntityType} from '../types';
 
-import Script from './';
+import Script from '.';
 
 
-type Props = ScriptProps & {
+type Props = {|
+    ...ScriptProps,
     entityId: number,
     entityType: EntityType,
     addWatch: typeof WatchActionCreators.addWatch,
     removeWatch: typeof WatchActionCreators.removeWatch,
     watches: Array<number>,
     isUnwatchable?: boolean
-};
+|};
 
 type State = {
     waitingWatch: boolean
@@ -46,9 +47,9 @@ export class WatchableScript extends React.PureComponent<Props, State> {
 
         this.setState({ waitingWatch: true });
 
-        const promise = isWatching ?
-            watcherService.stopWatching(entityType, entityId) :
-            watcherService.startWatching(entityType, entityId);
+        const promise = isWatching
+            ? watcherService.stopWatching(entityType, entityId)
+            : watcherService.startWatching(entityType, entityId);
 
         promise.then(
             () => {
@@ -62,12 +63,16 @@ export class WatchableScript extends React.PureComponent<Props, State> {
         );
     };
 
-    render(): React.Node {
-        const {watches, entityId, entityType, dropdownItems, additionalButtons, onDelete, isUnwatchable, ...props} = this.props;
+    render() {
+        const {
+            watches, entityId, dropdownItems, additionalButtons, onDelete, isUnwatchable,
+            addWatch, removeWatch, entityType,
+            ...props
+        } = this.props;
         const {waitingWatch} = this.state;
 
         if (isUnwatchable) {
-            return <Script {...this.props}/>;
+            return <Script additionalButtons={additionalButtons} dropdownItems={dropdownItems} {...props}/>;
         }
 
         const dropdown = dropdownItems ? [...dropdownItems] : [];

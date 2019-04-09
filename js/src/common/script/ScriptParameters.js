@@ -1,25 +1,25 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {Label} from '@atlaskit/field-base';
 
 
 export type ScriptParam = {
     label: string,
-    value: React.Node
+    value: Node
 };
 
 type ScriptParametersProps = {
-    params: Array<ScriptParam>
+    params: Array<?ScriptParam>
 };
 
 export class ScriptParameters extends React.PureComponent<ScriptParametersProps> {
-    render(): React.Node {
+    render() {
         const {params} = this.props;
 
         return (
             <div className="scriptParams">
-                {params.map((param, i) =>
+                {params.filter(Boolean).map((param, i) =>
                     <div className="item" key={i}>
                         <div className="label">
                             <Label label={`${param.label}:`} isFirstChild={true}/>

@@ -1,5 +1,6 @@
 package ru.mail.jira.plugins.groovy.util;
 
+@Deprecated
 public class RestFieldException extends IllegalArgumentException {
     private final String field;
 
@@ -10,5 +11,14 @@ public class RestFieldException extends IllegalArgumentException {
 
     public String getField() {
         return this.field;
+    }
+
+    @Override
+    public String getMessage() {
+        if (field != null) {
+            return field + ": " + super.getMessage();
+        }
+
+        return super.getMessage();
     }
 }

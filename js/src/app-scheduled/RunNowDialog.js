@@ -1,6 +1,5 @@
 //@flow
-import React, {type Node} from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 
 import ModalDialog from '@atlaskit/modal-dialog';
 import Spinner from '@atlaskit/spinner';
@@ -9,7 +8,7 @@ import type {RunNowResultType, ScheduledTaskType} from './types';
 
 import {ScheduledTaskMessages} from '../i18n/scheduled.i18n';
 import {CommonMessages} from '../i18n/common.i18n';
-import {scheduledTaskService} from '../service/services';
+import {scheduledTaskService} from '../service';
 import {ConsoleMessages} from '../i18n/console.i18n';
 
 import type {VoidCallback} from '../common/types';
@@ -27,11 +26,6 @@ type State = {
 };
 
 export class RunNowDialog extends React.PureComponent<Props, State> {
-    static propTypes = {
-        task: PropTypes.object.isRequired,
-        onClose: PropTypes.func.isRequired
-    };
-
     state = {
         running: false,
         result: null,
@@ -64,7 +58,7 @@ export class RunNowDialog extends React.PureComponent<Props, State> {
             );
     };
 
-    render(): Node {
+    render() {
         const {task} = this.props;
         const {running, result} = this.state;
 

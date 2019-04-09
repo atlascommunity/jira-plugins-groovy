@@ -3,17 +3,27 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:atlassian-scanner="http://www.atlassian.com/schema/atlassian-scanner"
        xmlns:osgi="http://www.springframework.org/schema/osgi"
-       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
         http://www.atlassian.com/schema/atlassian-scanner
         http://www.atlassian.com/schema/atlassian-scanner/atlassian-scanner.xsd
         http://www.springframework.org/schema/osgi
-        http://www.springframework.org/schema/osgi/spring-osgi.xsd
-       ">
+        http://www.springframework.org/schema/osgi/spring-osgi.xsd"
+>
     <atlassian-scanner:scan-indexes/>
 
-    <osgi:reference id="importedOsgiService">
+    <bean class="com.atlassian.jira.jql.query.QueryProjectRoleAndGroupPermissionsDecorator" autowire="constructor">
+        <constructor-arg index="0" ref="osgiPermissionManager"/>
+        <constructor-arg index="1" ref="projectRoleManager"/>
+    </bean>
+
+    <osgi:reference id="osgiPermissionManager">
+        <osgi:interfaces>
+            <value>com.atlassian.jira.security.PermissionManager</value>
+        </osgi:interfaces>
+    </osgi:reference>
+
+    <osgi:reference id="jqlOperandResolver">
         <osgi:interfaces>
             <value>com.atlassian.jira.jql.operand.JqlOperandResolver</value>
         </osgi:interfaces>

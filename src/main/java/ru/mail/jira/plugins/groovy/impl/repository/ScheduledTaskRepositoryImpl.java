@@ -34,10 +34,11 @@ import ru.mail.jira.plugins.groovy.api.dto.scheduled.TransitionOptionsDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.api.repository.ScheduledTaskRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
+import ru.mail.jira.plugins.groovy.api.dto.PickerOption;
 import ru.mail.jira.plugins.groovy.impl.scheduled.JobUtil;
 import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
+import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.UserMapper;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 
@@ -130,7 +131,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
 
         String comment = form.getComment();
         if (comment == null) {
-            comment = "Created.";
+            comment = Const.CREATED_COMMENT;
         }
 
         changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, comment);

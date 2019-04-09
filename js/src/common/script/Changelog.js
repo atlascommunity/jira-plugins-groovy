@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import reactStringReplace from 'react-string-replace';
 
@@ -12,7 +12,7 @@ import type {VoidCallback} from '../types';
 
 import {CommonMessages} from '../../i18n/common.i18n';
 
-import {getBaseUrl} from '../../service/ajaxHelper';
+import {getBaseUrl} from '../../service';
 
 
 type ChangelogProps = {
@@ -21,7 +21,7 @@ type ChangelogProps = {
     switchToChangelog: (ChangelogType) => () => void
 };
 
-export function Changelog({changelogs, switchToCurrent, switchToChangelog}: ChangelogProps): React.Node {
+export function Changelog({changelogs, switchToCurrent, switchToChangelog}: ChangelogProps): Node {
     return (
         <div className="scriptChangelogs" style={{width: '150px'}}>
             <div key="current" className="scriptChangelog" onClick={switchToCurrent}>
@@ -61,7 +61,7 @@ type ChangelogCommentProps = {
     issueReferences: Array<IssueReference>
 };
 
-function ChangelogComment({text, issueReferences}: ChangelogCommentProps): React.Node {
+function ChangelogComment({text, issueReferences}: ChangelogCommentProps): Node {
     if (!(issueReferences && issueReferences.length)) {
         return <p>{text}</p>;
     }
@@ -70,7 +70,7 @@ function ChangelogComment({text, issueReferences}: ChangelogCommentProps): React
         <p>
             {reactStringReplace(
                 text, /([A-Z0-9a-z]{1,10}-\d+)/g,
-                (issueKey: string, i: number): React.Node => {
+                (issueKey: string, i: number): Node => {
                     const issueReference = issueReferences.find(ref => ref.key === issueKey);
 
                     if (issueReference) {

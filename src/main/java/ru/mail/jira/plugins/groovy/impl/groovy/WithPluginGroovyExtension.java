@@ -13,6 +13,7 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
+import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 
 import java.util.List;
 import java.util.Set;
@@ -26,32 +27,45 @@ public class WithPluginGroovyExtension extends CompilationCustomizer {
     }
 
     @Override
-    public void call(SourceUnit source, GeneratorContext context, ClassNode classNode) throws CompilationFailedException {
+    public void call(SourceUnit source, GeneratorContext context, ClassNode ignore) throws CompilationFailedException {
+        ParseContext parseContext = parseContextHolder.get();
+        if (parseContext.getCompletedExtensions().contains(WithPluginGroovyExtension.class)) {
+            return;
+        }
+
         for (Statement statement : source.getAST().getStatementBlock().getStatements()) {
             if (statement instanceof ExpressionStatement) {
                 ExpressionStatement castedStatement = (ExpressionStatement) statement;
-                for (AnnotationNode annotationNode : castedStatement.getExpression().getAnnotations()) {
-                    if (annotationNode.getClassNode().getNameWithoutPackage().equals("WithPlugin")) {
-                        Expression expression = annotationNode.getMember("value");
+                processAnnotations(parseContext, castedStatement.getExpression().getAnnotations());
+            }
+        }
 
-                        Set<String> plugins = parseContextHolder.get().getPlugins();
+        source.getAST().getClasses().forEach(classNode -> processAnnotations(parseContext, classNode.getAnnotations()));
 
-                        if (expression instanceof ConstantExpression) {
-                            plugins.add(((String) ((ConstantExpression) expression).getValue()));
-                        } else if (expression instanceof ArrayExpression || expression instanceof ListExpression) {
-                            List<Expression> items;
+        parseContext.getCompletedExtensions().add(WithPluginGroovyExtension.class);
+    }
 
-                            if (expression instanceof ArrayExpression) {
-                                items = ((ArrayExpression) expression).getExpressions();
-                            } else {
-                                items = ((ListExpression) expression).getExpressions();
-                            }
+    private void processAnnotations(ParseContext parseContext, List<AnnotationNode> annotationNodes) {
+        for (AnnotationNode annotationNode : annotationNodes) {
+            if (annotationNode.getClassNode().getNameWithoutPackage().equals("WithPlugin")) {
+                Expression expression = annotationNode.getMember("value");
 
-                            for (Expression itemExpression : items) {
-                                if (itemExpression instanceof ConstantExpression) {
-                                    plugins.add(getStringConstant((ConstantExpression) itemExpression));
-                                }
-                            }
+                Set<String> plugins = parseContext.getPlugins();
+
+                if (expression instanceof ConstantExpression) {
+                    plugins.add(((String) ((ConstantExpression) expression).getValue()));
+                } else if (expression instanceof ArrayExpression || expression instanceof ListExpression) {
+                    List<Expression> items;
+
+                    if (expression instanceof ArrayExpression) {
+                        items = ((ArrayExpression) expression).getExpressions();
+                    } else {
+                        items = ((ListExpression) expression).getExpressions();
+                    }
+
+                    for (Expression itemExpression : items) {
+                        if (itemExpression instanceof ConstantExpression) {
+                            plugins.add(getStringConstant((ConstantExpression) itemExpression));
                         }
                     }
                 }

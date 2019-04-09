@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE workflow PUBLIC "-//OpenSymphony Group//DTD OSWorkflow 2.8//EN" "http://www.opensymphony.com/osworkflow/workflow_2_8.dtd">
+<workflow>
+  <meta name="jira.description"></meta>
+  <meta name="jira.update.author.key">admin</meta>
+  <meta name="jira.updated.date">1537972709235</meta>
+  <initial-actions>
+    <action id="1" name="Create">
+      <validators>
+        <validator name="" type="class">
+          <arg name="permission">Create Issue</arg>
+          <arg name="class.name">com.atlassian.jira.workflow.validator.PermissionValidator</arg>
+        </validator>
+      </validators>
+      <results>
+        <unconditional-result old-status="null" status="open" step="1">
+          <post-functions>
+            <function type="class">
+              <arg name="class.name">com.atlassian.jira.workflow.function.issue.IssueCreateFunction</arg>
+            </function>
+            <function type="class">
+              <arg name="class.name">com.atlassian.jira.workflow.function.issue.IssueReindexFunction</arg>
+            </function>
+            <function type="class">
+              <arg name="eventTypeId">1</arg>
+              <arg name="class.name">com.atlassian.jira.workflow.function.event.FireIssueEventFunction</arg>
+            </function>
+          </post-functions>
+        </unconditional-result>
+      </results>
+    </action>
+  </initial-actions>
+  <steps>
+    <step id="1" name="Open">
+      <meta name="jira.status.id">1</meta>
+      <actions>
+        <action id="11" name="assign to me">
+          <meta name="jira.description"></meta>
+          <meta name="jira.fieldscreen.id"></meta>
+          <restrict-to>
+            <conditions>
+              <condition type="class">
+                <arg name="INLINE_SCRIPT">b64_aW1wb3J0IGNvbS5hdGxhc3NpYW4uamlyYS5zZWN1cml0eS5KaXJhQXV0aGVudGljYXRpb25Db250ZXh0DQppbXBvcnQgcnUubWFpbC5qaXJhLnBsdWdpbnMuZ3Jvb3Z5LmFwaS5zY3JpcHQuU3RhbmRhcmRNb2R1bGUNCg0KQFN0YW5kYXJkTW9kdWxlDQpKaXJhQXV0aGVudGljYXRpb25Db250ZXh0IGF1dGhlbnRpY2F0aW9uQ29udGV4dA0KDQpyZXR1cm4gY3VycmVudFVzZXIubmFtZSA9PSAndXNlcicNCg==</arg>
+                <arg name="full.module.key">ru.mail.jira.plugins.groovyinline-script-condition</arg>
+                <arg name="INLINE_SCRIPT_NAME">is user</arg>
+                <arg name="class.name">ru.mail.jira.plugins.groovy.impl.workflow.ScriptedCondition</arg>
+                <arg name="UUID">82a169e2-8cfd-45c7-add2-de9a099be12d</arg>
+              </condition>
+            </conditions>
+          </restrict-to>
+          <results>
+            <unconditional-result old-status="Not Done" status="Done" step="1">
+              <post-functions>
+                <function type="class">
+                  <arg name="INLINE_SCRIPT">b64_aXNzdWUuYXNzaWduZWUgPSBjdXJyZW50VXNlcg0K</arg>
+                  <arg name="full.module.key">ru.mail.jira.plugins.groovyinline-script-function</arg>
+                  <arg name="INLINE_SCRIPT_NAME">assign to current user</arg>
+                  <arg name="class.name">ru.mail.jira.plugins.groovy.impl.workflow.ScriptedFunction</arg>
+                  <arg name="UUID">e5ef3c7e-e7ca-43f3-aab9-6ff5a390ba2e</arg>
+                </function>
+                <function type="class">
+                  <arg name="full.module.key">com.atlassian.jira.plugin.system.workflowupdateissuestatus-function</arg>
+                  <arg name="class.name">com.atlassian.jira.workflow.function.issue.UpdateIssueStatusFunction</arg>
+                </function>
+                <function type="class">
+                  <arg name="full.module.key">com.atlassian.jira.plugin.system.workflowcreatecomment-function</arg>
+                  <arg name="class.name">com.atlassian.jira.workflow.function.misc.CreateCommentFunction</arg>
+                </function>
+                <function type="class">
+                  <arg name="full.module.key">com.atlassian.jira.plugin.system.workflowgeneratechangehistory-function</arg>
+                  <arg name="class.name">com.atlassian.jira.workflow.function.issue.GenerateChangeHistoryFunction</arg>
+                </function>
+                <function type="class">
+                  <arg name="full.module.key">com.atlassian.jira.plugin.system.workflowreindexissue-function</arg>
+                  <arg name="class.name">com.atlassian.jira.workflow.function.issue.IssueReindexFunction</arg>
+                </function>
+                <function type="class">
+                  <arg name="eventTypeId">13</arg>
+                  <arg name="full.module.key">com.atlassian.jira.plugin.system.workflowfireevent-function</arg>
+                  <arg name="class.name">com.atlassian.jira.workflow.function.event.FireIssueEventFunction</arg>
+                </function>
+              </post-functions>
+            </unconditional-result>
+          </results>
+        </action>
+        <action id="21" name="close" view="fieldscreen">
+          <meta name="jira.description"></meta>
+          <meta name="jira.fieldscreen.id">2</meta>
+          <validators>
+            <validator name="" type="class">
+              <arg name="INLINE_SCRIPT">b64_aW1wb3J0IGNvbS5vcGVuc3ltcGhvbnkud29ya2Zsb3cuSW52YWxpZElucHV0RXhjZXB0aW9uDQoNCmlmICghdHJhbnNpZW50VmFyc1snY29tbWVudCddKSB7DQogICAgdGhyb3cgbmV3IEludmFsaWRJbnB1dEV4Y2VwdGlvbigiY29tbWVudCIsICJDb21tZW50IGlzIHJlcXVpcmVkIikNCn0NCg==</arg>
+              <arg name="full.module.key">ru.mail.jira.plugins.groovyinline-script-validator</arg>
+              <arg name="INLINE_SCRIPT_NAME">comment is required</arg>
+              <arg name="class.name">ru.mail.jira.plugins.groovy.impl.workflow.ScriptedValidator</arg>
+              <arg name="UUID">484e918a-e76c-4b94-9614-9c8daac48cb8</arg>
+            </validator>
+          </validators>
+          <results>
+            <unconditional-result old-status="Not Done" status="Done" step="2">
+              <post-functions>
+                <function type="class">
+                  <arg name="INLINE_SCRIPT">b64_dHJhbnNpZW50VmFyc1snY29tbWVudCddID0gJ3Rlc3Q6ICcgKyB0cmFuc2llbnRWYXJzWydjb21tZW50J10NCg==</arg>
+                  <arg name="full.module.key">ru.mail.jira.plugins.groovyinline-script-function</arg>
+                  <arg name="INLINE_SCRIPT_NAME"></arg>
+                  <arg name="class.name">ru.mail.jira.plugins.groovy.impl.workflow.ScriptedFunction</arg>
+                  <arg name="UUID">bbdb2aa5-bb6a-4f18-b6e8-b4621b67586c</arg>
+                </function>
+                <function type="class">
+                  <arg name="full.module.key">com.atlassian.jira.plugin.system.workflowupdateissuestatus-function</arg>
+                  <arg name="class.name">com.atlassian.jira.workflow.function.issue.UpdateIssueStatusFunction</arg>
+                </function>
+                <function type="class">
+                  <arg name="full.module.key">com.atlassian.jira.plugin.system.workflowcreatecomment-function</arg>
+                  <arg name="class.name">com.atlassian.jira.workflow.function.misc.CreateCommentFunction</arg>
+                </function>
+                <function type="class">
+                  <arg name="full.module.key">com.atlassian.jira.plugin.system.workflowgeneratechangehistory-function</arg>
+                  <arg name="class.name">com.atlassian.jira.workflow.function.issue.GenerateChangeHistoryFunction</arg>
+                </function>
+                <function type="class">
+                  <arg name="full.module.key">com.atlassian.jira.plugin.system.workflowreindexissue-function</arg>
+                  <arg name="class.name">com.atlassian.jira.workflow.function.issue.IssueReindexFunction</arg>
+                </function>
+                <function type="class">
+                  <arg name="eventTypeId">13</arg>
+                  <arg name="full.module.key">com.atlassian.jira.plugin.system.workflowfireevent-function</arg>
+                  <arg name="class.name">com.atlassian.jira.workflow.function.event.FireIssueEventFunction</arg>
+                </function>
+              </post-functions>
+            </unconditional-result>
+          </results>
+        </action>
+      </actions>
+    </step>
+    <step id="2" name="Done">
+      <meta name="jira.status.id">10001</meta>
+    </step>
+  </steps>
+</workflow>
+

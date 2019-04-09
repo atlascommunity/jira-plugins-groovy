@@ -1,10 +1,8 @@
 //@flow
-import React, {type Node} from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 
 import {connect} from 'react-redux';
-
-import memoizeOne from 'memoize-one';
+import {createSelector} from 'reselect';
 
 import {DragDropContext} from 'react-beautiful-dnd';
 
@@ -13,82 +11,92 @@ import Blanket from '@atlaskit/blanket';
 import PageHeader from '@atlaskit/page-header';
 import Button from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
+import {Checkbox} from '@atlaskit/checkbox';
+import Breadcrumbs from '@atlaskit/breadcrumbs';
 
-import {ScriptDialog} from './ScriptDialog';
 import {ScriptDirectory} from './ScriptDirectory';
-import {ScriptDirectoryDialog} from './ScriptDirectoryDialog';
-import {RegistryActionCreators} from './registry.reducer';
+import {ScriptDirectoryDialog, type DialogParams} from './ScriptDirectoryDialog';
+import {
+    filteredSelector, filterSelector, groupedDirsSelector,
+    deleteDirectory, deleteScript, moveScript, UpdateActionCreators as FilterActionCreators
+} from './redux';
+import {UsageStatusFlag} from './UsageStatusFlag';
 
-import type {RegistryDirectoryType, RegistryScriptType} from './types';
+import type {FilterType, RegistryDirectoryType} from './types';
 
-import {LoadingSpinner} from '../common/ak/LoadingSpinner';
 import {InfoMessage} from '../common/ak/messages';
 
-import {registryService} from '../service/services';
+import {registryService} from '../service';
 
-import {TitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import './ScriptRegistry.less';
+import type {DeleteDialogProps} from '../common/script-list/DeleteDialog';
+import {DeleteDialog} from '../common/script-list/DeleteDialog';
+import {withRoot} from '../common/script-list/breadcrumbs';
+
+import {LazilyRenderedContext} from '../common/lazyRender';
 
 
 type Props = {
-    ready: boolean,
     directories: $ReadOnlyArray<RegistryDirectoryType>,
-    deleteDirectory: typeof RegistryActionCreators.deleteDirectory,
-    deleteScript: typeof RegistryActionCreators.deleteScript,
-    moveScript: typeof RegistryActionCreators.moveScript
+    isScriptUsageReady: boolean,
+    isForceOpen: boolean,
+    filter: FilterType,
+    deleteDirectory: typeof deleteDirectory,
+    deleteScript: typeof deleteScript,
+    moveScript: typeof moveScript,
+    updateFilter: typeof FilterActionCreators.updateFilter
 };
 
 type State = {
     waiting: boolean,
     isDragging: boolean,
-    filter: string
+    directoryDialogProps: ?DialogParams,
+    deleteScriptProps: ?DeleteDialogProps,
+    deleteDirectoryProps: ?DeleteDialogProps
 };
 
 //todo: collapse/uncollapse all
 export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
-    static propTypes = {
-        ready: PropTypes.bool.isRequired,
-        directories: PropTypes.arrayOf(PropTypes.object.isRequired)
-    };
-
-    //$FlowFixMe
-    directoryDialogRef = React.createRef();
-    //$FlowFixMe
-    scriptDialogRef = React.createRef();
-
     state = {
         isDragging: false,
         waiting: false,
+        onlyUnused: false,
+        directoryDialogProps: null,
+        deleteScriptProps: null,
+        deleteDirectoryProps: null,
         filter: ''
     };
 
     _activateCreateDialog = (parentId: ?number, type: 'script'|'directory') => {
         if (type === 'directory') {
-            this.directoryDialogRef.current.getWrappedInstance().activateCreate(parentId);
-        } else {
-            this.scriptDialogRef.current.getWrappedInstance().activateCreate(parentId);
+            this.setState({ directoryDialogProps: {isNew: true, parentId} });
         }
     };
 
     _activateEditDialog = (id: number, type: 'script'|'directory') => {
-        console.log(id, type);
         if (type === 'directory') {
-            this.directoryDialogRef.current.getWrappedInstance().activateEdit(id);
-        } else {
-            this.scriptDialogRef.current.getWrappedInstance().activateEdit(id);
+            this.setState({ directoryDialogProps: {isNew: false, id} });
         }
     };
 
+    _closeDirectoryDialog = () => this.setState({ directoryDialogProps: null });
+
+    _closeDeleteScriptDialog = () => this.setState({ deleteScriptProps: null });
+
+    _closeDeleteDirectoryDialog = () => this.setState({ deleteDirectoryProps: null });
+
     _activateDeleteDialog = (id: number, type: 'script'|'directory', name: string) => {
-        // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${name}"?`)) {
-            if (type === 'directory') {
-                registryService.deleteDirectory(id).then(() => this.props.deleteDirectory(id));
-            } else {
-                registryService.deleteScript(id).then(() => this.props.deleteScript(id));
-            }
+        if (type === 'directory') {
+            this.setState({
+                deleteDirectoryProps: { id, name, onConfirm: () => registryService.deleteDirectory(id) }
+            });
+        } else {
+            this.setState({
+                deleteScriptProps: { id, name, onConfirm: () => registryService.deleteScript(id) }
+            });
         }
     };
 
@@ -115,164 +123,156 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
         const destId = parseInt(destination.droppableId, 10);
         const scriptId = parseInt(draggableId, 10);
 
-        const script = this._findScript(scriptId);
-
-        if (!script) {
-            console.error('unable to find script', result);
-            return;
-        }
-
-        this.props.moveScript(sourceId, destId, script);
+        this.props.moveScript(sourceId, destId, scriptId);
 
         this.setState({ waiting: true });
 
         registryService
-            .moveScript(script.id, destId)
+            .moveScript(scriptId, destId)
             .then(
                 () => {
                     this.setState({ waiting: false });
                     //todo: maybe show flag that script was successfully moved
                 },
                 () => {
-                    this.props.moveScript(destId, sourceId, script); //move script to old parent
+                    this.props.moveScript(destId, sourceId, scriptId); //move script to old parent
                     this.setState({ waiting: false });
                 }
             );
     };
 
-    _findScript(id: number): ?RegistryScriptType {
-        for (const dir of this.props.directories) {
-            const found = this._findScriptInDirectory(dir, id);
-            if (found) {
-                return found;
-            }
+    _onFilterChange = (e: SyntheticEvent<HTMLInputElement>) => this.props.updateFilter({ name: e.currentTarget.value });
+
+    _toggleUnused = () => this.props.updateFilter({ onlyUnused: !this.props.filter.onlyUnused });
+
+    componentDidUpdate(prevProps: Props) {
+        if (prevProps.directories !== this.props.directories) {
+            //trigger scroll event when directory list is changed so all visible lazily rendered elements render
+            window.dispatchEvent(new Event('scroll'));
         }
-        return null;
     }
 
-    _findScriptInDirectory(dir: RegistryDirectoryType, id: number): ?RegistryScriptType {
-        if (dir.children) {
-            for (const child of dir.children) {
-                const foundInDir = this._findScriptInDirectory(child, id);
-                if (foundInDir) {
-                    return foundInDir;
-                }
-            }
-        }
-        if (dir.scripts) {
-            return dir.scripts.find(script => script.id === id);
-        }
-        return null;
-    }
-
-    _onFilterChange = (e: SyntheticEvent<HTMLInputElement>) => this.setState({ filter: e.currentTarget.value });
-
-    _matchesFilter = (item: RegistryDirectoryType|RegistryScriptType, filter: string): boolean => {
-        return item.name.toLocaleLowerCase().includes(filter);
-    };
-
-    _getFilteredDirsInternal = (dirs: $ReadOnlyArray<RegistryDirectoryType>, filter: string): $ReadOnlyArray<RegistryDirectoryType> => {
-        return dirs
-            .map((dir: RegistryDirectoryType): RegistryDirectoryType => {
-                if (this._matchesFilter(dir, filter)) {
-                    return dir;
-                }
-                return {
-                    ...dir,
-                    scripts: dir.scripts.filter(script => this._matchesFilter(script, filter)),
-                    children: this._getFilteredDirsInternal(dir.children, filter)
-                };
-            })
-            .filter(dir => (dir.scripts.length + dir.children.length) > 0);
-    };
-
-    _getFilteredDirs = memoizeOne(this._getFilteredDirsInternal);
-
-    _countElements = (dir: RegistryDirectoryType): number => {
-        const children = dir.children ? dir.children.length : 0;
-        const scripts = dir.scripts ? dir.scripts.length : 0;
-        return children + scripts + dir.children.map(this._countElements).reduce((acc, i) => acc + i, 0);
-    };
-
-    _countArrayElements = (dirs: $ReadOnlyArray<RegistryDirectoryType>): number => {
-        return dirs.map(this._countElements).reduce((acc, i) => acc + i, 0);
-    };
-
-    render(): Node {
-        const {waiting, filter} = this.state;
-        const {ready} = this.props;
+    render() {
+        const {waiting, directoryDialogProps, deleteScriptProps, deleteDirectoryProps} = this.state;
+        const {isScriptUsageReady, isForceOpen, filter, deleteScript, deleteDirectory} = this.props;
 
         let directories: * = this.props.directories;
-        let forceOpen: boolean = false;
-
-        if (filter && filter.length >= 2) {
-            directories = this._getFilteredDirs(directories, filter.toLocaleLowerCase());
-            if (this._countArrayElements(directories) <= 50) {
-                forceOpen = true;
-            }
-        }
 
         return (
-            <DragDropContext onDragStart={this._onDragStart} onDragEnd={this._onDragEnd}>
-                <Page>
-                    <PageHeader
-                        actions={
-                            <Button
-                                appearance="primary"
-                                onClick={this._createDirectory}
-                            >
-                                {RegistryMessages.addDirectory}
-                            </Button>
-                        }
-                        bottomBar={
-                            <FieldTextStateless
-                                isLabelHidden
-                                compact
-                                label="hidden"
-                                placeholder="Filter"
-                                value={filter}
-                                onChange={this._onFilterChange}
-                            />
-                        }
-                    >
-                        {TitleMessages.registry}
-                    </PageHeader>
+            <LazilyRenderedContext>
+                <DragDropContext onDragStart={this._onDragStart} onDragEnd={this._onDragEnd}>
+                    <Page>
+                        <PageHeader
+                            actions={
+                                <Button
+                                    appearance="primary"
+                                    onClick={this._createDirectory}
+                                >
+                                    {RegistryMessages.addDirectory}
+                                </Button>
+                            }
+                            bottomBar={
+                                <div className="flex-row">
+                                    <div>
+                                        <FieldTextStateless
+                                            isLabelHidden
+                                            compact
+                                            label="hidden"
+                                            placeholder="Filter"
+                                            value={filter.name}
+                                            onChange={this._onFilterChange}
+                                        />
+                                    </div>
+                                    <div className="flex-vertical-middle">
+                                        <Checkbox
+                                            label={RegistryMessages.onlyUnused}
+                                            isDisabled={!isScriptUsageReady}
 
-                    <div className={`page-content ScriptList ${this.state.isDragging ? 'dragging' : ''}`}>
-                        {directories.map(directory =>
-                            <ScriptDirectory
-                                directory={directory}
-                                key={directory.id}
+                                            isChecked={filter.onlyUnused}
+                                            onChange={this._toggleUnused}
 
-                                forceOpen={forceOpen}
+                                            value="true"
+                                            name="onlyUnused"
+                                        />
+                                    </div>
+                                </div>
+                            }
+                            breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
+                        >
+                            {PageTitleMessages.registry}
+                        </PageHeader>
 
-                                onCreate={this._activateCreateDialog}
-                                onEdit={this._activateEditDialog}
-                                onDelete={this._activateDeleteDialog}
-                            />
-                        )}
+                        <div className={`page-content ScriptList ${this.state.isDragging ? 'dragging' : ''}`}>
+                            {directories.map(directory =>
+                                <ScriptDirectory
+                                    directory={directory}
+                                    key={directory.id}
 
-                        {!ready && <LoadingSpinner/>}
-                        {ready && !directories.length ? <InfoMessage title={RegistryMessages.noScripts}/> : null}
-                        <ScriptDirectoryDialog ref={this.directoryDialogRef}/>
-                        <ScriptDialog ref={this.scriptDialogRef}/>
+                                    forceOpen={isForceOpen}
 
-                        {waiting && <Blanket isTinted={true}/>}
-                    </div>
-                </Page>
-            </DragDropContext>
+                                    onCreate={this._activateCreateDialog}
+                                    onEdit={this._activateEditDialog}
+                                    onDelete={this._activateDeleteDialog}
+                                />
+                            )}
+
+                            {!directories.length ? <InfoMessage title={RegistryMessages.noScripts}/> : null}
+                            {directoryDialogProps && <ScriptDirectoryDialog {...directoryDialogProps} onClose={this._closeDirectoryDialog}/>}
+                            {deleteDirectoryProps &&
+                                <DeleteDialog
+                                    deleteItem={deleteDirectory}
+                                    onClose={this._closeDeleteDirectoryDialog}
+                                    i18n={{
+                                        heading: RegistryMessages.deleteDirectory,
+                                        areYouSure: CommonMessages.confirmDelete
+                                    }}
+
+                                    {...deleteDirectoryProps}
+                                />
+                            }
+                            {deleteScriptProps &&
+                                <DeleteDialog
+                                    deleteItem={deleteScript}
+                                    onClose={this._closeDeleteScriptDialog}
+                                    i18n={{
+                                        heading: RegistryMessages.deleteScript,
+                                        areYouSure: CommonMessages.confirmDelete
+                                    }}
+
+                                    {...deleteScriptProps}
+                                />
+                            }
+
+                            {waiting && <Blanket isTinted={true}/>}
+                        </div>
+
+                        <UsageStatusFlag/>
+                    </Page>
+                </DragDropContext>
+            </LazilyRenderedContext>
         );
     }
 }
 
+const rootSelector = createSelector(
+    [groupedDirsSelector],
+    dirs => [...(dirs[undefined] || [])].sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity: 'base'}))
+);
+
+const isForceOpenSelector = createSelector(
+    [filteredSelector],
+    state => state.isForceOpen
+);
+
 export const ScriptRegistry = connect(
-    memoizeOne(
-        (state: *): * => {
-            return {
-                ready: state.ready,
-                directories: state.directories
-            };
-        }
-    ),
-    RegistryActionCreators
+    (state) => ({
+        directories: rootSelector(state),
+        isForceOpen: isForceOpenSelector(state),
+        filter: filterSelector(state),
+        isScriptUsageReady: state.scriptUsage.ready
+    }),
+    {
+        deleteDirectory, deleteScript, moveScript,
+        updateFilter: FilterActionCreators.updateFilter
+    }
 )(ScriptRegistryInternal);

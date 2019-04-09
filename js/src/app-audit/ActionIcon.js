@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import Tooltip from '@atlaskit/tooltip';
 
@@ -12,15 +12,15 @@ import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 import ArrowRightCircleIcon from '@atlaskit/icon/glyph/arrow-right-circle';
 import UndoIcon from '@atlaskit/icon/glyph/undo';
 
-import type {EntityAction} from './types';
+import type {EntityAction} from '../common/types';
 
 
 type Props = {
     action: EntityAction
 };
 
-export function ActionIcon({action}: Props): React.Node {
-    let icon: React.Node = null;
+export function ActionIcon({action}: Props): Node {
+    let icon: Node = null;
     switch (action) {
         case 'CREATED':
             icon = <AddCircleIcon label={action}/>;

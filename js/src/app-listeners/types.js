@@ -6,19 +6,22 @@ export type ConditionType = {
     type: 'CLASS_NAME' | 'ISSUE',
     typeIds: $ReadOnlyArray<string>,
     projectIds: $ReadOnlyArray<string>,
-    className: ?string
+    className: ?string,
+    pluginKey: ?string
 };
 
 export type ConditionInputType = {
-    type?: 'CLASS_NAME' | 'ISSUE',
-    typeIds?: $ReadOnlyArray<string>,
-    projectIds?: $ReadOnlyArray<string>,
-    className?: ?string
+    type: ?'CLASS_NAME' | 'ISSUE',
+    typeIds: $ReadOnlyArray<string>,
+    projectIds: $ReadOnlyArray<string>,
+    className: ?string,
+    pluginKey: ?string
 };
 
 export type ListenerType = ScriptEntity & {
     uuid: string,
-    condition: ConditionType
+    condition: ConditionType,
+    alwaysTrack: boolean
 };
 
 export type ListenerInputType = ScriptEntity & {

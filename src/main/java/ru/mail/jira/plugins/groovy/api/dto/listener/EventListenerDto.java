@@ -16,7 +16,11 @@ public class EventListenerDto extends EventListenerForm {
     @XmlElement
     private String uuid;
     @XmlElement
+    private boolean initialized;
+    @XmlElement
     private List<ChangelogDto> changelogs;
     @XmlElement
     private Integer errorCount;
+    @XmlElement
+    private Integer warningCount;
 }

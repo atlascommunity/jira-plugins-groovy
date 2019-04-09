@@ -14,12 +14,16 @@ $webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.work
     require(['mailru/groovy/renderRegistryScript'], function(renderRegistryScript) {
         #set($nameHtml = ${escapeJs.apply($script.name)})
         #set($scriptHtml = ${escapeJs.apply($script.scriptBody)})
+        #set($descriptionHtml = ${escapeJs.apply($script.description)})
         renderRegistryScript(
             document.getElementById("mailru-groovy-script-react-container-$uuid"),
             "$script.id",
+            #if ($script.uuid) "$script.uuid" #else null #end,
             "$nameHtml",
             "$scriptHtml",
+            #if ($script.description) "$descriptionHtml" #else null #end,
             #if ($script.errorCount) $script.errorCount #else 0 #end,
+            #if ($script.warningCount) $script.warningCount #else 0 #end,
             #if ($paramsHtml) $paramsHtml #else null #end,
             #if ($paramValuesHtml) $paramValuesHtml #else null #end
         );

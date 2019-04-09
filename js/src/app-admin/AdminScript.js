@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 
@@ -10,81 +10,97 @@ import Lozenge from '@atlaskit/lozenge';
 
 import VidPlayIcon from '@atlaskit/icon/glyph/vid-play'; //todo: better icon
 import CodeIcon from '@atlaskit/icon/glyph/code';
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import {RunDialog} from './RunDialog';
 
 import type {AdminScriptType} from './types';
 
-import {ItemActionCreators, WatchActionCreators} from '../common/redux';
+import {WatchActionCreators} from '../common/redux';
 
-import {adminScriptService} from '../service/services';
+import {adminScriptService} from '../service';
 
 import {WatchableScript} from '../common/script/WatchableScript';
 
 import type {ScriptComponentProps} from '../common/script-list/types';
 import {AdminScriptMessages} from '../i18n/admin.i18n';
 import {CommonMessages} from '../i18n/common.i18n';
+import {RouterLink} from '../common/ak/RouterLink';
 
 
 const ConnectedWatchableScript = connect(
-    memoizeOne(
-        (state: *): * => {
-            return {
-                watches: state.watches
-            };
-        }
-    ),
+    memoizeOne(state => ({ watches: state.watches }) ),
     WatchActionCreators
 )(WatchableScript);
 
-const {deleteItem} = ItemActionCreators;
-
-type Props = ScriptComponentProps<AdminScriptType> & {
-    deleteItem: typeof deleteItem
-};
+type Props = ScriptComponentProps<AdminScriptType>;
 
 type State = {
     isRunning: boolean
 };
 
-class AdminScriptInternal extends React.PureComponent<Props, State> {
+export class AdminScript extends React.PureComponent<Props, State> {
+    static defaultProps = {
+        collapsible: true
+    };
+
     state = {
         isRunning: false
     };
 
-    _toggleDialog = () => this.setState((state: State): * => {
-        return {
-            isRunning: !state.isRunning
-        };
-    });
+    _toggleDialog = () => this.setState(state => ({ isRunning: !state.isRunning }));
 
-    _onEdit = () => this.props.onEdit(this.props.script.id);
-
-    _delete = () => {
-        const script = this.props.script;
-
-        // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${script.name}"?`)) {
-            adminScriptService.deleteScript(script.id).then(() => this.props.deleteItem(script.id));
-        }
-    };
-
-    _getScript = memoizeOne(
-        (script) => script.builtIn ? null : {
-            id: script.uuid,
-            name: script.name,
-            description: script.description,
-            inline: true,
-            scriptBody: script.scriptBody,
-            changelogs: script.changelogs,
-            errorCount: script.errorCount
-        }
+    _delete = () => this.props.onDelete && this.props.onDelete(
+        this.props.script.id,
+        this.props.script.name,
+        () => adminScriptService.deleteScript(this.props.script.id)
     );
 
-    render(): React.Node {
-        const {script} = this.props;
+    _getScript = memoizeOne(
+        (script) => (
+            script.builtIn
+            ? null
+            : {
+                id: script.uuid,
+                name: script.name,
+                description: script.description,
+                inline: true,
+                scriptBody: script.scriptBody,
+                changelogs: script.changelogs,
+                errorCount: script.errorCount,
+                warningCount: script.warningCount
+            }
+        )
+    );
+
+    render() {
+        const {script, collapsible, focused} = this.props;
         const {isRunning} = this.state;
         const {builtIn} = script;
+
+        const buttons = [
+            <Button
+                key="runNow"
+                appearance="subtle"
+                iconBefore={<VidPlayIcon label="run"/>}
+                onClick={this._toggleDialog}
+            >
+                {CommonMessages.run}
+            </Button>
+        ];
+
+        if (!builtIn) {
+            buttons.push(
+                <Button
+                    key="edit"
+                    appearance="subtle"
+                    iconBefore={<EditFilledIcon label=""/>}
+
+                    component={RouterLink}
+                    href={`/admin-scripts/${script.id}/edit`}
+                />
+            );
+        }
 
         return (
             <ConnectedWatchableScript
@@ -92,43 +108,50 @@ class AdminScriptInternal extends React.PureComponent<Props, State> {
                 entityType="ADMIN_SCRIPT"
                 isUnwatchable={builtIn}
 
-                title={builtIn ?
-                    <div className="flex-row space-between">
-                        <div className="flex-vertical-middle flex-none">
-                            <CodeIcon label=""/>
+                title={
+                    builtIn
+                    ? (
+                        <div className="flex-row space-between">
+                            <div className="flex-vertical-middle flex-none">
+                                <CodeIcon label=""/>
+                            </div>
+                            <div className="flex-vertical-middle flex-none">
+                                <Lozenge appearance="inprogress">
+                                    {AdminScriptMessages.builtIn}
+                                </Lozenge>
+                            </div>
+                            <div className="flex-vertical-middle">
+                                <h3 title={script.name}>
+                                    {script.name}
+                                </h3>
+                            </div>
+                            <div className="flex-grow"/>
                         </div>
-                        <div className="flex-vertical-middle flex-none">
-                            <Lozenge appearance="inprogress">
-                                {AdminScriptMessages.builtIn}
-                            </Lozenge>
-                        </div>
-                        <div className="flex-vertical-middle">
-                            <h3 title={script.name}>
-                                {script.name}
-                            </h3>
-                        </div>
-                        <div className="flex-grow"/>
-                    </div>
+                    )
                     : undefined
                 }
 
                 script={this._getScript(script)}
-
                 withChangelog={true}
+                collapsible={collapsible}
+                focused={focused}
 
-                onEdit={!builtIn ? this._onEdit : undefined}
                 onDelete={!builtIn ? this._delete : undefined}
-
-                additionalPrimaryButtons={[
-                    <Button key="runNow" appearance="subtle" iconBefore={<VidPlayIcon label="run"/>} onClick={this._toggleDialog}>
-                        {CommonMessages.run}
-                    </Button>
-                ]}
+                additionalPrimaryButtons={buttons}
+                dropdownItems={
+                    !builtIn
+                    ? [
+                        {
+                            label: CommonMessages.permalink,
+                            href: `/admin-scripts/${script.id}/view`,
+                            linkComponent: RouterLink
+                        }
+                    ]
+                    : undefined
+                }
             >
                 {isRunning && <RunDialog script={script} onClose={this._toggleDialog}/>}
             </ConnectedWatchableScript>
         );
     }
 }
-
-export const AdminScript = connect(null, { deleteItem })(AdminScriptInternal);

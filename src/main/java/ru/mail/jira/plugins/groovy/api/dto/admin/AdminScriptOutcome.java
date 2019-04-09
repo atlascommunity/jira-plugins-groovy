@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @Getter @Setter @AllArgsConstructor
-public class AdminScriptOutcome {
+public class AdminScriptOutcome<T> {
     @XmlElement
     private boolean success;
     @XmlElement
-    private String message;
+    private T message;
 }

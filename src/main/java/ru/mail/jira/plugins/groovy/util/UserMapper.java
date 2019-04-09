@@ -8,7 +8,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.JiraUser;
-import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
+import ru.mail.jira.plugins.groovy.api.dto.PickerOption;
 
 @Component
 public class UserMapper {

@@ -14,7 +14,13 @@
     <tr>
         <th>#text("common.words.name"):</th>
         <td>
-            $notification.entityName
+            #if ($permalink)
+                <a href="$baseurl$permalink">
+                    $notification.entityName
+                </a>
+            #else
+                $notification.entityName
+            #end
         </td>
     </tr>
     <tr>

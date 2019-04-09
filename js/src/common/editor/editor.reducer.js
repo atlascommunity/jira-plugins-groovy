@@ -1,16 +1,14 @@
 //@flow
-import {preferenceService} from '../../service/services';
+import {preferenceService} from '../../service';
 
 
 const SWITCH_THEME = 'SWITCH_THEME';
 
 export const EditorActionCreators = {
-    switchTheme: function(isLight: boolean): * {
-        return {
-            type: SWITCH_THEME,
-            isLight: isLight
-        };
-    }
+    switchTheme: (isLight: boolean) => ({
+        type: SWITCH_THEME,
+        isLight: isLight
+    })
 };
 
 type State = {

@@ -12,6 +12,8 @@ final class ValidationUtils {
 
     @Deprecated
     static void validateForm(I18nHelper i18nHelper, boolean isNew, ScriptForm form) {
+        form.setName(StringUtils.trimToNull(form.getName()));
+
         if (StringUtils.isEmpty(form.getName())) {
             throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "name");
         }

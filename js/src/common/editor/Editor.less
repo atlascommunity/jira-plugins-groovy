@@ -1,9 +1,80 @@
 @import (reference) '../../flex';
 
+@import (reference) '~@atlaskit/util-shared-styles/src/colors';
+@import (reference) '~@atlaskit/util-shared-styles/src/borders';
+@import (reference) '~@atlaskit/util-shared-styles/src/fonts';
+@import (reference) '~@atlaskit/util-shared-styles/src/grid';
+
 @import '../../../node_modules/codemirror/lib/codemirror.css';
 @import "../../../node_modules/codemirror/addon/lint/lint.css";
+@import "../../../node_modules/codemirror/addon/fold/foldgutter.css";
 @import '../../../node_modules/codemirror/theme/lesser-dark.css';
 @import '../../../node_modules/codemirror/theme/eclipse.css';
+
+.CodeMirror-lint-tooltip {
+  overflow: hidden;
+  position: fixed;
+  z-index: 100;
+  max-width: 600px;
+  opacity: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+
+  padding: @ak-grid-size @ak-grid-size*2;
+  font-family: @ak-code-font-family;
+  font-size: @ak-font-size-default * .8;
+
+  border: 1px solid @ak-color-N60;
+  background-color: @ak-color-N0;
+  border-radius: @ak-border-radius;
+  color: @ak-color-N900;
+  box-shadow: 0 0 0 1px @ak-color-N30A, 0 2px 1px @ak-color-N30A, 0 0 20px -6px @ak-color-N60A;
+
+  transition: none;
+  -moz-transition: none;
+  -webkit-transition: none;
+  -o-transition: none;
+  -ms-transition: none;
+}
+
+.icon-replace-fill(@src, @primary, @secondary) {
+  @escape-fill-primary: escape(@primary);
+  @escape-fill-secondary: escape(@secondary);
+  @data-uri: data-uri('image/svg+xml;charset=UTF-8', "@{src}");
+  @replace-src: replace(
+    replace(
+      replace("@{data-uri}", escape('currentColor'), @escape-fill-primary, 'g'),
+      escape('inherit'), @escape-fill-secondary, 'g'
+    ),
+    escape('<svg '), escape('<svg xmlns="http://www.w3.org/2000/svg" ')
+  );
+  background-image:e(@replace-src);
+}
+
+.CodeMirror-lint-marker-error,
+.CodeMirror-lint-message-error {
+  .icon-replace-fill('../../../node_modules/@atlaskit/icon/svgs/cross-circle.svg', @ak-color-R400, white);
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 16px;
+  margin-left: 2px
+}
+
+.CodeMirror-lint-marker-warning,
+.CodeMirror-lint-message-warning {
+  .icon-replace-fill('../../../node_modules/@atlaskit/icon/svgs/jira/failed-build-status.svg', @ak-color-Y400, white);
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 16px;
+  margin-left: 2px
+}
+
+.CodeMirror-lint-marker-multiple {
+  .icon-replace-fill('../../../node_modules/@atlaskit/icon/svgs/add-circle.svg', @ak-color-N900, white);
+  background-size: 10px;
+  margin-top: 2px;
+  margin-left: 2px;
+}
 
 .cm-s-lesser-dark {
   line-height: 1.46em;
@@ -63,4 +134,20 @@
 
 .ak-editor {
   z-index: 0;
+}
+
+.EditorInfo {
+  .flex-row;
+
+  margin-top: 2px;
+}
+
+.Bindings {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  >.flex-row {
+    flex-shrink: 0;
+  }
 }

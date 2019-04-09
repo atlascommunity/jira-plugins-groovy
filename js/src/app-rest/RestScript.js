@@ -1,58 +1,50 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {connect} from 'react-redux';
 
 import memoizeOne from 'memoize-one';
 
+import Button from '@atlaskit/button';
+
+import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
+
 import type {RestScriptType} from './types';
 
 import {ScriptParameters} from '../common/script';
 
-import {getPluginBaseUrl} from '../service/ajaxHelper';
+import {restService, getPluginBaseUrl} from '../service';
 
 import {CommonMessages, FieldMessages} from '../i18n/common.i18n';
 
-import {ItemActionCreators, WatchActionCreators} from '../common/redux';
-
-import {restService} from '../service/services';
+import {WatchActionCreators} from '../common/redux';
 
 import {WatchableScript} from '../common/script/WatchableScript';
+import {RouterLink} from '../common/ak/RouterLink';
 
 import type {ScriptComponentProps} from '../common/script-list/types';
 
 
 const ConnectedWatchableScript = connect(
-    memoizeOne(
-        (state: *): * => {
-            return {
-                watches: state.watches
-            };
-        }
-    ),
+    memoizeOne( state => ({ watches: state.watches }) ),
     WatchActionCreators
 )(WatchableScript);
 
-const {deleteItem} = ItemActionCreators;
+type Props = ScriptComponentProps<RestScriptType>;
 
-type Props = ScriptComponentProps<RestScriptType> & {
-    deleteItem: typeof deleteItem
-};
-
-class RestScriptInternal extends React.PureComponent<Props> {
-    _onEdit = () => this.props.onEdit(this.props.script.id);
-
-    _delete = () => {
-        const script = this.props.script;
-
-        // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${script.name}"?`)) {
-            restService.deleteScript(script.id).then(() => this.props.deleteItem(script.id));
-        }
+export class RestScript extends React.PureComponent<Props> {
+    static defaultProps = {
+        collapsible: true
     };
 
-    render(): React.Node {
-        const {script} = this.props;
+    _delete = () => this.props.onDelete && this.props.onDelete(
+        this.props.script.id,
+        this.props.script.name,
+        () => restService.deleteScript(this.props.script.id)
+    );
+
+    render() {
+        const {script, collapsible, focused} = this.props;
 
         const url = `${getPluginBaseUrl()}/custom/${script.name}`;
 
@@ -68,13 +60,34 @@ class RestScriptInternal extends React.PureComponent<Props> {
                     inline: true,
                     scriptBody: script.scriptBody,
                     changelogs: script.changelogs,
-                    errorCount: script.errorCount
+                    errorCount: script.errorCount,
+                    warningCount: script.warningCount
                 }}
 
                 withChangelog={true}
+                collapsible={collapsible}
+                focused={focused}
 
-                onEdit={this._onEdit}
                 onDelete={this._delete}
+
+                dropdownItems={[
+                    {
+                        label: CommonMessages.permalink,
+                        href: `/rest/${script.id}/view`,
+                        linkComponent: RouterLink
+                    }
+                ]}
+
+                additionalButtons={[
+                    <Button
+                        key="edit"
+                        appearance="subtle"
+                        iconBefore={<EditFilledIcon label=""/>}
+
+                        component={RouterLink}
+                        href={`/rest/${script.id}/edit`}
+                    />
+                ]}
             >
                 <ScriptParameters
                     params={[
@@ -88,9 +101,9 @@ class RestScriptInternal extends React.PureComponent<Props> {
                         },
                         {
                             label: FieldMessages.groups,
-                            value: script.groups.length ?
-                                script.groups.join(', ') :
-                                <div className="muted-text">{CommonMessages.notSpecified}</div>
+                            value: script.groups.length
+                                ? script.groups.join(', ')
+                                : <div className="muted-text">{CommonMessages.notSpecified}</div>
                         }
                     ]}
                 />
@@ -98,5 +111,3 @@ class RestScriptInternal extends React.PureComponent<Props> {
         );
     }
 }
-
-export const RestScript = connect(null, { deleteItem })(RestScriptInternal);

@@ -1,8 +1,9 @@
 [ignore]
-.*/node_modules/styled-components/.*
 .*/node_modules/jsonlint/.*
-.*/node_modules/react-beautiful-dnd/.*
 
+[untyped]
+#todo: remove when select flow issues are resolved in atlaskit
+.*/node_modules/react-select
 
 [include]
 
@@ -10,12 +11,17 @@
 
 [lints]
 all=warn
+sketchy-null-string=off
+sketchy-null-bool=off
+sketchy-null-number=off
+deprecated-type=off
+unclear-type=off
 
 [options]
 suppress_comment=\\(.\\|\n\\)*\\$ExpectError
 suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe
 module.name_mapper.extension='less' -> 'less'
-module.name_mapper='AJS' -> 'less'
 experimental.const_params=true
+include_warnings=true
 
 [strict]

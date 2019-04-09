@@ -1,0 +1,19 @@
+@import (reference) '~@atlaskit/util-shared-styles/src/borders';
+@import (reference) '~@atlaskit/util-shared-styles/src/grid';
+@import (reference) '../const';
+@import (reference) '../flex';
+
+
+.PageCard {
+  .flex-column;
+
+  width: 300px;
+
+  border: 1px solid @border-color;
+  border-radius: @ak-border-radius;
+  padding: @ak-grid-size;
+
+  &:hover {
+    text-decoration: none;
+  }
+}

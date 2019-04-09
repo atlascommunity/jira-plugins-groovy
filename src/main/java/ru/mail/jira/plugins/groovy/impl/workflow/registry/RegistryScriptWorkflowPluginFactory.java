@@ -1,17 +1,17 @@
 package ru.mail.jira.plugins.groovy.impl.workflow.registry;
 
 import com.atlassian.jira.plugin.workflow.AbstractWorkflowPluginFactory;
-import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.templaterenderer.JavaScriptEscaper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 import com.opensymphony.workflow.loader.AbstractDescriptor;
+import org.apache.commons.lang3.StringUtils;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.script.ParamType;
-import ru.mail.jira.plugins.groovy.impl.ScriptParamFactory;
+import ru.mail.jira.plugins.groovy.impl.param.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.Base64Util;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
-@Scanned
 public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkflowPluginFactory {
     private final ScriptRepository scriptRepository;
     private final ScriptParamFactory paramFactory;
@@ -55,9 +54,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
         map.put("id", scriptId);
         map.put("escapeJs", (Function<String, String>) JavaScriptEscaper::escape);
 
-        Map<String, Object> values = getScriptParams(script, args);
-        values.put("script", idString);
-        map.put("values", jsonMapper.write(values));
+        map.put("values", jsonMapper.write(getScriptParams(script, args)));
     }
 
     @Override
@@ -112,9 +109,11 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
                     value = "false";
                 }
 
-                if (value == null) {
+                value = StringUtils.trimToNull(value);
+                if (value == null && !scriptParamDto.isOptional()) {
                     throw new RuntimeException("param for " + paramName + " is not specified");
                 }
+
                 params.put(Const.getParamKey(paramName), Base64Util.encode(value));
             }
         }
@@ -128,7 +127,7 @@ public abstract class RegistryScriptWorkflowPluginFactory extends AbstractWorkfl
             if (script.getParams() != null) {
                 for (ScriptParamDto param : script.getParams()) {
                     String paramName = param.getName();
-                    String value = Base64Util.decode((String) args.get(Const.getParamKey(paramName)));
+                    String value = StringUtils.trimToNull(Base64Util.decode((String) args.get(Const.getParamKey(paramName))));
 
                     values.put(paramName, paramFactory.getParamFormValue(param, value));
                 }

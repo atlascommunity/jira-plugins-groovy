@@ -11,17 +11,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.listener.ConditionDescriptor;
+import ru.mail.jira.plugins.groovy.api.dto.listener.ConditionType;
+import ru.mail.jira.plugins.groovy.api.dto.listener.ScriptedEventListener;
 import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.util.Set;
 
 @Component
-public class EventListenerInvoker {
+public class EventListenerInvoker implements PluginLifecycleAware {
     private final Logger logger = LoggerFactory.getLogger(EventListenerInvoker.class);
 
     private final EventPublisher eventPublisher;
@@ -46,12 +50,19 @@ public class EventListenerInvoker {
         this.sentryService = sentryService;
     }
 
+    @Override
     public void onStart() {
         eventPublisher.register(this);
     }
 
+    @Override
     public void onStop() {
         eventPublisher.unregister(this);
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 200;
     }
 
     @EventListener
@@ -126,7 +137,7 @@ public class EventListenerInvoker {
             t = System.currentTimeMillis() - t;
         }
 
-        if (!successful) {
+        if (listener.isAlwaysTrack() || !successful || t >= ExecutionRepository.WARNING_THRESHOLD) {
             executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
                 "event", event.toString(),
                 "type", ScriptType.LISTENER.name()

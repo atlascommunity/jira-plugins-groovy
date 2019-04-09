@@ -10,5 +10,7 @@ export const RestMessages: I18nMessages = {
     addScript: i18n.rest.addScript,
     createScript: i18n.rest.createScript,
     updateScript: i18n.rest.updateScript,
-    noScripts: i18n.rest.noScripts
+    deleteScript: i18n.rest.deleteScript,
+    noScripts: i18n.rest.noScripts,
+    noGroups: i18n.rest.noGroups
 };

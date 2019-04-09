@@ -1,10 +1,19 @@
 //@flow
-import * as React from 'react';
+import type {Node} from 'react';
 
 import type {ChangelogType} from './script/types';
 
 
-export type EntityType = 'REGISTRY_SCRIPT' | 'REGISTRY_DIRECTORY' | 'LISTENER' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK' | 'ADMIN_SCRIPT';
+export const entityTypes = [
+    'REGISTRY_SCRIPT', 'REGISTRY_DIRECTORY', 'LISTENER', 'REST', 'CUSTOM_FIELD', 'SCHEDULED_TASK', 'ADMIN_SCRIPT', 'JQL_FUNCTION', 'GLOBAL_OBJECT'
+];
+
+export type EntityType = 'REGISTRY_SCRIPT' | 'REGISTRY_DIRECTORY' | 'LISTENER' | 'REST' | 'CUSTOM_FIELD' | 'SCHEDULED_TASK' | 'ADMIN_SCRIPT' | 'JQL_FUNCTION' | 'GLOBAL_OBJECT';
+
+export const entityActions = ['CREATED', 'UPDATED', 'DELETED', 'RESTORED', 'ENABLED', 'DISABLED', 'MOVED'];
+
+export type EntityAction = 'CREATED' | 'UPDATED' | 'DELETED' | 'RESTORED' | 'ENABLED' | 'DISABLED' | 'MOVED';
+
 
 export type IssueEventType = {
     id: number,
@@ -13,55 +22,65 @@ export type IssueEventType = {
 
 export type ProjectType = any; //todo
 
-export type ScriptEntityWithoutChangelogs = {
+export type ScriptEntityWithoutChangelogs = {|
     id: number,
     name: string,
     description: ?string,
-    errorCount: number,
+    errorCount?: number,
+    warningCount?: number,
     scriptBody: string
-};
+|};
 
-export type ScriptEntity = ScriptEntityWithoutChangelogs & {
+export type ScriptEntity = {|
+    ...ScriptEntityWithoutChangelogs,
     changelogs: Array<ChangelogType>,
-};
+|};
 
-export type AkFormFieldProps = {
+export type SelectProps = {|
+    isMulti?: boolean,
+    isClearable?: boolean,
+    delimiter?: string
+|};
+
+export type AkFormFieldProps = {|
     isValidationHidden: boolean
-};
+|};
 
-export type FieldProps = {
-    label: string,
+export type FieldProps = {|
+    label?: string,
     isLabelHidden?: boolean,
 
     isInvalid?: boolean,
-    invalidMessage?: React.Node,
+    invalidMessage?: Node,
 
     isRequired?: boolean,
-    isDisabled?: boolean
-};
+    isDisabled?: boolean,
 
-export type LoadableFieldProps = {
+    shouldFitContainer?: boolean
+|};
+
+export type LoadableFieldProps = {|
     isLoading?: boolean
-};
+|};
 
-export type MutableFieldProps<T> = {
+export type MutableFieldProps<T> = {|
     value: ?T,
     onChange: (?T) => void
-};
+|};
 
-export type OptMutableFieldProps<T> = {
+export type OptMutableFieldProps<T> = {|
     value?: ?T,
     onChange?: (?T) => void
-};
+|};
 
-export type FormFieldProps = {
+export type FormFieldProps = {|
     name?: string
-};
+|};
 
-export type MutableTextFieldProps<T, FieldType> = {
+export type MutableTextFieldProps<T, FieldType> = {|
     value: T,
     onChange: (SyntheticEvent<FieldType>) => void
-};
+|};
 
 export type ScriptError = {
     message: string
@@ -71,7 +90,8 @@ export type SyntaxError = ScriptError & {
     startLine: number,
     endLine: number,
     startColumn: number,
-    endColumn: number
+    endColumn: number,
+    type: 'warning' | 'error'
 };
 
 export type ObjectMap = {[string]: string};

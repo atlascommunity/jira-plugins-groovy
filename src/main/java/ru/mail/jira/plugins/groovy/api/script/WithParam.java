@@ -4,4 +4,6 @@ public @interface WithParam {
     String displayName();
 
     ParamType type();
+
+    boolean optional() default false;
 }

@@ -1,5 +1,5 @@
 //@flow
-import * as React from 'react';
+import React from 'react';
 
 import {Bindings} from '../common/bindings';
 import {EditorField} from '../common/ak/EditorField';
@@ -22,26 +22,30 @@ export class FormEditor extends React.Component<FormEditorProps, FormEditorState
         value: this.props.initialValue || ''
     };
 
-    _setValue = (value: ?string) => this.setState({ value: value || '' });
+    _setValue = (value: ?string) => {
+        this.setState({ value: value || '' });
+    };
 
-    render(): React.Node {
-        return <div>
-            <EditorField
-                label={CommonMessages.script}
-                isRequired={true}
+    render() {
+        return (
+            <div>
+                <EditorField
+                    label={CommonMessages.script}
+                    isRequired={true}
 
-                bindings={bindings}
+                    bindings={bindings}
 
-                value={this.state.value}
-                onChange={this._setValue}
-            />
-            <textarea
-                className="hidden"
+                    value={this.state.value}
+                    onChange={this._setValue}
+                />
+                <textarea
+                    className="hidden"
 
-                readOnly={true}
-                value={this.state.value}
-                name={this.props.fieldName}
-            />
-        </div>;
+                    readOnly={true}
+                    value={this.state.value}
+                    name={this.props.fieldName}
+                />
+            </div>
+        );
     }
 }

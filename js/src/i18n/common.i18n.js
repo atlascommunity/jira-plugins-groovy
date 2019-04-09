@@ -30,10 +30,13 @@ export const FieldMessages: I18nMessages = {
     order: i18n.fields.order,
     searcher: i18n.fields.searcher,
     groups: i18n.fields.groups,
-    issue: i18n.fields.issue
+    issue: i18n.fields.issue,
+    options: i18n.fields.options,
+    template: i18n.fields.template,
+    pluginKey: i18n.fields.pluginKey
 };
 
-export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction }) = {
+export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction, confirmDelete: I18nFunction }) = {
     loading: i18n.common.loading,
     completed: i18n.common.completed,
     update: i18n.common.update,
@@ -59,12 +62,17 @@ export const CommonMessages: ({ [string]: string, issuesFound: I18nFunction }) =
     condition: i18n.common.condition,
     validator: i18n.common.validator,
     function: i18n.common.function,
+    returnTypes: i18n.common.returnTypes,
     showAll: i18n.common.showAll,
     preview: i18n.common.preview,
     validating: i18n.common.validating,
     issuesFound: i18n.common.issuesFound,
     run: i18n.common.run,
-    back: i18n.common.back
+    back: i18n.common.back,
+    confirmDelete: i18n.common.confirmDelete,
+    all: i18n.common.all,
+    permalink: i18n.common.permalink,
+    renderAsHtml: i18n.common.renderAsHtml
 };
 
 export const DialogMessages: I18nMessages = {
@@ -92,5 +100,21 @@ export const TitleMessages: I18nMessages = {
     rest: i18n.titles.rest,
     fields: i18n.titles.fields,
     scheduled: i18n.titles.scheduled,
+    globalObjects: i18n.titles.globalObjects,
+    jql: i18n.titles.jql,
     extras: i18n.titles.extras,
+};
+
+export const PageTitleMessages: I18nMessages = {
+    console: i18n.pageTitles.console,
+    adminScripts: i18n.pageTitles.adminScripts,
+    registry: i18n.pageTitles.registry,
+    listeners: i18n.pageTitles.listeners,
+    audit: i18n.pageTitles.audit,
+    rest: i18n.pageTitles.rest,
+    fields: i18n.pageTitles.fields,
+    scheduled: i18n.pageTitles.scheduled,
+    globalObjects: i18n.pageTitles.globalObjects,
+    extras: i18n.pageTitles.extras,
+    jql: i18n.pageTitles.jql
 };

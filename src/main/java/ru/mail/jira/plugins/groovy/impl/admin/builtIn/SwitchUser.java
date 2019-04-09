@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class SwitchUser implements BuiltInScript {
+public class SwitchUser implements BuiltInScript<String> {
     private final HttpContext httpContext;
     private final AuditingManager auditingManager;
 
@@ -74,9 +74,14 @@ public class SwitchUser implements BuiltInScript {
     }
 
     @Override
+    public boolean isHtml() {
+        return false;
+    }
+
+    @Override
     public List<ScriptParamDto> getParams() {
         return ImmutableList.of(
-            new ScriptParamDto("user", "User", ParamType.USER)
+            new ScriptParamDto("user", "User", ParamType.USER, false)
         );
     }
 }

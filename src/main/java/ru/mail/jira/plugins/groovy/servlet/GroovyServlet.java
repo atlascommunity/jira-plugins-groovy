@@ -6,7 +6,6 @@ import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.websudo.WebSudoManager;
 import com.atlassian.sal.api.websudo.WebSudoSessionException;
 import com.atlassian.templaterenderer.TemplateRenderer;
-import com.google.common.collect.ImmutableSet;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
 
 import javax.servlet.http.HttpServlet;
@@ -14,23 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Set;
 
 @Scanned
 public class GroovyServlet extends HttpServlet {
-    private static final Set<String> ALLOWED_RESOURCES = ImmutableSet.of(
-        "console",
-        "registry",
-        "listeners",
-        "audit",
-        "fields",
-        "custom-field",
-        "rest",
-        "scheduled",
-        "admin-scripts",
-        "extras"
-    );
-
     private final TemplateRenderer templateRenderer;
     private final WebSudoManager webSudoManager;
     private final LoginUriProvider loginUriProvider;
@@ -62,8 +47,9 @@ public class GroovyServlet extends HttpServlet {
                 path = path.substring(1);
             }
 
-            if (!ALLOWED_RESOURCES.contains(path)) {
-                response.sendError(404);
+            if ("custom-field".equals(path)) {
+                response.sendRedirect("fields/" + request.getParameter("fieldConfigId") + "/edit");
+                return;
             }
 
             if (!permissionHelper.isAdmin()) {
@@ -74,7 +60,7 @@ public class GroovyServlet extends HttpServlet {
             webSudoManager.willExecuteWebSudoRequest(request);
 
             response.setContentType("text/html;charset=utf-8");
-            templateRenderer.render("ru/mail/jira/plugins/groovy/templates/" + path + ".vm", response.getWriter());
+            templateRenderer.render("ru/mail/jira/plugins/groovy/templates/main.vm", response.getWriter());
         } catch (WebSudoSessionException wes) {
             webSudoManager.enforceWebSudoProtection(request, response);
         }

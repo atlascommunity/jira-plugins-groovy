@@ -15,6 +15,7 @@ $webResourceManager.requireResourcesForContext("ru.mail.jira.plugins.groovy.work
                 "$nameHtml",
                 "$scriptHtml",
                 #if ($errorCount) $errorCount #else 0 #end,
+                #if ($warningCount) $warningCount #else 0 #end,
         );
     });
 </script>

@@ -1,8 +1,7 @@
 //@flow
 import {ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
 
-import type {FieldConfigItem} from '../app-fields/types';
-import type {FieldConfig, FieldConfigPreviewResult} from '../app-cf/types';
+import type {FieldConfig, FieldConfigItem, FieldConfigPreviewResult} from '../app-fields/types';
 
 
 export class FieldConfigService {

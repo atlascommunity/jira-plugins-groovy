@@ -14,7 +14,6 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -29,10 +28,9 @@ public class MultiUserScriptedCFType extends ScriptedCFType<List, ApplicationUse
     public MultiUserScriptedCFType(
         @ComponentImport UserBeanFactory userBeanFactory,
         @ComponentImport JiraAuthenticationContext authenticationContext,
-        FieldConfigRepository configRepository,
         FieldValueExtractor valueExtractor
     ) {
-        super(configRepository, valueExtractor, List.class);
+        super(valueExtractor, List.class);
         this.userBeanFactory = userBeanFactory;
         this.authenticationContext = authenticationContext;
     }

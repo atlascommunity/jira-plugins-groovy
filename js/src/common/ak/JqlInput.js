@@ -1,7 +1,7 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
-import debounce from 'lodash.debounce';
+import debounce from 'lodash/debounce';
 
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
 import Spinner from '@atlaskit/spinner';
@@ -9,23 +9,29 @@ import {colors} from '@atlaskit/theme';
 
 import CheckCircleIcon from '@atlaskit/icon/glyph/check-circle';
 
-import {jiraService} from '../../service/services';
+import {FormField} from './FormField';
+
+import {jiraService} from '../../service';
 import {CommonMessages} from '../../i18n/common.i18n';
 
 import type {FieldProps, ErrorType, MutableTextFieldProps} from '../types';
-import type {ValidationResult} from '../../service/jira.service';
+import type {JqlQueryValidationResult} from '../../service';
 
 
-type JqlInputProps = FieldProps & MutableTextFieldProps<string, HTMLTextAreaElement>;
+type Props = {|
+    ...FieldProps,
+    ...MutableTextFieldProps<string, HTMLTextAreaElement>,
+    shouldFitContainer?: boolean
+|};
 
-type JqlInputState = {
+type State = {
     validating: boolean,
     isInvalid: ?boolean,
-    invalidMessage: ?React.Node,
+    invalidMessage: ?Node,
     issues: ?number
 };
 
-export class JqlInput extends React.Component<JqlInputProps, JqlInputState> {
+export class JqlInput extends React.Component<Props, State> {
     state = {
         validating: false,
         isInvalid: null,
@@ -34,15 +40,13 @@ export class JqlInput extends React.Component<JqlInputProps, JqlInputState> {
     };
 
     _validate = (query: string) => {
-        //todo: track requestId
-
         this.setState({
             validating: true
         });
 
         jiraService
             .validateQuery(query)
-            .then((data: ValidationResult) => {
+            .then((data: JqlQueryValidationResult) => {
                 this.setState({
                     validating: false,
                     isInvalid: false,
@@ -51,60 +55,73 @@ export class JqlInput extends React.Component<JqlInputProps, JqlInputState> {
                 });
             })
             .catch(({response}: ErrorType) => {
-                if (response.data) {
-                    this.setState({
-                        validating: false,
-                        isInvalid: true,
-                        invalidMessage: (
-                            <div className="flex flex-column">
-                                {response.data.errorMessages.map((message, i) =>
-                                    <div key={i}>{message}</div>)
-                                }
-                            </div>
-                        ),
-                        issues: null
-                    });
+                const data = response.data;
+                if (data) {
+                    this.setState(
+                        (_state, {value}: Props): $Shape<State> => {
+                            if (query === value) {
+                                return {
+                                    validating: false,
+                                    isInvalid: true,
+                                    invalidMessage: (
+                                        <div className="flex flex-column">
+                                            {data.errorMessages.map((message, i) => <div key={i}>{message}</div>)}
+                                        </div>
+                                    ),
+                                    issues: null
+                                };
+                            }
+
+                            return {};
+                        });
                 }
             });
     };
 
     _debouncedValidate = debounce(this._validate, 500, { maxWait: 5000 });
 
-    constructor(props: JqlInputProps) {
+    constructor(props: Props) {
         super(props);
 
         this._debouncedValidate(props.value);
     }
 
-    componentWillReceiveProps(props: JqlInputProps) {
-        if (props.value !== this.props.value) {
-            this._debouncedValidate(props.value);
+    componentDidUpdate(prevProps: Props) {
+        const {value} = this.props;
+
+        if (prevProps.value !== value) {
+            this._debouncedValidate(value);
         }
     }
 
-    render(): React.Node {
-        const {value, onChange, isInvalid, invalidMessage, ...props} = this.props;
+    render() {
+        const {label, isRequired, value, onChange, isInvalid, invalidMessage, ...props} = this.props;
         const {issues, validating} = this.state;
 
         let invalid: boolean = isInvalid || false;
-        let invalidMsg: ?React.Node = invalidMessage;
+        let invalidMsg: ?Node = invalidMessage;
 
-        if (this.state.isInvalid !== null && this.state.isInvalid !== undefined) {
+        if (this.state.isInvalid) {
             invalid = this.state.isInvalid;
             invalidMsg = this.state.invalidMessage;
         }
 
         return (
             <div>
-                <FieldTextAreaStateless
-                    {...props}
+                <FormField
+                    label={label || ''}
+                    isRequired={isRequired}
 
                     isInvalid={invalid}
                     invalidMessage={invalidMsg}
+                >
+                    <FieldTextAreaStateless
+                        {...props}
 
-                    value={value}
-                    onChange={onChange}
-                />
+                        value={value}
+                        onChange={onChange}
+                    />
+                </FormField>
                 {validating &&
                     <div className="ak-description">
                         <Spinner size="small"/>

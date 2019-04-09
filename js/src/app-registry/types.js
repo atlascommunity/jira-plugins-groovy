@@ -4,28 +4,28 @@ import type {ScriptEntityWithoutChangelogs} from '../common/types';
 
 export type EntityType = 'script' | 'directory';
 
-export type WatcherCallback = (type: EntityType, id: number) => void;
 export type CreateCallback = (parentId: ?number, type: EntityType) => void;
 export type EditCallback = (id: number, type: EntityType) => void;
 export type DeleteCallback = (id: number, type: EntityType, name: string) => void;
 
 export type WorkflowScriptType = 'CONDITION' | 'VALIDATOR' | 'FUNCTION';
 
-export type RegistryScriptType = ScriptEntityWithoutChangelogs & {
-    types: $ReadOnlyArray<WorkflowScriptType>,
-    parentName: string,
-    directoryId: number
-};
-
-export type BasicRegistryDirectoryType = {
+export type RegistryScriptType = {|
+    ...ScriptEntityWithoutChangelogs,
     id: number,
     name: string,
-    fullName?: string
-};
+    uuid: ?string,
+    types: $ReadOnlyArray<WorkflowScriptType>,
+    directoryId: number,
+    parentName?: string,
+|};
 
-export type RegistryDirectoryType = BasicRegistryDirectoryType & {
-    scripts: $ReadOnlyArray<RegistryScriptType>,
-    children: $ReadOnlyArray<RegistryDirectoryType>
+export type RegistryDirectoryType = {
+    id: number,
+    name: string,
+    parentId: ?number,
+    parentName: ?string,
+    fullName?: string
 };
 
 export type WorkflowActionItemType = {
@@ -35,6 +35,7 @@ export type WorkflowActionItemType = {
 
 export type WorkflowActionType = {
     id: number,
+    stepId: ?number,
     name: string,
     items: Array<WorkflowActionItemType>
 };
@@ -47,3 +48,19 @@ export type WorkflowType = {
 };
 
 export type WorkflowMode = 'live' | 'draft';
+
+export type ScriptUsageItems = {[number]: number};
+
+export type ScriptUsageType = {
+    ready: boolean,
+    items: ScriptUsageItems
+};
+
+export type KeyedEntities<T> = {[number]: T | null | typeof undefined};
+
+export type GroupedEntities<T> = KeyedEntities<$ReadOnlyArray<T>>;
+
+export type FilterType = {|
+    name: string,
+    onlyUnused: boolean
+|};

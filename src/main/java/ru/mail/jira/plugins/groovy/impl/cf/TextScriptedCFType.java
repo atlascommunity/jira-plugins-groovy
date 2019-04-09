@@ -10,7 +10,6 @@ import com.atlassian.jira.issue.fields.rest.json.JsonData;
 import com.atlassian.jira.issue.fields.rest.json.JsonType;
 import com.atlassian.jira.issue.fields.rest.json.JsonTypeBuilder;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
-import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -18,10 +17,9 @@ import java.util.Map;
 @Scanned
 public class TextScriptedCFType extends ScriptedCFType<String, String> {
     protected TextScriptedCFType(
-        FieldConfigRepository configRepository,
         FieldValueExtractor valueExtractor
     ) {
-        super(configRepository, valueExtractor, String.class);
+        super(valueExtractor, String.class);
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.script.ParamType;
+import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 import ru.mail.jira.plugins.groovy.api.script.WithParam;
 
 public class ParamExtension extends CompilationCustomizer {
@@ -25,6 +26,11 @@ public class ParamExtension extends CompilationCustomizer {
 
     @Override
     public void call(SourceUnit source, GeneratorContext context, ClassNode classNode) throws CompilationFailedException {
+        ParseContext parseContext = parseContextHolder.get();
+        if (parseContext.getCompletedExtensions().contains(ParamExtension.class)) {
+            return;
+        }
+
         for (Statement statement : source.getAST().getStatementBlock().getStatements()) {
             if (statement instanceof ExpressionStatement) {
                 ExpressionStatement castedStatement = (ExpressionStatement) statement;
@@ -40,6 +46,7 @@ public class ParamExtension extends CompilationCustomizer {
                                 String varName = leftExpression.getName();
                                 String displayName = null;
                                 ParamType type = null;
+                                Boolean optional;
 
                                 Expression displayNameExpression = annotationNode.getMember("displayName");
                                 if (displayNameExpression instanceof ConstantExpression) {
@@ -54,6 +61,13 @@ public class ParamExtension extends CompilationCustomizer {
                                     }
                                 }
 
+                                Expression optionalExpression = annotationNode.getMember("optional");
+                                if (optionalExpression instanceof ConstantExpression) {
+                                    optional = (Boolean) ((ConstantExpression) optionalExpression).getValue();
+                                } else {
+                                    optional = false;
+                                }
+
                                 if (type == null) {
                                     throw new IllegalArgumentException("type must be present");
                                 }
@@ -62,8 +76,8 @@ public class ParamExtension extends CompilationCustomizer {
                                     throw new IllegalArgumentException(type.name() + " must be declared with class " + type.getType());
                                 }
 
-                                if (parseContextHolder.get().isExtended()) {
-                                    parseContextHolder.get().getParameters().add(new ScriptParamDto(varName, displayName, type));
+                                if (parseContext.isExtended()) {
+                                    parseContext.getParameters().add(new ScriptParamDto(varName, displayName, type, optional));
                                 }
                                 expression.setRightExpression(new VariableExpression(varName));
 
@@ -74,5 +88,7 @@ public class ParamExtension extends CompilationCustomizer {
                 }
             }
         }
+
+        parseContext.getCompletedExtensions().add(ParamExtension.class);
     }
 }

@@ -16,6 +16,8 @@ public class WorkflowActionDto {
     @XmlElement
     private Integer id;
     @XmlElement
+    private Integer stepId;
+    @XmlElement
     private String name;
     @XmlElement
     private List<WorkflowActionItem> items;

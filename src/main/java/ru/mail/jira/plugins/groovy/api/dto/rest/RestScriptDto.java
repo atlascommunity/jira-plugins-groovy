@@ -21,4 +21,6 @@ public class RestScriptDto extends RestScriptForm {
     private List<ChangelogDto> changelogs;
     @XmlElement
     private Integer errorCount;
+    @XmlElement
+    private Integer warningCount;
 }

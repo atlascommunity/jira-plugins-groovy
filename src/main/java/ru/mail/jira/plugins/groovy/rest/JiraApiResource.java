@@ -18,7 +18,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import ru.mail.jira.plugins.groovy.api.dto.listener.IssueEventType;
 import ru.mail.jira.plugins.groovy.api.dto.PickerResultSet;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
-import ru.mail.jira.plugins.groovy.impl.dto.PickerOption;
+import ru.mail.jira.plugins.groovy.api.dto.PickerOption;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

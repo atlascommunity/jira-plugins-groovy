@@ -4,6 +4,7 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableSet;
 import net.java.ao.DBParam;
@@ -28,6 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@ExportAsDevService
 public class RestRepositoryImpl implements RestRepository {
     private final ActiveObjects ao;
     private final I18nHelper i18nHelper;
@@ -88,7 +90,7 @@ public class RestRepositoryImpl implements RestRepository {
 
         String comment = form.getComment();
         if (comment == null) {
-            comment = "Created.";
+            comment = Const.CREATED_COMMENT;
         }
 
         changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, comment);
@@ -184,7 +186,7 @@ public class RestRepositoryImpl implements RestRepository {
         }
 
         if ((isNew || !form.getName().equals(oldName)) && !isNameAvailable(form.getName())) {
-            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.restNameTaken"), "name");
+            throw new RestFieldException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.nameTaken"), "name");
         }
 
         if (StringUtils.isEmpty(form.getScriptBody())) {
@@ -234,6 +236,7 @@ public class RestRepositoryImpl implements RestRepository {
 
         if (includeErrorCount) {
             result.setErrorCount(executionRepository.getErrorCount(script.getUuid()));
+            result.setWarningCount(executionRepository.getWarningCount(script.getUuid()));
         }
 
         return result;

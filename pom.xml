@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.mail.jira.plugins</groupId>
     <artifactId>groovy</artifactId>
-    <version>1.0.12.1</version>
+    <version>1.18.1</version>
     <organization>
-        <name>Mail.Ru Group</name>
-        <url>https://mail.ru</url>
+        <name>AtlasTeam</name>
+        <url>https://atlasteam.ru/</url>
     </organization>
-    <name>Groovy Amigo</name>
-    <description>Mail.Ru Groovy plugin.</description>
+    <name>MyGroovy</name>
+    <description>AtlasTeam Groovy plugin.</description>
     <packaging>atlassian-plugin</packaging>
     <dependencies>
         <dependency>
@@ -38,6 +38,14 @@
                 <exclusion>
                     <groupId>jta</groupId>
                     <artifactId>jta</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>antlr4-runtime</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>biz.aQute.bnd</groupId>
+                    <artifactId>biz.aQute.bndlib</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -71,11 +79,90 @@
             <version>1.16.16</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>2.4.15</version>
+            <artifactId>groovy</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-json</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-jsr223</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-sql</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-templates</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-xml</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-xml</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-groovydoc</artifactId>
+            <version>${groovy.version}</version>
+            <classifier>indy</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
@@ -117,28 +204,163 @@
             <version>2.6.1</version>
         </dependency>
         <dependency>
+            <groupId>com.atlassian.pocketknife</groupId>
+            <artifactId>atlassian-pocketknife-querydsl</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.7.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry</artifactId>
             <version>1.7.4</version>
+        </dependency>
+
+        <!-- make sure we don't include these in plugin -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>1.3.9</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.annotations</groupId>
+            <artifactId>atlassian-annotations</artifactId>
+            <version>1.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>1.1.0.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.atlassian.jira.plugins</groupId>
+            <artifactId>jira-greenhopper-api</artifactId>
+            <version>${gh.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.jira.plugins</groupId>
+            <artifactId>jira-greenhopper-plugin</artifactId>
+            <version>${gh.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>jndi</groupId>
+                    <artifactId>jndi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jta</groupId>
+                    <artifactId>jta</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>antlr4-runtime</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+            <version>1.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <version>1.4.0.Final</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.adaptavist.arquillian.atlassian</groupId>
+            <artifactId>remote-atlas-container</artifactId>
+            <version>3.5.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.21.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-tests</artifactId>
+            <version>${jira.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-jira-plugin</artifactId>
+                <artifactId>jira-maven-plugin</artifactId>
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
                     <enableQuickReload>true</enableQuickReload>
-                    <enableFastdev>false</enableFastdev>
-                    <jvmArgs>-Xmx1536m -Djira.websudo.is.disabled=false -Datlassian.mail.senddisabled=false</jvmArgs>
+                    <jvmArgs>-Xmx2048m -Datlassian.mail.senddisabled=false</jvmArgs>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
-                        <Export-Package>ru.mail.jira.plugins.api,</Export-Package>
-                        <Import-Package>org.springframework.osgi.*;resolution:="optional", org.eclipse.gemini.blueprint.*;resolution:="optional", com.atlassian.jira.plugin.webfragment.conditions, com.atlassian.jira.issue.customfields.searchers, com.atlassian.jira.jql.operand, *;resolution:=optional</Import-Package>
+                        <Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>
+                        <Export-Package>ru.mail.jira.plugins.groovy.api.*,</Export-Package>
+                        <Import-Package>
+                            <!-- imports -->
+                            org.springframework.osgi.*;resolution:="optional",
+                            org.eclipse.gemini.blueprint.*;resolution:="optional",
+                            <!-- spring imports -->
+                            org.springframework.aop,
+                            <!-- jira stuff -->
+                            com.atlassian.jira.plugin.webfragment.conditions,
+                            com.atlassian.jira.issue.customfields.searchers,
+                            com.atlassian.jira.jql.operand,
+                            <!-- required for spring lifecycle annotations -->
+                            javax.annotation,
+                            <!-- exclude stuff for querydsl pocketknife -->
+                            !net.sf.cglib.proxy,
+                            !org.jvnet.hudson.annotation_indexer,
+                            <!-- everything else -->
+                            *;resolution:=optional
+                        </Import-Package>
+                        <DynamicImport-Package>
+                            com.atlassian.greenhopper.*
+                        </DynamicImport-Package>
                         <Spring-Context>*</Spring-Context>
                     </instructions>
                     <compressJs>false</compressJs>
@@ -155,6 +377,107 @@
                             <version>${quick.reload.version}</version>
                         </pluginArtifact>
                     </pluginArtifacts>
+
+                    <products>
+                        <product>
+                            <id>jira</id>
+                            <instanceId>jira-current</instanceId>
+                            <version>${jira.version}</version>
+                            <productDataVersion>${jira.version}</productDataVersion>
+
+                            <shutdownTimeout>${shutdownTimeout}</shutdownTimeout>
+
+                            <applications>
+                                <application>
+                                    <applicationKey>jira-software</applicationKey>
+                                    <version>${jira.version}</version>
+                                </application>
+                            </applications>
+                        </product>
+                        <product>
+                            <id>jira</id>
+                            <instanceId>jira-latest</instanceId>
+                            <version>${jira.latest.version}</version>
+                            <productDataVersion>${jira.latest.version}</productDataVersion>
+
+                            <shutdownTimeout>${shutdownTimeout}</shutdownTimeout>
+
+                            <applications>
+                                <application>
+                                    <applicationKey>jira-software</applicationKey>
+                                    <version>${jira.latest.version}</version>
+                                </application>
+                            </applications>
+                        </product>
+                        <product>
+                            <id>jira</id>
+                            <instanceId>jira-73</instanceId>
+                            <version>${jira.oldest.version}</version>
+                            <productDataVersion>${jira.oldest.version}</productDataVersion>
+
+                            <shutdownTimeout>${shutdownTimeout}</shutdownTimeout>
+
+                            <applications>
+                                <application>
+                                    <applicationKey>jira-software</applicationKey>
+                                    <version>${jira.oldest.version}</version>
+                                </application>
+                            </applications>
+                        </product>
+                        <product>
+                            <id>jira</id>
+                            <instanceId>jira-lts</instanceId>
+                            <version>${jira.lts.version}</version>
+                            <productDataVersion>${jira.lts.version}</productDataVersion>
+
+                            <shutdownTimeout>${shutdownTimeout}</shutdownTimeout>
+
+                            <applications>
+                                <application>
+                                    <applicationKey>jira-software</applicationKey>
+                                    <version>${jira.lts.version}</version>
+                                </application>
+                            </applications>
+                        </product>
+                    </products>
+                    <testGroups>
+                        <testGroup>
+                            <id>jira-current</id>
+                            <productIds>
+                                <productId>jira-current</productId>
+                            </productIds>
+                            <includes>
+                                <include>it/**/*IT.java</include>
+                            </includes>
+                        </testGroup>
+                        <testGroup>
+                            <id>jira-oldest</id>
+                            <productIds>
+                                <productId>jira-73</productId>
+                            </productIds>
+                            <includes>
+                                <include>it/**/*IT.java</include>
+                            </includes>
+                        </testGroup>
+                        <testGroup>
+                            <id>jira-latest</id>
+                            <productIds>
+                                <productId>jira-latest</productId>
+                            </productIds>
+                            <includes>
+                                <include>it/**/*IT.java</include>
+                            </includes>
+                        </testGroup>
+                        <testGroup>
+                            <id>jira-lts</id>
+                            <productIds>
+                                <productId>jira-lts</productId>
+                            </productIds>
+                            <includes>
+                                <include>it/**/*IT.java</include>
+                            </includes>
+                        </testGroup>
+                    </testGroups>
                 </configuration>
             </plugin>
             <plugin>
@@ -175,24 +498,103 @@
                             <groupId>com.atlassian.plugin</groupId>
                             <artifactId>atlassian-spring-scanner-external-jar</artifactId>
                         </dependency>
+                        <dependency>
+                            <groupId>com.atlassian.pocketknife</groupId>
+                            <artifactId>atlassian-pocketknife-querydsl</artifactId>
+                        </dependency>
                     </scannedDependencies>
                     <verbose>false</verbose>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>4.7.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
     <properties>
-        <jira.version>7.6.3</jira.version>
-        <amps.version>6.3.14</amps.version>
+        <jira.version>7.10.2</jira.version>
+        <jira.oldest.version>7.3.0</jira.oldest.version>
+        <jira.latest.version>7.12.1</jira.latest.version>
+        <jira.lts.version>7.6.8</jira.lts.version>
+
+        <gh.version>7.10.0-DAILY20180821023118</gh.version>
+        <amps.version>8.0.1</amps.version>
         <ao.version>1.5.0</ao.version>
+        <junit.version>5.2.0</junit.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
         <quick.reload.version>2.0.0</quick.reload.version>
-        <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
+        <groovy.version>2.4.15</groovy.version>
+
+        <shutdownTimeout>60000</shutdownTimeout>
+
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
+
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>groovy-next</id>
+
+            <properties>
+                <groovy.version>2.5.3</groovy.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-macro</artifactId>
+                    <version>${groovy.version}</version>
+                    <classifier>indy</classifier>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-datetime</artifactId>
+                    <version>${groovy.version}</version>
+                    <classifier>indy</classifier>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+
+            <repositories>
+                <repository>
+                    <id>oss-jfrog-artifactory-snapshots</id>
+                    <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                        <checksumPolicy>warn</checksumPolicy>
+                    </snapshots>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
 
     <pluginRepositories>
         <pluginRepository>
@@ -222,6 +624,17 @@
             <releases>
                 <enabled>true</enabled>
                 <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>adaptavist-external</id>
+            <url>https://nexus.adaptavist.com/content/repositories/external</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
             </releases>
         </repository>
     </repositories>

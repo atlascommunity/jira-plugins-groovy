@@ -1,12 +1,12 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import Spinner from '@atlaskit/spinner';
 
 import './LoadingSpinner.less';
 
 
-export function LoadingSpinner(): React.Node {
+export function LoadingSpinner(): Node {
     return (
         <div className="LoadingSpinner">
             <div className="flex-horizontal-middle">

@@ -19,10 +19,19 @@
       }
     ],
     "eol-last": ["error", "always"],
+    "no-console": ["error", { "allow": ["debug", "warn", "error"] }],
+    "operator-linebreak": ["warn", "before", { "overrides": { "&&": "after"} }],
+    "multiline-ternary": ["warn", "always-multiline"],
 
     "react/prefer-stateless-function": [1, { "ignorePureComponents": true }],
+    "react/no-access-state-in-setstate": 2,
+    "react/no-this-in-sfc": 2,
+    "react/jsx-no-bind": 2,
     "react/jsx-no-literals": [1, {"noStrings": false}],
     "react/jsx-no-target-blank": 2,
+    "react/jsx-wrap-multilines": ["warn", { "arrow": "ignore" }],
+    "react/jsx-indent": ["warn"],
+    "react/jsx-indent-props": ["warn"],
 
     "jsx-quotes": ["error", "prefer-double"],
 
@@ -53,9 +62,28 @@
         "peerDependencies": false
       }
     ],
+    "import/no-namespace": ["warn"],
     "import/no-mutable-exports": ["warn"],
     "import/no-duplicates": ["warn"],
+    "import/no-useless-path-segments": ["warn"],
+    "import/no-internal-modules": [
+      "warn",
+      {
+        "allow": [
+          //external deps
+          "@atlaskit/icon/glyph/**",
+          "codemirror/**",
+          "lodash/*",
+          //internal deps
+          "common/**",
+          "i18n/*",
+          "**/types"
+        ]
+      }
+    ],
     "import/newline-after-import": ["error", { "count": 2 }],
+    "import/no-self-import": ["error"],
+    "import/no-cycle": ["error", { "commonjs": true }],
 
     "flowtype/require-valid-file-annotation": [
       2,
@@ -79,7 +107,8 @@
       2,
       "always",
       {
-        "excludeArrowFunctions": "expressionsOnly"
+        "excludeArrowFunctions": "expressionsOnly",
+        "excludeMatching": ["render"]
       }
     ],
     "flowtype/require-parameter-type": [
@@ -100,8 +129,15 @@
         }
       }
     ],
-    "flowtype/no-flow-fix-me-comments": [1],
-    "flowtype/semi": [2, "always"]
+    //"flowtype/no-flow-fix-me-comments": [1],
+    "flowtype/semi": [2, "always"],
+    "jsx-a11y/href-no-hash": [0]
+  },
+  "settings": {
+    "react": {
+      "version": "16.4.2",
+      "flowVersion": "0.78"
+    }
   },
   "extends": ["react-app"]
 }

@@ -1,7 +1,6 @@
 package ru.mail.jira.plugins.groovy.impl.cf;
 
 import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.customfields.CustomFieldSearcher;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.rest.FieldJsonRepresentation;
@@ -12,9 +11,8 @@ import com.atlassian.jira.util.velocity.NumberTool;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScript;
-import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
-import ru.mail.jira.plugins.groovy.util.Const;
+import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScriptDto;
+import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -23,13 +21,15 @@ import java.util.Map;
 public class TemplateScriptedCFType extends ScriptedCFType<Object, Object> {
     private final Logger logger = LoggerFactory.getLogger(TemplateScriptedCFType.class);
     private final FieldValueExtractor valueExtractor;
+    private final CustomFieldHelper customFieldHelper;
 
     public TemplateScriptedCFType(
-        FieldConfigRepository configRepository,
-        FieldValueExtractor valueExtractor
+        FieldValueExtractor valueExtractor,
+        CustomFieldHelper customFieldHelper
     ) {
-        super(configRepository, valueExtractor, Object.class);
+        super(valueExtractor, Object.class);
         this.valueExtractor = valueExtractor;
+        this.customFieldHelper = customFieldHelper;
     }
 
     @Override
@@ -39,34 +39,19 @@ public class TemplateScriptedCFType extends ScriptedCFType<Object, Object> {
 
     @Override
     public void fillDynamicVelocityParams(Map<String, Object> params, Issue issue, CustomField field, FieldLayoutItem fieldLayoutItem) {
-        FieldScript script = valueExtractor.getScript(field, issue);
+        FieldScriptDto script = valueExtractor.getScript(field, issue);
 
         params.put("template", script != null ? script.getTemplate() : "");
 
         if (script != null && script.isWithVelocityParams()) {
-            params.putAll(valueExtractor.extractValueHolder(field, issue, getType(field)).getVelocityParams());
+            params.putAll(valueExtractor.extractValueHolder(field, issue, customFieldHelper.getExpectedType(field)).getVelocityParams());
         }
     }
 
     @Nullable
     @Override
     public Object getValueFromIssue(CustomField field, Issue issue) {
-        return valueExtractor.extractValue(field, issue, getType(field));
-    }
-
-    private Class<Object> getType(CustomField field) {
-        CustomFieldSearcher searcher = field.getCustomFieldSearcher();
-        if (searcher != null) {
-            String searcherKey = searcher.getDescriptor().getCompleteKey();
-            Class searcherType = Const.SEARCHER_TYPES.get(searcherKey);
-            if (searcherType != null) {
-                return searcherType;
-            } else {
-                logger.warn("Unable to get type for searcher {}", searcherKey);
-            }
-        }
-
-        return Object.class;
+        return valueExtractor.extractValue(field, issue, customFieldHelper.getExpectedType(field));
     }
 
     @Override

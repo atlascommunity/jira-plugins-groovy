@@ -2,79 +2,98 @@
 import React, {type Node} from 'react';
 
 import {connect} from 'react-redux';
-
-import memoize from 'fast-memoize';
-import memoizeOne from 'memoize-one';
+import {createSelector} from 'reselect';
 
 import {Droppable} from 'react-beautiful-dnd';
 
-import Button, {ButtonGroup} from '@atlaskit/button';
-import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
+import Button from '@atlaskit/button';
 import Badge from '@atlaskit/badge';
+import {colors} from '@atlaskit/theme';
 
-import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
-import AddIcon from '@atlaskit/icon/glyph/add';
-import MoreVerticalIcon from '@atlaskit/icon/glyph/more-vertical';
 import FolderIcon from '@atlaskit/icon/glyph/folder';
 import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
-import WatchIcon from '@atlaskit/icon/glyph/watch';
-import WatchFilledIcon from '@atlaskit/icon/glyph/watch-filled';
+//$FlowFixMe
+import { Skeleton } from '@atlaskit/icon';
 
-import {RegistryActionCreators} from './registry.reducer';
+import {DirectoryStateActionCreators, groupedDirsSelector, groupedScriptsSelector} from './redux';
 
 import {DraggableRegistryScript} from './DraggableRegistryScript';
+import {ScriptDirectoryActions} from './ScriptDirectoryActions';
 
-import type {DeleteCallback, CreateCallback, EditCallback, RegistryDirectoryType} from './types';
+import type {DeleteCallback, CreateCallback, EditCallback, RegistryDirectoryType, RegistryScriptType} from './types';
 
-import {watcherService} from '../service/services';
+import {LazilyRendered} from '../common/lazyRender';
 
-import {CommonMessages} from '../i18n/common.i18n';
-import {RegistryMessages} from '../i18n/registry.i18n';
+import './ScriptDirectory.less';
 
 
-const countErrors = memoize((directory: RegistryDirectoryType): number => {
-    let errors: * = 0;
-    if (directory.scripts) {
-        errors += directory.scripts.map(script => script.errorCount || 0).reduce((a, b) => a + b, 0);
-    }
-    if (directory.children) {
-        errors += directory.children.map(child => countErrors(child)).reduce((a, b) => a + b, 0);
-    }
-    return errors;
-});
+function ActionsPlaceholder(): Node {
+    return (
+        <div className="ScriptDirectoryActionsPlaceholder">
+            <div className="ButtonPlaceholder" style={{width: '144px'}}>
+                <div className="ButtonIcon">
+                    <Skeleton/>
+                </div>
+                <div className="ButtonContentPlaceholder"/>
+            </div>
+            <div className="ButtonPlaceholder" style={{width: '122px'}}>
+                <div className="ButtonIcon">
+                    <Skeleton/>
+                </div>
+                <div className="ButtonContentPlaceholder"/>
+            </div>
+            <div className="IconButtonPlaceholder">
+                <Skeleton/>
+            </div>
+            <div className="IconButtonPlaceholder">
+                <Skeleton/>
+            </div>
+            <div className="IconButtonPlaceholder">
+                <Skeleton/>
+            </div>
+        </div>
+    );
+}
 
 type ScriptDirectoryProps = {
     directory: RegistryDirectoryType,
+    children: $ReadOnlyArray<RegistryDirectoryType>,
+    scripts: $ReadOnlyArray<RegistryScriptType>,
+    errorCount: number,
+    warningCount: number,
     onCreate: CreateCallback,
     onEdit: EditCallback,
     onDelete: DeleteCallback,
-    forceOpen: boolean
+    open: typeof DirectoryStateActionCreators.open,
+    close: typeof DirectoryStateActionCreators.close,
+    forceOpen: boolean,
+    isOpen: boolean,
 };
 
-type ScriptDirectoryState = {
-    collapsed: boolean
-};
-
-export class ScriptDirectory extends React.PureComponent<ScriptDirectoryProps, ScriptDirectoryState> {
-    state = {
-        collapsed: true
-    };
-
-    _toggle = () => this.setState({collapsed: !this.state.collapsed});
-
-    render(): Node {
-        const {collapsed} = this.state;
-        const {forceOpen, directory, onCreate, onEdit, onDelete} = this.props;
-
-        let directories: * = null;
-        let scripts: * = null;
-
-        const isOpen = !collapsed || forceOpen;
+export class ScriptDirectoryInternal extends React.PureComponent<ScriptDirectoryProps> {
+    _toggle = () => {
+        const {directory, isOpen, open, close} = this.props;
 
         if (isOpen) {
+            close(directory.id);
+        } else {
+            open(directory.id);
+        }
+    };
+
+    render() {
+        const {forceOpen, isOpen, directory, children, scripts, errorCount, warningCount, onCreate, onEdit, onDelete} = this.props;
+
+        let directories: ?Node = null;
+        let scriptsEl: ?$ReadOnlyArray<Node> = null;
+
+        const hasChildren = (children.length + scripts.length) > 0;
+        const open = (isOpen || forceOpen) && hasChildren;
+
+        if (open) {
             directories = (
                 <div>
-                    {directory.children ? directory.children.map(child =>
+                    {children && children.map(child =>
                         <ScriptDirectory
                             directory={child}
                             key={child.id}
@@ -83,23 +102,21 @@ export class ScriptDirectory extends React.PureComponent<ScriptDirectoryProps, S
                             onEdit={onEdit}
                             onDelete={onDelete}
                         />
-                    ) : null}
+                    )}
                 </div>
             );
-            scripts = (
-                directory.scripts && directory.scripts.map(script =>
+            scriptsEl = (
+                scripts && scripts.map(script =>
                     <DraggableRegistryScript
                         key={script.id}
                         script={script}
 
-                        onEdit={onEdit}
+                        //$FlowFixMe TODO: use same callback interface
                         onDelete={onDelete}
                     />
                 )
             );
         }
-
-        const errorCount = countErrors(directory);
 
         return (
             <div className="flex full-width flex-column scriptDirectory">
@@ -108,9 +125,9 @@ export class ScriptDirectory extends React.PureComponent<ScriptDirectoryProps, S
                         <Button
                             appearance="subtle"
                             spacing="none"
-                            iconBefore={!isOpen ? <FolderFilledIcon label=""/> : <FolderIcon label=""/>}
+                            iconBefore={!open ? <FolderFilledIcon label=""/> : <FolderIcon label=""/>}
 
-                            isDisabled={(directory.children.length + directory.scripts.length) === 0}
+                            isDisabled={!hasChildren}
 
                             onClick={this._toggle}
                         >
@@ -119,6 +136,13 @@ export class ScriptDirectory extends React.PureComponent<ScriptDirectoryProps, S
                             </h3>
                         </Button>
                     </div>
+                    {warningCount > 0 &&
+                        <div className="flex-vertical-middle flex-none errorCount">
+                            <div>
+                                <Badge max={99} value={warningCount} appearance={{ backgroundColor: colors.Y400, textColor: colors.N0 }}/>
+                            </div>
+                        </div>
+                    }
                     {errorCount > 0 &&
                         <div className="flex-vertical-middle flex-none errorCount">
                             <div>
@@ -128,26 +152,33 @@ export class ScriptDirectory extends React.PureComponent<ScriptDirectoryProps, S
                     }
                     <div className="flex-grow"/>
                     <div className="flex-none">
-                        <ScriptDirectoryActions
-                            id={directory.id}
-                            name={directory.name}
+                        <LazilyRendered>
+                            {render => render
+                                ? (
+                                    <ScriptDirectoryActions
+                                        id={directory.id}
+                                        name={directory.name}
 
-                            onCreate={onCreate}
-                            onEdit={onEdit}
-                            onDelete={onDelete}
-                        />
+                                        onCreate={onCreate}
+                                        onEdit={onEdit}
+                                        onDelete={onDelete}
+                                    />
+                                )
+                                : <ActionsPlaceholder/>
+                            }
+                        </LazilyRendered>
                     </div>
                 </div>
-                <div className={`scriptDirectoryChildren ${isOpen ? 'open' : ''}`}>
+                <div className={`scriptDirectoryChildren ${open ? 'open' : ''}`}>
                     <Droppable droppableId={`${directory.id}`}>
                         {(provided, snapshot) => (
                             <div
                                 ref={provided.innerRef}
                                 className={`ScriptList scriptDropArea ${snapshot.isDraggingOver ? 'draggingOver' : ''}`}
-                                style={{minHeight: (scripts && scripts.length) ? (65*scripts.length + 10*(scripts.length-1)) : null}}
+                                style={{minHeight: (scriptsEl && scriptsEl.length) ? (65*scriptsEl.length + 10*(scriptsEl.length-1)) : null}}
                                 {...provided.droppableProps}
                             >
-                                {scripts}
+                                {scriptsEl}
                                 {provided.placeholder}
                             </div>
                         )}
@@ -159,122 +190,61 @@ export class ScriptDirectory extends React.PureComponent<ScriptDirectoryProps, S
     }
 }
 
-type ActionsProps = {
-    id: number,
-    name: string,
-    onCreate: CreateCallback,
-    onEdit: EditCallback,
-    onDelete: DeleteCallback,
-    directoryWatches: Array<number>,
-    addWatch: typeof RegistryActionCreators.addWatch,
-    removeWatch: typeof RegistryActionCreators.removeWatch
-};
-
-type ActionsState = {
-    waitingWatch: boolean
-};
-
-export class ScriptDirectoryActionsInternal extends React.PureComponent<ActionsProps, ActionsState> {
-    _onEdit = () => this.props.onEdit(this.props.id, 'directory');
-    _onDelete = () => this.props.onDelete(this.props.id, 'directory', this.props.name);
-    _onCreateDir = () => this.props.onCreate(this.props.id, 'directory');
-    _onCreateScript = () => this.props.onCreate(this.props.id, 'script');
-
-    _toggleWatch = () => {
-        const {id, directoryWatches, addWatch, removeWatch} = this.props;
-
-        const isWatching = directoryWatches.includes(id);
-
-        this.setState({ waitingWatch: true });
-
-        const promise = isWatching ?
-            watcherService.stopWatching('REGISTRY_DIRECTORY', id) :
-            watcherService.startWatching('REGISTRY_DIRECTORY', id);
-
-        promise.then(
-            () => {
-                (isWatching ? removeWatch : addWatch)('directory', id);
-                this.setState({ waitingWatch: false });
-            },
-            (error: *) => {
-                this.setState({ waitingWatch: false });
-                throw error;
-            }
-        );
-    };
-
-    state = {
-        waitingWatch: false
-    };
-
-    render(): Node {
-        const {id, directoryWatches} = this.props;
-        const {waitingWatch} = this.state;
-
-        const isWatching = directoryWatches.includes(id);
-
-        return (
-            <ButtonGroup>
-                <Button
-                    appearance="subtle"
-                    iconBefore={<AddIcon label=""/>}
-
-                    onClick={this._onCreateDir}
-                >
-                    {RegistryMessages.addDirectory}
-                </Button>
-                <Button
-                    appearance="subtle"
-                    iconBefore={<AddIcon label=""/>}
-
-                    onClick={this._onCreateScript}
-                >
-                    {RegistryMessages.addScript}
-                </Button>
-                <Button
-                    appearance="subtle"
-                    iconBefore={<EditFilledIcon label=""/>}
-
-                    onClick={this._onEdit}
-                />
-                <Button
-                    key="watch"
-                    appearance="subtle"
-                    isDisabled={waitingWatch}
-                    iconBefore={isWatching ? <WatchFilledIcon label=""/> : <WatchIcon label=""/>}
-
-                    onClick={this._toggleWatch}
-                />
-                <DropdownMenu
-                    key="etc"
-
-                    position="bottom right"
-
-                    triggerType="button"
-                    triggerButtonProps={{
-                        appearance: 'subtle',
-                        iconBefore: <MoreVerticalIcon label=""/>
-                    }}
-                >
-                    <DropdownItemGroup>
-                        <DropdownItem onClick={this._onDelete}>
-                            {CommonMessages.delete}
-                        </DropdownItem>
-                    </DropdownItemGroup>
-                </DropdownMenu>
-            </ButtonGroup>
-        );
+const countExecutions = (
+    field: 'errorCount' | 'warningCount',
+    dirId: number,
+    scripts: {[?number]: ?$ReadOnlyArray<RegistryScriptType>},
+    dirs: {[?number]: ?$ReadOnlyArray<RegistryDirectoryType>}
+): number => {
+    let errors: number = 0;
+    if (scripts[dirId]) {
+        errors += scripts[dirId].map(script => script[field] || 0).reduce((a, b) => a + b, 0);
     }
-}
+    if (dirs[dirId]) {
+        errors += dirs[dirId].map(child => countExecutions(field, child.id, scripts, dirs)).reduce((a, b) => a + b, 0);
+    }
+    return errors;
+};
 
-const ScriptDirectoryActions = connect(
-    memoizeOne((state: *): * => {
-        return {
-            directoryWatches: state.directoryWatches
-        };
-    }),
+export const ScriptDirectory = connect(
+    (): * => {
+        const idSelector = (_state, props) => props.directory.id;
+        const entitySelector = (entities, id) => [...(entities[id] || [])].sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity: 'base'}));
+
+        const childrenSelector = createSelector(
+            [groupedDirsSelector, idSelector], entitySelector
+        );
+
+        const scriptsSelector = createSelector(
+            [groupedScriptsSelector, idSelector], entitySelector
+        );
+
+        const isOpenSelector = createSelector(
+            [state => state.openDirectories, idSelector],
+            (openDirectories, id) => openDirectories.includes(id)
+        );
+
+        const errorsSelector = createSelector(
+            [groupedDirsSelector, groupedScriptsSelector, idSelector],
+            (dirs, scripts, id) => countExecutions('errorCount', id, scripts, dirs)
+        );
+
+        const warningsSelector = createSelector(
+            [groupedDirsSelector, groupedScriptsSelector, idSelector],
+            (dirs, scripts, id) => countExecutions('warningCount', id, scripts, dirs)
+        );
+
+        //$FlowFixMe
+        return (state, props): * => ({
+            isOpen: isOpenSelector(state, props),
+            errorCount: errorsSelector(state, props),
+            warningCount: warningsSelector(state, props),
+            children: childrenSelector(state, props),
+            scripts: scriptsSelector(state, props)
+        });
+    },
     {
-        addWatch: RegistryActionCreators.addWatch,
-        removeWatch: RegistryActionCreators.removeWatch
+        open: DirectoryStateActionCreators.open,
+        close: DirectoryStateActionCreators.close
     }
-)(ScriptDirectoryActionsInternal);
+)(ScriptDirectoryInternal);

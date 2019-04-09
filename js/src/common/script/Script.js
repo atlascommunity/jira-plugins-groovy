@@ -1,10 +1,12 @@
 //@flow
 import React, {type Node, type Element} from 'react';
 
-import Button, {ButtonGroup} from '@atlaskit/button';
+import Button, {ButtonGroup, defaultProps as defaultButtonProps} from '@atlaskit/button';
 import Spinner from '@atlaskit/spinner';
 import Badge from '@atlaskit/badge';
 import DropdownMenu, {DropdownItemGroup, DropdownItem} from '@atlaskit/dropdown-menu';
+import {colors} from '@atlaskit/theme';
+import EmptyState from '@atlaskit/empty-state';
 
 import CodeIcon from '@atlaskit/icon/glyph/code';
 import EditIcon from '@atlaskit/icon/glyph/edit-filled';
@@ -22,24 +24,27 @@ import type {ScriptParam} from './ScriptParameters';
 
 import type {VoidCallback} from '../types';
 
-import {Editor} from '../editor/Editor';
-import {LoadingSpinner} from '../ak/LoadingSpinner';
+import Editor, {EditorThemeContextConsumer} from '../editor';
+import {LoadingSpinner} from '../ak';
 
 import {CommonMessages} from '../../i18n/common.i18n';
 
-import {executionService} from '../../service/services';
+import {executionService} from '../../service';
 
 
-type DropdownItemType = {
+type DropdownItemType = {|
     label: string,
     onClick?: VoidCallback,
-    href?: string
-};
+    href?: string,
+    linkComponent?: Function
+|};
 
-export type ScriptProps = {
+export type ScriptProps = {|
     withChangelog: boolean,
     collapsible: boolean,
     headerless: boolean,
+    focused: boolean,
+    noCode: boolean,
 
     script: ?ScriptType,
     changelogsLoader?: () => Promise<$ReadOnlyArray<ChangelogType>>,
@@ -52,12 +57,13 @@ export type ScriptProps = {
     onDelete?: VoidCallback,
 
     title?: Node,
+    scriptName?: Node,
     children?: Node,
     additionalButtons?: Array<Element<any>>,
     additionalPrimaryButtons?: Array<Element<any>>,
     dropdownItems?: Array<DropdownItemType>,
-    additionalParameters?: Array<ScriptParam>
-};
+    additionalParameters?: Array<?ScriptParam>
+|};
 
 type ScriptState = {
     showCode: boolean,
@@ -78,7 +84,9 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
     static defaultProps = {
         collapsible: true,
         withChangelog: false,
-        headerless: false
+        headerless: false,
+        focused: false,
+        noCode: false
     };
 
     state = {
@@ -164,28 +172,33 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         });
     };
 
-    render(): Node {
+    render() {
         const {
-            script, template, title, children, collapsible, withChangelog, onEdit, onDelete, additionalButtons,
-            additionalPrimaryButtons, additionalParameters, dropdownItems, headerless
+            script, template, title, scriptName, children, collapsible, withChangelog, onEdit, onDelete,
+            additionalButtons, additionalPrimaryButtons, additionalParameters, dropdownItems, headerless, focused, noCode
         } = this.props;
         const {activeSource, showCode, changelogsReady, changelogs, executions, executionsReady, onlyLastExecutions} = this.state;
 
-        let codeBlock : Node = null;
-        let templateBlock : Node = null;
-        let executionBar : Node = null;
+        let codeBlock: Node = null;
+        let templateBlock: Node = null;
+        let executionBar: Node = null;
 
-        const isOpen : boolean = showCode || !collapsible;
+        const isOpen: boolean = showCode || !collapsible;
 
         if (isOpen && script) {
             if (template) {
                 templateBlock = (
                     <div style={{overflow: 'hidden'}}>
-                        <Editor
-                            readOnly={true}
-                            mode={activeSource.id === 'current' ? 'velocity' : 'diff'}
-                            value={activeSource.id === 'current' ? template.body : activeSource.templateSource}
-                        />
+                        <EditorThemeContextConsumer>
+                            {context =>
+                                <Editor
+                                    readOnly={true}
+                                    mode={activeSource.id === 'current' ? 'velocity' : 'diff'}
+                                    value={activeSource.id === 'current' ? template.body : activeSource.templateSource}
+                                    {...context}
+                                />
+                            }
+                        </EditorThemeContextConsumer>
                     </div>
                 );
             }
@@ -206,16 +219,33 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                 }
             }
 
+            let editorEl: Node;
+
+            if (noCode && activeSource.id === 'current') {
+                editorEl = (
+                    <EmptyState header="No code"/>
+                );
+            } else {
+                editorEl = (
+                    <EditorThemeContextConsumer>
+                        {context =>
+                            <Editor
+                                readOnly={true}
+                                mode={activeSource.id === 'current' ? 'groovy' : 'diff'}
+                                value={activeSource.id === 'current' ? script && script.scriptBody : activeSource.source}
+                                {...context}
+                            />
+                        }
+                    </EditorThemeContextConsumer>
+                );
+            }
+
             codeBlock = (
                 <div className="flex-row editor">
                     {changelogsNode}
                     <div className="flex-grow flex-column">
                         <div style={{overflow: 'hidden'}}>
-                            <Editor
-                                readOnly={true}
-                                mode={activeSource.id === 'current' ? 'groovy' : 'diff'}
-                                value={activeSource.id === 'current' ? script && script.scriptBody : activeSource.source}
-                            />
+                            {editorEl}
                         </div>
                         {templateBlock}
                     </div>
@@ -226,22 +256,23 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                 executionBar = (
                     <div className="executions">
                         {executionsReady &&
-                        <div className="flex-row">
-                            <ExecutionBar executions={executions}/>
-                            {onlyLastExecutions && <div className="flex-grow"/>}
-                            {onlyLastExecutions &&
-                            <div>
-                                <Button
-                                    appearance="subtle"
-                                    iconBefore={<RecentIcon label=""/>}
-                                    spacing="compact"
+                            <div className="flex-row">
+                                <ExecutionBar executions={executions}/>
+                                {onlyLastExecutions && <div className="flex-grow"/>}
+                                {onlyLastExecutions &&
+                                    <div>
+                                        <Button
+                                            appearance="subtle"
+                                            iconBefore={<RecentIcon label=""/>}
+                                            spacing="compact"
 
-                                    onClick={this._showAllExecutions}
-                                >
-                                    {CommonMessages.showAll}
-                                </Button>
-                            </div>}
-                        </div>
+                                            onClick={this._showAllExecutions}
+                                        >
+                                            {CommonMessages.showAll}
+                                        </Button>
+                                    </div>
+                                }
+                            </div>
                         }
                         {!executionsReady && <Spinner size="small"/>}
                     </div>
@@ -249,7 +280,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             }
         }
 
-        const buttons : Array<Element<any>> = [];
+        const buttons: Array<Element<any>> = [];
 
         if (collapsible && script) {
             buttons.push(
@@ -306,14 +337,15 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
 
                     triggerType="button"
                     triggerButtonProps={{
+                        ...defaultButtonProps,
                         appearance: 'subtle',
                         iconBefore: <MoreVerticalIcon label=""/>
                     }}
                 >
                     <DropdownItemGroup>
-                        {dropdownItems.map((item: *, i: number): * =>
-                            <DropdownItem onClick={item.onClick} key={i} href={item.href}>
-                                {item.label}
+                        {dropdownItems.map(({label, ...itemProps}: *, i: number) =>
+                            <DropdownItem key={i} {...itemProps}>
+                                {label}
                             </DropdownItem>
                         )}
                     </DropdownItemGroup>
@@ -322,33 +354,47 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         }
 
         return (
-            <div className={`scriptRow ${!isOpen ? 'collapsed' : ''} ${template ? 'withTemplate' : ''}`}>
+            <div className={`scriptRow${!isOpen ? ' collapsed' : ''}${template ? ' withTemplate' : ''}${focused ? ' focused' : ''}`}>
                 {!headerless &&
                 <div className="flex-row title">
-                    {title ?
-                        <div className="flex-grow flex-vertical-middle">
-                            {title}
-                        </div>
-                        :
-                        <div className="flex-grow flex-row">
-                            <div className="flex-vertical-middle flex-none">
-                                <CodeIcon label=""/>
+                    {title
+                        ? (
+                            <div className="flex-grow flex-vertical-middle">
+                                {title}
                             </div>
-                            {' '}
-                            <div className="flex-vertical-middle">
-                                <h3 title={script && script.name}>
-                                    {script && script.name}
-                                </h3>
-                            </div>
-                            {script && !!script.errorCount &&
-                                <div className="flex-vertical-middle flex-none errorCount">
-                                    <div>
-                                        <Badge max={99} value={script.errorCount} appearance="important"/>
-                                    </div>
+                        )
+                        : (
+                            <div className="flex-grow flex-row">
+                                <div className="flex-vertical-middle flex-none">
+                                    <CodeIcon label=""/>
                                 </div>
-                            }
-                            <div className="flex-grow"/>
-                        </div>
+                                {' '}
+                                <div className="flex-vertical-middle">
+                                    <h3 title={script && script.name}>
+                                        {scriptName || (script && script.name)}
+                                    </h3>
+                                </div>
+                                {script && !!script.warningCount &&
+                                    <div className="flex-vertical-middle flex-none errorCount">
+                                        <div>
+                                            <Badge
+                                                max={99}
+                                                value={script.warningCount}
+                                                appearance={{ backgroundColor: colors.Y400, textColor: colors.N0 }}
+                                            />
+                                        </div>
+                                    </div>
+                                }
+                                {script && !!script.errorCount &&
+                                    <div className="flex-vertical-middle flex-none errorCount">
+                                        <div>
+                                            <Badge max={99} value={script.errorCount} appearance="important"/>
+                                        </div>
+                                    </div>
+                                }
+                                <div className="flex-grow"/>
+                            </div>
+                        )
                     }
                     <div className="flex-none flex-row">
                         <ButtonGroup>

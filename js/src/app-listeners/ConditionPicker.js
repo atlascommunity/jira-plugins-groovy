@@ -1,18 +1,17 @@
 //@flow
-import * as React from 'react';
+import React, {type Node} from 'react';
 
 import {AkFieldRadioGroup} from '@atlaskit/field-radio-group';
 import {FieldTextStateless} from '@atlaskit/field-text';
 
 import type {ConditionInputType} from './types';
 
-import {jiraService} from '../service/services';
+import {jiraService} from '../service';
 
 import {FieldMessages} from '../i18n/common.i18n';
 import {ListenerTypeMessages} from '../i18n/listener.i18n';
 
-import {AsyncLoadingMultiSelect} from '../common/ak/AsyncLoadingMultiSelect';
-import {FieldError} from '../common/ak/FieldError';
+import {AsyncLoadingMultiSelect, FormField, FieldError} from '../common/ak';
 
 import type {LoaderOptionType} from '../common/ak/AsyncLoadingMultiSelect';
 
@@ -42,12 +41,13 @@ const eventTypeLoader = () => jiraService
 type Props = {
     value: ConditionInputType,
     onChange: (value: ConditionInputType) => void,
-    error: any
+    error: any,
+    isDisabled?: boolean
 };
 
 export class ConditionPicker extends React.Component<Props> {
-    _onChange = (property: string): * => {
-        return (val: any) => {
+    _onChange = (property: string) =>
+        (val: any) => {
             const {value, onChange} = this.props;
 
             onChange({
@@ -55,7 +55,6 @@ export class ConditionPicker extends React.Component<Props> {
                 [property]: val
             });
         };
-    };
 
     _onTypeChange = (e: SyntheticEvent<HTMLInputElement>) => {
         const {value, onChange} = this.props;
@@ -67,8 +66,8 @@ export class ConditionPicker extends React.Component<Props> {
         }
     };
 
-    _onInputChange = (property: string): * => {
-        return (e: SyntheticEvent<HTMLInputElement>) => {
+    _onInputChange = (property: string) =>
+        (e: SyntheticEvent<HTMLInputElement>) => {
             const {value, onChange} = this.props;
 
             onChange({
@@ -76,10 +75,9 @@ export class ConditionPicker extends React.Component<Props> {
                 [property]: e.currentTarget.value
             });
         };
-    };
 
-    render(): React.Node {
-        const {value, error} = this.props;
+    render() {
+        const {value, error, isDisabled} = this.props;
 
         let errorField: * = null;
         let errorMessage: * = null;
@@ -89,30 +87,55 @@ export class ConditionPicker extends React.Component<Props> {
             errorMessage = error.message;
         }
 
-        let paramEl: ?React.Node = null;
+        let paramEl: ?Node = null;
 
         if (value.type) {
             switch (value.type) {
                 case 'CLASS_NAME':
-                    paramEl = <FieldTextStateless
-                        key="className"
+                    paramEl = [
+                        <FormField
+                            key="pluginKey"
 
-                        shouldFitContainer={true}
-                        required={true}
+                            label={FieldMessages.pluginKey}
 
-                        isInvalid={errorField === 'condition.className'}
-                        invalidMessage={errorField === 'condition.className' ? errorMessage : null}
+                            isInvalid={errorField === 'condition.pluginKey'}
+                            invalidMessage={errorField === 'condition.pluginKey' ? errorMessage : null}
+                        >
+                            <FieldTextStateless
+                                key="pluginKey"
+                                shouldFitContainer={true}
+                                disabled={isDisabled}
 
-                        label={FieldMessages.name}
-                        value={value.className || ''}
-                        onChange={this._onInputChange('className')}
-                    />;
+                                value={value.pluginKey || ''}
+                                onChange={this._onInputChange('pluginKey')}
+                            />
+                        </FormField>,
+                        <FormField
+                            key="className"
+
+                            label={ListenerTypeMessages.CLASS_NAME}
+                            isRequired={true}
+
+                            isInvalid={errorField === 'condition.className'}
+                            invalidMessage={errorField === 'condition.className' ? errorMessage : null}
+                        >
+                            <FieldTextStateless
+                                key="className"
+                                shouldFitContainer={true}
+                                disabled={isDisabled}
+
+                                value={value.className || ''}
+                                onChange={this._onInputChange('className')}
+                            />
+                        </FormField>
+                    ];
                     break;
                 case 'ISSUE':
                     paramEl = [
                         <AsyncLoadingMultiSelect
                             key="project"
                             label={FieldMessages.projects}
+                            isDisabled={isDisabled}
 
                             value={value.projectIds || []}
                             onChange={this._onChange('projectIds')}
@@ -121,6 +144,7 @@ export class ConditionPicker extends React.Component<Props> {
                         <AsyncLoadingMultiSelect
                             key="type"
                             label={FieldMessages.eventTypes}
+                            isDisabled={isDisabled}
 
                             value={value.typeIds || []}
                             onChange={this._onChange('typeIds')}
@@ -134,7 +158,7 @@ export class ConditionPicker extends React.Component<Props> {
         }
 
         return (
-            <div className="flex-column">
+            <div className="flex-column" style={{zIndex: 100}}>
                 <AkFieldRadioGroup
                     label={FieldMessages.type}
                     isRequired={true}
@@ -143,12 +167,14 @@ export class ConditionPicker extends React.Component<Props> {
                         {
                             label: ListenerTypeMessages.ISSUE,
                             value: 'ISSUE',
-                            isSelected: value.type === 'ISSUE'
+                            isSelected: value.type === 'ISSUE',
+                            isDisabled
                         },
                         {
                             label: ListenerTypeMessages.CLASS_NAME,
                             value: 'CLASS_NAME',
-                            isSelected: value.type === 'CLASS_NAME'
+                            isSelected: value.type === 'CLASS_NAME',
+                            isDisabled
                         }
                     ]}
                     value={value.type}

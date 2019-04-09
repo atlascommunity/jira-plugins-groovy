@@ -15,9 +15,7 @@ import com.atlassian.jira.rest.Dates;
 import com.atlassian.jira.util.DateFieldFormat;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.Map;
@@ -30,10 +28,9 @@ public class DateScriptedCFType extends ScriptedCFType<Date, Date> implements Da
     protected DateScriptedCFType(
         @ComponentImport DateFieldFormat dateFieldFormat,
         @ComponentImport DateTimeFormatterFactory dateTimeFormatterFactory,
-        FieldConfigRepository configRepository,
         FieldValueExtractor valueExtractor
     ) {
-        super(configRepository, valueExtractor, Date.class);
+        super(valueExtractor, Date.class);
         this.dateFieldFormat = dateFieldFormat;
         this.iso8601Formatter = dateTimeFormatterFactory.formatter().withStyle(DateTimeStyle.ISO_8601_DATE).withSystemZone();
     }

@@ -38,6 +38,7 @@ import ru.mail.jira.plugins.groovy.api.service.ScheduledTaskService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -47,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
-public class ScheduledTaskServiceImpl implements ScheduledTaskService {
+public class ScheduledTaskServiceImpl implements ScheduledTaskService, PluginLifecycleAware {
     private static final JobRunnerKey JOB_RUNNER_KEY = JobRunnerKey.of("ru.mail.jira.groovy.scriptJobRunner");
     private static final String LOCK_KEY = "ru.mail.jira.groovy.scheduledTasks";
     //todo: make it configurable
@@ -95,6 +96,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
         this.executionRepository = executionRepository;
     }
 
+    @Override
     public void onStart() {
         ClusterLock lock = lockService.getLockForName(LOCK_KEY);
 
@@ -169,8 +171,14 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
         }
     }
 
+    @Override
     public void onStop() {
         schedulerService.unregisterJobRunner(JOB_RUNNER_KEY);
+    }
+
+    @Override
+    public int getInitOrder() {
+        return 300;
     }
 
     private void createJob(ScheduledTaskDto task) {
@@ -431,6 +439,12 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService {
                         } else {
                             if (isMutableIssue) {
                                 issueBinding = issueManager.getIssueObject(issue.getId());
+
+                                if (issueBinding == null) {
+                                    logger.error("Issue with key {} doesn't exist", issue.getKey());
+                                    errors++;
+                                    continue;
+                                }
                             }
 
                             Exception error = runScript(task, ImmutableMap.of("issue", issueBinding), false);
