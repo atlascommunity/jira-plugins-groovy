@@ -13,7 +13,7 @@ public class PluginDataServiceImpl implements PluginDataService {
     }
 
     @Override
-    public void setSentryEnabled() {
+    public void setSentryEnabled(boolean enabled) {
         //todo
     }
 
@@ -28,7 +28,7 @@ public class PluginDataServiceImpl implements PluginDataService {
     }
 
     @Override
-    public void setSentryDsn() {
+    public void setSentryDsn(String dsn) {
         //todo
     }
 }

@@ -4,10 +4,10 @@ import java.util.Optional;
 
 public interface PluginDataService {
     boolean isSentryEnabled();
-    void setSentryEnabled();
+    void setSentryEnabled(boolean enabled);
 
     String getSentryDsnValue();
-    void setSentryDsn();
+    void setSentryDsn(String dsn);
 
     Optional<String> getSentryDsn();
 }

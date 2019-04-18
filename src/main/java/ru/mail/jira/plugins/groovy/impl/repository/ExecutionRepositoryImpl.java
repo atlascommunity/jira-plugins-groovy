@@ -4,6 +4,9 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.adapter.jackson.ObjectMapper;
 import com.atlassian.jira.cluster.ClusterInfo;
 import com.atlassian.jira.datetime.DateTimeFormatter;
+import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.web.ExecutingHttpRequest;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.pocketknife.api.querydsl.DatabaseAccessor;
 import com.atlassian.pocketknife.api.querydsl.util.OnRollback;
@@ -11,6 +14,8 @@ import com.atlassian.util.concurrent.ThreadFactories;
 import com.querydsl.core.types.dsl.*;
 import com.querydsl.sql.SQLExpressions;
 import com.querydsl.sql.Union;
+import io.sentry.event.User;
+import io.sentry.event.UserBuilder;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.slf4j.Logger;
@@ -20,8 +25,10 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.dto.execution.ScriptExecutionDto;
 import ru.mail.jira.plugins.groovy.api.entity.ScriptExecution;
+import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -43,26 +50,34 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     private final ActiveObjects ao;
     private final ClusterInfo clusterInfo;
     private final DateTimeFormatter dateTimeFormatter;
+    private final JiraAuthenticationContext authenticationContext;
     private final DatabaseAccessor databaseAccessor;
+    private final SentryService sentryService;
 
     @Autowired
     public ExecutionRepositoryImpl(
         @ComponentImport ActiveObjects ao,
         @ComponentImport ClusterInfo clusterInfo,
         @ComponentImport DateTimeFormatter dateTimeFormatter,
-        DatabaseAccessor databaseAccessor
+        @ComponentImport JiraAuthenticationContext authenticationContext,
+        DatabaseAccessor databaseAccessor,
+        SentryService sentryService
     ) {
         this.ao = ao;
         this.clusterInfo = clusterInfo;
         this.dateTimeFormatter = dateTimeFormatter;
+        this.authenticationContext = authenticationContext;
         this.databaseAccessor = databaseAccessor;
+        this.sentryService = sentryService;
     }
 
     @Override
     public void trackFromRegistry(int id, long time, boolean successful, String error, Map<String, String> additionalParams) {
         executorService.execute(() -> {
             try {
-                this.saveExecution(id, time, successful, error, objectMapper.writeValueAsString(getParams(additionalParams)));
+                Map<String, String> params = getParams(additionalParams);
+                this.saveExecution(id, time, successful, error, objectMapper.writeValueAsString(params));
+                this.submitSentryEvent(String.valueOf(id), time, error, params);
             } catch (Exception e) {
                 logger.error("unable to save execution", e);
             }
@@ -73,7 +88,9 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     public void trackInline(String id, long time, boolean successful, String error, Map<String, String> additionalParams) {
         executorService.execute(() -> {
             try {
-                this.saveExecution(id, time, successful, error, objectMapper.writeValueAsString(getParams(additionalParams)));
+                Map<String, String> params = getParams(additionalParams);
+                this.saveExecution(id, time, successful, error, objectMapper.writeValueAsString(params));
+                this.submitSentryEvent(id, time, error, params);
             } catch (Exception e) {
                 logger.error("unable to save execution", e);
             }
@@ -234,6 +251,30 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
             new DBParam("ERROR", error),
             new DBParam("EXTRA_PARAMS", additionalParams)
         );
+    }
+
+    private void submitSentryEvent(String id, long time, String error, User user, Map<String, String> params) {
+        sentryService.registerException(
+
+        );
+    }
+
+    private User getCurrentUser() {
+        ApplicationUser user = authenticationContext.getLoggedInUser();
+
+        if (user != null) {
+            HttpServletRequest currentRequest = ExecutingHttpRequest.get();
+            return new UserBuilder()
+                .setId(user.getKey())
+                .setUsername(user.getUsername())
+                .setEmail(user.getEmailAddress())
+                .setIpAddress(currentRequest != null ? currentRequest.getRemoteAddr() : null)
+                .build();
+        } else {
+            return new UserBuilder()
+                .setId("anonymous")
+                .build();
+        }
     }
 
     @Override

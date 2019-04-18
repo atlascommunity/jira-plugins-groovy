@@ -6,6 +6,7 @@ import com.atlassian.jira.cluster.ClusterInfo;
 import com.atlassian.jira.user.ApplicationUser;
 import io.sentry.Sentry;
 import io.sentry.event.EventBuilder;
+import io.sentry.event.User;
 import io.sentry.event.interfaces.ExceptionInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
@@ -38,10 +40,13 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
 
     @Override
     public void registerException(
-        ApplicationUser user,
+        User user,
         Exception e,
-        ScriptType type, Integer id, String inlineId,
-        String issue, Map<String, String> metaData
+        ScriptType type,
+        Integer id,
+        String inlineId,
+        String issue,
+        Map<String, String> metaData
     ) {
         if (pluginDataService.isSentryEnabled()) {
             EventBuilder eventBuilder = new EventBuilder()
@@ -49,10 +54,6 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
                 .withExtra("id", id != null ? id : inlineId)
                 .withTag("scriptType", type.name())
                 .withSentryInterface(new ExceptionInterface(e));
-
-            if (user != null) {
-                eventBuilder.withTag("user", user.getName());
-            }
 
             if (clusterInfo.isClustered()) {
                 eventBuilder.withTag("node", clusterInfo.getNodeId());
@@ -82,17 +83,21 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
 
         lock.lock();
         try {
-            //todo
+            pluginDataService.setSentryEnabled(enabled);
+            pluginDataService.setSentryDsn(dsn);
         } finally {
             lock.unlock();
         }
     }
 
     @Override
+    public void invalidateSettings() {
+        init();
+    }
+
+    @Override
     public void onStart() {
-        pluginDataService
-            .getSentryDsn()
-            .ifPresent(Sentry::init);
+        init();
     }
 
     @Override
@@ -103,5 +108,19 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
     @Override
     public int getInitOrder() {
         return 0;
+    }
+
+    private void init() {
+        Optional<String> dsn = getDsn();
+        if (dsn.isPresent()) {
+            Sentry.init(dsn.get());
+        } else {
+            Sentry.close();
+        }
+    }
+
+    //todo: cache locally with invalidation
+    private Optional<String> getDsn() {
+        return pluginDataService.getSentryDsn();
     }
 }
