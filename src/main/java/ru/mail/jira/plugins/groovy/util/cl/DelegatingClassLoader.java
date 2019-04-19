@@ -6,8 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -81,6 +84,16 @@ public class DelegatingClassLoader extends ClassLoader {
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    protected URL findResource(String name) {
+        return ClassLoaderUtil.getCurrentPluginClassLoader().getResource(name);
+    }
+
+    @Override
+    protected Enumeration<URL> findResources(String name) throws IOException {
+        return ClassLoaderUtil.getCurrentPluginClassLoader().getResources(name);
     }
 
     public ClassLoader getJiraClassLoader() {

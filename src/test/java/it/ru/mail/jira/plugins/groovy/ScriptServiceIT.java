@@ -27,14 +27,17 @@ import ru.mail.jira.plugins.groovy.impl.FileUtil;
 
 import javax.inject.Inject;
 
+import java.util.Date;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
 @RunWith(Arquillian.class)
 public class ScriptServiceIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
         "tests/jsonSlurper",
+        "tests/dateExtension",
         "tests/standardModule",
         "tests/pluginModule",
         "tests/containerService",
@@ -121,6 +124,24 @@ public class ScriptServiceIT {
         Object result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
 
         assertNotNull(result);
+    }
+
+    @Test
+    public void dateExtensionShouldWork() throws Exception {
+        String script = FileUtil.readArquillianExample("tests/dateExtension");
+
+        Object result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertThat(result, instanceOf(Date.class));
+    }
+
+    @Test
+    public void dateExtensionShouldWorkWithStc() throws Exception {
+        String script = FileUtil.readArquillianExample("tests/dateExtension");
+
+        Object result = scriptService.executeScriptStatic(null, script, ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
+
+        assertThat(result, instanceOf(Date.class));
     }
 
     @Test
