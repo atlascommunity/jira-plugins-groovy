@@ -48,7 +48,8 @@ public class ListenerDaoImpl implements ListenerDao {
             new DBParam("DESCRIPTION", form.getDescription()),
             new DBParam("SCRIPT_BODY", form.getScriptBody()),
             new DBParam("DELETED", false),
-            new DBParam("CONDITION", jsonMapper.write(form.getCondition()))
+            new DBParam("CONDITION", jsonMapper.write(form.getCondition())),
+            new DBParam("ALWAYS_TRACK", form.isAlwaysTrack())
         );
 
         String diff = changelogHelper.generateDiff(listener.getID(), "", listener.getName(), "", form.getScriptBody());
@@ -83,6 +84,7 @@ public class ListenerDaoImpl implements ListenerDao {
         listener.setUuid(UUID.randomUUID().toString());
         listener.setScriptBody(form.getScriptBody());
         listener.setCondition(jsonMapper.write(form.getCondition()));
+        listener.setAlwaysTrack(form.isAlwaysTrack());
         listener.save();
 
         addAuditLogAndNotify(user, EntityAction.UPDATED, listener, diff, comment);

@@ -13,6 +13,7 @@ import PageHeader from '@atlaskit/page-header';
 import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {FieldTextAreaStateless} from '@atlaskit/field-text-area';
+import {Checkbox} from '@atlaskit/checkbox';
 
 import {ConditionPicker} from './ConditionPicker';
 
@@ -53,7 +54,8 @@ type Form = {
     description: string,
     comment: string,
     scriptBody: string,
-    condition: ConditionInputType
+    condition: ConditionInputType,
+    alwaysTrack: boolean
 };
 
 type FormFieldKey = $Keys<Form>;
@@ -69,7 +71,8 @@ const makeForm: RecordFactory<Form> = Record({
         projectIds: [],
         className: null,
         pluginKey: null
-    }
+    },
+    alwaysTrack: false
 });
 
 type Props = DialogComponentProps & {
@@ -126,7 +129,8 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                             description: listener.description || '',
                             scriptBody: listener.scriptBody,
                             //$FlowFixMe todo
-                            condition: listener.condition
+                            condition: listener.condition,
+                            alwaysTrack: listener.alwaysTrack
                         }),
                         listener: listener,
                         ready: true,
@@ -192,6 +196,8 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
     _setTextValue = (field) => (event) => this.mutateValue(field, event.currentTarget.value);
 
     _setObjectValue = (field) => (value) => this.mutateValue(field, value);
+
+    _setCheckboxValue = field => event => this.mutateValue(field, event.currentTarget.checked);
 
     render() {
         const {isNew} = this.props;
@@ -274,6 +280,16 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                         />
                     </FormField>
 
+                    <FormField
+                        label={FieldMessages.options}
+                    >
+                        <Checkbox
+                            label="Track successful executions"
+                            isChecked={values.get('alwaysTrack')}
+                            onChange={this._setCheckboxValue('alwaysTrack')}
+                        />
+                    </FormField>
+
                     <ConditionPicker
                         value={condition}
                         onChange={this._setObjectValue('condition')}
@@ -290,6 +306,8 @@ class ListenerFormInternal extends React.PureComponent<Props, State> {
                         invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
                     >
                         <CheckedEditorField
+                            resizable={true}
+
                             isDisabled={waiting}
 
                             scriptType="LISTENER"

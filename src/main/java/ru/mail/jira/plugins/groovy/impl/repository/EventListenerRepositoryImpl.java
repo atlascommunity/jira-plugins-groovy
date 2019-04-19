@@ -94,15 +94,21 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
     @Override
     public List<EventListenerDto> getListeners(boolean includeChangelogs, boolean includeErrorCount) {
+        List<ScriptedEventListener> cachedListeners = getAllListeners();
+
         return Arrays
             .stream(ao.find(Listener.class, Query.select().where("DELETED = ?", false)))
-            .map(listener -> buildDto(listener, includeChangelogs, includeErrorCount))
+            .map(listener -> buildDto(
+                listener,
+                cachedListeners.stream().anyMatch(cached -> Objects.equals(cached.getUuid(), listener.getUuid())),
+                includeChangelogs, includeErrorCount)
+            )
             .collect(Collectors.toList());
     }
 
     @Override
     public EventListenerDto getEventListener(int id) {
-        return buildDto(ao.get(Listener.class, id), true, true);
+        return buildDto(ao.get(Listener.class, id), true, true, true);
     }
 
     @Override
@@ -113,7 +119,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         cache.remove(VALUE_KEY);
 
-        return buildDto(listener, true, true);
+        return buildDto(listener, true, true, true);
     }
 
     @Override
@@ -124,7 +130,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         cache.remove(VALUE_KEY);
 
-        return buildDto(listener, true, true);
+        return buildDto(listener, true, true, true);
     }
 
     @Override
@@ -146,7 +152,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         cache.removeAll();
     }
 
-    private EventListenerDto buildDto(Listener listener, boolean includeChangelogs, boolean includeErrorCount) {
+    private EventListenerDto buildDto(Listener listener, boolean initialized, boolean includeChangelogs, boolean includeErrorCount) {
         EventListenerDto result = new EventListenerDto();
         result.setId(listener.getID());
         result.setName(listener.getName());
@@ -154,6 +160,8 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         result.setScriptBody(listener.getScriptBody());
         result.setUuid(listener.getUuid());
         result.setCondition(jsonMapper.read(listener.getCondition(), ConditionDescriptor.class));
+        result.setInitialized(initialized);
+        result.setAlwaysTrack(listener.isAlwaysTrack() != null ? listener.isAlwaysTrack() : false);
 
         if (includeChangelogs) {
             result.setChangelogs(changelogHelper.collect(listener.getChangelogs()));
@@ -224,10 +232,13 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             descriptor.setClassInstance(loadConditionClass(descriptor));
         }
 
+        boolean alwaysTrack = listener.isAlwaysTrack() != null ? listener.isAlwaysTrack() : false;
+
         return new ScriptedEventListener(
             listener.getID(),
             listener.getScriptBody(),
             listener.getUuid(),
+            alwaysTrack,
             descriptor
         );
     }

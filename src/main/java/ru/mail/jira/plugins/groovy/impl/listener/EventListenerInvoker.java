@@ -129,7 +129,7 @@ public class EventListenerInvoker implements PluginLifecycleAware {
             t = System.currentTimeMillis() - t;
         }
 
-        if (!successful || t >= ExecutionRepository.WARNING_THRESHOLD) {
+        if (listener.isAlwaysTrack() || !successful || t >= ExecutionRepository.WARNING_THRESHOLD) {
             executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
                 "event", event.toString(),
                 "type", ScriptType.LISTENER.name()

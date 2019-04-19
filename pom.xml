@@ -533,7 +533,7 @@
         <quick.reload.version>3.0.0</quick.reload.version>
 
         <gh.version>8.0.0-DAILY20190122023019</gh.version>
-        <amps.version>8.0.0</amps.version>
+        <amps.version>8.0.1</amps.version>
         <ao.version>1.5.0</ao.version>
         <junit.version>5.2.0</junit.version>
         <atlassian.spring.scanner.version>2.1.7</atlassian.spring.scanner.version>

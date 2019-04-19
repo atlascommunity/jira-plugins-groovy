@@ -130,6 +130,7 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
     @EventListener
     public void onPluginEnabled(PluginEnabledEvent event) {
         globalObjectsBindingProvider.refresh();
+        listenerRepository.invalidate();
     }
 
     private void flushPluginDependenants(Plugin plugin) {

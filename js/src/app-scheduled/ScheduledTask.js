@@ -212,8 +212,10 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
             </div>
         );
 
+        const isJqlTransition = script.type === 'ISSUE_JQL_TRANSITION';
+
         const scriptObject = (
-            script.type !== 'ISSUE_JQL_TRANSITION'
+            !isJqlTransition
             ? {
                 id: script.uuid,
                 name: script.name,
@@ -222,7 +224,13 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                 changelogs: script.changelogs,
                 description: script.description
             }
-            : null
+            : {
+                id: script.uuid,
+                name: script.name,
+                inline: true,
+                changelogs: script.changelogs,
+                description: script.description
+            }
         );
 
         return (
@@ -233,6 +241,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                 withChangelog={true}
                 collapsible={collapsible}
                 focused={focused}
+                noCode={isJqlTransition}
 
                 script={scriptObject}
                 title={titleEl}

@@ -284,6 +284,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                         invalidMessage={errorMessage || ''}
                     >
                         <CheckedEditorField
+                            resizable={true}
                             scriptType="CUSTOM_FIELD"
                             typeParams={{ velocityParamsEnabled: velocityParamsEnabled ? 'true' : 'false' }}
                             bindings={velocityParamsEnabled ? bindingsWithVelocity : bindings}
@@ -305,6 +306,7 @@ export class CustomFieldFormInternal extends React.Component<Props, State> {
                             invalidMessage={errorMessage || ''}
                         >
                             <EditorField
+                                resizable={true}
                                 mode="velocity"
                                 //todo: bindings={[ Bindings.issue ]}
 

@@ -321,6 +321,7 @@ export class RestFormInternal extends React.Component<Props, State> {
                         invalidMessage={errorField === 'scriptBody' ? errorMessage : null}
                     >
                         <CheckedEditorField
+                            resizable={true}
                             scriptType="REST"
 
                             bindings={bindings}

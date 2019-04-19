@@ -19,6 +19,9 @@ public interface Listener extends AbstractScript {
     String getCondition();
     void setCondition(String condition);
 
+    Boolean isAlwaysTrack();
+    void setAlwaysTrack(Boolean alwaysTrack);
+
     @OneToMany(reverse = "getListener")
     ListenerChangelog[] getChangelogs();
 }

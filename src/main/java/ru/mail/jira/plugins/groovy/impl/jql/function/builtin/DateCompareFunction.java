@@ -337,13 +337,15 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
                 throw new RuntimeException("Unknown field: " + fieldName);
             }
 
-            if (!(field instanceof DateField)) {
-                throw new RuntimeException("Field " + field + " is not date field");
-            }
-
             boolean isDateTimeField;
             if (field instanceof CustomField) {
-                Optional<String> searcherOptional = FieldUtil.getSearcherKey((CustomField) field);
+                CustomField cf = (CustomField) field;
+
+                if (!(cf.getCustomFieldType() instanceof DateField)) {
+                    throw new RuntimeException("Field " + field + " is not date field");
+                }
+
+                Optional<String> searcherOptional = FieldUtil.getSearcherKey(cf);
 
                 if (searcherOptional.isPresent()) {
                     switch (searcherOptional.get()) {
@@ -360,6 +362,10 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
                     throw new RuntimeException("Searcher for field " + fieldName + " isn't specified");
                 }
             } else {
+                if (!(field instanceof DateField)) {
+                    throw new RuntimeException("Field " + field + " is not date field");
+                }
+
                 isDateTimeField = !Const.SYSTEM_DATE_FIELDS.contains(field.getClass());
             }
 
