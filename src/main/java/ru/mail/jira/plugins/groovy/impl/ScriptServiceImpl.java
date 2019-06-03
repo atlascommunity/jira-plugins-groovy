@@ -30,6 +30,7 @@ import ru.mail.jira.plugins.groovy.impl.groovy.statik.DeprecatedAstVisitor;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
 import ru.mail.jira.plugins.groovy.impl.var.HttpClientBindingDescriptor;
 import ru.mail.jira.plugins.groovy.impl.var.LoggerBindingDescriptor;
+import ru.mail.jira.plugins.groovy.impl.var.ScriptTypeBindingProvider;
 import ru.mail.jira.plugins.groovy.impl.var.TemplateEngineBindingDescriptor;
 import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 
@@ -206,17 +207,15 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         HashMap<String, Object> bindings = new HashMap<>();
 
         for (BindingProvider bindingProvider : bindingProviders) {
-            bindingProvider.getBindings().forEach((name, value) -> bindings.put(name, value.getValue(scriptId)));
+            bindingProvider.getBindings().forEach((name, value) -> bindings.put(name, value.getValue(type, scriptId)));
         }
-
-        bindings.put("scriptType", type);
 
         for (Map.Entry<String, ScriptClosure> entry : globalFunctions.entrySet()) {
             bindings.put(entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<String, BindingDescriptor> entry : globalVariables.entrySet()) {
-            bindings.put(entry.getKey(), entry.getValue().getValue(scriptId));
+            bindings.put(entry.getKey(), entry.getValue().getValue(type, scriptId));
         }
 
         bindings.putAll(externalBindings);
@@ -342,6 +341,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         globalVariables.put("logger", new LoggerBindingDescriptor());
         globalVariables.put("log", new LoggerBindingDescriptor());
         globalVariables.put("templateEngine", new TemplateEngineBindingDescriptor(gcl));
+        globalVariables.put("scriptType", new ScriptTypeBindingProvider());
     }
 
     @Override

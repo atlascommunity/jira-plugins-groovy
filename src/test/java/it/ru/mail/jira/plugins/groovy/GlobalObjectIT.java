@@ -114,7 +114,7 @@ public class GlobalObjectIT {
 
         BindingDescriptor<?> binding = findCurrentScriptBinding();
 
-        assertThat(binding.getValue(null), instanceOf(binding.getType()));
+        assertThat(binding.getValue(ScriptType.CONSOLE, null), instanceOf(binding.getType()));
     }
 
     @Test
@@ -154,7 +154,7 @@ public class GlobalObjectIT {
 
         BindingDescriptor<?> binding = findCurrentScriptBinding();
 
-        assertThat(binding.getValue(null), instanceOf(binding.getType()));
+        assertThat(binding.getValue(ScriptType.CONSOLE, null), instanceOf(binding.getType()));
     }
 
     @Test

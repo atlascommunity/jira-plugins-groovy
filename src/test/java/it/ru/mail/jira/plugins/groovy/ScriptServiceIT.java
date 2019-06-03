@@ -124,6 +124,14 @@ public class ScriptServiceIT {
     }
 
     @Test
+    public void typeShouldBeDefinedForStc() throws Exception {
+        assertEquals(
+            Boolean.TRUE,
+            scriptService.executeScriptStatic(null, "scriptType == ScriptType.CONSOLE", ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of())
+        );
+    }
+
+    @Test
     public void docGenerationShouldWork() throws Exception {
         ClassDoc generatedDoc = groovyDocService.parseDocs("GroovyDocTest", "GroovyDocTest", FileUtil.readArquillianExample("tests/GroovyDocTest"));
 

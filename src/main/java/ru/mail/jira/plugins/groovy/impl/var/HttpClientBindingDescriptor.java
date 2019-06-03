@@ -7,6 +7,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import ru.mail.jira.plugins.groovy.api.dto.docs.ClassDoc;
+import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
 
 import javax.annotation.Nonnull;
@@ -44,7 +45,7 @@ public class HttpClientBindingDescriptor implements BindingDescriptor<CloseableH
     }
 
     @Override
-    public CloseableHttpClient getValue(String scriptId) {
+    public CloseableHttpClient getValue(ScriptType scriptType, String scriptId) {
         return this.httpClient;
     }
 

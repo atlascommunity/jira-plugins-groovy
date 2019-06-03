@@ -4,6 +4,7 @@ import groovy.lang.GroovyClassLoader;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.TemplateEngine;
 import ru.mail.jira.plugins.groovy.api.dto.docs.ClassDoc;
+import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
 
 import javax.annotation.Nonnull;
@@ -16,7 +17,7 @@ public class TemplateEngineBindingDescriptor implements BindingDescriptor<Templa
     }
 
     @Override
-    public TemplateEngine getValue(String scriptId) {
+    public TemplateEngine getValue(ScriptType scriptType, String scriptId) {
         return templateEngine;
     }
 
