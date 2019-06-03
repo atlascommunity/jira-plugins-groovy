@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.api.script.binding;
 
 import ru.mail.jira.plugins.groovy.api.dto.docs.ClassDoc;
+import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 
 import javax.annotation.Nonnull;
 
@@ -14,7 +15,7 @@ public class BindingDescriptorImpl<T> implements BindingDescriptor<T> {
     }
 
     @Override
-    public T getValue(String scriptId) {
+    public T getValue(ScriptType scriptType, String scriptId) {
         return object;
     }
 

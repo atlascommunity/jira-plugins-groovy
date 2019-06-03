@@ -3,6 +3,7 @@ package ru.mail.jira.plugins.groovy.impl.var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.groovy.api.dto.docs.ClassDoc;
+import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
 
 import javax.annotation.Nonnull;
@@ -11,7 +12,7 @@ public class LoggerBindingDescriptor implements BindingDescriptor<Logger> {
     private final Logger defaultLogger = LoggerFactory.getLogger("ru.mail.jira.plugins.groovy.script.$script$");
 
     @Override
-    public Logger getValue(String scriptId) {
+    public Logger getValue(ScriptType scriptType, String scriptId) {
         if (scriptId != null) {
             return LoggerFactory.getLogger("ru.mail.jira.plugins.groovy.script." + scriptId);
         } else {
