@@ -77,7 +77,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
             .addCompilationCustomizers(
                 new CompileStaticExtension(parseContextHolder, this),
                 new ImportCustomizer().addStarImports("ru.mail.jira.plugins.groovy.api.script"),
-                new WithPluginGroovyExtension(parseContextHolder),
+                new WithPluginExtension(parseContextHolder),
                 new LoadClassesExtension(parseContextHolder, injectionResolver, classLoader),
                 new InjectionExtension(parseContextHolder),
                 new ParamExtension(parseContextHolder)
