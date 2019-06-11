@@ -527,9 +527,9 @@
 
     <properties>
         <jira.version>8.0.0</jira.version>
-        <jira.oldest.version>7.3.0</jira.oldest.version>
-        <jira.latest.version>7.12.1</jira.latest.version>
-        <jira.lts.version>7.6.8</jira.lts.version>
+        <jira.oldest.version>8.0.0</jira.oldest.version>
+        <jira.latest.version>8.2.1</jira.latest.version>
+        <jira.lts.version>8.2.1</jira.lts.version>
         <quick.reload.version>3.0.0</quick.reload.version>
 
         <gh.version>8.0.0-DAILY20190122023019</gh.version>
@@ -537,7 +537,7 @@
         <ao.version>1.5.0</ao.version>
         <junit.version>5.2.0</junit.version>
         <atlassian.spring.scanner.version>2.1.7</atlassian.spring.scanner.version>
-        <groovy.version>2.5.6</groovy.version>
+        <groovy.version>2.5.7</groovy.version>
 
         <shutdownTimeout>60000</shutdownTimeout>
 
@@ -546,6 +546,16 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>groovy-next</id>
+
+            <properties>
+                <groovy.version>3.0.0-beta-1</groovy.version>
+            </properties>
+        </profile>
+    </profiles>
 
     <pluginRepositories>
         <pluginRepository>
