@@ -21,7 +21,8 @@ export type ConditionInputType = {
 export type ListenerType = ScriptEntity & {
     uuid: string,
     condition: ConditionType,
-    alwaysTrack: boolean
+    alwaysTrack: boolean,
+    initialized: boolean
 };
 
 export type ListenerInputType = ScriptEntity & {
