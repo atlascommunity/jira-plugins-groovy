@@ -62,10 +62,13 @@ public class FindScriptByUuid implements BuiltInScript<String> {
 
     @Override
     public String run(ApplicationUser currentUser, Map<String, Object> params) throws Exception {
-        String uuid = StringUtils.trimToNull((String) params.get("uuid"));
-        if (uuid == null) {
+        String uuidParam = StringUtils.trimToNull((String) params.get("uuid"));
+        if (uuidParam == null) {
             throw new ValidationException("UUID is required");
         }
+
+        //has to be final
+        String uuid = uuidParam.replace('_', '-');
 
         NumberPath<Integer> idPath = Expressions.numberPath(Integer.class, "ID");
         StringPath entityTypePath = Expressions.stringPath("ENTITY_TYPE");

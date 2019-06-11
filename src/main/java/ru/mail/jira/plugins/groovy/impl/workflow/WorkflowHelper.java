@@ -138,6 +138,7 @@ public class WorkflowHelper {
         boolean success = true;
         String error = null;
         String id = script.getId();
+        String uuid = script.getUuid();
 
         HashMap<String, Object> bindings = new HashMap<>(script.getParams());
         bindings.put("issue", issue);
@@ -147,7 +148,7 @@ public class WorkflowHelper {
         long t = System.currentTimeMillis();
         try {
             result = scriptService.executeScript(
-                id,
+                uuid != null ? uuid : id,
                 script.getScriptBody(),
                 type,
                 bindings
@@ -186,14 +187,14 @@ public class WorkflowHelper {
                 "params", script.getParams().toString()
             );
             if (script.isFromRegistry()) {
-                if (script.getUuid() == null) {
+                if (uuid == null) {
                     Integer parsedId = Ints.tryParse(id);
 
                     if (parsedId != null) {
                         executionRepository.trackFromRegistry(parsedId, t, success, error, params);
                     }
                 } else {
-                    executionRepository.trackInline(script.getUuid(), t, success, error, params);
+                    executionRepository.trackInline(uuid, t, success, error, params);
                 }
             } else {
                 executionRepository.trackInline(id, t, success, error, params);

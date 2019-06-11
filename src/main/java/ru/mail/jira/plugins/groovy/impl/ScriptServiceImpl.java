@@ -105,26 +105,26 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
 
     @Override
     public ParseContext parseScript(String script) {
-        CompiledScript result = parseClass(script, true, false, null);
+        CompiledScript result = parseClass(script, null, true, false, null);
         InvokerHelper.removeClass(result.getScriptClass());
         return result.getParseContext();
     }
 
     @Override
     public ParseContext parseScriptStatic(String script, Map<String, Class> types) {
-        CompiledScript result = parseClass(script, true, true, types);
+        CompiledScript result = parseClass(script, null, true, true, types);
         InvokerHelper.removeClass(result.getScriptClass());
         return result.getParseContext();
     }
 
     @Override
     public Class parseClass(String classBody, boolean extended) {
-        return parseClass(classBody, extended, false, null).getScriptClass();
+        return parseClass(classBody, null, extended, false, null).getScriptClass();
     }
 
     @Override
     public Class parseClassStatic(String classBody, boolean extended, Map<String, Class> types) {
-        return parseClass(classBody, extended, true, types).getScriptClass();
+        return parseClass(classBody, null, extended, true, types).getScriptClass();
     }
 
     @Override
@@ -181,11 +181,11 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         CompiledScript compiledScript = null;
 
         if (scriptId != null) {
-            compiledScript = scriptCache.get(scriptId, ignore -> parseClass(scriptString, false, compileStatic, types));
+            compiledScript = scriptCache.get(scriptId, ignore -> parseClass(scriptString, scriptId, false, compileStatic, types));
         }
 
         if (compiledScript == null) {
-            compiledScript = parseClass(scriptString, false, compileStatic, types);
+            compiledScript = parseClass(scriptString, scriptId, false, compileStatic, types);
         }
 
         //make sure that plugin classes can be loaded for cached scripts
@@ -269,7 +269,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         }
     }
 
-    private CompiledScript parseClass(String script, boolean extended, boolean compileStatic, Map<String, Class> types) {
+    private CompiledScript parseClass(String script, String id, boolean extended, boolean compileStatic, Map<String, Class> types) {
         logger.debug("parsing script");
         try {
             parseContextHolder.get().setExtended(extended);
@@ -277,8 +277,14 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
             parseContextHolder.get().setTypes(types);
 
             Class scriptClass = null;
+
+            String scriptId = id;
+            if (scriptId == null) {
+                scriptId = String.valueOf(System.currentTimeMillis());
+            }
+            String fileName = "script_" + scriptId.replace('-', '_') + "." + Math.abs(script.hashCode()) + ".groovy";
+
             if (compileStatic) {
-                String fileName = "script" + System.currentTimeMillis() + Math.abs(script.hashCode()) + ".groovy";
                 CompilationUnit compilationUnit = new CompilationUnit(compilerConfiguration, null, gcl);
                 SourceUnit sourceUnit = compilationUnit.addSource(fileName, script);
                 compilationUnit.compile(Phases.CLASS_GENERATION);
@@ -317,7 +323,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
 
                 //todo: we might have an issue if some script (parsed by gcl) created class with name Xxx and there's global object with same class name
             } else {
-                scriptClass = gcl.parseClass(script);
+                scriptClass = gcl.parseClass(script, fileName);
             }
 
             logger.debug("parsed script");
@@ -334,7 +340,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     @Override
     public void onStart() {
         for (Map.Entry<String, String> entry : globalFunctionManager.getGlobalFunctions().entrySet()) {
-            globalFunctions.put(entry.getKey(), new ScriptClosure(parseClass(entry.getValue(), false, false, null).getScriptClass()));
+            globalFunctions.put(entry.getKey(), new ScriptClosure(parseClass(entry.getValue(), null, false, false, null).getScriptClass()));
         }
 
         globalVariables.put("httpClient", new HttpClientBindingDescriptor());
