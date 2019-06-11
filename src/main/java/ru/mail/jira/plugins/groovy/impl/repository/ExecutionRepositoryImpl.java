@@ -257,6 +257,16 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     }
 
     @Override
+    public void deleteAll() {
+        databaseAccessor.run(connection ->
+            connection
+                .delete(SCRIPT_EXECUTION)
+                .execute(),
+            OnRollback.NOOP
+        );
+    }
+
+    @Override
     public void deleteOldExecutions() {
         int deleted = ao.deleteWithSQL(ScriptExecution.class, "DATE < ?", new Timestamp(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14)));
         logger.info("Deleted {} old executions", deleted);

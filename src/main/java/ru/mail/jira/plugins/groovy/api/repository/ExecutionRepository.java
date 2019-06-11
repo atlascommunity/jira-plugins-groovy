@@ -30,6 +30,8 @@ public interface ExecutionRepository {
 
     void deleteExecutions(int scriptId, Timestamp until);
 
+    void deleteAll();
+
     int getErrorCount(int id);
 
     int getErrorCount(String id);
