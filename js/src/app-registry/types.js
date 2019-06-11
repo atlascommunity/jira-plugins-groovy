@@ -8,6 +8,8 @@ export type CreateCallback = (parentId: ?number, type: EntityType) => void;
 export type EditCallback = (id: number, type: EntityType) => void;
 export type DeleteCallback = (id: number, type: EntityType, name: string) => void;
 
+export const scriptTypes = ['CONDITION', 'VALIDATOR', 'FUNCTION'];
+
 export type WorkflowScriptType = 'CONDITION' | 'VALIDATOR' | 'FUNCTION';
 
 export type RegistryScriptType = {|
@@ -62,5 +64,6 @@ export type GroupedEntities<T> = KeyedEntities<$ReadOnlyArray<T>>;
 
 export type FilterType = {|
     name: string,
-    onlyUnused: boolean
+    onlyUnused: boolean,
+    scriptType: ?WorkflowScriptType
 |};
