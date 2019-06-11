@@ -103,7 +103,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
             comment = Const.CREATED_COMMENT;
         }
 
-        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), null, user.getKey(), diff, comment);
 
         addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
@@ -120,7 +120,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
 
-        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), script.getUuid(), user.getKey(), diff, comment);
 
         script.setUuid(UUID.randomUUID().toString());
         script.setName(form.getName());

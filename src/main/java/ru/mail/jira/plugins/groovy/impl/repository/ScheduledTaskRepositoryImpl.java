@@ -134,7 +134,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             comment = Const.CREATED_COMMENT;
         }
 
-        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), null, user.getKey(), diff, comment);
 
         addAuditLogAndNotify(user, EntityAction.CREATED, task, diff, comment);
 
@@ -150,7 +150,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         String diff = changelogHelper.generateDiff(id, task.getName(), form.getName(), task.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
 
-        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), task.getUuid(), user.getKey(), diff, comment);
 
         task.setUuid(UUID.randomUUID().toString());
         task.setName(form.getName());

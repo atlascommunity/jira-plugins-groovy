@@ -19,7 +19,9 @@ export type ChangelogType = {
     templateDiff?: string,
     author: JiraUser,
     date: string,
-    issueReferences: Array<IssueReference>
+    issueReferences: Array<IssueReference>,
+    warnings: number,
+    errors: number
 };
 
 export type ExecutionType = {

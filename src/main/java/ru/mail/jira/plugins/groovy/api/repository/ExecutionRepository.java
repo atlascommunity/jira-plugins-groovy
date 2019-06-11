@@ -5,6 +5,7 @@ import ru.mail.jira.plugins.groovy.api.dto.execution.ScriptExecutionDto;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public interface ExecutionRepository {
@@ -36,7 +37,11 @@ public interface ExecutionRepository {
 
     int getErrorCount(String id);
 
+    Map<String, Long> getErrorCount(Set<String> ids);
+
     int getWarningCount(int id);
 
     int getWarningCount(String id);
+
+    Map<String, Long> getWarningCount(Set<String> ids);
 }

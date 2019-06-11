@@ -8,6 +8,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.pocketknife.api.querydsl.DatabaseAccessor;
 import com.atlassian.pocketknife.api.querydsl.util.OnRollback;
 import com.atlassian.util.concurrent.ThreadFactories;
+import com.google.common.collect.ImmutableMap;
 import com.querydsl.core.types.dsl.*;
 import com.querydsl.sql.SQLExpressions;
 import com.querydsl.sql.Union;
@@ -247,6 +248,32 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     }
 
     @Override
+    public Map<String, Long> getErrorCount(Set<String> ids) {
+        if (ids.isEmpty()) {
+            return ImmutableMap.of();
+        }
+
+        return databaseAccessor.run(connection ->
+            connection
+                .select(SCRIPT_EXECUTION.INLINE_ID.as("id"), SQLExpressions.count().as("count"))
+                .from(SCRIPT_EXECUTION)
+                .where(
+                    SCRIPT_EXECUTION.INLINE_ID.in(ids),
+                    SCRIPT_EXECUTION.SUCCESSFUL.isFalse()
+                )
+                .groupBy(SCRIPT_EXECUTION.INLINE_ID)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                    row -> row.get(0, String.class),
+                    row -> row.get(1, Long.class)
+                ))
+            ,
+            OnRollback.NOOP
+        );
+    }
+
+    @Override
     public int getWarningCount(int id) {
         return ao.count(ScriptExecution.class, Query.select().where("SCRIPT_ID = ? AND TIME >= ?", id, WARNING_THRESHOLD));
     }
@@ -254,6 +281,33 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     @Override
     public int getWarningCount(String id) {
         return ao.count(ScriptExecution.class, Query.select().where("INLINE_ID = ? AND TIME >= ?", id, WARNING_THRESHOLD));
+    }
+
+    @Override
+    public Map<String, Long> getWarningCount(Set<String> ids) {
+        if (ids.isEmpty()) {
+            return ImmutableMap.of();
+        }
+
+        return databaseAccessor.run(connection ->
+                connection
+                    .select(SCRIPT_EXECUTION.INLINE_ID.as("id"), SQLExpressions.count().as("count"))
+                    .from(SCRIPT_EXECUTION)
+                    .where(
+                        SCRIPT_EXECUTION.INLINE_ID.in(ids),
+                        SCRIPT_EXECUTION.SUCCESSFUL.isTrue(),
+                        SCRIPT_EXECUTION.TIME.goe(WARNING_THRESHOLD)
+                    )
+                    .groupBy(SCRIPT_EXECUTION.INLINE_ID)
+                    .fetch()
+                    .stream()
+                    .collect(Collectors.toMap(
+                        row -> row.get(0, String.class),
+                        row -> row.get(1, Long.class)
+                    ))
+            ,
+            OnRollback.NOOP
+        );
     }
 
     @Override

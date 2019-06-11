@@ -83,7 +83,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
             comment = Const.CREATED_COMMENT;
         }
 
-        changelogHelper.addChangelog(AdminScriptChangelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(AdminScriptChangelog.class, script.getID(), null, user.getKey(), diff, comment);
 
         addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
@@ -104,7 +104,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
 
-        changelogHelper.addChangelog(AdminScriptChangelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(AdminScriptChangelog.class, script.getID(), script.getUuid(), user.getKey(), diff, comment);
 
         script.setUuid(UUID.randomUUID().toString());
         script.setName(form.getName());

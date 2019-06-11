@@ -93,7 +93,7 @@ public class RestRepositoryImpl implements RestRepository {
             comment = Const.CREATED_COMMENT;
         }
 
-        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(RestChangelog.class, script.getID(), null, user.getKey(), diff, comment);
 
         addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
@@ -109,7 +109,7 @@ public class RestRepositoryImpl implements RestRepository {
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
 
-        changelogHelper.addChangelog(RestChangelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(RestChangelog.class, script.getID(), script.getUuid(), user.getKey(), diff, comment);
 
         script.setUuid(UUID.randomUUID().toString());
         script.setMethods(joinMethods(form.getMethods()));

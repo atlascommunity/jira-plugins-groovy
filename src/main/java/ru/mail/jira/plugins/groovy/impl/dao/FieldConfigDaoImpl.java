@@ -87,7 +87,7 @@ public class FieldConfigDaoImpl implements FieldConfigDao {
             comment = Const.CREATED_COMMENT;
         }
 
-        changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldScript.getID(), user.getKey(), diff, comment, additionalParams);
+        changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldScript.getID(), null, user.getKey(), diff, comment, additionalParams);
 
         CustomField cf = jiraFieldConfig.getCustomField();
         addAuditLogAndNotify(user, EntityAction.CREATED, fieldScript, (int) configId, cf != null ? cf.getName() : "undefined", diff, templateDiff, comment);
@@ -111,7 +111,7 @@ public class FieldConfigDaoImpl implements FieldConfigDao {
             additionalParams.put("TEMPLATE_DIFF", StringUtils.isEmpty(templateDiff) ? "no changes" : templateDiff);
         }
 
-        changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldScript.getID(), user.getKey(), diff, form.getComment(), additionalParams);
+        changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldScript.getID(), fieldScript.getUuid(), user.getKey(), diff, form.getComment(), additionalParams);
 
         fieldScript.setCacheable(form.isCacheable());
         fieldScript.setScriptBody(form.getScriptBody());
