@@ -36,7 +36,7 @@
     "@atlaskit/tooltip": "^12.1.6",
     "@atlaskit/util-shared-styles": "^3.0.0",
     "classnames": "^2.2.6",
-    "codemirror": "^5.41.0",
+    "codemirror": "^5.47.0",
     "immutable": "4.0.0-rc.9",
     "lodash": "^4.17.11",
     "memoize-one": "^4.0.2",
