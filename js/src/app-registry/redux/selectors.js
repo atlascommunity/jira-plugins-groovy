@@ -86,9 +86,10 @@ export const filteredSelector = createSelector(
                 }
             });
 
-        if (!filter.onlyUnused && nameFilter) {
+        if (nameFilter) {
             //$FlowFixMe: Object.values returns mixed type, consider using es6 Map or immutablejs map
             const allDirectories: $ReadOnlyArray<RegistryDirectoryType> = Object.values(directories);
+
             allDirectories
                 .filter((script: RegistryDirectoryType): boolean => {
                     let matchesFilter: boolean = true;
