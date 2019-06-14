@@ -28,6 +28,7 @@ import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.entity.EntityType;
 import ru.mail.jira.plugins.groovy.api.script.ParamType;
 import ru.mail.jira.plugins.groovy.api.service.admin.BuiltInScript;
+import ru.mail.jira.plugins.groovy.impl.repository.querydsl.QAbstractChangelog;
 import ru.mail.jira.plugins.groovy.impl.repository.querydsl.QAbstractScript;
 import ru.mail.jira.plugins.groovy.impl.workflow.search.WorkflowSearchCollector;
 import ru.mail.jira.plugins.groovy.impl.workflow.search.WorkflowSearchService;
@@ -78,12 +79,12 @@ public class FindScriptByUuid implements BuiltInScript<String> {
             SQLQueryFactory queryFactory = connection.query();
 
             Expression<Tuple> union = SQLExpressions.unionAll(
-                getAbstractScriptQuery(QueryDslTables.ADMIN_SCRIPT, uuid, EntityType.ADMIN_SCRIPT),
-                getAbstractScriptQuery(QueryDslTables.JQL_FUNCTION, uuid, EntityType.JQL_FUNCTION),
-                getAbstractScriptQuery(QueryDslTables.LISTENER, uuid, EntityType.LISTENER),
-                getAbstractScriptQuery(QueryDslTables.REST, uuid, EntityType.REST),
-                getAbstractScriptQuery(QueryDslTables.SCHEDULED_TASK, uuid, EntityType.SCHEDULED_TASK),
-                getAbstractScriptQuery(QueryDslTables.REGISTRY_SCRIPT, uuid, EntityType.REGISTRY_SCRIPT),
+                getAbstractScriptQuery(QueryDslTables.ADMIN_SCRIPT, QueryDslTables.ADMIN_CHANGELOG, uuid, EntityType.ADMIN_SCRIPT),
+                getAbstractScriptQuery(QueryDslTables.JQL_FUNCTION, QueryDslTables.JQL_CHANGELOG, uuid, EntityType.JQL_FUNCTION),
+                getAbstractScriptQuery(QueryDslTables.LISTENER, QueryDslTables.LISTENER_CHANGELOG, uuid, EntityType.LISTENER),
+                getAbstractScriptQuery(QueryDslTables.REST, QueryDslTables.REST_CHANGELOG, uuid, EntityType.REST),
+                getAbstractScriptQuery(QueryDslTables.SCHEDULED_TASK, QueryDslTables.SCHEDULED_CHANGELOG, uuid, EntityType.SCHEDULED_TASK),
+                getAbstractScriptQuery(QueryDslTables.REGISTRY_SCRIPT, QueryDslTables.SCRIPT_CHANGELOG, uuid, EntityType.REGISTRY_SCRIPT),
                 SQLExpressions
                     .select(
                         QueryDslTables.FIELD_CONFIG.FIELD_CONFIG_ID.as(idPath),
@@ -91,6 +92,11 @@ public class FindScriptByUuid implements BuiltInScript<String> {
                         Expressions.constant(EntityType.CUSTOM_FIELD.name())
                     )
                     .from(QueryDslTables.FIELD_CONFIG)
+                    .leftJoin(QueryDslTables.FIELD_CHANGELOG)
+                    .on(
+                        QueryDslTables.FIELD_CONFIG.ID.eq(QueryDslTables.FIELD_CHANGELOG.SCRIPT_ID),
+                        QueryDslTables.FIELD_CHANGELOG.UUID.isNotNull()
+                    )
                     .where(QueryDslTables.FIELD_CONFIG.UUID.eq(uuid))
             ).as("union");
 
@@ -100,7 +106,8 @@ public class FindScriptByUuid implements BuiltInScript<String> {
                     namePath,
                     entityTypePath
                 )
-                .from(union);
+                .from(union)
+                .limit(1);
 
             query.setUseLiterals(true);
 
@@ -150,15 +157,27 @@ public class FindScriptByUuid implements BuiltInScript<String> {
 
     }
 
-    private SQLQuery<Tuple> getAbstractScriptQuery(QAbstractScript abstractScript, String uuid, EntityType entityType) {
+    private SQLQuery<Tuple> getAbstractScriptQuery(QAbstractScript script, QAbstractChangelog changelog, String uuid, EntityType entityType) {
         return SQLExpressions
             .select(
-                abstractScript.ID.as("ID"),
-                abstractScript.NAME.as("NAME"),
+                script.ID.as("ID"),
+                Expressions
+                    .cases()
+                    .when(changelog.UUID.eq(uuid))
+                    .then(script.NAME.concat(" (Old revision)"))
+                    .otherwise(script.NAME)
+                    .as("NAME"),
                 Expressions.asString(Expressions.constantAs(entityType.name(), Expressions.stringPath("ENTITY_TYPE")))
             )
-            .from(abstractScript)
-            .where(abstractScript.UUID.eq(uuid));
+            .from(script)
+            .leftJoin(changelog).on(
+                changelog.SCRIPT_ID.eq(script.ID),
+                changelog.UUID.isNotNull()
+            )
+            .where(Expressions.anyOf(
+                script.UUID.eq(uuid),
+                changelog.UUID.eq(uuid)
+            ));
     }
 
     @Override
