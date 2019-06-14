@@ -9,6 +9,7 @@ import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.admin.AdminScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.admin.AdminScriptForm;
 import ru.mail.jira.plugins.groovy.api.entity.*;
@@ -57,8 +58,13 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
     public List<AdminScriptDto> getAllScripts() {
         return Arrays
             .stream(ao.find(AdminScript.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(script -> buildScriptDto(script, true, true))
+            .map(script -> buildScriptDto(script, false, true))
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ChangelogDto> getChangelogs(int id) {
+        return changelogHelper.collect(ao.find(AdminScriptChangelog.class, Query.select().where("SCRIPT_ID = ?", id)));
     }
 
     @Override

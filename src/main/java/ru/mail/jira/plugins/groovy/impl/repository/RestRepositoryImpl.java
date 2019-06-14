@@ -12,6 +12,7 @@ import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
 import ru.mail.jira.plugins.groovy.util.RestFieldException;
@@ -67,7 +68,7 @@ public class RestRepositoryImpl implements RestRepository {
     public List<RestScriptDto> getAllScripts() {
         return Arrays
             .stream(ao.find(RestScript.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(script -> buildScriptDto(script, true, true))
+            .map(script -> buildScriptDto(script, false, true))
             .collect(Collectors.toList());
     }
 
@@ -170,6 +171,11 @@ public class RestRepositoryImpl implements RestRepository {
             script.getScriptBody(),
             parseGroups(script.getGroups())
         );
+    }
+
+    @Override
+    public List<ChangelogDto> getChangelogs(int id) {
+        return changelogHelper.collect(ao.find(RestChangelog.class, Query.select().where("SCRIPT_ID = ?", id)));
     }
 
     private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, RestScript script, String diff, String description) {

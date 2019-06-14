@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.RunInfo;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskForm;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskDto;
@@ -99,6 +100,11 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             .stream(ao.find(ScheduledTask.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
             .map(task -> buildDto(task, includeChangelogs, includeRunInfo))
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ChangelogDto> getChangelogs(int id) {
+        return changelogHelper.collect(ao.find(ScheduledTaskChangelog.class, Query.select().where("TASK_ID = ?", id)));
     }
 
     @Override

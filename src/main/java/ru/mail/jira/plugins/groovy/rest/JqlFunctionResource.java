@@ -45,7 +45,18 @@ public class JqlFunctionResource {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
-            return functionRepository.getAllScripts(true, true);
+            return functionRepository.getAllScripts(false, true);
+        }).getResponse();
+    }
+
+    @GET
+    @Path("/{id}/changelogs")
+    @WebSudoRequired
+    public Response getChangelogs(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return functionRepository.getChangelogs(id);
         }).getResponse();
     }
 

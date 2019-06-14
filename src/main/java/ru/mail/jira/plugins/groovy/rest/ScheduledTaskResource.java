@@ -45,7 +45,18 @@ public class ScheduledTaskResource {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
-            return scheduledTaskRepository.getAllTasks(true, true);
+            return scheduledTaskRepository.getAllTasks(false, true);
+        }).getResponse();
+    }
+
+    @GET
+    @Path("/{id}/changelogs")
+    @WebSudoRequired
+    public Response getChangelogs(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return scheduledTaskRepository.getChangelogs(id);
         }).getResponse();
     }
 

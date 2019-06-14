@@ -14,10 +14,7 @@ import ru.mail.jira.plugins.groovy.api.dao.FieldConfigDao;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigForm;
 import ru.mail.jira.plugins.groovy.api.dto.notification.NotificationDto;
-import ru.mail.jira.plugins.groovy.api.entity.EntityAction;
-import ru.mail.jira.plugins.groovy.api.entity.EntityType;
-import ru.mail.jira.plugins.groovy.api.entity.FieldScript;
-import ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog;
+import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.service.NotificationService;
 import ru.mail.jira.plugins.groovy.api.service.WatcherService;
@@ -55,6 +52,20 @@ public class FieldConfigDaoImpl implements FieldConfigDao {
     @Override
     public FieldScript findByConfigId(long id) {
         return findConfig(id);
+    }
+
+    @Override
+    public FieldConfigChangelog[] getChangelogs(long id) {
+        return ao.find(
+            FieldConfigChangelog.class,
+            Query
+                .select()
+                .alias(FieldScript.class, "FS")
+                .alias(FieldConfigChangelog.class, "FCC")
+                .from(FieldConfigChangelog.class)
+                .join(FieldScript.class, "FS.ID = FCC.FIELD_CONFIG_ID")
+                .where("FS.FIELD_CONFIG_ID = ?", id)
+        );
     }
 
     @Override

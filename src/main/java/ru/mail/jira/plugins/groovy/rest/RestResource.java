@@ -99,4 +99,15 @@ public class RestResource {
             return restRepository.getAllScripts();
         }).getResponse();
     }
+
+    @GET
+    @Path("/{id}/changelogs")
+    @WebSudoRequired
+    public Response getChangelogs(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return restRepository.getChangelogs(id);
+        }).getResponse();
+    }
 }

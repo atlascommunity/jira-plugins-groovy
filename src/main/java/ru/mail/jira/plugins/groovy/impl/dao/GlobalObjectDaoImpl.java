@@ -43,6 +43,11 @@ public class GlobalObjectDaoImpl implements GlobalObjectDao {
     }
 
     @Override
+    public GlobalObjectChangelog[] getChangelogs(int id) {
+        return ao.find(GlobalObjectChangelog.class, Query.select().where("SCRIPT_ID = ?", id));
+    }
+
+    @Override
     public GlobalObject get(int id) {
         return ao.get(GlobalObject.class, id);
     }

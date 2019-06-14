@@ -46,6 +46,17 @@ public class GlobalObjectResource {
     }
 
     @GET
+    @Path("/{id}/changelogs")
+    @WebSudoRequired
+    public Response getChangelogs(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return globalObjectRepository.getChangelogs(id);
+        }).getResponse();
+    }
+
+    @GET
     @Path("/{id}")
     @WebSudoRequired
     public Response get(@PathParam("id") int id) {

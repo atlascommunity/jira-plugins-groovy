@@ -59,6 +59,17 @@ public class AdminScriptResource {
         }).getResponse();
     }
 
+    @GET
+    @Path("/{id}/changelogs")
+    @WebSudoRequired
+    public Response getChangelogs(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return adminScriptRepository.getChangelogs(id);
+        }).getResponse();
+    }
+
     @Path("/")
     @POST
     public Response createTask(AdminScriptForm form) {

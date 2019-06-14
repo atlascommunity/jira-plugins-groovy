@@ -12,6 +12,7 @@ import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionForm;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
@@ -75,6 +76,11 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
             .stream(ao.find(JqlFunctionScript.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
             .map(it -> buildScriptDto(it, includeChangelogs, includeErrorCount))
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ChangelogDto> getChangelogs(int id) {
+        return changelogHelper.collect(ao.find(JqlFunctionScriptChangelog.class, Query.select().where("SCRIPT_ID = ?", id)));
     }
 
     @Override

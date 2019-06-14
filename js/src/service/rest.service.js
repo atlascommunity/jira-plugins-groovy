@@ -2,6 +2,7 @@
 import {ajaxDelete, ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
 
 import type {RestScriptType} from '../app-rest/types';
+import type {ChangelogType} from '../common/script/types';
 
 
 export class RestService {
@@ -27,5 +28,9 @@ export class RestService {
 
     restoreScript(id: number): Promise<void> {
         return ajaxPost(`${getPluginBaseUrl()}/rest/${id}/restore`);
+    }
+
+    getChangelogs(id: number): Promise<$ReadOnlyArray<ChangelogType>> {
+        return ajaxGet(`${getPluginBaseUrl()}/rest/${id}/changelogs`);
     }
 }

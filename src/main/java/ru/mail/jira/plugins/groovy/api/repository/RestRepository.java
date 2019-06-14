@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.groovy.api.repository;
 
 import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.jira.user.ApplicationUser;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.rest.HttpMethod;
 import ru.mail.jira.plugins.groovy.api.dto.rest.RestScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.rest.RestScriptForm;
@@ -11,6 +12,8 @@ import java.util.List;
 
 public interface RestRepository {
     List<RestScriptDto> getAllScripts();
+
+    List<ChangelogDto> getChangelogs(int id);
 
     @Transactional
     RestScriptDto createScript(ApplicationUser user, RestScriptForm form);

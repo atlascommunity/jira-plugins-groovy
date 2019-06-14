@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.api.repository;
 
 import com.atlassian.jira.user.ApplicationUser;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerDto;
 import ru.mail.jira.plugins.groovy.api.dto.listener.EventListenerForm;
 import ru.mail.jira.plugins.groovy.api.dto.listener.ScriptedEventListener;
@@ -9,6 +10,8 @@ import java.util.List;
 
 public interface EventListenerRepository {
     List<ScriptedEventListener> getAllListeners();
+
+    List<ChangelogDto> getChangelogs(int id);
 
     List<EventListenerDto> getListeners(boolean includeChangelogs, boolean includeErrorCount);
 
