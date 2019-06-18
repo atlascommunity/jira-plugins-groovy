@@ -2,7 +2,6 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 
 import com.atlassian.jira.issue.search.SearchProviderFactory;
 import com.atlassian.jira.jql.operand.QueryLiteral;
-import com.atlassian.jira.jql.query.IssueIdJoinQueryFactory;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryCreationContextImpl;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.CommentQueryParser;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.QueryParseResult;
+import ru.mail.jira.plugins.groovy.util.lucene.IssueIdJoinQueryFactory;
 
 import javax.annotation.Nonnull;
 import java.util.*;
