@@ -8,19 +8,18 @@ import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.SimpleCollector;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Collect Issue Ids for subquery searchers. Pretty much copy of Jira's IssueIdCollector
  */
-//todo: maybe implement collector for documents where issueId isn't DocValues
 public class IssueIdCollector extends SimpleCollector {
     private Set<String> issueIds;
     private SortedDocValues docValues;
 
     public IssueIdCollector() {
-        this.issueIds = new TreeSet<>();
+        this.issueIds = new HashSet<>();
     }
 
     @Override

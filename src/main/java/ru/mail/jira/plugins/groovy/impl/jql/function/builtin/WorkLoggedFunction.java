@@ -8,12 +8,10 @@ import com.atlassian.jira.jql.query.QueryCreationContextImpl;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
-import org.apache.lucene.search.ConstantScoreQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +62,7 @@ public class WorkLoggedFunction extends AbstractBuiltInQueryFunction {
         }
 
         return new QueryFactoryResult(
-            new ConstantScoreQuery(issueIdJoinQueryFactory.createIssueIdJoinQuery(parseResult.getQuery(), SearchProviderFactory.WORKLOG_INDEX)),
+            issueIdJoinQueryFactory.createIssueIdJoinQuery(parseResult.getQuery(), SearchProviderFactory.WORKLOG_INDEX),
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }

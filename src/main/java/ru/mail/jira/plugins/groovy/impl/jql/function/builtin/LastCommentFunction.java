@@ -3,9 +3,11 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.search.SearchProviderFactory;
-import com.atlassian.jira.issue.statistics.util.FieldDocumentHitCollector;
 import com.atlassian.jira.jql.operand.QueryLiteral;
-import com.atlassian.jira.jql.query.*;
+import com.atlassian.jira.jql.query.QueryCreationContext;
+import com.atlassian.jira.jql.query.QueryCreationContextImpl;
+import com.atlassian.jira.jql.query.QueryFactoryResult;
+import com.atlassian.jira.jql.query.QueryProjectRoleAndGroupPermissionsDecorator;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -13,22 +15,25 @@ import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.document.Document;
+import org.apache.lucene.index.*;
 import org.apache.lucene.search.*;
+import org.apache.lucene.util.BytesRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.CommentQueryParser;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.QueryParseResult;
+import ru.mail.jira.plugins.groovy.impl.jql.indexers.AdditionalFieldsCommentExtractor;
 import ru.mail.jira.plugins.groovy.util.lucene.IssueIdCollector;
+import ru.mail.jira.plugins.groovy.util.lucene.IssueIdJoinQueryFactory;
 import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class LastCommentFunction extends AbstractCommentQueryFunction {
@@ -36,18 +41,21 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
     private final QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator;
     private final SearchProviderFactory searchProviderFactory;
     private final SearchService searchService;
+    private final IssueIdJoinQueryFactory issueIdJoinQueryFactory;
     private final SearchHelper searchHelper;
 
     @Autowired
     public LastCommentFunction(
         @ComponentImport SearchProviderFactory searchProviderFactory,
         @ComponentImport SearchService searchService,
+        IssueIdJoinQueryFactory issueIdJoinQueryFactory,
         CommentQueryParser commentQueryParser,
         QueryProjectRoleAndGroupPermissionsDecorator queryPermissionDecorator,
         SearchHelper searchHelper
     ) {
         super(commentQueryParser, "lastComment", 1);
         this.searchProviderFactory = searchProviderFactory;
+        this.issueIdJoinQueryFactory = issueIdJoinQueryFactory;
         this.searchService = searchService;
         this.queryPermissionDecorator = queryPermissionDecorator;
         this.searchHelper = searchHelper;
@@ -145,29 +153,22 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
             return QueryFactoryResult.createFalseResult();
         }
 
-        logger.debug("constructed comment query");
+        logger.debug("parsed comment query");
 
         BooleanQuery commentQuery = new BooleanQuery
             .Builder()
             .add(parseResult.getQuery(), BooleanClause.Occur.MUST)
-            .add(QueryUtil.createMultiTermQuery(DocumentConstants.COMMENT_ID, commentIds), BooleanClause.Occur.MUST)
+            .add(QueryUtil.createMultiTermQuery(DocumentConstants.COMMENT_ID, commentIds.stream().map(BytesRef::new).collect(Collectors.toList())), BooleanClause.Occur.MUST)
             .build();
 
-        IssueIdCollector collector = new IssueIdCollector();
+        logger.debug("constructed comment query");
 
-        try {
-            searcher.search(
-                commentQuery,
-                collector
-            );
-        } catch (IOException e) {
-            logger.error("caught exception while searching", e);
-        }
+        Query issueIdJoinQuery = issueIdJoinQueryFactory.createIssueIdJoinQuery(commentQuery, SearchProviderFactory.COMMENT_INDEX);
 
-        logger.debug("search complete");
+        logger.debug("constructed join query");
 
         return new QueryFactoryResult(
-            QueryUtil.createIssueIdQuery(collector.getIssueIds()),
+            issueIdJoinQuery,
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }
@@ -194,27 +195,39 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         return queryResult.getQuery();
     }
 
-    private class LastCommentIdCollector extends FieldDocumentHitCollector {
+    private class LastCommentIdCollector extends SimpleCollector {
         private Map<String, String> lastCommentIds = new HashMap<>();
-        private Map<String, String> lastDates = new HashMap<>();
+        private Map<String, Long> lastDates = new HashMap<>();
+        private SortedDocValues issueIds;
+        private SortedDocValues commentIds;
+        private NumericDocValues commentDates;
 
         @Override
-        protected Set<String> getFieldsToLoad() {
-            return ImmutableSet.of(DocumentConstants.ISSUE_ID, DocumentConstants.COMMENT_ID, DocumentConstants.COMMENT_CREATED);
+        protected void doSetNextReader(LeafReaderContext context) throws IOException {
+            LeafReader reader = context.reader();
+            this.issueIds = reader.getSortedDocValues(DocumentConstants.ISSUE_ID);
+            this.commentIds = reader.getSortedDocValues(AdditionalFieldsCommentExtractor.COMMENT_ID_FIELD);
+            this.commentDates = reader.getNumericDocValues(AdditionalFieldsCommentExtractor.CREATED_FIELD);
         }
 
         @Override
-        public void collect(Document document) {
-            String issue = document.get(DocumentConstants.ISSUE_ID);
-            String commentId = document.get(DocumentConstants.COMMENT_ID);
-            String date = document.get(DocumentConstants.COMMENT_CREATED);
+        public void collect(int doc) throws IOException {
+            if (issueIds.advanceExact(doc) && commentIds.advanceExact(doc) && commentDates.advanceExact(doc)) {
+                String issue = issueIds.binaryValue().utf8ToString();
 
-            String lastDate = lastDates.get(issue);
+                long date = commentDates.longValue();
+                Long lastDate = lastDates.get(issue);
 
-            if (lastDate == null || date.compareTo(lastDate) >= 0) {
-                lastCommentIds.put(issue, commentId);
-                lastDates.put(issue, date);
+                if (lastDate == null || date >= lastDate) {
+                    lastCommentIds.put(issue, commentIds.binaryValue().utf8ToString());
+                    lastDates.put(issue, date);
+                }
             }
+        }
+
+        @Override
+        public boolean needsScores() {
+            return false;
         }
     }
 }
