@@ -6,20 +6,21 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.SimpleCollector;
+import org.apache.lucene.util.BytesRef;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Collect Issue Ids for subquery searchers. Pretty much copy of Jira's IssueIdCollector
  */
 public class IssueIdCollector extends SimpleCollector {
-    private Set<String> issueIds;
+    private Set<BytesRef> issueIds;
     private SortedDocValues docValues;
 
     public IssueIdCollector() {
-        this.issueIds = new HashSet<>();
+        this.issueIds = new TreeSet<>();
     }
 
     @Override
@@ -29,11 +30,11 @@ public class IssueIdCollector extends SimpleCollector {
     @Override
     public void collect(final int docId) throws IOException {
         if (docValues.advanceExact(docId)) {
-            issueIds.add(docValues.binaryValue().utf8ToString());
+            issueIds.add(BytesRef.deepCopyOf(docValues.binaryValue()));
         }
     }
 
-    public Set<String> getIssueIds() {
+    public Set<BytesRef> getIssueIds() {
         return issueIds;
     }
 

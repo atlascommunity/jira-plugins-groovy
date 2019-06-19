@@ -104,8 +104,8 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
 
                 searchHelper.doSearch(issueQuery, new MatchAllDocsQuery(), issueIdCollector, queryCreationContext);
 
-                Set<String> issueIds = issueIdCollector.getIssueIds();
-                if (issueIds.size() > 0) {
+                Collection<BytesRef> issueIds = issueIdCollector.getIssueIds();
+                if (!issueIds.isEmpty()) {
                     joinQuery = QueryUtil.createIssueIdQuery(issueIds);
                 } else {
                     return QueryFactoryResult.createFalseResult();
@@ -138,11 +138,11 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
             logger.error("caught exception while searching", e);
         }
 
-        Set<String> commentIds = new HashSet<>(lastCommentIdCollector.lastCommentIds.values());
+        Set<BytesRef> commentIds = new TreeSet<>(lastCommentIdCollector.lastCommentIds.values());
 
         logger.debug("collected last comments: {}", commentIds.size());
 
-        if (commentIds.size() == 0) {
+        if (commentIds.isEmpty()) {
             return QueryFactoryResult.createFalseResult();
         }
 
@@ -155,10 +155,10 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
 
         logger.debug("parsed comment query");
 
-        BooleanQuery commentQuery = new BooleanQuery
+        Query commentQuery = new BooleanQuery
             .Builder()
-            .add(parseResult.getQuery(), BooleanClause.Occur.MUST)
-            .add(QueryUtil.createMultiTermQuery(DocumentConstants.COMMENT_ID, commentIds.stream().map(BytesRef::new).collect(Collectors.toList())), BooleanClause.Occur.MUST)
+            .add(parseResult.getQuery(), BooleanClause.Occur.FILTER)
+            .add(QueryUtil.createMultiTermQuery(DocumentConstants.COMMENT_ID, commentIds), BooleanClause.Occur.FILTER)
             .build();
 
         logger.debug("constructed comment query");
@@ -196,8 +196,8 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
     }
 
     private class LastCommentIdCollector extends SimpleCollector {
-        private Map<String, String> lastCommentIds = new HashMap<>();
-        private Map<String, Long> lastDates = new HashMap<>();
+        private Map<BytesRef, BytesRef> lastCommentIds = new HashMap<>();
+        private Map<BytesRef, Long> lastDates = new HashMap<>();
         private SortedDocValues issueIds;
         private SortedDocValues commentIds;
         private NumericDocValues commentDates;
@@ -213,14 +213,15 @@ public class LastCommentFunction extends AbstractCommentQueryFunction {
         @Override
         public void collect(int doc) throws IOException {
             if (issueIds.advanceExact(doc) && commentIds.advanceExact(doc) && commentDates.advanceExact(doc)) {
-                String issue = issueIds.binaryValue().utf8ToString();
+                BytesRef issue = issueIds.binaryValue();
 
                 long date = commentDates.longValue();
                 Long lastDate = lastDates.get(issue);
 
                 if (lastDate == null || date >= lastDate) {
-                    lastCommentIds.put(issue, commentIds.binaryValue().utf8ToString());
-                    lastDates.put(issue, date);
+                    BytesRef issueKey = BytesRef.deepCopyOf(issue);
+                    lastCommentIds.put(issueKey, BytesRef.deepCopyOf(commentIds.binaryValue()));
+                    lastDates.put(issueKey, date);
                 }
             }
         }
