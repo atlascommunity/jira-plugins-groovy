@@ -33,7 +33,6 @@ import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class LastCommentFunction extends AbstractCommentQueryFunction {
