@@ -50,6 +50,6 @@ class TestJqlValuesFunction implements ScriptedJqlQueryFunction {
         searchProviderFactory
                 .getSearcher(SearchProviderFactory.ISSUE_INDEX)
                 .search(new TermQuery(new Term(DocumentConstants.ISSUE_ASSIGNEE, queryCreationContext.applicationUser.key)), collector)
-        return QueryUtil.createIssueIdQuery(collector.getIssueIds())
+        return QueryUtil.createMultiTermQuery(DocumentConstants.ISSUE_ID, collector.getIssueIds())
     }
 }
