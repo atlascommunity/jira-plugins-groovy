@@ -10,12 +10,12 @@ import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 
 public class InjectionExtension extends CompilationCustomizer {
     private final ParseContextHolder parseContextHolder;
-    private final InjectionVisitor injectionVisitor;
+    private final InjectionVisitor visitor;
 
     public InjectionExtension(ParseContextHolder parseContextHolder) {
         super(CompilePhase.CANONICALIZATION);
         this.parseContextHolder = parseContextHolder;
-        this.injectionVisitor = new InjectionVisitor(parseContextHolder);
+        this.visitor = new InjectionVisitor(parseContextHolder);
     }
 
     @Override
@@ -26,9 +26,8 @@ public class InjectionExtension extends CompilationCustomizer {
             return;
         }
 
-        source.getAST().getClasses().forEach(injectionVisitor::visitClass);
+        source.getAST().getClasses().forEach(visitor::visitClass);
+
         parseContext.getCompletedExtensions().add(InjectionExtension.class);
     }
-
-
 }

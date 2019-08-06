@@ -50,6 +50,17 @@ public class FieldConfigResource {
         }).getResponse();
     }
 
+    @GET
+    @Path("/{id}/changelogs")
+    @WebSudoRequired
+    public Response getChangelogs(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return fieldConfigRepository.getChangelogs(id);
+        }).getResponse();
+    }
+
     @Path("/{id}")
     @GET
     public Response getFieldConfig(@PathParam("id") long id) {

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dao.GlobalObjectDao;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectDto;
 import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectForm;
 import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
@@ -57,7 +58,11 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
 
     @Override
     public List<GlobalObjectDto> getAll() {
-        return globalObjectDao.getAll().stream().map(this::buildDto).collect(Collectors.toList());
+        return globalObjectDao
+            .getAll()
+            .stream()
+            .map(script -> buildDto(script, false))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -68,7 +73,12 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
             return null;
         }
 
-        return buildDto(object);
+        return buildDto(object, true);
+    }
+
+    @Override
+    public List<ChangelogDto> getChangelogs(int id) {
+        return changelogHelper.collect(globalObjectDao.getChangelogs(id));
     }
 
     @Override
@@ -79,7 +89,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
 
         invalidationService.invalidateGlobalObjects();
 
-        return buildDto(result);
+        return buildDto(result, true);
     }
 
     @Override
@@ -90,7 +100,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
 
         invalidationService.invalidateGlobalObjects();
 
-        return buildDto(result);
+        return buildDto(result, true);
     }
 
     @Override
@@ -130,7 +140,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
         }
     }
 
-    private GlobalObjectDto buildDto(GlobalObject script) {
+    private GlobalObjectDto buildDto(GlobalObject script, boolean withChangelogs) {
         GlobalObjectDto result = new GlobalObjectDto();
 
         result.setId(script.getID());
@@ -140,10 +150,12 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
         result.setScriptBody(script.getScriptBody());
         result.setDeleted(script.isDeleted());
 
-        result.setChangelogs(changelogHelper.collect(script.getChangelogs()));
-
         result.setErrorCount(executionRepository.getErrorCount(script.getUuid()));
         result.setWarningCount(executionRepository.getWarningCount(script.getUuid()));
+
+        if (withChangelogs) {
+            result.setChangelogs(changelogHelper.collect(script.getChangelogs()));
+        }
 
         return result;
     }

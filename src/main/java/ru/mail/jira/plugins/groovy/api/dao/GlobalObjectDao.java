@@ -4,11 +4,14 @@ import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.jira.user.ApplicationUser;
 import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectForm;
 import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
+import ru.mail.jira.plugins.groovy.api.entity.GlobalObjectChangelog;
 
 import java.util.List;
 
 public interface GlobalObjectDao {
     List<GlobalObject> getAll();
+
+    GlobalObjectChangelog[] getChangelogs(int id);
 
     GlobalObject get(int id);
 

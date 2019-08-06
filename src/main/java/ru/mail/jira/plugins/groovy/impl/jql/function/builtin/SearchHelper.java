@@ -5,6 +5,7 @@ import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchProvider;
 import com.atlassian.jira.issue.search.SearchProviderFactory;
+import com.atlassian.jira.issue.search.SearchQuery;
 import com.atlassian.jira.jql.query.LuceneQueryBuilder;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.user.ApplicationUser;
@@ -46,7 +47,7 @@ public class SearchHelper {
     public void doSearch(Query jqlQuery, org.apache.lucene.search.Query luceneQuery, Collector collector, QueryCreationContext qcc) {
         try {
             if (qcc.isSecurityOverriden()) {
-                BooleanQuery query = new BooleanQuery();
+                BooleanQuery.Builder query = new BooleanQuery.Builder();
 
                 if (jqlQuery != null && jqlQuery.getWhereClause() != null) {
                     query.add(luceneQueryBuilder.createLuceneQuery(qcc, jqlQuery.getWhereClause()), BooleanClause.Occur.MUST);
@@ -54,9 +55,9 @@ public class SearchHelper {
 
                 query.add(luceneQuery, BooleanClause.Occur.MUST);
 
-                searchProviderFactory.getSearcher(SearchProviderFactory.ISSUE_INDEX).search(query, collector);
+                searchProviderFactory.getSearcher(SearchProviderFactory.ISSUE_INDEX).search(query.build(), collector);
             } else {
-                searchProvider.search(jqlQuery, qcc.getApplicationUser(), collector, luceneQuery);
+                searchProvider.search(SearchQuery.create(jqlQuery, qcc.getApplicationUser()).luceneQuery(luceneQuery), collector);
             }
         } catch (SearchException | IOException e) {
             logger.error("Caught exception while searching", e);

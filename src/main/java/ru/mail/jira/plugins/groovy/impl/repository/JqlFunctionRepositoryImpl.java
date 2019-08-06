@@ -12,6 +12,7 @@ import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionForm;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
@@ -78,6 +79,11 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
     }
 
     @Override
+    public List<ChangelogDto> getChangelogs(int id) {
+        return changelogHelper.collect(ao.find(JqlFunctionScriptChangelog.class, Query.select().where("SCRIPT_ID = ?", id)));
+    }
+
+    @Override
     public JqlFunctionScriptDto getScript(int id) {
         return buildScriptDto(ao.get(JqlFunctionScript.class, id), false, false);
     }
@@ -103,7 +109,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
             comment = Const.CREATED_COMMENT;
         }
 
-        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), null, user.getKey(), diff, comment);
 
         addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
@@ -120,7 +126,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
 
-        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), script.getUuid(), user.getKey(), diff, comment);
 
         script.setUuid(UUID.randomUUID().toString());
         script.setName(form.getName());

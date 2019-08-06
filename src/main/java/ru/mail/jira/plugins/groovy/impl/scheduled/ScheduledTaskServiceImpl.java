@@ -422,12 +422,12 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService, PluginLif
 
                 try {
                     boolean isMutableIssue = type == ScheduledTaskType.ISSUE_JQL_SCRIPT;
-                    SearchResults searchResults = searchService.search(runAs, query, new PagerFilter(ISSUE_LIMIT));
+                    SearchResults<Issue> searchResults = searchService.search(runAs, query, new PagerFilter(ISSUE_LIMIT));
 
                     long total = searchResults.getTotal();
                     long errors = 0;
 
-                    for (Issue issue : searchResults.getIssues()) {
+                    for (Issue issue : searchResults.getResults()) {
                         Issue issueBinding = issue;
 
                         if (isTransition) {

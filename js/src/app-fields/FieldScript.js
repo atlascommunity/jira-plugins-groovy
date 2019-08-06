@@ -11,7 +11,7 @@ import EditFilledIcon from '@atlaskit/icon/glyph/edit-filled';
 
 import type {FieldConfigItem} from './types';
 
-import {getBaseUrl} from '../service';
+import {fieldConfigService, getBaseUrl} from '../service';
 
 import {JiraMessages, FieldMessages, ErrorMessages, CommonMessages} from '../i18n/common.i18n';
 import {ErrorMessage} from '../common/ak/messages';
@@ -31,6 +31,8 @@ const ConnectedWatchableScript = connect(
 type Props = ScriptComponentProps<FieldConfigItem>;
 
 export class FieldScript extends React.PureComponent<Props> {
+    _getChangelogs = () => fieldConfigService.getChangelogs(this.props.script.id);
+
     render() {
         const {script, collapsible, focused} = this.props;
 
@@ -55,6 +57,7 @@ export class FieldScript extends React.PureComponent<Props> {
                     }
                     : undefined
                 }
+                changelogsLoader={this._getChangelogs}
 
                 withChangelog={true}
                 collapsible={collapsible}

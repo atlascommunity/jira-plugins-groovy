@@ -43,6 +43,11 @@ public class GlobalObjectDaoImpl implements GlobalObjectDao {
     }
 
     @Override
+    public GlobalObjectChangelog[] getChangelogs(int id) {
+        return ao.find(GlobalObjectChangelog.class, Query.select().where("SCRIPT_ID = ?", id));
+    }
+
+    @Override
     public GlobalObject get(int id) {
         return ao.get(GlobalObject.class, id);
     }
@@ -72,7 +77,7 @@ public class GlobalObjectDaoImpl implements GlobalObjectDao {
             comment = Const.CREATED_COMMENT;
         }
 
-        changelogHelper.addChangelog(GlobalObjectChangelog.class, "SCRIPT_ID", result.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(GlobalObjectChangelog.class, "SCRIPT_ID", result.getID(), null, user.getKey(), diff, comment);
 
         addAuditLogAndNotify(user, EntityAction.CREATED, result, diff, comment);
 
@@ -90,7 +95,7 @@ public class GlobalObjectDaoImpl implements GlobalObjectDao {
         String diff = changelogHelper.generateDiff(id, result.getName(), form.getName(), result.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
 
-        changelogHelper.addChangelog(GlobalObjectChangelog.class, "SCRIPT_ID", result.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(GlobalObjectChangelog.class, "SCRIPT_ID", result.getID(), result.getUuid(), user.getKey(), diff, comment);
 
         result.setUuid(UUID.randomUUID().toString());
         result.setName(form.getName());

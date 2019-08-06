@@ -13,4 +13,6 @@ public interface TestHelperService {
     void nonTransactional(ApplicationUser user, String directoryName);
 
     <T extends Exception> T getCompilationExceptionCause(Exception e);
+
+    Class<?> loadClass(String name) throws ClassNotFoundException;
 }

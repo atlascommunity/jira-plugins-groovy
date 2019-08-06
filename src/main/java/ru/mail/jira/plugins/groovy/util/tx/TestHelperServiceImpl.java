@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.directory.ScriptDirectoryForm;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.service.TestHelperService;
+import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 
 import java.util.List;
 
@@ -19,14 +20,17 @@ import java.util.List;
 public class TestHelperServiceImpl implements TestHelperService {
     private final ActiveObjects activeObjects;
     private final ScriptRepository scriptRepository;
+    private final DelegatingClassLoader classLoader;
 
     @Autowired
     public TestHelperServiceImpl(
         @ComponentImport ActiveObjects activeObjects,
-        ScriptRepository scriptRepository
+        ScriptRepository scriptRepository,
+        DelegatingClassLoader classLoader
     ) {
         this.activeObjects = activeObjects;
         this.scriptRepository = scriptRepository;
+        this.classLoader = classLoader;
     }
 
     @Override
@@ -65,6 +69,11 @@ public class TestHelperServiceImpl implements TestHelperService {
         }
 
         throw new IllegalArgumentException("Error is not ExceptionMessage");
+    }
+
+    @Override
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        return classLoader.loadClass(name);
     }
 
     private void create(ApplicationUser user, String directoryName) {

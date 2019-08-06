@@ -21,7 +21,6 @@ import com.atlassian.jira.timezone.TimeZoneManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.UserKeyService;
 import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.jira.util.LuceneUtils;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.query.operand.FunctionOperand;
@@ -31,6 +30,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.antlr.v4.runtime.*;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
@@ -110,7 +110,7 @@ public abstract class AbstractEntityQueryParser {
         ApplicationUser user = queryCreationContext.getApplicationUser();
         ZoneId userZoneId = timeZoneManager.getTimeZoneforUser(user).toZoneId();
 
-        BooleanQuery query = new BooleanQuery();
+        BooleanQuery.Builder query = new BooleanQuery.Builder();
 
         MessageSet messageSet = new MessageSetImpl();
 
@@ -123,11 +123,11 @@ public abstract class AbstractEntityQueryParser {
                         if (userKeys.size() == 1) {
                             query.add(new TermQuery(new Term(authorField, userKeys.iterator().next())), BooleanClause.Occur.MUST);
                         } else {
-                            BooleanQuery booleanQuery = new BooleanQuery();
+                            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
                             for (String userKey : userKeys) {
                                 booleanQuery.add(new TermQuery(new Term(authorField, userKey)), BooleanClause.Occur.SHOULD);
                             }
-                            query.add(booleanQuery, BooleanClause.Occur.MUST);
+                            query.add(booleanQuery.build(), BooleanClause.Occur.MUST);
                         }
                     } else {
                         messageSet.addErrorMessage("Unable to find user \"" + value + "\"");
@@ -157,10 +157,9 @@ public abstract class AbstractEntityQueryParser {
                         Date until = Date.from(date.atTime(LocalTime.MAX).atZone(userZoneId).toInstant());
 
                         query.add(
-                            new TermRangeQuery(
+                            LongPoint.newRangeQuery(
                                 createdField,
-                                formatDate(since), formatDate(until),
-                                true, true
+                                formatDate(since), formatDate(until)
                             ),
                             BooleanClause.Occur.MUST
                         );
@@ -174,7 +173,10 @@ public abstract class AbstractEntityQueryParser {
 
                     if (date != null) {
                         query.add(
-                            new TermRangeQuery(createdField, null, formatDate(date), true, false),
+                            LongPoint.newRangeQuery(
+                                createdField,
+                                Long.MIN_VALUE, formatDate(date)
+                            ),
                             BooleanClause.Occur.MUST
                         );
                     } else {
@@ -187,7 +189,10 @@ public abstract class AbstractEntityQueryParser {
 
                     if (date != null) {
                         query.add(
-                            new TermRangeQuery(createdField, formatDate(date), null, false, true),
+                            LongPoint.newRangeQuery(
+                                createdField,
+                                formatDate(date), Long.MAX_VALUE
+                            ),
                             BooleanClause.Occur.MUST
                         );
                     } else {
@@ -229,7 +234,7 @@ public abstract class AbstractEntityQueryParser {
                     ProjectRole role = projectRoleManager.getProjectRole(value);
 
                     if (role != null) {
-                        BooleanQuery projectsQuery = new BooleanQuery();
+                        BooleanQuery.Builder projectsQuery = new BooleanQuery.Builder();
                         for (Project project : projects) {
                             if (archivingHelper.isProjectArchived(project)) {
                                 logger.warn("Project {} is archived", project.getKey());
@@ -239,25 +244,25 @@ public abstract class AbstractEntityQueryParser {
                             ProjectRoleActors projectRoleActors = projectRoleManager.getProjectRoleActors(role, project);
 
                             if (projectRoleActors != null) {
-                                BooleanQuery projectQuery = new BooleanQuery();
+                                BooleanQuery.Builder projectQuery = new BooleanQuery.Builder();
                                 projectQuery.add(
                                     new TermQuery(new Term(DocumentConstants.PROJECT_ID, String.valueOf(project.getId()))),
                                     BooleanClause.Occur.MUST
                                 );
 
-                                BooleanQuery usersQuery = new BooleanQuery();
+                                BooleanQuery.Builder usersQuery = new BooleanQuery.Builder();
                                 for (ApplicationUser roleUser : projectRoleActors.getApplicationUsers()) {
                                     usersQuery.add(
                                         new TermQuery(new Term(authorField, roleUser.getKey())),
                                         BooleanClause.Occur.SHOULD
                                     );
                                 }
-                                projectQuery.add(usersQuery, BooleanClause.Occur.MUST);
+                                projectQuery.add(usersQuery.build(), BooleanClause.Occur.MUST);
 
-                                projectsQuery.add(projectQuery, BooleanClause.Occur.SHOULD);
+                                projectsQuery.add(projectQuery.build(), BooleanClause.Occur.SHOULD);
                             }
                         }
-                        query.add(projectsQuery, BooleanClause.Occur.MUST);
+                        query.add(projectsQuery.build(), BooleanClause.Occur.MUST);
                     } else {
                         messageSet.addErrorMessage("Role \"" + value + "\" wasn't found");
                     }
@@ -267,7 +272,7 @@ public abstract class AbstractEntityQueryParser {
                     Group group = groupManager.getGroup(value);
 
                     if (group != null) {
-                        BooleanQuery groupQuery = new BooleanQuery();
+                        BooleanQuery.Builder groupQuery = new BooleanQuery.Builder();
 
                         for (ApplicationUser groupUser : groupManager.getUsersInGroup(group)) {
                             groupQuery.add(
@@ -275,7 +280,7 @@ public abstract class AbstractEntityQueryParser {
                                 BooleanClause.Occur.SHOULD
                             );
                         }
-                        query.add(groupQuery, BooleanClause.Occur.MUST);
+                        query.add(groupQuery.build(), BooleanClause.Occur.MUST);
                     } else {
                         messageSet.addErrorMessage("Group \"" + value + "\" wasn't found");
                     }
@@ -309,7 +314,7 @@ public abstract class AbstractEntityQueryParser {
             return new QueryParseResult(null, messageSet);
         }
 
-        return new QueryParseResult(addPermissionsCheck(queryCreationContext, query), messageSet);
+        return new QueryParseResult(addPermissionsCheck(queryCreationContext, query.build()), messageSet);
     }
 
     protected Map<String, String> parseQuery(MessageSet messageSet, String query) {
@@ -335,11 +340,11 @@ public abstract class AbstractEntityQueryParser {
         return listener.values;
     }
 
-    private String formatDate(Date date) {
+    private Long formatDate(Date date) {
         if (isLocalDate) {
-            return LuceneUtils.localDateToString(LocalDateFactory.from(date));
+            return LocalDateFactory.from(date).getEpochDays();
         } else {
-            return LuceneUtils.dateToString(date);
+            return date.getTime();
         }
     }
 

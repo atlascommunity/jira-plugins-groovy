@@ -2,6 +2,7 @@
 import {ajaxDelete, ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
 
 import type {ListenerType} from '../app-listeners/types';
+import type {ChangelogType} from '../common/script/types';
 
 
 export class ListenerService {
@@ -27,5 +28,9 @@ export class ListenerService {
 
     restoreListener(id: number): Promise<void> {
         return ajaxPost(`${getPluginBaseUrl()}/listener/${id}/restore`);
+    }
+
+    getChangelogs(id: number): Promise<$ReadOnlyArray<ChangelogType>> {
+        return ajaxGet(`${getPluginBaseUrl()}/listener/${id}/changelogs`);
     }
 }

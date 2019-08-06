@@ -4,19 +4,13 @@ import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.greenhopper.api.customfield.ManagedCustomFieldsService;
 import com.atlassian.greenhopper.api.issuetype.ManagedIssueTypesService;
-import com.atlassian.greenhopper.model.rapid.RapidView;
 import com.atlassian.greenhopper.service.rapid.RapidViewQueryService;
 import com.atlassian.greenhopper.service.rapid.view.RapidViewService;
-import com.atlassian.greenhopper.service.sprint.Sprint;
 import com.atlassian.greenhopper.service.sprint.SprintService;
-import com.atlassian.jira.issue.fields.CustomField;
-import com.atlassian.jira.issue.issuetype.IssueType;
-import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.event.events.PluginEnabledEvent;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +19,11 @@ import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 import ru.mail.jira.plugins.groovy.util.ObjectUtil;
 import ru.mail.jira.plugins.groovy.util.PluginComponentUtil;
 
-import java.util.Collection;
 import java.util.Optional;
 
+
 @Component
-public class DelegatingJiraSoftwareHelper implements PluginLifecycleAware, JiraSoftwareHelper {
+public class DelegatingJiraSoftwareHelper implements PluginLifecycleAware, JiraSoftwareHelperFactory {
     private static final String GREENHOPPER_KEY = "com.pyxis.greenhopper.jira";
 
     private final Logger logger = LoggerFactory.getLogger(DelegatingJiraSoftwareHelper.class);
@@ -39,7 +33,10 @@ public class DelegatingJiraSoftwareHelper implements PluginLifecycleAware, JiraS
     private JiraSoftwareHelper delegate;
 
     @Autowired
-    public DelegatingJiraSoftwareHelper(@ComponentImport EventPublisher eventPublisher, @ComponentImport PluginAccessor pluginAccessor) {
+    public DelegatingJiraSoftwareHelper(
+        @ComponentImport EventPublisher eventPublisher,
+        @ComponentImport PluginAccessor pluginAccessor
+    ) {
         this.eventPublisher = eventPublisher;
         this.pluginAccessor = pluginAccessor;
     }
@@ -99,54 +96,14 @@ public class DelegatingJiraSoftwareHelper implements PluginLifecycleAware, JiraS
             } else {
                 logger.warn("JSW modules not available");
             }
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | TypeNotPresentException e) {
             logger.info("Creating JSW stub helper");
-            this.delegate = new JiraSoftwareHelperStub();
+            this.delegate = null;
         }
     }
 
     @Override
-    public boolean isAvailable() {
-        return delegate.isAvailable();
-    }
-
-    @Override
-    public CustomField getEpicLinkField() {
-        return delegate.getEpicLinkField();
-    }
-
-    @Override
-    public CustomField getRankField() {
-        return delegate.getRankField();
-    }
-
-    @Override
-    public CustomField getSprintField() {
-        return delegate.getSprintField();
-    }
-
-    @Override
-    public IssueType getEpicIssueType() {
-        return delegate.getEpicIssueType();
-    }
-
-    @Override
-    public Optional<RapidView> findRapidViewByName(ApplicationUser user, String name) {
-        return delegate.findRapidViewByName(user, name);
-    }
-
-    @Override
-    public Query getRapidViewQuery(ApplicationUser user, Optional rapidView) {
-        return delegate.getRapidViewQuery(user, rapidView);
-    }
-
-    @Override
-    public Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, Optional rapidView) {
-        return delegate.findActiveSprintsByBoard(user, rapidView);
-    }
-
-    @Override
-    public Optional<Sprint> findSprint(ApplicationUser user, Optional rapidView, String name) {
-        return delegate.findSprint(user, rapidView, name);
+    public Optional<JiraSoftwareHelper> get() {
+        return Optional.ofNullable(delegate);
     }
 }
