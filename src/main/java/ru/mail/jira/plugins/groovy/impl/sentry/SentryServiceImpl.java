@@ -3,14 +3,14 @@ package ru.mail.jira.plugins.groovy.impl.sentry;
 import com.atlassian.beehive.ClusterLock;
 import com.atlassian.beehive.ClusterLockService;
 import com.atlassian.jira.cluster.ClusterInfo;
-import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import io.sentry.Sentry;
 import io.sentry.event.EventBuilder;
 import io.sentry.event.User;
 import io.sentry.event.interfaces.ExceptionInterface;
+import io.sentry.event.interfaces.UserInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.api.script.PluginModule;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.PluginDataService;
 import ru.mail.jira.plugins.groovy.api.service.SentryService;
@@ -29,8 +29,8 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
 
     @Autowired
     public SentryServiceImpl(
-        @PluginModule ClusterLockService clusterLockService,
-        @PluginModule ClusterInfo clusterInfo,
+        @ComponentImport ClusterLockService clusterLockService,
+        @ComponentImport ClusterInfo clusterInfo,
         PluginDataService pluginDataService
     ) {
         this.clusterLockService = clusterLockService;
@@ -40,20 +40,20 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
 
     @Override
     public void registerException(
+        String id,
         User user,
         Exception e,
         ScriptType type,
-        Integer id,
-        String inlineId,
         String issue,
         Map<String, String> metaData
     ) {
         if (pluginDataService.isSentryEnabled()) {
             EventBuilder eventBuilder = new EventBuilder()
-                .withExtra("scriptType", type.name())
-                .withExtra("id", id != null ? id : inlineId)
-                .withTag("scriptType", type.name())
-                .withSentryInterface(new ExceptionInterface(e));
+                .withTag("id", id)
+                .withSentryInterface(new ExceptionInterface(e))
+                .withSentryInterface(new UserInterface(
+                    user.getId(), user.getUsername(), user.getIpAddress(), user.getEmail(), user.getData()
+                ));
 
             if (clusterInfo.isClustered()) {
                 eventBuilder.withTag("node", clusterInfo.getNodeId());
@@ -67,9 +67,7 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
                 eventBuilder.withTag("issue", issue);
             }
 
-            String scriptId = id != null ? id.toString() : inlineId;
-
-            eventBuilder.withTag("script", type + "-" + scriptId);
+            eventBuilder.withTag("script", type + "-" + id);
 
             Sentry.capture(eventBuilder.build());
 
@@ -119,7 +117,6 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
         }
     }
 
-    //todo: cache locally with invalidation
     private Optional<String> getDsn() {
         return pluginDataService.getSentryDsn();
     }

@@ -17,7 +17,6 @@ import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
-import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.util.Set;
@@ -112,7 +111,7 @@ public class EventListenerInvoker implements PluginLifecycleAware {
         String uuid = listener.getUuid();
         long t = System.currentTimeMillis();
         boolean successful = true;
-        String error = null;
+        Exception error = null;
 
         try {
             scriptService.executeScript(
@@ -124,7 +123,7 @@ public class EventListenerInvoker implements PluginLifecycleAware {
         } catch (Exception e) {
             logger.error("Was unable to execute listener {}/{}", listener.getId(), uuid, e);
             successful = false;
-            error = ExceptionHelper.writeExceptionToString(e);
+            error = e;
         } finally {
             t = System.currentTimeMillis() - t;
         }

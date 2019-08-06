@@ -15,7 +15,6 @@ import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScriptDto;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.util.Const;
-import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -149,7 +148,7 @@ public class FieldValueExtractor {
         String uuid = script.getId();
         long t = System.currentTimeMillis();
         boolean successful = true;
-        String error = null;
+        Exception error = null;
         T value = null;
 
         try {
@@ -191,7 +190,7 @@ public class FieldValueExtractor {
                 field.getIdAsLong(), issue.getKey(), e
             );
             successful = false;
-            error = ExceptionHelper.writeExceptionToString(e);
+            error = e;
         } finally {
             t = System.currentTimeMillis() - t;
         }

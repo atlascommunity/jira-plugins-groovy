@@ -28,6 +28,7 @@ import ru.mail.jira.plugins.groovy.api.dto.execution.ScriptExecutionDto;
 import ru.mail.jira.plugins.groovy.api.entity.ScriptExecution;
 import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
+import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
@@ -73,12 +74,15 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     }
 
     @Override
-    public void trackFromRegistry(int id, long time, boolean successful, String error, Map<String, String> additionalParams) {
+    public void trackFromRegistry(int id, long time, boolean successful, Exception exception, Map<String, String> additionalParams) {
+        User currentUser = getCurrentUser();
         executorService.execute(() -> {
             try {
                 Map<String, String> params = getParams(additionalParams);
-                this.saveExecution(id, time, successful, error, objectMapper.writeValueAsString(params));
-                this.submitSentryEvent(String.valueOf(id), time, error, params);
+                this.saveExecution(id, time, successful, exception, objectMapper.writeValueAsString(params));
+                if (!successful) {
+                    this.submitSentryEvent(String.valueOf(id), time, exception, currentUser, params);
+                }
             } catch (Exception e) {
                 logger.error("unable to save execution", e);
             }
@@ -86,12 +90,15 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     }
 
     @Override
-    public void trackInline(String id, long time, boolean successful, String error, Map<String, String> additionalParams) {
+    public void trackInline(String id, long time, boolean successful, Exception exception, Map<String, String> additionalParams) {
+        User currentUser = getCurrentUser();
         executorService.execute(() -> {
             try {
                 Map<String, String> params = getParams(additionalParams);
-                this.saveExecution(id, time, successful, error, objectMapper.writeValueAsString(params));
-                this.submitSentryEvent(id, time, error, params);
+                this.saveExecution(id, time, successful, exception, objectMapper.writeValueAsString(params));
+                if (!successful) {
+                    this.submitSentryEvent(id, time, exception, currentUser, params);
+                }
             } catch (Exception e) {
                 logger.error("unable to save execution", e);
             }
@@ -230,33 +237,33 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         return result;
     }
 
-    private void saveExecution(int id, long time, boolean successful, String error, String additionalParams) {
+    private void saveExecution(int id, long time, boolean successful, Exception exception, String additionalParams) {
         ao.create(
             ScriptExecution.class,
             new DBParam("SCRIPT_ID", id),
             new DBParam("TIME", time),
             new DBParam("DATE", new Timestamp(System.currentTimeMillis())),
             new DBParam("SUCCESSFUL", successful),
-            new DBParam("ERROR", error),
+            new DBParam("ERROR", ExceptionHelper.writeExceptionToString(exception)),
             new DBParam("EXTRA_PARAMS", additionalParams)
         );
     }
 
-    private void saveExecution(String id, long time, boolean successful, String error, String additionalParams) {
+    private void saveExecution(String id, long time, boolean successful, Exception exception, String additionalParams) {
         ao.create(
             ScriptExecution.class,
             new DBParam("INLINE_ID", id),
             new DBParam("TIME", time),
             new DBParam("DATE", new Timestamp(System.currentTimeMillis())),
             new DBParam("SUCCESSFUL", successful),
-            new DBParam("ERROR", error),
+            new DBParam("ERROR", ExceptionHelper.writeExceptionToString(exception)),
             new DBParam("EXTRA_PARAMS", additionalParams)
         );
     }
 
-    private void submitSentryEvent(String id, long time, String error, User user, Map<String, String> params) {
+    private void submitSentryEvent(String id, long time, Exception e, User user, Map<String, String> params) {
         sentryService.registerException(
-
+            id, user, e, null, null, params
         );
     }
 

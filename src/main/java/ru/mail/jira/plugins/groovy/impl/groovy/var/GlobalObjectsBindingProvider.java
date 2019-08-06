@@ -17,7 +17,6 @@ import ru.mail.jira.plugins.groovy.api.script.binding.LazyDocBindingDescriptorIm
 import ru.mail.jira.plugins.groovy.api.service.GroovyDocService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
-import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
@@ -112,7 +111,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                         globalObject.getUuid(),
                         0L,
                         false,
-                        ExceptionHelper.writeExceptionToString(e),
+                        e,
                         ImmutableMap.of(
                             "type", ScriptType.GLOBAL_OBJECT.name()
                         ));

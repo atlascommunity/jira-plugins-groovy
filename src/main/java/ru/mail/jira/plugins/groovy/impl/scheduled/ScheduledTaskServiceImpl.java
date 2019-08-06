@@ -37,7 +37,6 @@ import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.ScheduledTaskService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.util.Const;
-import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import javax.annotation.Nullable;
@@ -299,7 +298,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService, PluginLif
         String uuid = taskInfo.getUuid();
         long t = System.currentTimeMillis();
         boolean successful = true;
-        String error = null;
+        Exception error = null;
         Exception exception = null;
 
         try {
@@ -312,7 +311,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService, PluginLif
         } catch (Exception e) {
             exception = e;
             successful = false;
-            error = ExceptionHelper.writeExceptionToString(e);
+            error = e;
         }
 
         if (trackAll) {

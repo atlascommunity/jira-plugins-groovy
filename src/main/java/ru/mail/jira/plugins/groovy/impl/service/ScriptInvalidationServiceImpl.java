@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
+import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 import ru.mail.jira.plugins.groovy.impl.cf.FieldValueCache;
 import ru.mail.jira.plugins.groovy.impl.groovy.var.GlobalObjectsBindingProvider;
@@ -30,6 +31,7 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
     private static final String SCRIPT_INVALIDATION_CHANNEL = "ru.mail.groovy.si";
     private static final String FIELD_INVALIDATION_CHANNEL = "ru.mail.groovy.fi";
     private static final String GLOBAL_OBJECTS_CHANNEL = "ru.mail.groovy.go";
+    private static final String SENTRY_CHANNEL = "ru.mail.groovy.se";
 
     private final Logger logger = LoggerFactory.getLogger(ScriptInvalidationService.class);
     private final ClusterMessagingService clusterMessagingService;
@@ -40,6 +42,7 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
     private final GlobalObjectsBindingProvider globalObjectsBindingProvider;
     private final ModuleManager moduleManager;
     private final EventListenerRepository listenerRepository;
+    private final SentryService sentryService;
 
     @Autowired
     public ScriptInvalidationServiceImpl(
@@ -49,7 +52,8 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
         FieldValueCache fieldValueCache,
         GlobalObjectsBindingProvider globalObjectsBindingProvider,
         ModuleManager moduleManager,
-        EventListenerRepository listenerRepository) {
+        EventListenerRepository listenerRepository, SentryService sentryService
+    ) {
         this.clusterMessagingService = clusterMessagingService;
         this.pluginEventManager = pluginEventManager;
         this.scriptService = scriptService;
@@ -57,6 +61,7 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
         this.globalObjectsBindingProvider = globalObjectsBindingProvider;
         this.moduleManager = moduleManager;
         this.listenerRepository = listenerRepository;
+        this.sentryService = sentryService;
         this.messageConsumer = new MessageConsumer();
     }
 
@@ -92,6 +97,12 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
     public void invalidateGlobalObjects() {
         clusterMessagingService.sendRemote(GLOBAL_OBJECTS_CHANNEL, "");
         globalObjectsBindingProvider.refresh();
+    }
+
+    @Override
+    public void invalidateSentry() {
+        sentryService.invalidateSettings();
+        clusterMessagingService.sendRemote(SENTRY_CHANNEL, "");
     }
 
     @Override
@@ -165,6 +176,8 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
                 }
             } else if (GLOBAL_OBJECTS_CHANNEL.equals(channel)) {
                 globalObjectsBindingProvider.refresh();
+            } else if (SENTRY_CHANNEL.equals(channel)) {
+                sentryService.invalidateSettings();
             }
         }
     }
