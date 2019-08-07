@@ -321,7 +321,7 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService, PluginLif
                 successful,
                 error,
                 ImmutableMap.of(
-                    "type", ScriptType.LISTENER.name(),
+                    "type", ScriptType.SCHEDULED_TASK.name(),
                     "bindings", bindings.toString()
                 )
             );
