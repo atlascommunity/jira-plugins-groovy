@@ -263,7 +263,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
 
     private void submitSentryEvent(String id, long time, Exception e, User user, Map<String, String> params) {
         sentryService.registerException(
-            id, user, e, null, null, params
+            id, user, e, null, params
         );
     }
 

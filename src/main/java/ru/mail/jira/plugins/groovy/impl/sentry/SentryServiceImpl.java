@@ -4,6 +4,7 @@ import com.atlassian.beehive.ClusterLock;
 import com.atlassian.beehive.ClusterLockService;
 import com.atlassian.jira.cluster.ClusterInfo;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.google.common.collect.ImmutableSet;
 import io.sentry.Sentry;
 import io.sentry.event.EventBuilder;
 import io.sentry.event.User;
@@ -11,16 +12,17 @@ import io.sentry.event.interfaces.ExceptionInterface;
 import io.sentry.event.interfaces.UserInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.PluginDataService;
 import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
+    private static final Set<String> TAGS = ImmutableSet.of("type", "issue");
     private static final String LOCK_KEY = "ru.mail.jira.groovy.sentry";
 
     private final ClusterLockService clusterLockService;
@@ -43,7 +45,6 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
         String id,
         User user,
         Exception e,
-        ScriptType type,
         String issue,
         Map<String, String> metaData
     ) {
@@ -60,14 +61,18 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
             }
 
             if (metaData != null) {
-                metaData.forEach((k, v) -> eventBuilder.withExtra("meta." + k, v));
+                metaData.forEach((k, v) -> {
+                    if (TAGS.contains(k)) {
+                        eventBuilder.withTag("meta." + k, v);
+                    } else {
+                        eventBuilder.withExtra("meta." + k, v);
+                    }
+                });
             }
 
             if (issue != null) {
                 eventBuilder.withTag("issue", issue);
             }
-
-            eventBuilder.withTag("script", type + "-" + id);
 
             Sentry.capture(eventBuilder.build());
 
