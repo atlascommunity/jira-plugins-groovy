@@ -203,30 +203,10 @@ public abstract class AbstractEntityQueryParser {
                 case "inRole": {
                     Collection<String> determinedProjects = queryCreationContext.getDeterminedProjects();
 
-                    List<Project> projects;
+                    Collection<Project> projects;
 
                     if (determinedProjects.size() > 0) {
-                        //todo: use projectManager.getProjectsByArgs when it will be safe to support only Jira >= 7.10.x
-                        projects = new ArrayList<>();
-                        for (String idOrKeyOrName : determinedProjects) {
-                            Project project;
-                            long id = NumberUtils.toLong(idOrKeyOrName, -1L);
-                            if (id > -1) {
-                                project = projectManager.getProjectObj(id);
-                            } else {
-                                project = projectManager.getProjectObjByKey(idOrKeyOrName);
-                                if (project == null) {
-                                    project = projectManager.getProjectObjByName(idOrKeyOrName);
-                                }
-                            }
-
-                            if (project != null) {
-                                projects.add(project);
-                            } else {
-                                logger.warn("unable to find determined project for string \"{}\"", idOrKeyOrName);
-                            }
-                        }
-                        projects = new ArrayList<>();
+                        projects = projectManager.getProjectsByArgs(determinedProjects);
                     } else {
                         projects = projectManager.getProjects();
                     }
