@@ -302,7 +302,14 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
 
                 GroovyClassLoader.InnerLoader innerLoader = new GroovyClassLoader.InnerLoader(gcl);
 
-                String mainClass = sourceUnit.getAST().getClasses().get(0).getName();
+                String mainClass = sourceUnit
+                    .getAST()
+                    .getClasses()
+                    .stream()
+                    .map(ClassNode::getName)
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Unable to find main class"));
+
                 for (Object aClass : compilationUnit.getClasses()) {
                     if (aClass instanceof GroovyClass) {
                         GroovyClass groovyClass = (GroovyClass) aClass;
