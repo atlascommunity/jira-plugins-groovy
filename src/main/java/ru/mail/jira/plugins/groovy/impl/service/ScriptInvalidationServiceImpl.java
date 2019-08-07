@@ -52,7 +52,8 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
         FieldValueCache fieldValueCache,
         GlobalObjectsBindingProvider globalObjectsBindingProvider,
         ModuleManager moduleManager,
-        EventListenerRepository listenerRepository, SentryService sentryService
+        EventListenerRepository listenerRepository,
+        SentryService sentryService
     ) {
         this.clusterMessagingService = clusterMessagingService;
         this.pluginEventManager = pluginEventManager;
