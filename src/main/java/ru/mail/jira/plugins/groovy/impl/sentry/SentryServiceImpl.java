@@ -127,7 +127,7 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
     private void init() {
         Optional<String> dsn = pluginDataService.getSentryDsn();
         if (dsn.isPresent()) {
-            Sentry.init(dsn.get());
+            Sentry.init(dsn.get() + "?stacktrace.app.packages=mygroovy.scripts");
         } else {
             Sentry.close();
         }

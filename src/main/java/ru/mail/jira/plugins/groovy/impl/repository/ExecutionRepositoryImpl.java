@@ -80,7 +80,6 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         //we need these only if we're sending event to sentry
         User currentUser = successful ? null : getCurrentUser();
         HttpInterface httpInterface = successful ? null : getCurrentRequest();
-
         executorService.execute(() -> {
             try {
                 Map<String, String> params = getParams(additionalParams);
