@@ -17,6 +17,8 @@ import com.querydsl.sql.SQLExpressions;
 import com.querydsl.sql.Union;
 import io.sentry.event.User;
 import io.sentry.event.UserBuilder;
+import io.sentry.event.helper.BasicRemoteAddressResolver;
+import io.sentry.event.interfaces.HttpInterface;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.slf4j.Logger;
@@ -75,13 +77,16 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
 
     @Override
     public void trackFromRegistry(int id, long time, boolean successful, Exception exception, Map<String, String> additionalParams) {
-        User currentUser = getCurrentUser();
+        //we need these only if we're sending event to sentry
+        User currentUser = successful ? null : getCurrentUser();
+        HttpInterface httpInterface = successful ? null : getCurrentRequest();
+
         executorService.execute(() -> {
             try {
                 Map<String, String> params = getParams(additionalParams);
                 this.saveExecution(id, time, successful, exception, objectMapper.writeValueAsString(params));
                 if (!successful) {
-                    this.submitSentryEvent(String.valueOf(id), time, exception, currentUser, params);
+                    this.submitSentryEvent(String.valueOf(id), time, exception, httpInterface, currentUser, params);
                 }
             } catch (Exception e) {
                 logger.error("unable to save execution", e);
@@ -91,13 +96,16 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
 
     @Override
     public void trackInline(String id, long time, boolean successful, Exception exception, Map<String, String> additionalParams) {
-        User currentUser = getCurrentUser();
+        //we need these only if we're sending event to sentry
+        User currentUser = successful ? null : getCurrentUser();
+        HttpInterface httpInterface = successful ? null : getCurrentRequest();
+
         executorService.execute(() -> {
             try {
                 Map<String, String> params = getParams(additionalParams);
                 this.saveExecution(id, time, successful, exception, objectMapper.writeValueAsString(params));
                 if (!successful) {
-                    this.submitSentryEvent(id, time, exception, currentUser, params);
+                    this.submitSentryEvent(id, time, exception, httpInterface, currentUser, params);
                 }
             } catch (Exception e) {
                 logger.error("unable to save execution", e);
@@ -261,9 +269,9 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         );
     }
 
-    private void submitSentryEvent(String id, long time, Exception e, User user, Map<String, String> params) {
+    private void submitSentryEvent(String id, long time, Exception e, HttpInterface httpInterface, User user, Map<String, String> params) {
         sentryService.registerException(
-            id, user, e, null, params
+            id, user, e, httpInterface, params
         );
     }
 
@@ -283,6 +291,16 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
                 .setId("anonymous")
                 .build();
         }
+    }
+
+    private HttpInterface getCurrentRequest() {
+        HttpServletRequest currentRequest = ExecutingHttpRequest.get();
+
+        if (currentRequest == null) {
+            return null;
+        }
+
+        return new HttpInterface(currentRequest, new BasicRemoteAddressResolver());
     }
 
     @Override

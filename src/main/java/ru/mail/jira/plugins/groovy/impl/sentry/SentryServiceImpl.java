@@ -9,6 +9,7 @@ import io.sentry.Sentry;
 import io.sentry.event.EventBuilder;
 import io.sentry.event.User;
 import io.sentry.event.interfaces.ExceptionInterface;
+import io.sentry.event.interfaces.HttpInterface;
 import io.sentry.event.interfaces.UserInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,7 +46,7 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
         String id,
         User user,
         Exception e,
-        String issue,
+        HttpInterface httpInterface,
         Map<String, String> metaData
     ) {
         if (pluginDataService.isSentryEnabled()) {
@@ -55,6 +56,10 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
                 .withSentryInterface(new UserInterface(
                     user.getId(), user.getUsername(), user.getIpAddress(), user.getEmail(), user.getData()
                 ));
+
+            if (httpInterface != null) {
+                eventBuilder.withSentryInterface(httpInterface);
+            }
 
             if (clusterInfo.isClustered()) {
                 eventBuilder.withTag("node", clusterInfo.getNodeId());
@@ -68,10 +73,6 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
                         eventBuilder.withExtra("meta." + k, v);
                     }
                 });
-            }
-
-            if (issue != null) {
-                eventBuilder.withTag("issue", issue);
             }
 
             Sentry.capture(eventBuilder.build());

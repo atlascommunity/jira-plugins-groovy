@@ -1,12 +1,12 @@
 package ru.mail.jira.plugins.groovy.api.service;
 
 import io.sentry.event.User;
-import ru.mail.jira.plugins.groovy.api.script.ScriptType;
+import io.sentry.event.interfaces.HttpInterface;
 
 import java.util.Map;
 
 public interface SentryService {
-    void registerException(String id, User user, Exception e, String issue, Map<String, String> metaData);
+    void registerException(String id, User user, Exception e, HttpInterface httpInterface, Map<String, String> metaData);
 
     void updateSettings(boolean enabled, String dsn);
 
