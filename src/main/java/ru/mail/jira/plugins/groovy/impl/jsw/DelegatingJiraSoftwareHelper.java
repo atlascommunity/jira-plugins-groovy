@@ -65,7 +65,7 @@ public class DelegatingJiraSoftwareHelper implements PluginLifecycleAware, JiraS
 
     @Override
     public int getInitOrder() {
-        return 0;
+        return 1;
     }
 
     private void createDelegate(Plugin plugin) {
