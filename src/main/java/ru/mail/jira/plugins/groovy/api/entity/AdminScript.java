@@ -4,6 +4,8 @@ import net.java.ao.OneToMany;
 import net.java.ao.schema.NotNull;
 import net.java.ao.schema.StringLength;
 
+import java.util.Map;
+
 public interface AdminScript extends AbstractScript {
     @NotNull
     void setUuid(String uuid);

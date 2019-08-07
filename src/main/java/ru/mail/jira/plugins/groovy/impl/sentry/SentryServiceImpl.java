@@ -89,6 +89,16 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
     }
 
     @Override
+    public boolean isEnabled() {
+        return pluginDataService.isSentryEnabled();
+    }
+
+    @Override
+    public String getDsn() {
+        return pluginDataService.getSentryDsnValue();
+    }
+
+    @Override
     public void invalidateSettings() {
         init();
     }
@@ -109,15 +119,11 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
     }
 
     private void init() {
-        Optional<String> dsn = getDsn();
+        Optional<String> dsn = pluginDataService.getSentryDsn();
         if (dsn.isPresent()) {
             Sentry.init(dsn.get());
         } else {
             Sentry.close();
         }
-    }
-
-    private Optional<String> getDsn() {
-        return pluginDataService.getSentryDsn();
     }
 }

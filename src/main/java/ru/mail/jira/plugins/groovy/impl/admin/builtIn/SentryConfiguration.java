@@ -11,6 +11,7 @@ import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.api.service.admin.BuiltInScript;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,14 @@ public class SentryConfiguration implements BuiltInScript<String> {
     ) {
         this.scriptInvalidationService = scriptInvalidationService;
         this.sentryService = sentryService;
+    }
+
+    @Override
+    public Map<String, Object> getDefaultValues() {
+        Map<String, Object> result = new HashMap<>();
+        result.put("enabled", sentryService.isEnabled());
+        result.put("dsn", sentryService.getDsn());
+        return result;
     }
 
     @Override

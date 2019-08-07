@@ -10,5 +10,8 @@ public interface SentryService {
 
     void updateSettings(boolean enabled, String dsn);
 
+    boolean isEnabled();
+    String getDsn();
+
     void invalidateSettings();
 }
