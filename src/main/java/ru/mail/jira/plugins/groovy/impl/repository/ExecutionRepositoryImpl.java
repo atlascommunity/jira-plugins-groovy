@@ -277,17 +277,19 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     private User getCurrentUser() {
         ApplicationUser user = authenticationContext.getLoggedInUser();
 
+        HttpServletRequest currentRequest = ExecutingHttpRequest.get();
+        String ip = currentRequest != null ? currentRequest.getRemoteAddr() : null;
         if (user != null) {
-            HttpServletRequest currentRequest = ExecutingHttpRequest.get();
             return new UserBuilder()
                 .setId(user.getKey())
                 .setUsername(user.getUsername())
                 .setEmail(user.getEmailAddress())
-                .setIpAddress(currentRequest != null ? currentRequest.getRemoteAddr() : null)
+                .setIpAddress(ip)
                 .build();
         } else {
             return new UserBuilder()
                 .setId("anonymous")
+                .setIpAddress(ip)
                 .build();
         }
     }

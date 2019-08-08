@@ -51,7 +51,7 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
     ) {
         if (pluginDataService.isSentryEnabled()) {
             EventBuilder eventBuilder = new EventBuilder()
-                .withTag("id", id)
+                .withTag("script-id", id)
                 .withSentryInterface(new ExceptionInterface(e))
                 .withSentryInterface(new UserInterface(
                     user.getId(), user.getUsername(), user.getIpAddress(), user.getEmail(), user.getData()
@@ -62,7 +62,7 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
             }
 
             if (clusterInfo.isClustered()) {
-                eventBuilder.withTag("node", clusterInfo.getNodeId());
+                eventBuilder.withTag("jira-node", clusterInfo.getNodeId());
             }
 
             if (metaData != null) {
