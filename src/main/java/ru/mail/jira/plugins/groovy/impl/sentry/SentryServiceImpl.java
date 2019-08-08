@@ -18,7 +18,6 @@ import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -101,7 +100,7 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
 
     @Override
     public String getDsn() {
-        return pluginDataService.getSentryDsnValue();
+        return pluginDataService.getSentryDsn();
     }
 
     @Override
@@ -125,9 +124,9 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
     }
 
     private void init() {
-        Optional<String> dsn = pluginDataService.getSentryDsn();
-        if (dsn.isPresent()) {
-            Sentry.init(dsn.get() + "?stacktrace.app.packages=mygroovy.scripts");
+        String dsn = pluginDataService.getSentryDsn();
+        if (dsn != null ) {
+            Sentry.init(dsn + "?stacktrace.app.packages=mygroovy.scripts");
         } else {
             Sentry.close();
         }

@@ -34,13 +34,8 @@ public class PluginDataServiceImpl implements PluginDataService {
     }
 
     @Override
-    public String getSentryDsnValue() {
+    public String getSentryDsn() {
         return (String) pluginSettingsFactory.createGlobalSettings().get(SETTING_PREFIX + ".sentry.dsn");
-    }
-
-    @Override
-    public Optional<String> getSentryDsn() {
-        return Optional.ofNullable(getSentryDsnValue());
     }
 
     @Override
