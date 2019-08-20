@@ -20,7 +20,6 @@ import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.param.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.Base64Util;
 import ru.mail.jira.plugins.groovy.util.Const;
-import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,8 +77,8 @@ public class WorkflowHelper {
                                 String value = StringUtils.trimToNull(Base64Util.decode((String) args.get(Const.getParamKey(paramName))));
 
                                 if (value == null && !param.isOptional()) {
-                                    String error = "Value for script param " + paramName + " is not found";
-                                    logger.error(error);
+                                    Exception error = new RuntimeException("Value for script param " + paramName + " is not found");
+                                    logger.error(error.getMessage());
 
                                     if (script.getUuid() != null) {
                                         executionRepository.trackInline(
@@ -136,7 +135,7 @@ public class WorkflowHelper {
         WorkflowException rethrow = null;
 
         boolean success = true;
-        String error = null;
+        Exception error = null;
         String id = script.getId();
         String uuid = script.getUuid();
 
@@ -158,7 +157,7 @@ public class WorkflowHelper {
                 if (!(result instanceof Boolean)) {
                     result = false;
                     success = false;
-                    error = "Condition must return boolean type";
+                    error = new RuntimeException("Condition must return boolean type");
                     logger.warn("Condition script {} didn't return boolean type for issue {}", id, issue.getKey());
                 }
             }
@@ -166,7 +165,7 @@ public class WorkflowHelper {
             rethrow = e;
         } catch (Exception e) {
             success = false;
-            error = ExceptionHelper.writeExceptionToString(e);
+            error = e;
             logger.error("Exception occurred while executing script {} for issue {}", id, issue.getKey(), e);
         } finally {
             t = System.currentTimeMillis() - t;

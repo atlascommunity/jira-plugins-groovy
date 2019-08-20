@@ -133,14 +133,13 @@ public class CustomRestResource {
             successful = false;
             exception = e;
             logger.error("Error for rest script {}", key, exception);
-            error = ExceptionHelper.writeExceptionToString(e);
         }
 
         executionRepository.trackInline(
             script.getId(),
             System.currentTimeMillis() - t,
             successful,
-            error,
+            exception,
             ImmutableMap.<String, String>builder()
                 .put("method", method.name())
                 .put("queryParameters", Objects.toString(uriInfo.getQueryParameters()))
