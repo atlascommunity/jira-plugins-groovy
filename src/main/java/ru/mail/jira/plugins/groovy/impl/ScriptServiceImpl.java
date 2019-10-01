@@ -285,53 +285,47 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
             }
             String fileName = "script_" + scriptId.replace('-', '_') + "." + Math.abs(script.hashCode()) + ".groovy";
 
-            if (compileStatic) {
-                CompilationUnit compilationUnit = new CompilationUnit(compilerConfiguration, null, gcl);
-                SourceUnit sourceUnit = compilationUnit.addSource(fileName, script);
-                compilationUnit.compile(Phases.CLASS_GENERATION);
+            CompilationUnit compilationUnit = new CompilationUnit(compilerConfiguration, null, gcl);
+            SourceUnit sourceUnit = compilationUnit.addSource(fileName, script);
+            compilationUnit.compile(Phases.CLASS_GENERATION);
 
-                if (extended) {
-                    DeprecatedAstVisitor astVisitor = new DeprecatedAstVisitor();
+            if (extended) {
+                DeprecatedAstVisitor astVisitor = new DeprecatedAstVisitor();
 
-                    for (Object aClass : compilationUnit.getAST().getClasses()) {
-                        astVisitor.visitClass((ClassNode) aClass);
-                    }
-
-                    parseContextHolder.get().setWarnings(astVisitor.getWarnings());
+                for (Object aClass : compilationUnit.getAST().getClasses()) {
+                    astVisitor.visitClass((ClassNode) aClass);
                 }
 
-                GroovyClassLoader.InnerLoader innerLoader = new GroovyClassLoader.InnerLoader(gcl);
+                parseContextHolder.get().setWarnings(astVisitor.getWarnings());
+            }
 
-                String mainClass = sourceUnit
-                    .getAST()
-                    .getClasses()
-                    .stream()
-                    .map(ClassNode::getName)
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Unable to find main class"));
+            GroovyClassLoader.InnerLoader innerLoader = new GroovyClassLoader.InnerLoader(gcl);
 
-                for (Object aClass : compilationUnit.getClasses()) {
-                    if (aClass instanceof GroovyClass) {
-                        GroovyClass groovyClass = (GroovyClass) aClass;
+            String mainClass = sourceUnit
+                .getAST()
+                .getClasses()
+                .stream()
+                .map(ClassNode::getName)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Unable to find main class"));
 
-                        BytecodeProcessor bytecodePostprocessor = compilerConfiguration.getBytecodePostprocessor();
+            for (Object aClass : compilationUnit.getClasses()) {
+                if (aClass instanceof GroovyClass) {
+                    GroovyClass groovyClass = (GroovyClass) aClass;
 
-                        byte[] byteCode = groovyClass.getBytes();
-                        if (bytecodePostprocessor != null) {
-                            byteCode = bytecodePostprocessor.processBytecode(groovyClass.getName(), byteCode);
-                        }
+                    BytecodeProcessor bytecodePostprocessor = compilerConfiguration.getBytecodePostprocessor();
 
-                        Class clazz = innerLoader.defineClass(groovyClass.getName(), byteCode);
+                    byte[] byteCode = groovyClass.getBytes();
+                    if (bytecodePostprocessor != null) {
+                        byteCode = bytecodePostprocessor.processBytecode(groovyClass.getName(), byteCode);
+                    }
 
-                        if (groovyClass.getName().equals(mainClass)) {
-                            scriptClass = clazz;
-                        }
+                    Class clazz = innerLoader.defineClass(groovyClass.getName(), byteCode);
+
+                    if (groovyClass.getName().equals(mainClass)) {
+                        scriptClass = clazz;
                     }
                 }
-
-                //todo: we might have an issue if some script (parsed by gcl) created class with name Xxx and there's global object with same class name
-            } else {
-                scriptClass = gcl.parseClass(script, fileName);
             }
 
             logger.debug("parsed script");
