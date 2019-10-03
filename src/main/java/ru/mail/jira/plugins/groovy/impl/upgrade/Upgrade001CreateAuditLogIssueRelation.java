@@ -36,7 +36,7 @@ public class Upgrade001CreateAuditLogIssueRelation implements PluginUpgradeTask 
 
     @Override
     public String getShortDescription() {
-        return "Created relation between audit log entry and Jira issues";
+        return "Creates relation between audit log entry and Jira issues";
     }
 
     @Override
