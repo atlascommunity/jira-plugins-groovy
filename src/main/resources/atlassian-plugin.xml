@@ -436,7 +436,7 @@
         class="ru.mail.jira.plugins.groovy.impl.jql.indexers.AdditionalFieldsCommentExtractor"
     />
 
-    <web-panel name="MyGroovy" key="due-date-indicator" location="atl.jira.view.issue.right.context" weight="1000">
+    <web-panel name="MyGroovy" key="mygroovy-actions" location="atl.jira.view.issue.right.context" weight="1000">
         <context-provider class="ru.mail.jira.plugins.groovy.servlet.IssuePanelContextProvider"/>
         <resource name="view" type="velocity" location="ru/mail/jira/plugins/groovy/templates/issue-panel.vm"/>
         <label>MyGroovy</label>

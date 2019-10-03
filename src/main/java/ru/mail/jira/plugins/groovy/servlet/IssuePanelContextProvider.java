@@ -20,9 +20,7 @@ public class IssuePanelContextProvider extends AbstractJiraContextProvider {
     }
 
     @Override
-    public Map getContextMap(
-        ApplicationUser applicationUser, JiraHelper jiraHelper
-    ) {
+    public Map getContextMap(ApplicationUser applicationUser, JiraHelper jiraHelper) {
         Map<String, Object> params = jiraHelper.getContextParams();
 
         Issue issue = (Issue) params.get("issue");
