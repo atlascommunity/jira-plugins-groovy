@@ -139,10 +139,7 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
     @Override
     public void createRelations(AuditLogEntry entry) {
         EntityAction action = entry.getAction();
-        if (action == EntityAction.DISABLED || action == EntityAction.ENABLED || action == EntityAction.DELETED ||
-            action == EntityAction.RESTORED || action == EntityAction.MOVED ||
-            entry.getCategory() == EntityType.REGISTRY_DIRECTORY
-        ) {
+        if (action == EntityAction.MOVED || entry.getCategory() == EntityType.REGISTRY_DIRECTORY) {
             return;
         }
 

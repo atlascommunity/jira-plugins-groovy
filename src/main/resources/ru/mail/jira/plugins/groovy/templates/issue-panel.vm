@@ -3,10 +3,21 @@
     #foreach($change in $changes)
         <div>
             <div>
+                <span class="aui-avatar aui-avatar-xsmall">
+                    <span class="aui-avatar-inner">
+                        <img src="$change.user.avatarUrl" alt="$change.user.displayName" />
+                    </span>
+                </span>
+                $change.user.displayName
+                <small>$change.date</small>
+            </div>
+            <div>
                 #if($change.action == 'CREATED')
                     <span class="aui-icon aui-icon-small aui-iconfont-add-circle">$change.action</span>
                 #elseif($change.action == 'UPDATED')
                     <span class="aui-icon aui-icon-small aui-iconfont-edit-filled">$change.action</span>
+                #else
+                    $change.action
                 #end
                 $i18n.getText($change.category.getI18nName())
                 #if ($change.scriptId)
@@ -16,7 +27,6 @@
                         </strong>
                     </a>
                 #end
-                <small>$change.date</small>
             </div>
             <div>
                 <small>$change.description</small>
