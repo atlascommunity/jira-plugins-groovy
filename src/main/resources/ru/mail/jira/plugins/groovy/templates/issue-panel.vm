@@ -13,11 +13,49 @@
             </div>
             <div>
                 #if($change.action == 'CREATED')
-                    <span class="aui-icon aui-icon-small aui-iconfont-add-circle">$change.action</span>
+                    <span
+                            class="aui-icon aui-icon-small aui-iconfont-add-circle"
+                            title="$i18n.getText($change.action.i18nName)"
+                    >
+                        $i18n.getText($change.action.i18nName)
+                    </span>
                 #elseif($change.action == 'UPDATED')
-                    <span class="aui-icon aui-icon-small aui-iconfont-edit-filled">$change.action</span>
+                    <span
+                            class="aui-icon aui-icon-small aui-iconfont-edit-filled"
+                            title="$i18n.getText($change.action.i18nName)"
+                    >
+                        $i18n.getText($change.action.i18nName)
+                    </span>
+                #elseif($change.action == 'DELETED')
+                    <span
+                            class="aui-icon aui-icon-small aui-iconfont-trash"
+                            title="$i18n.getText($change.action.i18nName)"
+                    >
+                        $i18n.getText($change.action.i18nName)
+                    </span>
+                #elseif($change.action == 'RESTORED')
+                    <span
+                            class="aui-icon aui-icon-small aui-iconfont-undo"
+                            title="$i18n.getText($change.action.i18nName)"
+                    >
+                        $i18n.getText($change.action.i18nName)
+                    </span>
+                #elseif($change.action == 'ENABLED')
+                    <span
+                            class="aui-icon aui-icon-small aui-iconfont-check-circle-filled"
+                            title="$i18n.getText($change.action.i18nName)"
+                    >
+                        $i18n.getText($change.action.i18nName)
+                    </span>
+                #elseif($change.action == 'DISABLED')
+                    <span
+                            class="aui-icon aui-icon-small aui-iconfont-cross-circle"
+                            title="$i18n.getText($change.action.i18nName)"
+                    >
+                        $i18n.getText($change.action.i18nName)
+                    </span>
                 #else
-                    $change.action
+                    $i18n.getText($change.action.i18nName)
                 #end
                 $i18n.getText($change.category.getI18nName())
                 #if ($change.scriptId)
