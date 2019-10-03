@@ -24,4 +24,6 @@ public class AuditLogEntryDto extends AuditLogEntryForm {
     private Integer scriptId;
     @XmlElement
     private JiraUser user;
+    @XmlElement
+    private String url;
 }

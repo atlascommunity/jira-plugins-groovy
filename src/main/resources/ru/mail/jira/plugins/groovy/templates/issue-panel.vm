@@ -1,0 +1,27 @@
+#* @vtlvariable name="changes" type="java.util.List<ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryDto>" *#
+#if ($changes)
+    #foreach($change in $changes)
+        <div>
+            <div>
+                #if($change.action == 'CREATED')
+                    <span class="aui-icon aui-icon-small aui-iconfont-add-circle">$change.action</span>
+                #elseif($change.action == 'UPDATED')
+                    <span class="aui-icon aui-icon-small aui-iconfont-edit-filled">$change.action</span>
+                #end
+                $i18n.getText($change.category.getI18nName())
+                #if ($change.scriptId)
+                    <a href="$change.url">
+                        <strong>
+                            $change.scriptName
+                        </strong>
+                    </a>
+                #end
+                <small>$change.date</small>
+            </div>
+            <div>
+                <small>$change.description</small>
+            </div>
+            <hr/>
+        </div>
+    #end
+#end
