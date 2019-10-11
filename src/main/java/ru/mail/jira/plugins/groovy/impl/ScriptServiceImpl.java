@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.script.*;
 import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingProvider;
-import ru.mail.jira.plugins.groovy.api.service.GlobalFunctionManager;
 import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
@@ -65,7 +64,6 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         .build();
 
     private final InjectionResolver injectionResolver;
-    private final GlobalFunctionManager globalFunctionManager;
     private final DelegatingClassLoader classLoader;
     private final GroovyClassLoader gcl;
     private final CompilerConfiguration compilerConfiguration;
@@ -73,11 +71,9 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     @Autowired
     public ScriptServiceImpl(
         InjectionResolver injectionResolver,
-        GlobalFunctionManager globalFunctionManager,
         DelegatingClassLoader classLoader
     ) {
         this.injectionResolver = injectionResolver;
-        this.globalFunctionManager = globalFunctionManager;
         this.classLoader = classLoader;
         this.compilerConfiguration = new CompilerConfiguration()
             .addCompilationCustomizers(
@@ -347,10 +343,6 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
 
     @Override
     public void onStart() {
-        for (Map.Entry<String, String> entry : globalFunctionManager.getGlobalFunctions().entrySet()) {
-            globalFunctions.put(entry.getKey(), new ScriptClosure(parseClass(entry.getValue(), null, false, false, null).getScriptClass()));
-        }
-
         globalVariables.put("httpClient", new HttpClientBindingDescriptor());
         globalVariables.put("logger", new LoggerBindingDescriptor());
         globalVariables.put("log", new LoggerBindingDescriptor());
