@@ -4,6 +4,7 @@ import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.google.common.collect.ImmutableMap;
 import groovy.lang.*;
@@ -56,6 +57,11 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         .maximumSize(1000)
         .expireAfterAccess(1, TimeUnit.HOURS)
         .recordStats()
+        .removalListener((String k, CompiledScript v, RemovalCause reason) -> {
+            if (v != null) {
+                InvokerHelper.removeClass(v.getScriptClass());
+            }
+        })
         .build();
 
     private final InjectionResolver injectionResolver;
