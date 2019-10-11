@@ -77,16 +77,16 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         ClassLoaderUtil.runInContext(() -> {
             logger.info("loading cache");
 
-            Map<String, BindingDescriptor<?>> objects = new HashMap<>();
-            Map<String, Class> types = new HashMap<>();
-
-            boolean incomplete = false;
-
             objects
                 .values()
                 .stream()
                 .map(BindingDescriptor::getType)
                 .forEach(InvokerHelper::removeClass);
+
+            Map<String, BindingDescriptor<?>> objects = new HashMap<>();
+            Map<String, Class> types = new HashMap<>();
+
+            boolean incomplete = false;
 
             for (GlobalObject globalObject : globalObjectDao.getAll()) {
                 try {
