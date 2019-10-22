@@ -6,6 +6,7 @@ public final class QueryDslTables {
     private QueryDslTables() {}
 
     public static final QAuditLogEntry AUDIT_LOG_ENTRY = new QAuditLogEntry();
+    public static final QAuditLogIssueRelation AUDIT_LOG_ISSUE_RELATION = new QAuditLogIssueRelation();
     public static final QScriptExecution SCRIPT_EXECUTION = new QScriptExecution();
 
     public static final QAbstractScript ADMIN_SCRIPT = new QAbstractScript("ADMIN_SCRIPT");

@@ -39,6 +39,7 @@
         <entity>ru.mail.jira.plugins.groovy.api.entity.Listener</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.ListenerChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.AuditLogEntry</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.AuditLogIssueRelation</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestScript</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.FieldScript</entity>
@@ -434,4 +435,13 @@
         key="mygroovy-comment-search-extractor"
         class="ru.mail.jira.plugins.groovy.impl.jql.indexers.AdditionalFieldsCommentExtractor"
     />
+
+    <web-panel name="MyGroovy" key="mygroovy-actions" location="atl.jira.view.issue.right.context" weight="1000">
+        <context-provider class="ru.mail.jira.plugins.groovy.servlet.IssuePanelContextProvider"/>
+        <resource name="view" type="velocity" location="ru/mail/jira/plugins/groovy/templates/issue-panel.vm"/>
+        <label>MyGroovy</label>
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">admin</param>
+        </condition>
+    </web-panel>
 </atlassian-plugin>
