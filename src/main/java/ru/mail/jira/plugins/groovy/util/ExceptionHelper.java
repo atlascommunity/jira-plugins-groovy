@@ -19,6 +19,9 @@ public final class ExceptionHelper {
     }
 
     public static String writeExceptionToString(Exception e) {
+        if (e == null) {
+            return null;
+        }
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
