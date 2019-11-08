@@ -30,7 +30,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
-@ExportAsDevService(ScriptRepository.class)
+@ExportAsService(ScriptRepository.class)
 public class ScriptRepositoryImpl implements ScriptRepository {
     private static final Collator COLLATOR = Collator.getInstance();
 
