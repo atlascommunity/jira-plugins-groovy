@@ -312,17 +312,17 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
         AuditLogEntryDto result = new AuditLogEntryDto();
 
         EntityType category = EntityType.valueOf(row.get(AUDIT_LOG_ENTRY.CATEGORY));
-        Integer id = row.get(AUDIT_LOG_ENTRY.ID);
+        Integer entityId = row.get(AUDIT_LOG_ENTRY.ENTITY_ID);
 
         result.setDate(dateTimeFormatter.forLoggedInUser().format(row.get(AUDIT_LOG_ENTRY.DATE)));
-        result.setId(id);
+        result.setId(row.get(AUDIT_LOG_ENTRY.ID));
         result.setUser(userMapper.buildUser(row.get(AUDIT_LOG_ENTRY.USER_KEY)));
         result.setAction(EntityAction.valueOf(row.get(AUDIT_LOG_ENTRY.ACTION)));
         result.setCategory(category);
         result.setDescription(row.get(AUDIT_LOG_ENTRY.DESCRIPTION));
-        result.setUrl(ScriptUtil.getPermalink(category, id));
+        result.setUrl(ScriptUtil.getPermalink(category, entityId));
 
-        fillEntityData(result, category, row.get(AUDIT_LOG_ENTRY.ENTITY_ID));
+        fillEntityData(result, category, entityId);
 
         return result;
     }
