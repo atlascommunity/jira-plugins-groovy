@@ -534,7 +534,7 @@
     <properties>
         <jira.version>8.2.1</jira.version>
         <jira.oldest.version>8.0.0</jira.oldest.version>
-        <jira.latest.version>8.2.1</jira.latest.version>
+        <jira.latest.version>8.5.1</jira.latest.version>
         <jira.lts.version>8.2.1</jira.lts.version>
         <quick.reload.version>3.0.0</quick.reload.version>
 
