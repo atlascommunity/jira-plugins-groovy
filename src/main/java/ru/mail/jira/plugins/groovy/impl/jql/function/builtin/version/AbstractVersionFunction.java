@@ -20,6 +20,7 @@ import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.JqlFunctionPa
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.QueryUtil;
 
 import javax.annotation.Nonnull;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -122,7 +123,14 @@ public abstract class AbstractVersionFunction implements CustomFunction {
             .forEach((field, value) -> {
                 Date tempDate = jqlFunctionParser.parseDate(queryCreationContext, value);
                 if (tempDate != null) {
-                    tempDate = DateUtils.truncate(tempDate, Calendar.DATE);
+                    tempDate = Date.from(
+                        tempDate
+                            .toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate()
+                            .atStartOfDay(ZoneId.systemDefault())
+                            .toInstant()
+                    );
                 } else {
                     messageSet.addErrorMessage("\"" + field + "\" date is invalid");
                     return;
@@ -131,7 +139,7 @@ public abstract class AbstractVersionFunction implements CustomFunction {
                 Date date = tempDate;
 
                 if ("on".equals(field)) {
-                    predicates.add(versionDate -> versionDate.equals(date));
+                    predicates.add(versionDate -> versionDate.getTime() == date.getTime());
                 } else if ("after".equals(field)) {
                     predicates.add(versionDate -> versionDate.after(date));
                 } else if ("before".equals(field)) {
