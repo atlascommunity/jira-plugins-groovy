@@ -14,7 +14,6 @@ import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
-import org.apache.commons.lang.time.DateUtils;
 import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.JqlFunctionParser;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query.QueryUtil;
