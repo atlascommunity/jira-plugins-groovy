@@ -3,11 +3,7 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin.query;
 import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.jira.datetime.LocalDateFactory;
 import com.atlassian.jira.issue.index.DocumentConstants;
-import com.atlassian.jira.jql.operand.FunctionOperandHandler;
 import com.atlassian.jira.jql.operand.QueryLiteral;
-import com.atlassian.jira.jql.operand.registry.JqlFunctionHandlerRegistry;
-import com.atlassian.jira.jql.parser.antlr.JqlLexer;
-import com.atlassian.jira.jql.parser.antlr.JqlParser;
 import com.atlassian.jira.jql.query.LikeQueryFactory;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.util.JqlDateSupport;
@@ -19,49 +15,35 @@ import com.atlassian.jira.security.roles.ProjectRoleActors;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.timezone.TimeZoneManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.UserKeyService;
-import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
-import com.atlassian.query.operand.FunctionOperand;
 import com.atlassian.query.operand.SingleValueOperand;
 import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import org.antlr.v4.runtime.*;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryBaseListener;
-import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryLexer;
-import ru.mail.jira.plugins.groovy.impl.jql.antlr.CommentedQueryParser;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.AbstractCommentQueryFunction;
-import ru.mail.jira.plugins.groovy.util.AntlrUtil;
-import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 import ru.mail.jira.plugins.groovy.util.compat.ArchivingHelper;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class AbstractEntityQueryParser {
     private final Logger logger = LoggerFactory.getLogger(AbstractCommentQueryFunction.class);
     private final LikeQueryFactory likeQueryFactory = new LikeQueryFactory(false);
 
-    private final JqlFunctionHandlerRegistry jqlFunctionHandlerRegistry;
     private final ProjectRoleManager projectRoleManager;
     private final TimeZoneManager timeZoneManager;
     private final ProjectManager projectManager;
     private final JqlDateSupport jqlDateSupport;
-    private final UserKeyService userKeyService;
     private final GroupManager groupManager;
-    private final UserManager userManager;
 
+    private final JqlFunctionParser jqlFunctionParser;
     private final ArchivingHelper archivingHelper;
 
     private final boolean isLocalDate;
@@ -72,26 +54,22 @@ public abstract class AbstractEntityQueryParser {
     private final String roleLevelField;
 
     protected AbstractEntityQueryParser(
-        JqlFunctionHandlerRegistry jqlFunctionHandlerRegistry,
         ProjectRoleManager projectRoleManager,
         TimeZoneManager timeZoneManager,
         ProjectManager projectManager,
         JqlDateSupport jqlDateSupport,
-        UserKeyService userKeyService,
         GroupManager groupManager,
-        UserManager userManager,
+        JqlFunctionParser jqlFunctionParser,
         ArchivingHelper archivingHelper,
         boolean isLocalDate, String createdField, String authorField, String bodyField,
         String levelField, String roleLevelField
     ) {
-        this.jqlFunctionHandlerRegistry = jqlFunctionHandlerRegistry;
         this.projectRoleManager = projectRoleManager;
         this.timeZoneManager = timeZoneManager;
         this.projectManager = projectManager;
         this.jqlDateSupport = jqlDateSupport;
-        this.userKeyService = userKeyService;
         this.groupManager = groupManager;
-        this.userManager = userManager;
+        this.jqlFunctionParser = jqlFunctionParser;
 
         this.archivingHelper = archivingHelper;
 
@@ -114,10 +92,10 @@ public abstract class AbstractEntityQueryParser {
 
         MessageSet messageSet = new MessageSetImpl();
 
-        parseQuery(messageSet, queryString).forEach((key, value) -> {
+        QueryUtil.parseQuery(messageSet, queryString).forEach((key, value) -> {
             switch (key) {
                 case "by": {
-                    Set<String> userKeys = parseUser(queryCreationContext, value);
+                    Set<String> userKeys = jqlFunctionParser.parseUser(queryCreationContext, value);
 
                     if (userKeys != null && userKeys.size() > 0) {
                         if (userKeys.size() == 1) {
@@ -169,7 +147,7 @@ public abstract class AbstractEntityQueryParser {
                     break;
                 }
                 case "before": {
-                    Date date = parseDate(queryCreationContext, value);
+                    Date date = jqlFunctionParser.parseDate(queryCreationContext, value);
 
                     if (date != null) {
                         query.add(
@@ -185,7 +163,7 @@ public abstract class AbstractEntityQueryParser {
                     break;
                 }
                 case "after": {
-                    Date date = parseDate(queryCreationContext, value);
+                    Date date = jqlFunctionParser.parseDate(queryCreationContext, value);
 
                     if (date != null) {
                         query.add(
@@ -297,29 +275,6 @@ public abstract class AbstractEntityQueryParser {
         return new QueryParseResult(addPermissionsCheck(queryCreationContext, query.build()), messageSet);
     }
 
-    protected Map<String, String> parseQuery(MessageSet messageSet, String query) {
-        CommentedQueryLexer lexer = new CommentedQueryLexer(CharStreams.fromString(query));
-        TokenStream tokenStream = new CommonTokenStream(lexer);
-        CommentedQueryParser parser = new CommentedQueryParser(tokenStream);
-
-        CommentedQueryListener listener = new CommentedQueryListener();
-        parser.addParseListener(listener);
-        parser.addErrorListener(new BaseErrorListener() {
-            @Override
-            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                messageSet.addErrorMessage("Parsing error at " + charPositionInLine + ": " + msg);
-            }
-        });
-
-        parser.commented_query();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Parsed values {}", listener.values);
-        }
-
-        return listener.values;
-    }
-
     private Long formatDate(Date date) {
         if (isLocalDate) {
             return LocalDateFactory.from(date).getEpochDays();
@@ -328,111 +283,5 @@ public abstract class AbstractEntityQueryParser {
         }
     }
 
-    private boolean isFunction(String value) {
-        return value.indexOf('(') != -1 && value.indexOf(')') != -1;
-    }
-
-    private Set<String> parseUser(QueryCreationContext queryCreationContext, String value) {
-        Set<String> result = null;
-
-        if (isFunction(value)) {
-            try {
-                result = parseFunction(queryCreationContext, value)
-                    .stream()
-                    .map(QueryLiteral::getStringValue)
-                    .map(userKeyService::getKeyForUsername)
-                    .collect(Collectors.toSet());
-            } catch (Exception e) {
-                logger.warn("Unable to parse function", e);
-            }
-        } else {
-            ApplicationUser user = userManager.getUserByName(value);
-            if (user == null) {
-                user = userManager.getUserByKey(value);
-            }
-
-            if (user != null) {
-                result = ImmutableSet.of(user.getKey());
-            }
-        }
-
-        return result;
-    }
-
-    private Date parseDate(QueryCreationContext queryCreationContext, String value) {
-        Date result = null;
-
-        if (isFunction(value)) {
-            try {
-                result = parseFunction(queryCreationContext, value)
-                    .stream()
-                    .map(QueryLiteral::getLongValue)
-                    .filter(Objects::nonNull)
-                    .map(Date::new)
-                    .findAny()
-                    .orElse(null);
-            } catch (Exception e) {
-                logger.warn("Unable to parse function", e);
-            }
-        } else if (jqlDateSupport.validate(value)) {
-            result = jqlDateSupport.convertToDate(value);
-        }
-
-        return result;
-    }
-
-    private List<QueryLiteral> parseFunction(QueryCreationContext queryCreationContext, String functionCall) throws Exception {
-        FunctionOperand functionOperand = createJqlParser(functionCall).func();
-        FunctionOperandHandler operandHandler = jqlFunctionHandlerRegistry.getOperandHandler(functionOperand);
-
-        return operandHandler.getValues(queryCreationContext, functionOperand, null);
-    }
-
-    //create JqlParser with jira class loader, since not all antlr packages are exported from jira core
-    private JqlParser createJqlParser(String clauseString) throws Exception {
-        ClassLoader jiraClassLoader = ClassLoaderUtil.getJiraClassLoader();
-
-        Class<?> antlrStringStreamClass = jiraClassLoader.loadClass("org.antlr.runtime.ANTLRStringStream");
-        Class<?> commonTokenStreamClass = jiraClassLoader.loadClass("org.antlr.runtime.CommonTokenStream");
-        Class<?> charStreamClass = jiraClassLoader.loadClass("org.antlr.runtime.CharStream");
-        Class<?> tokenSourceClass = jiraClassLoader.loadClass("org.antlr.runtime.TokenSource");
-        Class<?> tokenStreamClass = jiraClassLoader.loadClass("org.antlr.runtime.TokenStream");
-
-        Object antlrStringStream = antlrStringStreamClass.getConstructor(String.class).newInstance(clauseString);
-        JqlLexer lexer = JqlLexer.class.getConstructor(charStreamClass).newInstance(antlrStringStream);
-
-        Object commonTokenStream = commonTokenStreamClass.getConstructor(tokenSourceClass).newInstance(lexer);
-        return JqlParser.class.getConstructor(tokenStreamClass).newInstance(commonTokenStream);
-    }
-
     protected abstract Query addPermissionsCheck(QueryCreationContext queryCreationContext, Query query);
-
-    private static class CommentedQueryListener extends CommentedQueryBaseListener {
-        private final Map<String, String> values = new HashMap<>();
-
-        @Override
-        public void exitBy_query(CommentedQueryParser.By_queryContext ctx) {
-            values.put("by", AntlrUtil.unescapeString(ctx.username_expr().getText()));
-        }
-
-        @Override
-        public void exitLike_query(CommentedQueryParser.Like_queryContext ctx) {
-            values.put("like", AntlrUtil.unescapeString(ctx.str_expr().getText()));
-        }
-
-        @Override
-        public void exitDate_query(CommentedQueryParser.Date_queryContext ctx) {
-            values.put(ctx.date_field().getText(), AntlrUtil.unescapeString(ctx.date_expr().getText()));
-        }
-
-        @Override
-        public void exitGroup_query(CommentedQueryParser.Group_queryContext ctx) {
-            values.put(ctx.group_field().getText(), AntlrUtil.unescapeString(ctx.group_expr().getText()));
-        }
-
-        @Override
-        public void exitRole_query(CommentedQueryParser.Role_queryContext ctx) {
-            values.put(ctx.role_field().getText(), AntlrUtil.unescapeString(ctx.role_expr().getText()));
-        }
-    }
 }
