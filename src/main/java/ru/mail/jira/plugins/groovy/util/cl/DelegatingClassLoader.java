@@ -34,6 +34,10 @@ public class DelegatingClassLoader extends ClassLoader {
     }
 
     public void ensureAvailability(Set<Plugin> plugins) {
+        if (plugins.size() == 0) {
+            return;
+        }
+
         Lock lock = rwLock.writeLock();
         lock.lock();
         try {
