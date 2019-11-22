@@ -197,6 +197,10 @@ public class FieldValueExtractor {
             t = System.currentTimeMillis() - t;
         }
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("{} field value calculation for {} took {}ms", field.getId(), issue.getKey(), t);
+        }
+
         if (!successful || t >= FIELD_TRACKING_THRESHOLD) {
             executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
                 "issue", issue.getKey(),
