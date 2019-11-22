@@ -21,6 +21,8 @@ import java.util.Map;
 
 @Component
 public class FieldValueExtractor {
+    private static final long FIELD_TRACKING_THRESHOLD = 1000;
+
     private final Logger logger = LoggerFactory.getLogger(FieldValueExtractor.class);
 
     private final FieldConfigRepository fieldConfigRepository;
@@ -195,8 +197,7 @@ public class FieldValueExtractor {
             t = System.currentTimeMillis() - t;
         }
 
-        //todo: make an option?
-        if (!successful || t >= ExecutionRepository.WARNING_THRESHOLD) {
+        if (!successful || t >= FIELD_TRACKING_THRESHOLD) {
             executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
                 "issue", issue.getKey(),
                 "type", ScriptType.CUSTOM_FIELD.name()
