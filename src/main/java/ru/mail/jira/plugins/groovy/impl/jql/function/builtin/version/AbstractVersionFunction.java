@@ -5,10 +5,13 @@ import com.atlassian.jira.JiraDataTypes;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryCreationContextImpl;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.plugin.jql.function.JqlFunctionModuleDescriptor;
+import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.project.version.Version;
 import com.atlassian.jira.project.version.VersionManager;
+import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
@@ -28,9 +31,26 @@ import java.util.stream.Collectors;
 public abstract class AbstractVersionFunction implements CustomFunction {
     private final VersionManager versionManager;
     private final ProjectManager projectManager;
+    private final PermissionManager permissionManager;
     private final JqlFunctionParser jqlFunctionParser;
     private final Function<Version, Date> dateExtractor;
     private final String functionName;
+
+    protected AbstractVersionFunction(
+        VersionManager versionManager,
+        ProjectManager projectManager,
+        PermissionManager permissionManager,
+        JqlFunctionParser jqlFunctionParser,
+        Function<Version, Date> dateExtractor,
+        String functionName
+    ) {
+        this.versionManager = versionManager;
+        this.projectManager = projectManager;
+        this.permissionManager = permissionManager;
+        this.jqlFunctionParser = jqlFunctionParser;
+        this.dateExtractor = dateExtractor;
+        this.functionName = "my_" + functionName;
+    }
 
     @Override
     public String getModuleKey() {
@@ -44,20 +64,6 @@ public abstract class AbstractVersionFunction implements CustomFunction {
     @Override
     public String getFunctionName() {
         return functionName;
-    }
-
-    protected AbstractVersionFunction(
-        VersionManager versionManager,
-        ProjectManager projectManager,
-        JqlFunctionParser jqlFunctionParser,
-        Function<Version, Date> dateExtractor,
-        String functionName
-    ) {
-        this.versionManager = versionManager;
-        this.projectManager = projectManager;
-        this.jqlFunctionParser = jqlFunctionParser;
-        this.dateExtractor = dateExtractor;
-        this.functionName = "my_" + functionName;
     }
 
     @Nonnull
@@ -84,12 +90,22 @@ public abstract class AbstractVersionFunction implements CustomFunction {
 
         Set<String> determinedProjects = queryCreationContext.getDeterminedProjects();
 
-        Collection<Version> versions;
-        if (determinedProjects.size() > 0) {
-            versions = versionManager.getAllVersionsForProjects(projectManager.getProjectsByArgs(determinedProjects), true);
-        } else {
-            versions = versionManager.getAllVersions();
-        }
+        Collection<Project> projects = (
+            determinedProjects.size() > 0
+                ? projectManager.getProjectsByArgs(determinedProjects)
+                : projectManager.getProjects()
+            )
+            .stream()
+            .filter(project ->
+                permissionManager.hasPermission(
+                    ProjectPermissions.BROWSE_PROJECTS,
+                    project,
+                    queryCreationContext.getApplicationUser()
+                )
+            )
+            .collect(Collectors.toList());
+
+        Collection<Version> versions = versionManager.getAllVersionsForProjects(projects, true);
 
         return versions
             .stream()

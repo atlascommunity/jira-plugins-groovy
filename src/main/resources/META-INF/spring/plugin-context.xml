@@ -13,15 +13,9 @@
     <atlassian-scanner:scan-indexes/>
 
     <bean class="com.atlassian.jira.jql.query.QueryProjectRoleAndGroupPermissionsDecorator" autowire="constructor">
-        <constructor-arg index="0" ref="osgiPermissionManager"/>
+        <constructor-arg index="0" ref="permissionManager"/>
         <constructor-arg index="1" ref="projectRoleManager"/>
     </bean>
-
-    <osgi:reference id="osgiPermissionManager">
-        <osgi:interfaces>
-            <value>com.atlassian.jira.security.PermissionManager</value>
-        </osgi:interfaces>
-    </osgi:reference>
 
     <osgi:reference id="jqlOperandResolver">
         <osgi:interfaces>
