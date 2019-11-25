@@ -32,6 +32,7 @@ import ru.mail.jira.plugins.groovy.impl.var.HttpClientBindingDescriptor;
 import ru.mail.jira.plugins.groovy.impl.var.LoggerBindingDescriptor;
 import ru.mail.jira.plugins.groovy.impl.var.ScriptTypeBindingProvider;
 import ru.mail.jira.plugins.groovy.impl.var.TemplateEngineBindingDescriptor;
+import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 
 import java.io.IOException;
@@ -65,24 +66,25 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         .build();
 
     private final InjectionResolver injectionResolver;
-    private final DelegatingClassLoader classLoader;
+    private final ContextAwareClassLoader contextAwareClassLoader;
     private final GroovyClassLoader gcl;
     private final CompilerConfiguration compilerConfiguration;
 
     @Autowired
     public ScriptServiceImpl(
         InjectionResolver injectionResolver,
-        DelegatingClassLoader classLoader
+        DelegatingClassLoader classLoader,
+        ContextAwareClassLoader contextAwareClassLoader
     ) {
         this.injectionResolver = injectionResolver;
-        this.classLoader = classLoader;
+        this.contextAwareClassLoader = contextAwareClassLoader;
         this.compilerConfiguration = new CompilerConfiguration()
             .addCompilationCustomizers(
                 new PackageCustomizer(),
                 new CompileStaticExtension(parseContextHolder, this),
                 new ImportCustomizer().addStarImports("ru.mail.jira.plugins.groovy.api.script"),
                 new WithPluginExtension(parseContextHolder),
-                new LoadClassesExtension(parseContextHolder, injectionResolver, classLoader),
+                new LoadClassesExtension(parseContextHolder, injectionResolver, contextAwareClassLoader),
                 new InjectionExtension(parseContextHolder),
                 new ParamExtension(parseContextHolder)
             );
@@ -227,7 +229,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
                 plugins.add(plugin);
             }
 
-            classLoader.ensureAvailability(plugins);
+        contextAwareClassLoader.addPlugins(plugins);
 
             logger.debug("created class");
 
@@ -280,7 +282,8 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         } catch (Exception e) {
             return new ScriptExecutionOutcome(null, executionContextHolder.get(), System.currentTimeMillis() - t, e);
         } finally {
-            executionContextHolder.reset();
+            this.contextAwareClassLoader.clearContext();
+            this.executionContextHolder.reset();
             if (!fromCache && script != null) {
                 InvokerHelper.removeClass(script.getClass());
             }
@@ -288,12 +291,9 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     }
 
     public void onPluginDisable(Plugin plugin) {
-        String pluginKey = plugin.getKey();
-
         Lock lock = rwLock.writeLock();
         lock.lock();
         try {
-            classLoader.unloadPlugin(pluginKey);
             scriptCache.invalidateAll();
         } finally {
             lock.unlock();
@@ -366,6 +366,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         } finally {
             logger.debug("resetting parse context");
             this.parseContextHolder.reset();
+            this.contextAwareClassLoader.clearContext();
         }
     }
 

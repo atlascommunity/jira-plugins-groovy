@@ -24,6 +24,7 @@ import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ParseContext;
+import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 
 import java.io.IOException;
@@ -38,7 +39,8 @@ class ScriptServiceImplTest {
 
     @BeforeEach
     public void setup() {
-        DelegatingClassLoader delegatingClassLoader = new DelegatingClassLoader();
+        ContextAwareClassLoader contextAwareClassLoader = new ContextAwareClassLoader();
+        DelegatingClassLoader delegatingClassLoader = new DelegatingClassLoader(contextAwareClassLoader);
         MockPlugin testPlugin = new MockPlugin("Test plugin", "testPLugin", new PluginInformation(), PluginState.ENABLED);
         testPlugin.setClassLoader(Thread.currentThread().getContextClassLoader());
         InjectionResolver injectionResolver = new MockInjectionResolver(
@@ -52,7 +54,8 @@ class ScriptServiceImplTest {
 
         scriptService = new ScriptServiceImpl(
             injectionResolver,
-            delegatingClassLoader
+            delegatingClassLoader,
+            contextAwareClassLoader
         );
     }
 
