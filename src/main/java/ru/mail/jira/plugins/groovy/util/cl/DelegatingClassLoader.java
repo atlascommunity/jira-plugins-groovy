@@ -32,7 +32,7 @@ public class DelegatingClassLoader extends ClassLoader {
     public DelegatingClassLoader(ContextAwareClassLoader contextAwareClassLoader) {
         super(null);
         this.classLoaders = new LinkedHashMap<>();
-        this.classLoaders.put("__local", new ClassLoaderEntry(Thread.currentThread().getContextClassLoader(), false));
+        this.classLoaders.put("__local", new ClassLoaderEntry(Thread.currentThread().getContextClassLoader(), true));
         //loader for jira core classes
         this.classLoaders.put("__jira", new ClassLoaderEntry(ClassLoaderUtil.getJiraClassLoader(), true));
         //loader for WithPlugin classes
