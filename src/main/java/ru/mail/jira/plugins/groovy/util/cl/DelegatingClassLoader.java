@@ -13,12 +13,9 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
 public class DelegatingClassLoader extends ClassLoader {
-    private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final Logger logger = LoggerFactory.getLogger(DelegatingClassLoader.class);
     private final LoadingCache<String, Class<?>> classCache = Caffeine
         .newBuilder()
