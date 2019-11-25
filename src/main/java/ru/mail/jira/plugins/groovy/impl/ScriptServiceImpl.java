@@ -66,6 +66,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         .build();
 
     private final InjectionResolver injectionResolver;
+    private final DelegatingClassLoader classLoader;
     private final ContextAwareClassLoader contextAwareClassLoader;
     private final GroovyClassLoader gcl;
     private final CompilerConfiguration compilerConfiguration;
@@ -77,6 +78,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         ContextAwareClassLoader contextAwareClassLoader
     ) {
         this.injectionResolver = injectionResolver;
+        this.classLoader = classLoader;
         this.contextAwareClassLoader = contextAwareClassLoader;
         this.compilerConfiguration = new CompilerConfiguration()
             .addCompilationCustomizers(
@@ -194,6 +196,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     public void invalidateAll() {
         scriptCache.invalidateAll();
         gcl.clearCache();
+        classLoader.flushCache();
     }
 
     private ScriptExecutionOutcome doExecuteScript(
@@ -406,6 +409,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
 
         globalVariables.clear();
         bindingProviders.clear();
+        classLoader.flushCache();
     }
 
     @Override
