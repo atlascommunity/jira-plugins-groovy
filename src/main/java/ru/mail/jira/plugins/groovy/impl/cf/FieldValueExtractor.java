@@ -202,6 +202,7 @@ public class FieldValueExtractor {
         }
 
         if (!successful || t >= FIELD_TRACKING_THRESHOLD) {
+            logger.warn("{} field value calculation for {} took {}ms", field.getId(), issue.getKey(), t);
             executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
                 "issue", issue.getKey(),
                 "type", ScriptType.CUSTOM_FIELD.name()
