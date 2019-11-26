@@ -1,7 +1,7 @@
 const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const WrmPlugin = require('atlassian-webresource-webpack-plugin');
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 
 const devMode = process.env.NODE_ENV !== 'production';
@@ -22,7 +22,7 @@ module.exports = {
     },
     optimization: {
         minimizer: [
-            new UglifyJsPlugin({
+            new TerserPlugin({
                 cache: true,
                 parallel: true,
                 sourceMap: true

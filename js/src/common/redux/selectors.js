@@ -1,7 +1,7 @@
 //@flow
 import {createSelector} from 'reselect';
 
-import type {NamedItemType} from './index';
+import type {NamedItemType} from './actions';
 
 
 export const orderedItemsSelector = () =>
