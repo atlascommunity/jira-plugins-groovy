@@ -183,9 +183,11 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         logger.debug("started execution");
 
         CompiledScript compiledScript = null;
+        boolean fromCache = false;
 
         if (scriptId != null) {
             compiledScript = scriptCache.get(scriptId, ignore -> parseClass(scriptString, scriptId, false, compileStatic, types));
+            fromCache = true;
         }
 
         if (compiledScript == null) {
@@ -256,7 +258,9 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
 
             return result;
         } finally {
-            InvokerHelper.removeClass(script.getClass());
+            if (!fromCache) {
+                InvokerHelper.removeClass(script.getClass());
+            }
         }
     }
 
