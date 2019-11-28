@@ -91,7 +91,6 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
             for (GlobalObject globalObject : globalObjectDao.getAll()) {
                 try {
                     Class objectClass = scriptService.parseClassStatic(globalObject.getScriptBody(), true, ImmutableMap.of());
-                    InvokerHelper.removeClass(objectClass);
                     Object object = singletonFactory.createInstance(objectClass);
                     objects.put(
                         globalObject.getName(),
@@ -150,7 +149,19 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
     }
 
     @Override
-    public void onStop() {}
+    public void onStop() {
+        Lock wLock = rwLock.writeLock();
+        wLock.lock();
+        try {
+            this.objects
+                .values()
+                .stream()
+                .map(BindingDescriptor::getType)
+                .forEach(InvokerHelper::removeClass);
+        } finally {
+            wLock.unlock();
+        }
+    }
 
     @Override
     public int getInitOrder() {
