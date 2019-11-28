@@ -94,6 +94,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
             classLoader,
             this.compilerConfiguration
         );
+        this.gcl.setResourceLoader((url) -> null);
     }
 
     @Override
