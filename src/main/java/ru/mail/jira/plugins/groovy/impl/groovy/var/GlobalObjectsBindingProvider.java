@@ -90,6 +90,8 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
             for (GlobalObject globalObject : globalObjectDao.getAll()) {
                 try {
+                    long t = System.currentTimeMillis();
+
                     Class objectClass = scriptService.parseClassStatic(globalObject.getScriptBody(), true, ImmutableMap.of());
                     Object object = singletonFactory.createInstance(objectClass);
                     objects.put(
@@ -104,6 +106,20 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                         })
                     );
                     types.put(objectClass.getName(), objectClass);
+
+                    t = System.currentTimeMillis() - t;
+
+                    if (t >= ExecutionRepository.WARNING_THRESHOLD) {
+                        executionRepository.trackInline(
+                            globalObject.getUuid(),
+                            t,
+                            true,
+                            null,
+                            ImmutableMap.of(
+                                "type", ScriptType.GLOBAL_OBJECT.name()
+                            )
+                        );
+                    }
                 } catch (Exception e) {
                     logger.error("Unable to initialize global object {}", globalObject.getName(), e);
                     executionRepository.trackInline(
@@ -113,7 +129,8 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                         e,
                         ImmutableMap.of(
                             "type", ScriptType.GLOBAL_OBJECT.name()
-                        ));
+                        )
+                    );
                 }
             }
 
