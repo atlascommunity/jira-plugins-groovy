@@ -24,6 +24,7 @@ import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 import ru.mail.jira.plugins.groovy.impl.cf.FieldValueCache;
 import ru.mail.jira.plugins.groovy.impl.groovy.var.GlobalObjectsBindingProvider;
 import ru.mail.jira.plugins.groovy.impl.jql.ModuleManager;
+import ru.mail.jira.plugins.groovy.util.Const;
 
 @Component
 @ExportAsService({ScriptInvalidationService.class})
@@ -146,6 +147,11 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
     }
 
     private void flushPluginDependenants(Plugin plugin) {
+        if (plugin.getKey().equals(Const.PLUGIN_KEY)) {
+            //ignore, we're going to die anyway
+            return;
+        }
+
         logger.info("Flushing dependants for plugin {}", plugin.getKey());
         scriptService.onPluginDisable(plugin);
         globalObjectsBindingProvider.refresh();
