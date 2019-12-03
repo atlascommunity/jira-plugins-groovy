@@ -34,11 +34,11 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private volatile Map<String, BindingDescriptor<?>> objects = ImmutableMap.of();
     private volatile Map<String, Class> types = ImmutableMap.of();
+    private volatile boolean initialized = false;
 
     private final ScriptService scriptService;
     private final GlobalObjectDao globalObjectDao;
     private final ExecutionRepository executionRepository;
-    private final DelegatingClassLoader delegatingClassLoader;
     private final GroovyDocService groovyDocService;
     private final SingletonFactory singletonFactory;
     //we must keep reference to this object
@@ -56,10 +56,12 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         this.scriptService = scriptService;
         this.globalObjectDao = globalObjectDao;
         this.executionRepository = executionRepository;
-        this.delegatingClassLoader = delegatingClassLoader;
         this.groovyDocService = groovyDocService;
         this.singletonFactory = singletonFactory;
         this.globalObjectClassLoader = new GlobalObjectClassLoader(this);
+
+        delegatingClassLoader.registerClassLoader("__go", globalObjectClassLoader);
+        scriptService.registerBindingProvider(this);
     }
 
     public void refresh() {
@@ -143,8 +145,32 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         });
     }
 
+    private void unsafeInitialize() {
+        this.unsafeLoadCaches();
+        initialized = true;
+    }
+
+    private void initializePrematurely() {
+        Lock wLock = rwLock.writeLock();
+        wLock.lock();
+        try {
+            if (initialized) {
+                return;
+            }
+
+            logger.warn("doing premature initialization");
+            unsafeInitialize();
+        } finally {
+            wLock.unlock();
+        }
+    }
+
     @Override
     public Map<String, BindingDescriptor<?>> getBindings() {
+        if (!initialized) {
+            initializePrematurely();
+        }
+
         Lock rLock = rwLock.readLock();
         rLock.lock();
         try {
@@ -160,9 +186,17 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
     @Override
     public void onStart() {
-        this.unsafeLoadCaches();
-        delegatingClassLoader.registerClassLoader("__go", globalObjectClassLoader);
-        scriptService.registerBindingProvider(this);
+        if (!initialized) {
+            ReentrantReadWriteLock.WriteLock wLock = rwLock.writeLock();
+            wLock.lock();
+            try {
+                if (!initialized) {
+                    unsafeInitialize();
+                }
+            } finally {
+                wLock.unlock();
+            }
+        }
     }
 
     @Override
