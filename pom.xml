@@ -16,7 +16,6 @@
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-api</artifactId>
-            <version>${jira.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -28,7 +27,6 @@
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-core</artifactId>
-            <version>${jira.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -52,19 +50,16 @@
         <dependency>
             <groupId>com.atlassian.plugin</groupId>
             <artifactId>atlassian-spring-scanner-annotation</artifactId>
-            <version>${atlassian.spring.scanner.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
-            <version>1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugins.rest</groupId>
             <artifactId>atlassian-rest-common</artifactId>
-            <version>1.0.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -174,19 +169,16 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.9</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.templaterenderer</groupId>
             <artifactId>atlassian-template-renderer-api</artifactId>
-            <version>1.3.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.activeobjects</groupId>
             <artifactId>activeobjects-plugin</artifactId>
-            <version>${ao.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -226,7 +218,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>18.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -244,19 +235,16 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.annotations</groupId>
             <artifactId>atlassian-annotations</artifactId>
-            <version>2.1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
-            <version>2.0.1.Final</version>
             <scope>provided</scope>
         </dependency>
 
@@ -322,13 +310,11 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.21.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-tests</artifactId>
-            <version>${jira.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -530,6 +516,18 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.atlassian.jira</groupId>
+                <artifactId>jira-project</artifactId>
+                <version>${jira.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <properties>
         <jira.version>8.2.1</jira.version>
