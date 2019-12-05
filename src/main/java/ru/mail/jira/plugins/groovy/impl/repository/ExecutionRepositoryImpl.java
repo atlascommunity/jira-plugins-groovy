@@ -266,6 +266,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         result.setSuccess(execution.isSuccessful());
         result.setSlow(execution.getTime() >= WARNING_THRESHOLD);
         result.setError(execution.getError());
+        result.setLog(execution.getLog());
         result.setExtraParams(execution.getExtraParams());
         result.setId(execution.getID());
 

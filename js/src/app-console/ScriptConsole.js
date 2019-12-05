@@ -153,7 +153,7 @@ export class ScriptConsole extends React.Component<Props, State> {
                     <Tabs
                         tabs={[
                             {
-                                label: 'Result',
+                                label: CommonMessages.result,
                                 content: (
                                     <div className="result">
                                         {
@@ -184,7 +184,7 @@ export class ScriptConsole extends React.Component<Props, State> {
                                 )
                             },
                             {
-                                label: 'Log',
+                                label: CommonMessages.log,
                                 content: (
                                     <div className="result">
                                         {output && output.log != null

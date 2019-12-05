@@ -32,7 +32,8 @@ export type ExecutionType = {
     slow: boolean,
     date: string,
     extraParams: {[string]: string},
-    error?: string
+    error?: string,
+    log?: string
 };
 
 export type ScriptId = number | string;
