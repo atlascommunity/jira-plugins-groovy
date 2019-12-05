@@ -328,7 +328,7 @@
                 <configuration>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
-                    <jvmArgs>-Xmx2048m -Datlassian.mail.senddisabled=false</jvmArgs>
+                    <jvmArgs>-Xmx4096m -Datlassian.mail.senddisabled=false</jvmArgs>
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>
