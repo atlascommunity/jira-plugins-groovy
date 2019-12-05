@@ -60,7 +60,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         this.singletonFactory = singletonFactory;
         this.globalObjectClassLoader = new GlobalObjectClassLoader(this);
 
-        delegatingClassLoader.registerClassLoader("__go", globalObjectClassLoader);
+        delegatingClassLoader.registerClassLoader("__go", globalObjectClassLoader, false);
         scriptService.registerBindingProvider(this);
     }
 
