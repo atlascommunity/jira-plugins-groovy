@@ -49,6 +49,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     private final Map<String, ScriptClosure> globalFunctions = new HashMap<>();
     private final Map<String, BindingDescriptor> globalVariables = new HashMap<>();
     private final ParseContextHolder parseContextHolder = new ParseContextHolder();
+    private final ExecutionContextHolder executionContextHolder = new ExecutionContextHolder();
     //assuming that all mutations happen only during initialization in single thread
     private final List<BindingProvider> bindingProviders = new ArrayList<>();
     private final Cache<String, CompiledScript> scriptCache = Caffeine
@@ -99,12 +100,29 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
 
     @Override
     public Object executeScript(String scriptId, String scriptString, ScriptType type, Map<String, Object> bindings) throws Exception {
+        ScriptExecutionOutcome outcome = executeScriptWithOutcome(scriptId, scriptString, type, bindings);
+
+        if (outcome.isSuccessful()) {
+            return outcome.getResult();
+        }
+
+        throw outcome.getError();
+    }
+
+    @Override
+    public ScriptExecutionOutcome executeScriptWithOutcome(String scriptId, String scriptString, ScriptType type, Map<String, Object> bindings) {
         return doExecuteScript(scriptId, scriptString, type, bindings, false, null);
     }
 
     @Override
     public Object executeScriptStatic(String scriptId, String scriptString, ScriptType type, Map<String, Object> bindings, Map<String, Class> types) throws Exception {
-        return doExecuteScript(scriptId, scriptString, type, bindings, true, types);
+        ScriptExecutionOutcome outcome = doExecuteScript(scriptId, scriptString, type, bindings, true, types);
+
+        if (outcome.isSuccessful()) {
+            return outcome.getResult();
+        }
+
+        throw outcome.getError();
     }
 
     @Override
@@ -176,89 +194,94 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         gcl.clearCache();
     }
 
-    private Object doExecuteScript(
+    private ScriptExecutionOutcome doExecuteScript(
         String scriptId, String scriptString, ScriptType type, Map<String, Object> externalBindings,
         boolean compileStatic, Map<String, Class> types
-    ) throws Exception {
+    ) {
         logger.debug("started execution");
 
+        long t = System.currentTimeMillis();
         CompiledScript compiledScript = null;
+        Script script = null;
         boolean fromCache = false;
 
-        if (scriptId != null) {
-            compiledScript = scriptCache.get(scriptId, ignore -> parseClass(scriptString, scriptId, false, compileStatic, types));
-            fromCache = true;
-        }
-
-        if (compiledScript == null) {
-            compiledScript = parseClass(scriptString, scriptId, false, compileStatic, types);
-        }
-
-        //make sure that plugin classes can be loaded for cached scripts
-        Set<Plugin> plugins = new HashSet<>();
-        for (String pluginKey : compiledScript.getParseContext().getPlugins()) {
-            Plugin plugin = injectionResolver.getPlugin(pluginKey);
-
-            if (plugin == null) {
-                throw new RuntimeException("Plugin " + pluginKey + " couldn't be loaded");
-            }
-
-            plugins.add(plugin);
-        }
-
-        classLoader.ensureAvailability(plugins);
-
-        logger.debug("created class");
-
-        HashMap<String, Object> bindings = new HashMap<>();
-
-        for (BindingProvider bindingProvider : bindingProviders) {
-            bindingProvider.getBindings().forEach((name, value) -> bindings.put(name, value.getValue(type, scriptId)));
-        }
-
-        for (Map.Entry<String, ScriptClosure> entry : globalFunctions.entrySet()) {
-            bindings.put(entry.getKey(), entry.getValue());
-        }
-
-        for (Map.Entry<String, BindingDescriptor> entry : globalVariables.entrySet()) {
-            bindings.put(entry.getKey(), entry.getValue().getValue(type, scriptId));
-        }
-
-        bindings.putAll(externalBindings);
-
-        for (ScriptInjection injection : compiledScript.getParseContext().getInjections()) {
-            if (injection.getPlugin() != null) {
-                Object component = injectionResolver.resolvePluginInjection(injection.getPlugin(), injection.getClassName());
-
-                if (component != null) {
-                    bindings.put(injection.getVariableName(), component);
-                    continue;
-                }
-            } else {
-                Object component = injectionResolver.resolveStandardInjection(injection.getClassName());
-
-                if (component != null) {
-                    bindings.put(injection.getVariableName(), component);
-                    continue;
-                }
-            }
-
-            throw new RuntimeException("Unable to resolve injection: " + injection);
-        }
-
-        logger.debug("initialized bindings");
-
-        Script script = InvokerHelper.createScript(compiledScript.getScriptClass(), new Binding(bindings));
-
-        logger.debug("created script");
-
         try {
+            if (scriptId != null) {
+                compiledScript = scriptCache.get(scriptId, ignore -> parseClass(scriptString, scriptId, false, compileStatic, types));
+                fromCache = true;
+            }
+
+            if (compiledScript == null) {
+                compiledScript = parseClass(scriptString, scriptId, false, compileStatic, types);
+            }
+
+            //make sure that plugin classes can be loaded for cached scripts
+            Set<Plugin> plugins = new HashSet<>();
+            for (String pluginKey : compiledScript.getParseContext().getPlugins()) {
+                Plugin plugin = injectionResolver.getPlugin(pluginKey);
+
+                if (plugin == null) {
+                    throw new RuntimeException("Plugin " + pluginKey + " couldn't be loaded");
+                }
+
+                plugins.add(plugin);
+            }
+
+            classLoader.ensureAvailability(plugins);
+
+            logger.debug("created class");
+
+            HashMap<String, Object> bindings = new HashMap<>();
+
+            for (BindingProvider bindingProvider : bindingProviders) {
+                bindingProvider.getBindings().forEach((name, value) -> bindings.put(name, value.getValue(type, scriptId)));
+            }
+
+            for (Map.Entry<String, ScriptClosure> entry : globalFunctions.entrySet()) {
+                bindings.put(entry.getKey(), entry.getValue());
+            }
+
+            for (Map.Entry<String, BindingDescriptor> entry : globalVariables.entrySet()) {
+                bindings.put(entry.getKey(), entry.getValue().getValue(type, scriptId));
+            }
+
+            bindings.putAll(externalBindings);
+
+            for (ScriptInjection injection : compiledScript.getParseContext().getInjections()) {
+                if (injection.getPlugin() != null) {
+                    Object component = injectionResolver.resolvePluginInjection(injection.getPlugin(), injection.getClassName());
+
+                    if (component != null) {
+                        bindings.put(injection.getVariableName(), component);
+                        continue;
+                    }
+                } else {
+                    Object component = injectionResolver.resolveStandardInjection(injection.getClassName());
+
+                    if (component != null) {
+                        bindings.put(injection.getVariableName(), component);
+                        continue;
+                    }
+                }
+
+                throw new RuntimeException("Unable to resolve injection: " + injection);
+            }
+
+            logger.debug("initialized bindings");
+
+            script = InvokerHelper.createScript(compiledScript.getScriptClass(), new Binding(bindings));
+
+            logger.debug("created script");
+
             Object result = script.run();
             logger.debug("completed script");
 
-            return result;
+            return new ScriptExecutionOutcome(result, executionContextHolder.get(), System.currentTimeMillis() - t, null);
+        } catch (Exception e) {
+            return new ScriptExecutionOutcome(null, executionContextHolder.get(), System.currentTimeMillis() - t, e);
         } finally {
-            if (!fromCache) {
+            executionContextHolder.reset();
+            if (!fromCache && script != null) {
                 InvokerHelper.removeClass(script.getClass());
             }
         }
@@ -349,8 +372,8 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     @Override
     public void onStart() {
         globalVariables.put("httpClient", new HttpClientBindingDescriptor());
-        globalVariables.put("logger", new LoggerBindingDescriptor());
-        globalVariables.put("log", new LoggerBindingDescriptor());
+        globalVariables.put("logger", new LoggerBindingDescriptor(executionContextHolder));
+        globalVariables.put("log", new LoggerBindingDescriptor(executionContextHolder));
         globalVariables.put("templateEngine", new TemplateEngineBindingDescriptor(gcl));
         globalVariables.put("scriptType", new ScriptTypeBindingProvider());
     }

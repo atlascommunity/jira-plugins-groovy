@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
+import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
@@ -131,11 +132,8 @@ public class WorkflowHelper {
     }
 
     public Object executeScript(ScriptDescriptor script, ScriptType type, Issue issue, ApplicationUser user, Map transientVars) throws WorkflowException {
-        Object result = null;
         WorkflowException rethrow = null;
 
-        boolean success = true;
-        Exception error = null;
         String id = script.getId();
         String uuid = script.getUuid();
 
@@ -144,36 +142,38 @@ public class WorkflowHelper {
         bindings.put("currentUser", user);
         bindings.put("transientVars", transientVars);
 
-        long t = System.currentTimeMillis();
-        try {
-            result = scriptService.executeScript(
-                uuid != null ? uuid : id,
-                script.getScriptBody(),
-                type,
-                bindings
-            );
+        ScriptExecutionOutcome outcome = scriptService.executeScriptWithOutcome(
+            uuid != null ? uuid : id,
+            script.getScriptBody(),
+            type,
+            bindings
+        );
 
-            if (type == ScriptType.WORKFLOW_CONDITION) {
-                if (!(result instanceof Boolean)) {
-                    result = false;
-                    success = false;
-                    error = new RuntimeException("Condition must return boolean type");
-                    logger.warn("Condition script {} didn't return boolean type for issue {}", id, issue.getKey());
-                }
+        Object result = null;
+
+        if (!outcome.isSuccessful()) {
+            if (outcome.getError() instanceof WorkflowException) {
+                rethrow = (WorkflowException) outcome.getError();
+                //WorkflowException is OK
+                outcome.setError(null);
+            } else {
+                logger.error("Exception occurred while executing script {} for issue {}", id, issue.getKey(), outcome.getError());
             }
-        } catch (WorkflowException e) {
-            rethrow = e;
-        } catch (Exception e) {
-            success = false;
-            error = e;
-            logger.error("Exception occurred while executing script {} for issue {}", id, issue.getKey(), e);
-        } finally {
-            t = System.currentTimeMillis() - t;
+        } else {
+            result = outcome.getResult();
+        }
+
+        if (type == ScriptType.WORKFLOW_CONDITION) {
+            if (!(result instanceof Boolean)) {
+                result = false;
+                outcome.setError(new RuntimeException("Condition must return boolean type"));
+                logger.warn("Condition script {} didn't return boolean type for issue {}", id, issue.getKey());
+            }
         }
 
         boolean trackExecution = true;
 
-        if (type == ScriptType.WORKFLOW_CONDITION && success && t < ExecutionRepository.WARNING_THRESHOLD) {
+        if (type == ScriptType.WORKFLOW_CONDITION && outcome.isSuccessful() && outcome.getTime() < ExecutionRepository.WARNING_THRESHOLD) {
             trackExecution = false;
         }
 
@@ -185,18 +185,19 @@ public class WorkflowHelper {
                 "type", type.name(),
                 "params", script.getParams().toString()
             );
+
             if (script.isFromRegistry()) {
                 if (uuid == null) {
                     Integer parsedId = Ints.tryParse(id);
 
                     if (parsedId != null) {
-                        executionRepository.trackFromRegistry(parsedId, t, success, error, params);
+                        executionRepository.trackFromRegistry(parsedId, outcome.getTime(), outcome.isSuccessful(), outcome.getError(), params);
                     }
                 } else {
-                    executionRepository.trackInline(uuid, t, success, error, params);
+                    executionRepository.trackInline(uuid, outcome, params);
                 }
             } else {
-                executionRepository.trackInline(id, t, success, error, params);
+                executionRepository.trackInline(id, outcome, params);
             }
         }
 
