@@ -31,6 +31,7 @@
     "@atlaskit/section-message": "^1.0.10",
     "@atlaskit/select": "^6.1.4",
     "@atlaskit/spinner": "^9.0.10",
+    "@atlaskit/tabs": "8.0.9",
     "@atlaskit/theme": "^6.2.0",
     "@atlaskit/toggle": "^5.0.10",
     "@atlaskit/tooltip": "^12.1.6",

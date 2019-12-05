@@ -14,5 +14,7 @@ public class ConsoleResponse {
     @XmlElement
     private String result;
     @XmlElement
+    private String log;
+    @XmlElement
     private long time;
 }

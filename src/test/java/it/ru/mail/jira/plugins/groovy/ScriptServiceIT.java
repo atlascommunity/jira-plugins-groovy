@@ -9,6 +9,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import it.ru.mail.jira.plugins.groovy.util.ArquillianUtil;
+import org.apache.log4j.Level;
+import org.apache.log4j.spi.LoggingEvent;
 import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -20,6 +22,7 @@ import ru.mail.jira.plugins.groovy.api.dto.docs.ClassDoc;
 import ru.mail.jira.plugins.groovy.api.dto.docs.MethodDoc;
 import ru.mail.jira.plugins.groovy.api.dto.docs.ParameterDoc;
 import ru.mail.jira.plugins.groovy.api.dto.docs.TypeDoc;
+import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.GroovyDocService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
@@ -28,6 +31,7 @@ import ru.mail.jira.plugins.groovy.impl.FileUtil;
 import javax.inject.Inject;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -41,7 +45,8 @@ public class ScriptServiceIT {
         "tests/standardModule",
         "tests/pluginModule",
         "tests/containerService",
-        "tests/GroovyDocTest"
+        "tests/GroovyDocTest",
+        "tests/logging"
     );
 
     @ComponentImport
@@ -142,6 +147,42 @@ public class ScriptServiceIT {
         Object result = scriptService.executeScriptStatic(null, script, ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
 
         assertThat(result, instanceOf(Date.class));
+    }
+
+    @Test
+    public void logShouldWork() throws Exception {
+        String script = FileUtil.readArquillianExample("tests/logging");
+
+        ScriptExecutionOutcome outcome = scriptService.executeScriptWithOutcome(null, script, ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertNotNull(outcome);
+        assertNotNull(outcome.getExecutionContext());
+        assertNotNull(outcome.getExecutionContext().getLogEntries());
+
+        List<LoggingEvent> logEntries = outcome.getExecutionContext().getLogEntries();
+
+        List<String> referenceMessages = ImmutableList.of(
+            "test trace",
+            "test debug",
+            "test info",
+            "test warn",
+            "test error"
+        );
+
+        List<Level> referenceLevels = ImmutableList.of(
+            Level.TRACE,
+            Level.DEBUG,
+            Level.INFO,
+            Level.WARN,
+            Level.ERROR
+        );
+
+        for (int i = 0; i < logEntries.size(); ++i) {
+            LoggingEvent event = logEntries.get(i);
+
+            assertEquals(referenceMessages.get(i), event.getMessage());
+            assertEquals(referenceLevels.get(i), event.getLevel());
+        }
     }
 
     @Test

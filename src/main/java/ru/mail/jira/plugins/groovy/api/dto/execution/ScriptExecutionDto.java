@@ -24,6 +24,8 @@ public class ScriptExecutionDto {
     private String date;
     @XmlElement
     private String error;
+    @XmlElement
+    private String log;
     @XmlElement @JsonRawValue
     private String extraParams;
 }

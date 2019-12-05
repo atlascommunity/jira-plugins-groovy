@@ -33,6 +33,7 @@ import ru.mail.jira.plugins.groovy.api.entity.ScheduledTaskType;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ScheduledTaskRepository;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskDto;
+import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.ScheduledTaskService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
@@ -296,38 +297,22 @@ public class ScheduledTaskServiceImpl implements ScheduledTaskService, PluginLif
 
     private Exception runScript(ScheduledTaskDto taskInfo, Map<String, Object> bindings, boolean trackAll) {
         String uuid = taskInfo.getUuid();
-        long t = System.currentTimeMillis();
-        boolean successful = true;
-        Exception error = null;
-        Exception exception = null;
 
-        try {
-            scriptService.executeScript(
-                taskInfo.getUuid(),
-                taskInfo.getScriptBody(),
-                ScriptType.SCHEDULED_TASK,
-                bindings
-            );
-        } catch (Exception e) {
-            exception = e;
-            successful = false;
-            error = e;
+        ScriptExecutionOutcome outcome = scriptService.executeScriptWithOutcome(
+            taskInfo.getUuid(),
+            taskInfo.getScriptBody(),
+            ScriptType.SCHEDULED_TASK,
+            bindings
+        );
+
+        if (trackAll || !outcome.isSuccessful()) {
+            executionRepository.trackInline(uuid, outcome, ImmutableMap.of(
+                "type", ScriptType.SCHEDULED_TASK.name(),
+                "bindings", bindings.toString()
+            ));
         }
 
-        if (trackAll) {
-            executionRepository.trackInline(
-                uuid,
-                System.currentTimeMillis() - t,
-                successful,
-                error,
-                ImmutableMap.of(
-                    "type", ScriptType.SCHEDULED_TASK.name(),
-                    "bindings", bindings.toString()
-                )
-            );
-        }
-
-        return exception;
+        return outcome.getError();
     }
 
     private boolean transitionIssue(ApplicationUser user, Issue issue, int action, TransitionOptions options) {

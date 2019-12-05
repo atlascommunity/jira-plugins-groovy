@@ -9,11 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScriptDto;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.FieldConfigRepository;
-import ru.mail.jira.plugins.groovy.api.service.ScriptService;
-import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScriptDto;
+import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
+import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.util.Const;
 
 import java.util.HashMap;
@@ -110,7 +111,7 @@ public class FieldValueExtractor {
                 Map<String, Object> velocityParams = isTemplated ? new HashMap<>() : null;
 
                 return new ValueHolder(
-                    issue.getUpdated().getTime()/1000,
+                    issue.getUpdated().getTime() / 1000,
                     doExtractValue(field, script, issue, velocityParams, tType),
                     velocityParams
                 );
@@ -142,74 +143,70 @@ public class FieldValueExtractor {
         );
     }
 
-    private <T> T doExtractValue(CustomField field, FieldScriptDto script, Issue issue, Map<String, Object> velocityParams, Class<T> tType) {
+    private <T> T doExtractValue(
+        CustomField field,
+        FieldScriptDto script,
+        Issue issue,
+        Map<String, Object> velocityParams,
+        Class<T> tType
+    ) {
         if (logger.isTraceEnabled()) {
             logger.trace("Extracting value from issue {} for field {} (cacheable: {})", issue.getKey(), field.getId(), script.isCacheable());
         }
 
-        String uuid = script.getId();
-        long t = System.currentTimeMillis();
-        boolean successful = true;
-        Exception error = null;
-        T value = null;
-
-        try {
-            if (logger.isTraceEnabled()) {
-                logger.trace("executing script for field {} with id {}", field.getId(), script.getId());
-            }
-
-            Map<String, Object> bindings = new HashMap<>();
-            bindings.put("issue", issue);
-            bindings.put("velocityParams", velocityParams);
-            Object result = scriptService.executeScript(
-                script.getId(),
-                script.getScriptBody(),
-                ScriptType.CUSTOM_FIELD,
-                bindings
-            );
-
-            if (result == null) {
-                return null;
-            }
-
-            if (logger.isTraceEnabled()) {
-                logger.trace("script result {}", result);
-            }
-
-            if (tType == Double.class && (result instanceof Number) && !(result instanceof Double)) {
-                result = ((Number) result).doubleValue();
-            }
-
-            if (!tType.isInstance(result)) {
-                logger.error("Result type ({}) doesn't match field type {}", result.getClass(), tType);
-            }
-            //todo: try to check collections in future if multi
-
-            value = tType.cast(result);
-        } catch (Exception e) {
-            logger.error(
-                "caught exception in script field {} for issue {}",
-                field.getIdAsLong(), issue.getKey(), e
-            );
-            successful = false;
-            error = e;
-        } finally {
-            t = System.currentTimeMillis() - t;
+        if (logger.isTraceEnabled()) {
+            logger.trace("executing script for field {} with id {}", field.getId(), script.getId());
         }
+
+        Map<String, Object> bindings = new HashMap<>();
+        bindings.put("issue", issue);
+        bindings.put("velocityParams", velocityParams);
+        ScriptExecutionOutcome outcome = scriptService.executeScriptWithOutcome(
+            script.getId(),
+            script.getScriptBody(),
+            ScriptType.CUSTOM_FIELD,
+            bindings
+        );
+
+        boolean successful = outcome.isSuccessful();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("{} field value calculation for {} took {}ms", field.getId(), issue.getKey(), t);
+            logger.debug("{} field value calculation for {} took {}ms", field.getId(), issue.getKey(), outcome.getTime());
         }
 
-        if (!successful || t >= FIELD_TRACKING_THRESHOLD) {
-            logger.warn("{} field value calculation for {} took {}ms", field.getId(), issue.getKey(), t);
-            executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
+        if (!successful || outcome.getTime() >= FIELD_TRACKING_THRESHOLD) {
+            logger.warn("{} field value calculation for {} took {}ms", field.getId(), issue.getKey(), outcome.getTime());
+            executionRepository.trackInline(script.getId(), outcome, ImmutableMap.of(
                 "issue", issue.getKey(),
                 "type", ScriptType.CUSTOM_FIELD.name()
             ));
         }
 
-        return value;
+        if (!successful) {
+            logger.error(
+                "caught exception in script field {} for issue {}",
+                field.getIdAsLong(), issue.getKey(), outcome.getError()
+            );
+
+            return null;
+        }
+
+        Object result = outcome.getResult();
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("script result {}", result);
+        }
+
+        if (tType == Double.class && (result instanceof Number) && !(result instanceof Double)) {
+            result = ((Number) result).doubleValue();
+        }
+
+        if (!tType.isInstance(result)) {
+            logger.error("Result type ({}) doesn't match field type {}", result.getClass(), tType);
+        }
+        //todo: try to check collections in future if multi
+
+        return tType.cast(result);
     }
 
     public void clearCache() {

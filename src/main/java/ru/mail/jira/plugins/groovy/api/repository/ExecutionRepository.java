@@ -1,8 +1,8 @@
 package ru.mail.jira.plugins.groovy.api.repository;
 
 import ru.mail.jira.plugins.groovy.api.dto.execution.ScriptExecutionDto;
+import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +14,8 @@ public interface ExecutionRepository {
     void trackFromRegistry(int id, long time, boolean successful, Exception e, Map<String, String> additionalParams);
 
     void trackInline(String id, long time, boolean successful, Exception e, Map<String, String> additionalParams);
+
+    void trackInline(String id, ScriptExecutionOutcome outcome, Map<String, String> additionalParams);
 
     Map<Integer, Long> getRegistryErrorCount();
 
@@ -28,8 +30,6 @@ public interface ExecutionRepository {
     List<ScriptExecutionDto> getLastInlineExecutions(String scriptId);
 
     void deleteOldExecutions();
-
-    void deleteExecutions(int scriptId, Timestamp until);
 
     void deleteAll();
 

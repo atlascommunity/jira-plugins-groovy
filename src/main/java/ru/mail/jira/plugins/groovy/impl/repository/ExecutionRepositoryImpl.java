@@ -21,6 +21,7 @@ import io.sentry.event.helper.BasicRemoteAddressResolver;
 import io.sentry.event.interfaces.HttpInterface;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
+import org.apache.log4j.spi.LoggingEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,10 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.dto.execution.ScriptExecutionDto;
 import ru.mail.jira.plugins.groovy.api.entity.ScriptExecution;
+import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 import ru.mail.jira.plugins.groovy.api.service.SentryService;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
+import ru.mail.jira.plugins.groovy.impl.groovy.log.LogTransformer;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +59,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     private final DateTimeFormatter dateTimeFormatter;
     private final JiraAuthenticationContext authenticationContext;
     private final DatabaseAccessor databaseAccessor;
+    private final LogTransformer logTransformer;
     private final SentryService sentryService;
 
     @Autowired
@@ -65,6 +69,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         @ComponentImport DateTimeFormatter dateTimeFormatter,
         @ComponentImport JiraAuthenticationContext authenticationContext,
         DatabaseAccessor databaseAccessor,
+        LogTransformer logTransformer,
         SentryService sentryService
     ) {
         this.ao = ao;
@@ -72,6 +77,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         this.dateTimeFormatter = dateTimeFormatter;
         this.authenticationContext = authenticationContext;
         this.databaseAccessor = databaseAccessor;
+        this.logTransformer = logTransformer;
         this.sentryService = sentryService;
     }
 
@@ -85,7 +91,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
                 Map<String, String> params = getParams(additionalParams);
                 this.saveExecution(id, time, successful, exception, objectMapper.writeValueAsString(params));
                 if (!successful) {
-                    this.submitSentryEvent(String.valueOf(id), time, exception, httpInterface, currentUser, params);
+                    this.submitSentryEvent(String.valueOf(id), exception, httpInterface, currentUser, params);
                 }
             } catch (Exception e) {
                 logger.error("unable to save execution", e);
@@ -102,9 +108,31 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         executorService.execute(() -> {
             try {
                 Map<String, String> params = getParams(additionalParams);
-                this.saveExecution(id, time, successful, exception, objectMapper.writeValueAsString(params));
+                this.saveExecution(id, time, successful, null, exception, objectMapper.writeValueAsString(params));
                 if (!successful) {
-                    this.submitSentryEvent(id, time, exception, httpInterface, currentUser, params);
+                    this.submitSentryEvent(id, exception, httpInterface, currentUser, params);
+                }
+            } catch (Exception e) {
+                logger.error("unable to save execution", e);
+            }
+        });
+    }
+
+    @Override
+    public void trackInline(String id, ScriptExecutionOutcome outcome, Map<String, String> additionalParams) {
+        //we need these only if we're sending event to sentry
+        User currentUser = outcome.isSuccessful() ? null : getCurrentUser();
+        HttpInterface httpInterface = outcome.isSuccessful() ? null : getCurrentRequest();
+
+        executorService.execute(() -> {
+            try {
+                Map<String, String> params = getParams(additionalParams);
+                this.saveExecution(
+                    id, outcome.getTime(), outcome.isSuccessful(), outcome.getExecutionContext().getLogEntries(),
+                    outcome.getError(), objectMapper.writeValueAsString(params)
+                );
+                if (!outcome.isSuccessful()) {
+                    this.submitSentryEvent(id, outcome.getError(), httpInterface, currentUser, params);
                 }
             } catch (Exception e) {
                 logger.error("unable to save execution", e);
@@ -238,6 +266,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         result.setSuccess(execution.isSuccessful());
         result.setSlow(execution.getTime() >= WARNING_THRESHOLD);
         result.setError(execution.getError());
+        result.setLog(execution.getLog());
         result.setExtraParams(execution.getExtraParams());
         result.setId(execution.getID());
 
@@ -256,19 +285,26 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         );
     }
 
-    private void saveExecution(String id, long time, boolean successful, Exception exception, String additionalParams) {
+    private void saveExecution(String id, long time, boolean successful, List<LoggingEvent> loggingEvents, Exception exception, String additionalParams) {
         ao.create(
             ScriptExecution.class,
             new DBParam("INLINE_ID", id),
             new DBParam("TIME", time),
             new DBParam("DATE", new Timestamp(System.currentTimeMillis())),
             new DBParam("SUCCESSFUL", successful),
+            new DBParam("LOG", logTransformer.formatLog(loggingEvents)),
             new DBParam("ERROR", ExceptionHelper.writeExceptionToString(exception)),
             new DBParam("EXTRA_PARAMS", additionalParams)
         );
     }
 
-    private void submitSentryEvent(String id, long time, Exception e, HttpInterface httpInterface, User user, Map<String, String> params) {
+    private void submitSentryEvent(
+        String id,
+        Exception e,
+        HttpInterface httpInterface,
+        User user,
+        Map<String, String> params
+    ) {
         sentryService.registerException(
             id, user, e, httpInterface, params
         );
@@ -391,20 +427,6 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     public void deleteOldExecutions() {
         int deleted = ao.deleteWithSQL(ScriptExecution.class, "DATE < ?", new Timestamp(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14)));
         logger.info("Deleted {} old executions", deleted);
-    }
-
-    @Override
-    public void deleteExecutions(int scriptId, Timestamp until) {
-        databaseAccessor.run(
-            connection -> connection
-                .delete(SCRIPT_EXECUTION)
-                .where(
-                    SCRIPT_EXECUTION.SCRIPT_ID.eq(scriptId),
-                    SCRIPT_EXECUTION.DATE.before(until)
-                )
-                .execute(),
-            OnRollback.NOOP
-        );
     }
 
     @Override

@@ -3,6 +3,7 @@ import React from 'react';
 
 import Button from '@atlaskit/button';
 import {Checkbox} from '@atlaskit/checkbox';
+import Tabs from '@atlaskit/tabs';
 
 import type {ConsoleResult} from './types';
 
@@ -148,32 +149,54 @@ export class ScriptConsole extends React.Component<Props, State> {
                     </Button>
                 </div>
                 <br/>
-                {!waiting && <div className="result">
-                    {
-                        output
-                        ? (
-                            <div>
-                                <strong>{ConsoleMessages.executedIn(output.time.toString())}</strong>
-                                {isHtml
-                                    ? <div dangerouslySetInnerHTML={{ __html: output.result }}/>
-                                    : <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{output.result}</pre>
-                                }
-                            </div>
-                        )
-                        : null
-                    }
-                    {
-                        error
-                        ? (
-                            <ErrorMessage title={errorMessage || undefined}>
-                                <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>
-                                    {error['stack-trace']}
-                                </pre>
-                            </ErrorMessage>
-                        )
-                        : null
-                    }
-                </div>}
+                {!waiting &&
+                    <Tabs
+                        tabs={[
+                            {
+                                label: CommonMessages.result,
+                                content: (
+                                    <div className="result">
+                                        {
+                                            output
+                                                ? (
+                                                    <div>
+                                                        <strong>{ConsoleMessages.executedIn(output.time.toString())}</strong>
+                                                        {isHtml
+                                                            ? <div dangerouslySetInnerHTML={{ __html: output.result }}/>
+                                                            : <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{output.result}</pre>
+                                                        }
+                                                    </div>
+                                                )
+                                                : null
+                                        }
+                                        {
+                                            error
+                                                ? (
+                                                    <ErrorMessage title={errorMessage || undefined}>
+                                                        <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>
+                                                            {error['stack-trace']}
+                                                        </pre>
+                                                    </ErrorMessage>
+                                                )
+                                                : null
+                                        }
+                                    </div>
+                                )
+                            },
+                            {
+                                label: CommonMessages.log,
+                                content: (
+                                    <div className="result">
+                                        {output && output.log != null
+                                            ? <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{output.log}</pre>
+                                            : 'Log is empty'
+                                        }
+                                    </div>
+                                )
+                            }
+                        ]}
+                    />
+                }
             </div>
         );
     }

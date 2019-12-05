@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.mail.jira.plugins</groupId>
     <artifactId>groovy</artifactId>
-    <version>1.19.6-jira8</version>
+    <version>1.20.0-jira8</version>
     <organization>
         <name>AtlasTeam</name>
         <url>https://atlasteam.ru/</url>
