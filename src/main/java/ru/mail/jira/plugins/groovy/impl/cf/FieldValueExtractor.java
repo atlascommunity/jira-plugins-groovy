@@ -201,7 +201,7 @@ public class FieldValueExtractor {
             result = ((Number) result).doubleValue();
         }
 
-        if (!tType.isInstance(result)) {
+        if (result != null && !tType.isInstance(result)) {
             logger.error("Result type ({}) doesn't match field type {}", result.getClass(), tType);
         }
         //todo: try to check collections in future if multi
