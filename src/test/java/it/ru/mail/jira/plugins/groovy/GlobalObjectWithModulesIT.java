@@ -36,6 +36,7 @@ public class GlobalObjectWithModulesIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
         "tests/go/WithStandardModule",
         "tests/go/WithJswModule",
+        "tests/go/WithPluginModule",
         "tests/go/NonExistingImport"
     );
 
@@ -115,7 +116,7 @@ public class GlobalObjectWithModulesIT {
     }
 
     @Test
-    public void pluginShouldWork() throws Exception {
+    public void jswShouldWork() throws Exception {
         createObject("tests/go/WithJswModule");
 
         Object result = scriptService.executeScript(null, globalObjectName + ".getRankField()", ScriptType.CONSOLE, ImmutableMap.of());
@@ -124,10 +125,28 @@ public class GlobalObjectWithModulesIT {
     }
 
     @Test
-    public void pluginStaticShouldWork() throws Exception {
+    public void jswStaticShouldWork() throws Exception {
         createObject("tests/go/WithJswModule");
 
         Object result = scriptService.executeScriptStatic(null, globalObjectName + ".getRankField()", ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
+
+        assertNotNull(result);
+    }
+
+    @Test
+    public void pluginShouldWork() throws Exception {
+        createObject("tests/go/WithPluginModule");
+
+        Object result = scriptService.executeScript(null, globalObjectName + ".getScripts()", ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertNotNull(result);
+    }
+
+    @Test
+    public void pluginStaticShouldWork() throws Exception {
+        createObject("tests/go/WithPluginModule");
+
+        Object result = scriptService.executeScriptStatic(null, globalObjectName + ".getScripts()", ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
 
         assertNotNull(result);
     }
