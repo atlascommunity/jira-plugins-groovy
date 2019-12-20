@@ -149,8 +149,8 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     }
 
     @Override
-    public Class parseClassStatic(String classBody, boolean extended, Map<String, Class> types) {
-        return parseClass(classBody, null, extended, true, types).getScriptClass();
+    public CompiledScript<?> parseClassStatic(String classBody, boolean extended, Map<String, Class> types) {
+        return parseClass(classBody, null, extended, true, types);
     }
 
     @Override
@@ -232,8 +232,6 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
                 plugins.add(plugin);
             }
 
-        contextAwareClassLoader.addPlugins(plugins);
-
             logger.debug("created class");
 
             HashMap<String, Object> bindings = new HashMap<>();
@@ -250,6 +248,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
                 bindings.put(entry.getKey(), entry.getValue().getValue(type, scriptId));
             }
 
+            contextAwareClassLoader.addPlugins(plugins);
             bindings.putAll(externalBindings);
 
             for (ScriptInjection injection : compiledScript.getParseContext().getInjections()) {

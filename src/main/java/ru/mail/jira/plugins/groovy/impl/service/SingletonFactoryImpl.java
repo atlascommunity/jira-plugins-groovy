@@ -3,11 +3,13 @@ package ru.mail.jira.plugins.groovy.impl.service;
 import com.atlassian.plugin.Plugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 import ru.mail.jira.plugins.groovy.api.script.PluginModule;
 import ru.mail.jira.plugins.groovy.api.script.StandardModule;
 import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
+import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -16,15 +18,18 @@ import java.util.Arrays;
 @Component
 public class SingletonFactoryImpl implements SingletonFactory {
     private final InjectionResolver injectionResolver;
+    private final ContextAwareClassLoader contextAwareClassLoader;
 
     @Autowired
     public SingletonFactoryImpl(
-        InjectionResolver injectionResolver
+        InjectionResolver injectionResolver,
+        ContextAwareClassLoader contextAwareClassLoader
     ) {
         this.injectionResolver = injectionResolver;
+        this.contextAwareClassLoader = contextAwareClassLoader;
     }
 
-    private <T> Constructor<T> findSingleConstructor(Class<?> type) {
+    private <T> Constructor<T> findSingleConstructor(Class<T> type) {
         Constructor[] constructors = type.getConstructors();
 
         if (constructors.length == 0) {
@@ -38,9 +43,8 @@ public class SingletonFactoryImpl implements SingletonFactory {
         return constructors[0];
     }
 
-    @Override
-    public <T> Object[] getConstructorArguments(Class<T> type) {
-        Constructor<T> constructor = findSingleConstructor(type);
+    public <T> Object[] doGetConstructorArguments(CompiledScript<T> compiledScript) {
+        Constructor<T> constructor = findSingleConstructor(compiledScript.getScriptClass());
 
         if (constructor.getParameterCount() == 0) {
             return new Object[0];
@@ -74,11 +78,24 @@ public class SingletonFactoryImpl implements SingletonFactory {
     }
 
     @Override
-    public <T> T createInstance(Class<T> type) {
+    public <T> Object[] getConstructorArguments(CompiledScript<T> compiledScript) {
         try {
-            return (T) findSingleConstructor(type).newInstance(getConstructorArguments(type));
+            contextAwareClassLoader.addPlugins(injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins()));
+            return doGetConstructorArguments(compiledScript);
+        } finally {
+            contextAwareClassLoader.clearContext();
+        }
+    }
+
+    @Override
+    public <T> T createInstance(CompiledScript<T> compiledScript) {
+        try {
+            contextAwareClassLoader.addPlugins(injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins()));
+            return (T) findSingleConstructor(compiledScript.getScriptClass()).newInstance(doGetConstructorArguments(compiledScript));
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            contextAwareClassLoader.clearContext();
         }
     }
 }

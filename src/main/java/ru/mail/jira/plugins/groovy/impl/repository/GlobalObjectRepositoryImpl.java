@@ -15,6 +15,7 @@ import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectForm;
 import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.GlobalObjectRepository;
+import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
@@ -122,7 +123,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
 
-        Class scriptClass = scriptService.parseClassStatic(form.getScriptBody(), true, ImmutableMap.of());
+        CompiledScript scriptClass = scriptService.parseClassStatic(form.getScriptBody(), true, ImmutableMap.of());
 
         try {
             singletonFactory.getConstructorArguments(scriptClass);

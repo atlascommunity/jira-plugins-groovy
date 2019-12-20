@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.groovy.api.service;
 
 import com.atlassian.plugin.Plugin;
 import ru.mail.jira.plugins.groovy.api.dto.CacheStatsDto;
+import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingProvider;
@@ -32,7 +33,7 @@ public interface ScriptService {
     Class parseClass(String classBody, boolean extended);
 
     @WithPluginLoader
-    Class parseClassStatic(String classBody, boolean extended, Map<String, Class> types);
+    CompiledScript<?> parseClassStatic(String classBody, boolean extended, Map<String, Class> types);
 
     CacheStatsDto getCacheStats();
 

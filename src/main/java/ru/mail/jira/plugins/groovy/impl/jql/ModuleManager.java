@@ -71,7 +71,8 @@ public class ModuleManager {
 
     private CustomFunction initializeFunction(JqlFunctionScriptDto script) {
         try {
-            Class scriptClass = scriptService.parseClassStatic(script.getScriptBody(), false, ImmutableMap.of());
+            Class scriptClass = scriptService.parseClassStatic(script.getScriptBody(), false, ImmutableMap.of()).getScriptClass();
+            InvokerHelper.removeClass(scriptClass);
 
             if (ScriptedJqlFunction.class.isAssignableFrom(scriptClass)) {
                 Supplier supplier = () -> ClassLoaderUtil.runInContext(

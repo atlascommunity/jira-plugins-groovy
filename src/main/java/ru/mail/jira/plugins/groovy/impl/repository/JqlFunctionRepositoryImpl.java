@@ -20,6 +20,7 @@ import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.JqlFunctionRepository;
+import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
@@ -184,14 +185,14 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
 
-        Class functionClass = scriptService.parseClassStatic(form.getScriptBody(), false, ImmutableMap.of());
+        CompiledScript compiledScript = scriptService.parseClassStatic(form.getScriptBody(), false, ImmutableMap.of());
 
-        if (!ScriptedJqlFunction.class.isAssignableFrom(functionClass)) {
+        if (!ScriptedJqlFunction.class.isAssignableFrom(compiledScript.getScriptClass())) {
             throw new ValidationException("Must implement ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction", "scriptBody");
         }
 
         try {
-            singletonFactory.getConstructorArguments(functionClass);
+            singletonFactory.getConstructorArguments(compiledScript);
         } catch (IllegalArgumentException e) {
             throw new ValidationException(e.getMessage(), "scriptBody");
         }

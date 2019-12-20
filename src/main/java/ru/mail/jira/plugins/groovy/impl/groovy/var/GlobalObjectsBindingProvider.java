@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dao.GlobalObjectDao;
 import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
+import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingProvider;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
@@ -94,8 +95,10 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                 try {
                     long t = System.currentTimeMillis();
 
-                    Class objectClass = scriptService.parseClassStatic(globalObject.getScriptBody(), true, ImmutableMap.of());
-                    Object object = singletonFactory.createInstance(objectClass);
+                    CompiledScript<?> compiledScript = scriptService.parseClassStatic(globalObject.getScriptBody(), true, ImmutableMap.of());
+                    Class<?> objectClass = compiledScript.getScriptClass();
+                    Object object = singletonFactory.createInstance(compiledScript);
+
                     objects.put(
                         globalObject.getName(),
                         new LazyDocBindingDescriptorImpl(object, object.getClass(), () -> {

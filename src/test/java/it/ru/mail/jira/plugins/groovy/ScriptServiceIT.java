@@ -43,6 +43,7 @@ public class ScriptServiceIT {
         "tests/jsonSlurper",
         "tests/dateExtension",
         "tests/standardModule",
+        "tests/jswModule",
         "tests/pluginModule",
         "tests/containerService",
         "tests/GroovyDocTest",
@@ -115,6 +116,15 @@ public class ScriptServiceIT {
 
     @Test
     public void pluginModuleShouldWork() throws Exception {
+        String script = FileUtil.readArquillianExample("tests/pluginModule");
+
+        Object result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertNotNull(result);
+    }
+
+    @Test
+    public void jswModuleShouldWork() throws Exception {
         String script = FileUtil.readArquillianExample("tests/pluginModule");
 
         Object result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());

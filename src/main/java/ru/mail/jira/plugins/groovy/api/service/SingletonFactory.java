@@ -1,7 +1,9 @@
 package ru.mail.jira.plugins.groovy.api.service;
 
-public interface SingletonFactory {
-    <T> Object[] getConstructorArguments(Class<T> type) throws IllegalArgumentException;
+import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 
-    <T> T createInstance(Class<T> type);
+public interface SingletonFactory {
+    <T> Object[] getConstructorArguments(CompiledScript<T> type) throws IllegalArgumentException;
+
+    <T> T createInstance(CompiledScript<T> type);
 }
