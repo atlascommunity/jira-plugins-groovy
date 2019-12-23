@@ -66,6 +66,10 @@ export const filteredSelector = createSelector(
                 }
                 if (nameFilter.length >= 2) {
                     matchesFilter = script.name.toLocaleLowerCase().includes(nameFilter);
+
+                    if (!matchesFilter && script.description) {
+                        matchesFilter = script.description.toLocaleLowerCase().includes(nameFilter);
+                    }
                 }
                 return matchesUnused && matchesFilter;
             })

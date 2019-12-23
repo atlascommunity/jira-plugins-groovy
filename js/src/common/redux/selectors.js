@@ -18,6 +18,10 @@ export const orderedItemsSelector = () =>
                     let matchesFilter: boolean = true;
                     if (filter.length >= 2) {
                         matchesFilter = script.name.toLocaleLowerCase().includes(filter);
+
+                        if (!matchesFilter && script.description) {
+                            matchesFilter = script.description.toLocaleLowerCase().includes(filter);
+                        }
                     }
                     return matchesFilter;
                 })
