@@ -3,22 +3,24 @@ package ru.mail.jira.plugins.groovy.impl.service;
 import com.atlassian.plugin.Plugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
-import ru.mail.jira.plugins.groovy.api.script.PluginModule;
-import ru.mail.jira.plugins.groovy.api.script.StandardModule;
+import ru.mail.jira.plugins.groovy.api.script.*;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
 import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
+import ru.mail.jira.plugins.groovy.impl.groovy.var.GlobalObjectsBindingProvider;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.Optional;
 
 @Component
 public class SingletonFactoryImpl implements SingletonFactory {
     private final InjectionResolver injectionResolver;
     private final ContextAwareClassLoader contextAwareClassLoader;
+    private GlobalObjectsBindingProvider globalObjectsBindingProvider;
 
     @Autowired
     public SingletonFactoryImpl(
@@ -30,7 +32,7 @@ public class SingletonFactoryImpl implements SingletonFactory {
     }
 
     private <T> Constructor<T> findSingleConstructor(Class<T> type) {
-        Constructor[] constructors = type.getConstructors();
+        Constructor<?>[] constructors = type.getConstructors();
 
         if (constructors.length == 0) {
             throw new IllegalArgumentException("No public constructors found");
@@ -40,19 +42,19 @@ public class SingletonFactoryImpl implements SingletonFactory {
             throw new IllegalArgumentException("Found more than one public constructor");
         }
 
-        return constructors[0];
+        return (Constructor<T>) constructors[0];
     }
 
-    public <T> Object[] doGetConstructorArguments(CompiledScript<T> compiledScript) {
+    public <T> ResolvedConstructorArgument[] doGetConstructorArguments(CompiledScript<T> compiledScript) {
         Constructor<T> constructor = findSingleConstructor(compiledScript.getScriptClass());
 
         if (constructor.getParameterCount() == 0) {
-            return new Object[0];
+            return new ResolvedConstructorArgument[0];
         }
 
         Annotation[][] allParameterAnnotations = constructor.getParameterAnnotations();
         Class<?>[] parameterTypes = constructor.getParameterTypes();
-        Object[] result = new Object[parameterTypes.length];
+        ResolvedConstructorArgument[] result = new ResolvedConstructorArgument[parameterTypes.length];
 
         for (int i = 0; i < parameterTypes.length; ++i) {
             Annotation[] parameterAnnotations = allParameterAnnotations[i];
@@ -62,11 +64,33 @@ public class SingletonFactoryImpl implements SingletonFactory {
                 String bundleName = ClassLoaderUtil.getClassBundleName(parameterType);
                 Plugin plugin = injectionResolver.getPlugin(bundleName);
 
-                result[i] = injectionResolver.resolvePluginInjection(plugin, parameterType);
+                result[i] = new ResolvedConstructorArgument(
+                    ResolvedConstructorArgument.ArgumentType.PLUGIN,
+                    injectionResolver.resolvePluginInjection(plugin, parameterType)
+                );
             } else if (Arrays.stream(parameterAnnotations).anyMatch(it -> it.annotationType().equals(StandardModule.class))) {
-                result[i] = injectionResolver.resolveStandardInjection(parameterType);
+                result[i] = new ResolvedConstructorArgument(
+                    ResolvedConstructorArgument.ArgumentType.STANDARD,
+                    injectionResolver.resolveStandardInjection(parameterType)
+                );
             } else {
-                throw new IllegalArgumentException("Parameter at index " + i + " is not annotated");
+                Optional<GlobalObjectModule> globalObjectInjection = Arrays
+                    .stream(parameterAnnotations)
+                    .filter(it -> it instanceof GlobalObjectModule)
+                    .map(it -> (GlobalObjectModule) it)
+                    .findAny();
+
+                if (globalObjectInjection.isPresent()) {
+                    BindingDescriptor<?> bindingDescriptor = globalObjectsBindingProvider.getBindings().get(globalObjectInjection.get().value());
+                    if (bindingDescriptor != null) {
+                        result[i] = new ResolvedConstructorArgument(
+                            ResolvedConstructorArgument.ArgumentType.GLOBAL_OBJECT,
+                            bindingDescriptor.getValue(null, null)
+                        );
+                    }
+                } else {
+                    throw new IllegalArgumentException("Parameter at index " + i + " is not annotated");
+                }
             }
 
             if (result[i] == null) {
@@ -81,6 +105,16 @@ public class SingletonFactoryImpl implements SingletonFactory {
     public <T> Object[] getConstructorArguments(CompiledScript<T> compiledScript) {
         try {
             contextAwareClassLoader.addPlugins(injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins()));
+            return getObjects(doGetConstructorArguments(compiledScript));
+        } finally {
+            contextAwareClassLoader.clearContext();
+        }
+    }
+
+    @Override
+    public <T> ResolvedConstructorArgument[] getExtendedConstructorArguments(CompiledScript<T> compiledScript) throws IllegalArgumentException {
+        try {
+            contextAwareClassLoader.addPlugins(injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins()));
             return doGetConstructorArguments(compiledScript);
         } finally {
             contextAwareClassLoader.clearContext();
@@ -91,11 +125,22 @@ public class SingletonFactoryImpl implements SingletonFactory {
     public <T> T createInstance(CompiledScript<T> compiledScript) {
         try {
             contextAwareClassLoader.addPlugins(injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins()));
-            return (T) findSingleConstructor(compiledScript.getScriptClass()).newInstance(doGetConstructorArguments(compiledScript));
+            return findSingleConstructor(compiledScript.getScriptClass()).newInstance(getObjects(doGetConstructorArguments(compiledScript)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             contextAwareClassLoader.clearContext();
         }
+    }
+
+    public void setGlobalObjectsBindingProvider(GlobalObjectsBindingProvider globalObjectsBindingProvider) {
+        this.globalObjectsBindingProvider = globalObjectsBindingProvider;
+    }
+
+    private Object[] getObjects(ResolvedConstructorArgument[] arguments) {
+        return Arrays
+            .stream(arguments)
+            .map(ResolvedConstructorArgument::getObject)
+            .toArray();
     }
 }

@@ -8,7 +8,6 @@ import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.plugin.PluginParseException;
 import com.atlassian.plugin.module.ModuleFactory;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.pocketknife.api.querydsl.util.OnRollback;
 import com.google.common.collect.ImmutableMap;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.dom4j.tree.DefaultElement;
@@ -31,7 +30,6 @@ import ru.mail.jira.plugins.groovy.impl.jql.function.ValuesFunctionAdapter;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
@@ -71,13 +69,13 @@ public class ModuleManager {
 
     private CustomFunction initializeFunction(JqlFunctionScriptDto script) {
         try {
-            Class scriptClass = scriptService.parseClassStatic(script.getScriptBody(), false, ImmutableMap.of()).getScriptClass();
+            Class scriptClass = scriptService.parseSingleton(script.getScriptBody(), false, ImmutableMap.of()).getScriptClass();
             InvokerHelper.removeClass(scriptClass);
 
             if (ScriptedJqlFunction.class.isAssignableFrom(scriptClass)) {
                 Supplier supplier = () -> ClassLoaderUtil.runInContext(
                     () -> singletonFactory.createInstance(
-                        scriptService.parseClassStatic(script.getScriptBody(), false, ImmutableMap.of())
+                        scriptService.parseSingleton(script.getScriptBody(), false, ImmutableMap.of())
                     )
                 );
 

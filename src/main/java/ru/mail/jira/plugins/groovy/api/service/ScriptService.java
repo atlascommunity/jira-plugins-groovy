@@ -33,7 +33,7 @@ public interface ScriptService {
     Class parseClass(String classBody, boolean extended);
 
     @WithPluginLoader
-    CompiledScript<?> parseClassStatic(String classBody, boolean extended, Map<String, Class> types);
+    CompiledScript<?> parseSingleton(String classBody, boolean extended, Map<String, Class> types);
 
     CacheStatsDto getCacheStats();
 
