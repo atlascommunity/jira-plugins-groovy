@@ -22,6 +22,9 @@ public interface GlobalObject extends AbstractScript {
     void setScriptBody(String scriptBody);
     String getScriptBody();
 
+    void setDependencies(String dependencies);
+    String getDependencies();
+
     @OneToMany(reverse = "getScript")
     GlobalObjectChangelog[] getChangelogs();
 }

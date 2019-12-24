@@ -37,7 +37,8 @@ public class GlobalObjectWithModulesIT {
         "tests/go/WithStandardModule",
         "tests/go/WithJswModule",
         "tests/go/WithPluginModule",
-        "tests/go/NonExistingImport"
+        "tests/go/NonExistingImport",
+        "tests/go/BorkedObject"
     );
 
     @Inject
@@ -188,5 +189,22 @@ public class GlobalObjectWithModulesIT {
         assertNull(bindingProvider.getBindings().get(globalObjectName));
 
         assertNotNull(bindingProvider.getBindings().get(legitScript.getName()));
+    }
+
+    @Test
+    public void globalBindingsShouldNotWork() throws Exception {
+        boolean exceptionOccurred = false;
+
+        try {
+            createObject("tests/go/BorkedObject");
+        } catch (Exception e) {
+            if ("org.codehaus.groovy.control.MultipleCompilationErrorsException".equals(e.getClass().getCanonicalName())) {
+                exceptionOccurred = true;
+            } else {
+                throw e;
+            }
+        }
+
+        assertTrue(exceptionOccurred);
     }
 }

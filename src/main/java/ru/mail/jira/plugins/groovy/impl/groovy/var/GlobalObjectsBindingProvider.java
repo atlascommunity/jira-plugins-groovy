@@ -18,14 +18,15 @@ import ru.mail.jira.plugins.groovy.api.script.binding.LazyDocBindingDescriptorIm
 import ru.mail.jira.plugins.groovy.api.service.GroovyDocService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
+import ru.mail.jira.plugins.groovy.impl.service.SingletonFactoryImpl;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 @Component("GlobalObjectsBindingProvider")
 @ExportAsDevService(BindingProvider.class)
@@ -52,7 +53,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         ExecutionRepository executionRepository,
         DelegatingClassLoader delegatingClassLoader,
         GroovyDocService groovyDocService,
-        SingletonFactory singletonFactory
+        SingletonFactoryImpl singletonFactory
     ) {
         this.scriptService = scriptService;
         this.globalObjectDao = globalObjectDao;
@@ -61,6 +62,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         this.singletonFactory = singletonFactory;
         this.globalObjectClassLoader = new GlobalObjectClassLoader(this);
 
+        singletonFactory.setGlobalObjectsBindingProvider(this);
         delegatingClassLoader.registerClassLoader("__go", globalObjectClassLoader, false);
         scriptService.registerBindingProvider(this);
     }
@@ -90,53 +92,87 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
             Map<String, Class> types = new HashMap<>();
 
             boolean incomplete = false;
+            List<GlobalObject> allObjects = new LinkedList<>(globalObjectDao.getAll());
+            int prevRemaining = allObjects.size();
 
-            for (GlobalObject globalObject : globalObjectDao.getAll()) {
-                try {
-                    long t = System.currentTimeMillis();
+            while (true) {
+                allObjectsLoop:
+                for (Iterator<GlobalObject> iterator = allObjects.iterator(); iterator.hasNext(); ) {
+                    GlobalObject globalObject = iterator.next();
 
-                    CompiledScript<?> compiledScript = scriptService.parseClassStatic(globalObject.getScriptBody(), true, ImmutableMap.of());
-                    Class<?> objectClass = compiledScript.getScriptClass();
-                    Object object = singletonFactory.createInstance(compiledScript);
+                    //check if all dependencies are initialized
+                    String dependenciesString = globalObject.getDependencies();
+                    if (dependenciesString != null) {
+                        String[] dependencies = dependenciesString.split(";");
 
-                    objects.put(
-                        globalObject.getName(),
-                        new LazyDocBindingDescriptorImpl(object, object.getClass(), () -> {
-                            try {
-                                return groovyDocService.parseDocs(objectClass.getCanonicalName(), objectClass.getSimpleName(), globalObject.getScriptBody());
-                            } catch (Exception e) {
-                                logger.error("Unable to parse doc for global object {}", globalObject.getName(), e);
-                                return null;
+                        for (String dependency : dependencies) {
+                            if (!types.containsKey(dependency)) {
+                                continue allObjectsLoop;
                             }
-                        })
-                    );
-                    types.put(objectClass.getName(), objectClass);
+                        }
+                    }
 
-                    t = System.currentTimeMillis() - t;
+                    try {
+                        long t = System.currentTimeMillis();
 
-                    if (t >= ExecutionRepository.WARNING_THRESHOLD) {
+                        CompiledScript<?> compiledScript = scriptService.parseSingleton(globalObject.getScriptBody(), true, ImmutableMap.of());
+                        Class<?> objectClass = compiledScript.getScriptClass();
+                        Object object = singletonFactory.createInstance(compiledScript);
+
+                        objects.put(
+                            globalObject.getName(),
+                            new LazyDocBindingDescriptorImpl(object, object.getClass(), () -> {
+                                try {
+                                    return groovyDocService.parseDocs(objectClass.getCanonicalName(), objectClass.getSimpleName(), globalObject.getScriptBody());
+                                } catch (Exception e) {
+                                    logger.error("Unable to parse doc for global object {}", globalObject.getName(), e);
+                                    return null;
+                                }
+                            })
+                        );
+                        types.put(objectClass.getName(), objectClass);
+
+                        t = System.currentTimeMillis() - t;
+
+                        if (t >= ExecutionRepository.WARNING_THRESHOLD) {
+                            executionRepository.trackInline(
+                                globalObject.getUuid(),
+                                t,
+                                true,
+                                null,
+                                ImmutableMap.of(
+                                    "type", ScriptType.GLOBAL_OBJECT.name()
+                                )
+                            );
+                        }
+
+                        iterator.remove();
+                    } catch (Exception e) {
+                        logger.error("Unable to initialize global object {}", globalObject.getName(), e);
                         executionRepository.trackInline(
                             globalObject.getUuid(),
-                            t,
-                            true,
-                            null,
+                            0L,
+                            false,
+                            e,
                             ImmutableMap.of(
                                 "type", ScriptType.GLOBAL_OBJECT.name()
                             )
                         );
                     }
-                } catch (Exception e) {
-                    logger.error("Unable to initialize global object {}", globalObject.getName(), e);
-                    executionRepository.trackInline(
-                        globalObject.getUuid(),
-                        0L,
-                        false,
-                        e,
-                        ImmutableMap.of(
-                            "type", ScriptType.GLOBAL_OBJECT.name()
-                        )
-                    );
                 }
+
+                //if nothing is initialized in last iteration, consider remaining objects as failed
+                if (prevRemaining == allObjects.size()) {
+                    if (allObjects.size() > 0) {
+                        logger.error(
+                            "Failed to initialize objects: {}",
+                            allObjects.stream().map(GlobalObject::getName).collect(Collectors.joining(";"))
+                        );
+                    }
+                    break;
+                }
+
+                prevRemaining = allObjects.size();
             }
 
             this.objects = objects;

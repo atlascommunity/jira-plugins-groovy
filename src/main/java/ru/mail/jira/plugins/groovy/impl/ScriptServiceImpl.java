@@ -149,7 +149,8 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     }
 
     @Override
-    public CompiledScript<?> parseClassStatic(String classBody, boolean extended, Map<String, Class> types) {
+    public CompiledScript<?> parseSingleton(String classBody, boolean extended, Map<String, Class> types) {
+        parseContextHolder.get().setSingleton(true);
         return parseClass(classBody, null, extended, true, types);
     }
 

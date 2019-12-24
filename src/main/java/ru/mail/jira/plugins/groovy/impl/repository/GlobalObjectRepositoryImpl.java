@@ -16,6 +16,7 @@ import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.GlobalObjectRepository;
 import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
+import ru.mail.jira.plugins.groovy.api.script.ResolvedConstructorArgument;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
@@ -23,6 +24,7 @@ import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -123,10 +125,22 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
 
-        CompiledScript scriptClass = scriptService.parseClassStatic(form.getScriptBody(), true, ImmutableMap.of());
+        CompiledScript scriptClass = scriptService.parseSingleton(form.getScriptBody(), true, ImmutableMap.of());
 
         try {
-            singletonFactory.getConstructorArguments(scriptClass);
+            ResolvedConstructorArgument[] arguments = singletonFactory.getExtendedConstructorArguments(scriptClass);
+
+            form.setDependencies(
+                StringUtils.trimToNull(
+                    Arrays
+                        .stream(arguments)
+                        .filter(it -> it.getArgumentType() == ResolvedConstructorArgument.ArgumentType.GLOBAL_OBJECT)
+                        .map(ResolvedConstructorArgument::getObject)
+                        .map(Object::getClass)
+                        .map(Class::getCanonicalName)
+                        .collect(Collectors.joining(";"))
+                )
+            );
         } catch (IllegalArgumentException e) {
             throw new ValidationException(e.getMessage(), "scriptBody");
         }

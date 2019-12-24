@@ -25,6 +25,10 @@ public class TypeBasedTypeCheckingExtension extends AbstractTypeCheckingExtensio
 
     @Override
     public boolean handleUnresolvedVariableExpression(VariableExpression vexp) {
+        if (parseContextHolder.get().isSingleton()) {
+            return false;
+        }
+
         Map<String, BindingDescriptor> globalBindings = scriptService.getGlobalBindings();
         BindingDescriptor globalBinding = globalBindings.get(vexp.getName());
 

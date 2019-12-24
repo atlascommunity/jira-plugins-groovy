@@ -67,7 +67,8 @@ public class GlobalObjectDaoImpl implements GlobalObjectDao {
             new DBParam("LOWER_NAME", form.getName().toLowerCase()),
             new DBParam("DESCRIPTION", form.getDescription()),
             new DBParam("SCRIPT_BODY", form.getScriptBody()),
-            new DBParam("DELETED", false)
+            new DBParam("DELETED", false),
+            new DBParam("DEPENDENCIES", form.getDependencies())
         );
 
         String diff = changelogHelper.generateDiff(result.getID(), "", result.getName(), "", form.getScriptBody());
@@ -102,6 +103,7 @@ public class GlobalObjectDaoImpl implements GlobalObjectDao {
         result.setLowerName(form.getName().toLowerCase());
         result.setDescription(form.getDescription());
         result.setScriptBody(form.getScriptBody());
+        result.setDependencies(form.getDependencies());
         result.save();
 
         addAuditLogAndNotify(user, EntityAction.UPDATED, result, diff, comment);

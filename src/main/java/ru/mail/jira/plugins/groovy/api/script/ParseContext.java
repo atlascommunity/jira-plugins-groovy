@@ -14,6 +14,8 @@ public class ParseContext {
     @Setter
     private boolean extended;
     @Setter
+    private boolean singleton;
+    @Setter
     private Map<String, Class> types;
     @Setter
     private List<WarningMessage> warnings;

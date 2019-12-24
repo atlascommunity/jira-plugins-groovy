@@ -9,4 +9,5 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @Getter @Setter
 public class GlobalObjectForm extends ScriptForm {
+    private String dependencies;
 }

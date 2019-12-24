@@ -185,7 +185,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
 
-        CompiledScript compiledScript = scriptService.parseClassStatic(form.getScriptBody(), false, ImmutableMap.of());
+        CompiledScript compiledScript = scriptService.parseSingleton(form.getScriptBody(), false, ImmutableMap.of());
 
         if (!ScriptedJqlFunction.class.isAssignableFrom(compiledScript.getScriptClass())) {
             throw new ValidationException("Must implement ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction", "scriptBody");
