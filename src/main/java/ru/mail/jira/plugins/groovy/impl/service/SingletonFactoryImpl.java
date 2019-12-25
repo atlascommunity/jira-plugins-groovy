@@ -85,7 +85,7 @@ public class SingletonFactoryImpl implements SingletonFactory {
                         .getBindings()
                         .values()
                         .stream()
-                        .filter(it -> it.getClass() == parameterType)
+                        .filter(it -> it.getType() == parameterType)
                         .findAny();
                     if (bindingDescriptor.isPresent()) {
                         result[i] = new ResolvedConstructorArgument(

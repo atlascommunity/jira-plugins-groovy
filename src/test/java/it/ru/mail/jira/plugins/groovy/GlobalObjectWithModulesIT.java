@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import ru.mail.jira.plugins.groovy.api.dao.GlobalObjectDao;
 import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectDto;
+import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectForm;
 import ru.mail.jira.plugins.groovy.api.e.UnableToLoadPluginException;
 import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
 import ru.mail.jira.plugins.groovy.api.repository.GlobalObjectRepository;
@@ -28,6 +29,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 
@@ -38,7 +40,9 @@ public class GlobalObjectWithModulesIT {
         "tests/go/WithJswModule",
         "tests/go/WithPluginModule",
         "tests/go/NonExistingImport",
-        "tests/go/BorkedObject"
+        "tests/go/BorkedObject",
+        "tests/go/GlobalObject",
+        "tests/go/WithGoDependency"
     );
 
     @Inject
@@ -82,10 +86,14 @@ public class GlobalObjectWithModulesIT {
     }
 
     private void createObject(String sourcePath) throws IOException {
-        GlobalObjectDto globalObjectDto = globalObjectRepository.create(userHelper.getAdmin(), Forms.globalObject(sourcePath));
-
+        GlobalObjectDto globalObjectDto = createObject(Forms.globalObject(sourcePath));
         globalObjectName = globalObjectDto.getName();
+    }
+
+    private GlobalObjectDto createObject(GlobalObjectForm form) throws IOException {
+        GlobalObjectDto globalObjectDto = globalObjectRepository.create(userHelper.getAdmin(), form);
         deleteIds.add(globalObjectDto.getId());
+        return globalObjectDto;
     }
 
     @Test
@@ -206,5 +214,22 @@ public class GlobalObjectWithModulesIT {
         }
 
         assertTrue(exceptionOccurred);
+    }
+
+    @Test
+    public void globalObjectImportShouldWork() throws Exception {
+        GlobalObjectDto object = createObject(Forms.globalObject("tests/go/GlobalObject"));
+        GlobalObjectForm form = Forms.globalObject("tests/go/WithGoDependency");
+        form.setScriptBody(
+            form.getScriptBody().replaceAll(
+                Pattern.quote("$INJECTED_GO_CLASSNAME$"),
+                bindingProvider.getBindings().get(object.getName()).getType().getSimpleName()
+            )
+        );
+        GlobalObjectDto object2 = createObject(form);
+
+        Object result = scriptService.executeScript(null, object2.getName() + ".getAdmin()", ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertNotNull(result);
     }
 }
