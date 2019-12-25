@@ -81,11 +81,16 @@ public class SingletonFactoryImpl implements SingletonFactory {
                     .findAny();
 
                 if (globalObjectInjection.isPresent()) {
-                    BindingDescriptor<?> bindingDescriptor = globalObjectsBindingProvider.getBindings().get(globalObjectInjection.get().value());
-                    if (bindingDescriptor != null) {
+                    Optional<BindingDescriptor<?>> bindingDescriptor = globalObjectsBindingProvider
+                        .getBindings()
+                        .values()
+                        .stream()
+                        .filter(it -> it.getClass() == parameterType)
+                        .findAny();
+                    if (bindingDescriptor.isPresent()) {
                         result[i] = new ResolvedConstructorArgument(
                             ResolvedConstructorArgument.ArgumentType.GLOBAL_OBJECT,
-                            bindingDescriptor.getValue(null, null)
+                            bindingDescriptor.get().getValue(null, null)
                         );
                     }
                 } else {
