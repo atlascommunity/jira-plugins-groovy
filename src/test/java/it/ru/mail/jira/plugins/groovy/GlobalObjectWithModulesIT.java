@@ -228,6 +228,11 @@ public class GlobalObjectWithModulesIT {
         );
         GlobalObjectDto object2 = createObject(form);
 
+        assertNotNull(globalObjectDao.get(object.getId()));
+        assertNotNull(bindingProvider.getBindings().get(object.getName()));
+        assertNotNull(globalObjectDao.get(object2.getId()));
+        assertNotNull(bindingProvider.getBindings().get(object2.getName()));
+
         Object result = scriptService.executeScript(null, object2.getName() + ".getAdmin()", ScriptType.CONSOLE, ImmutableMap.of());
 
         assertNotNull(result);
@@ -262,5 +267,38 @@ public class GlobalObjectWithModulesIT {
         assertNotNull(bindingProvider.getBindings().get(object.getName()));
         assertNotNull(globalObjectDao.get(object2.getId()));
         assertNull(bindingProvider.getBindings().get(object2.getName()));
+    }
+
+    @Test
+    public void prematureInitializationShouldWork() throws Exception {
+        GlobalObjectDto object = createObject(Forms.globalObject("tests/go/GlobalObject"));
+        GlobalObjectForm form = Forms.globalObject("tests/go/WithGoDependency");
+        form.setScriptBody(
+            form.getScriptBody().replaceAll(
+                Pattern.quote("$INJECTED_GO_CLASSNAME$"),
+                bindingProvider.getBindings().get(object.getName()).getType().getSimpleName()
+            )
+        );
+        GlobalObjectDto object2 = createObject(form);
+
+        assertNotNull(globalObjectDao.get(object.getId()));
+        assertNotNull(bindingProvider.getBindings().get(object.getName()));
+        assertNotNull(globalObjectDao.get(object2.getId()));
+        assertNotNull(bindingProvider.getBindings().get(object2.getName()));
+
+        Object result = scriptService.executeScript(null, object2.getName() + ".getAdmin()", ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertNotNull(result);
+
+        testHelperService.deinitializeGlobalObjects();
+
+        assertNotNull(globalObjectDao.get(object.getId()));
+        assertNotNull(bindingProvider.getBindings().get(object.getName()));
+        assertNotNull(globalObjectDao.get(object2.getId()));
+        assertNotNull(bindingProvider.getBindings().get(object2.getName()));
+
+        result = scriptService.executeScript(null, object2.getName() + ".getAdmin()", ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertNotNull(result);
     }
 }

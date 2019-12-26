@@ -107,6 +107,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
                         for (String dependency : dependencies) {
                             if (!types.containsKey(dependency)) {
+                                logger.warn("unable to satisfy dependency on {} for {}", dependency, globalObject.getName());
                                 continue allObjectsLoop;
                             }
                         }
@@ -161,6 +162,11 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                     }
                 }
 
+                this.types = new HashMap<>(types);
+                this.objects = new HashMap<>(objects);
+                //should be fine to be set early, we're still in write lock
+                this.initialized = true;
+
                 //if nothing is initialized in last iteration, consider remaining objects as failed
                 if (prevRemaining == allObjects.size()) {
                     if (allObjects.size() > 0) {
@@ -174,9 +180,6 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
                 prevRemaining = allObjects.size();
             }
-
-            this.objects = objects;
-            this.types = types;
 
             logger.info("loaded global object cache (incomplete: {})", incomplete);
 
@@ -256,5 +259,14 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
     @Override
     public int getInitOrder() {
         return 11;
+    }
+
+    /**
+     * UNSAFE - for tests only
+     */
+    public void deinitialize() {
+        this.initialized = false;
+        this.objects = ImmutableMap.of();
+        this.types = ImmutableMap.of();
     }
 }
