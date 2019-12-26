@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dto.directory.ScriptDirectoryForm;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.service.TestHelperService;
+import ru.mail.jira.plugins.groovy.impl.groovy.var.GlobalObjectsBindingProvider;
 import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 
 import java.util.List;
@@ -21,16 +22,19 @@ public class TestHelperServiceImpl implements TestHelperService {
     private final ActiveObjects activeObjects;
     private final ScriptRepository scriptRepository;
     private final DelegatingClassLoader classLoader;
+    private final GlobalObjectsBindingProvider globalObjectsBindingProvider;
 
     @Autowired
     public TestHelperServiceImpl(
         @ComponentImport ActiveObjects activeObjects,
         ScriptRepository scriptRepository,
-        DelegatingClassLoader classLoader
+        DelegatingClassLoader classLoader,
+        GlobalObjectsBindingProvider globalObjectsBindingProvider
     ) {
         this.activeObjects = activeObjects;
         this.scriptRepository = scriptRepository;
         this.classLoader = classLoader;
+        this.globalObjectsBindingProvider = globalObjectsBindingProvider;
     }
 
     @Override
@@ -74,6 +78,11 @@ public class TestHelperServiceImpl implements TestHelperService {
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
         return classLoader.loadClass(name);
+    }
+
+    @Override
+    public void deinitializeGlobalObjects() {
+        globalObjectsBindingProvider.deinitialize();
     }
 
     private void create(ApplicationUser user, String directoryName) {

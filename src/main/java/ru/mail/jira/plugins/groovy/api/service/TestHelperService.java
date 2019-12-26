@@ -15,4 +15,6 @@ public interface TestHelperService {
     <T extends Exception> T getCompilationExceptionCause(Exception e);
 
     Class<?> loadClass(String name) throws ClassNotFoundException;
+
+    void deinitializeGlobalObjects();
 }
