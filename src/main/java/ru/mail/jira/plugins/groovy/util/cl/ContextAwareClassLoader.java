@@ -2,13 +2,16 @@ package ru.mail.jira.plugins.groovy.util.cl;
 
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 @Component
 public class ContextAwareClassLoader extends ClassLoader {
-    private final ThreadLocal<Queue<Set<Plugin>>> currentContext = ThreadLocal.withInitial(LinkedList::new);
+    private final Logger logger = LoggerFactory.getLogger(ContextAwareClassLoader.class);
+    private final ThreadLocal<Deque<Set<Plugin>>> currentContext = ThreadLocal.withInitial(LinkedList::new);
 
     public void addPlugins(Collection<Plugin> plugins) {
         for (Plugin plugin : plugins) {
@@ -21,14 +24,18 @@ public class ContextAwareClassLoader extends ClassLoader {
     }
 
     public void startContext() {
-        currentContext.get().add(new HashSet<>());
+        logger.trace("creating context");
+        currentContext.get().push(new HashSet<>());
     }
 
     public void exitContext() {
+        logger.trace("exiting context");
+
         Queue<Set<Plugin>> queue = getQueue();
         queue.remove();
 
         if (queue.isEmpty()) {
+            logger.trace("clearing thread local state");
             currentContext.remove();
         }
     }
