@@ -90,6 +90,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
             this.objects = new HashMap<>();
             this.types = new HashMap<>();
+            this.initialized = true;
 
             boolean incomplete = false;
             List<GlobalObject> allObjects = new LinkedList<>(globalObjectDao.getAll());
@@ -182,11 +183,6 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         });
     }
 
-    private void unsafeInitialize() {
-        this.unsafeLoadCaches();
-        initialized = true;
-    }
-
     private void initializePrematurely() {
         Lock wLock = rwLock.writeLock();
         wLock.lock();
@@ -196,7 +192,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
             }
 
             logger.warn("doing premature initialization");
-            unsafeInitialize();
+            unsafeLoadCaches();
         } finally {
             wLock.unlock();
         }
@@ -228,7 +224,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
             wLock.lock();
             try {
                 if (!initialized) {
-                    unsafeInitialize();
+                    unsafeLoadCaches();
                 }
             } finally {
                 wLock.unlock();
