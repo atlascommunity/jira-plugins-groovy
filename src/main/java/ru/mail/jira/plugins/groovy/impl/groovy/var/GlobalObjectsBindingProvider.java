@@ -88,8 +88,8 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                 .map(BindingDescriptor::getType)
                 .forEach(InvokerHelper::removeClass);
 
-            Map<String, BindingDescriptor<?>> objects = new HashMap<>();
-            Map<String, Class> types = new HashMap<>();
+            this.objects = new HashMap<>();
+            this.types = new HashMap<>();
 
             boolean incomplete = false;
             List<GlobalObject> allObjects = new LinkedList<>(globalObjectDao.getAll());
@@ -161,11 +161,6 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                         );
                     }
                 }
-
-                this.types = new HashMap<>(types);
-                this.objects = new HashMap<>(objects);
-                //should be fine to be set early, we're still in write lock
-                this.initialized = true;
 
                 //if nothing is initialized in last iteration, consider remaining objects as failed
                 if (prevRemaining == allObjects.size()) {
