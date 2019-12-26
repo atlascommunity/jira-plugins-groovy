@@ -11,7 +11,7 @@ import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.api.dto.directory.RegistryScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.script.ParamType;
-import ru.mail.jira.plugins.groovy.impl.param.ScriptParamFactory;
+import ru.mail.jira.plugins.groovy.api.script.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.Base64Util;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;

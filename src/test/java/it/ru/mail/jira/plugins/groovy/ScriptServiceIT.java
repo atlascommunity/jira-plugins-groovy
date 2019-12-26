@@ -18,11 +18,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.dto.docs.ClassDoc;
 import ru.mail.jira.plugins.groovy.api.dto.docs.MethodDoc;
 import ru.mail.jira.plugins.groovy.api.dto.docs.ParameterDoc;
 import ru.mail.jira.plugins.groovy.api.dto.docs.TypeDoc;
+import ru.mail.jira.plugins.groovy.api.script.ParamType;
 import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
+import ru.mail.jira.plugins.groovy.api.script.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.GroovyDocService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
@@ -45,6 +48,7 @@ public class ScriptServiceIT {
         "tests/standardModule",
         "tests/jswModule",
         "tests/pluginModule",
+        "tests/pluginModuleWithScriptParam",
         "tests/containerService",
         "tests/GroovyDocTest",
         "tests/logging"
@@ -69,6 +73,10 @@ public class ScriptServiceIT {
     @ComponentImport
     @Inject
     private BuildUtilsInfo buildUtilsInfo;
+
+    @ComponentImport
+    @Inject
+    private ScriptParamFactory scriptParamFactory;
 
     private ApplicationUser oldUser;
 
@@ -246,6 +254,22 @@ public class ScriptServiceIT {
             ),
             generatedDoc
         );
+    }
+
+    @Test
+    public void scriptParamShouldNotBreakClassLoading() throws Exception {
+        Object param = scriptParamFactory.getParamObject(new ScriptParamDto("script", "Script", ParamType.SCRIPT, false), "return \"test ok\"");
+
+        Object result = scriptService.executeScript(
+            null,
+            FileUtil.readArquillianExample("tests/pluginModuleWithScriptParam"),
+            ScriptType.ADMIN_SCRIPT,
+            ImmutableMap.of(
+                "script", param
+            )
+        );
+
+        assertNotNull(result);
     }
 
     private static String buildLink(String url, String className) {

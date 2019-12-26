@@ -6,7 +6,7 @@ import com.opensymphony.workflow.loader.AbstractDescriptor;
 import com.opensymphony.workflow.loader.ConditionDescriptor;
 import ru.mail.jira.plugins.groovy.api.dto.workflow.WorkflowScriptType;
 import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
-import ru.mail.jira.plugins.groovy.impl.param.ScriptParamFactory;
+import ru.mail.jira.plugins.groovy.api.script.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.JsonMapper;
 
 import java.util.Map;
