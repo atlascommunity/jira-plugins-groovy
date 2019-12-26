@@ -109,32 +109,35 @@ public class SingletonFactoryImpl implements SingletonFactory {
     @Override
     public <T> Object[] getConstructorArguments(CompiledScript<T> compiledScript) {
         try {
+            contextAwareClassLoader.startContext();
             contextAwareClassLoader.addPlugins(injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins()));
             return getObjects(doGetConstructorArguments(compiledScript));
         } finally {
-            contextAwareClassLoader.clearContext();
+            contextAwareClassLoader.exitContext();
         }
     }
 
     @Override
     public <T> ResolvedConstructorArgument[] getExtendedConstructorArguments(CompiledScript<T> compiledScript) throws IllegalArgumentException {
         try {
+            contextAwareClassLoader.startContext();
             contextAwareClassLoader.addPlugins(injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins()));
             return doGetConstructorArguments(compiledScript);
         } finally {
-            contextAwareClassLoader.clearContext();
+            contextAwareClassLoader.exitContext();
         }
     }
 
     @Override
     public <T> T createInstance(CompiledScript<T> compiledScript) {
         try {
+            contextAwareClassLoader.startContext();
             contextAwareClassLoader.addPlugins(injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins()));
             return findSingleConstructor(compiledScript.getScriptClass()).newInstance(getObjects(doGetConstructorArguments(compiledScript)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            contextAwareClassLoader.clearContext();
+            contextAwareClassLoader.exitContext();
         }
     }
 

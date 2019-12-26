@@ -212,6 +212,8 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         boolean fromCache = false;
 
         try {
+            contextAwareClassLoader.startContext();
+
             if (scriptId != null) {
                 compiledScript = scriptCache.get(scriptId, ignore -> parseClass(scriptString, scriptId, false, compileStatic, types));
                 fromCache = true;
@@ -285,7 +287,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         } catch (Exception e) {
             return new ScriptExecutionOutcome(null, executionContextHolder.get(), System.currentTimeMillis() - t, e);
         } finally {
-            this.contextAwareClassLoader.clearContext();
+            this.contextAwareClassLoader.exitContext();
             this.executionContextHolder.reset();
             if (!fromCache && script != null) {
                 InvokerHelper.removeClass(script.getClass());
@@ -306,6 +308,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     private CompiledScript parseClass(String script, String id, boolean extended, boolean compileStatic, Map<String, Class> types) {
         logger.debug("parsing script");
         try {
+            contextAwareClassLoader.startContext();
             parseContextHolder.get().setExtended(extended);
             parseContextHolder.get().setCompileStatic(compileStatic);
             parseContextHolder.get().setTypes(types);
@@ -369,7 +372,7 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
         } finally {
             logger.debug("resetting parse context");
             this.parseContextHolder.reset();
-            this.contextAwareClassLoader.clearContext();
+            this.contextAwareClassLoader.exitContext();
         }
     }
 

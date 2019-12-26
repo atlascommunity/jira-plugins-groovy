@@ -8,7 +8,7 @@ import java.util.*;
 
 @Component
 public class ContextAwareClassLoader extends ClassLoader {
-    private final ThreadLocal<Set<Plugin>> currentContext = ThreadLocal.withInitial(HashSet::new);
+    private final ThreadLocal<Queue<Set<Plugin>>> currentContext = ThreadLocal.withInitial(LinkedList::new);
 
     public void addPlugins(Collection<Plugin> plugins) {
         for (Plugin plugin : plugins) {
@@ -17,16 +17,25 @@ public class ContextAwareClassLoader extends ClassLoader {
             }
         }
 
-        currentContext.get().addAll(plugins);
+        getContext().addAll(plugins);
     }
 
-    public void clearContext() {
-        currentContext.remove();
+    public void startContext() {
+        currentContext.get().add(new HashSet<>());
+    }
+
+    public void exitContext() {
+        Queue<Set<Plugin>> queue = getQueue();
+        queue.remove();
+
+        if (queue.isEmpty()) {
+            currentContext.remove();
+        }
     }
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        for (Plugin plugin : currentContext.get()) {
+        for (Plugin plugin : getContext()) {
             if (plugin.getPluginState() != PluginState.ENABLED) {
                 throw new RuntimeException("Plugin " + plugin.getKey() + " is not enabled");
             }
@@ -38,5 +47,19 @@ public class ContextAwareClassLoader extends ClassLoader {
         }
 
         throw new ClassNotFoundException(name);
+    }
+
+    private Queue<Set<Plugin>> getQueue() {
+        Queue<Set<Plugin>> activeContext = currentContext.get();
+
+        if (activeContext.isEmpty()) {
+            throw new IllegalStateException("context is empty");
+        }
+
+        return activeContext;
+    }
+
+    private Set<Plugin> getContext() {
+        return getQueue().peek();
     }
 }
