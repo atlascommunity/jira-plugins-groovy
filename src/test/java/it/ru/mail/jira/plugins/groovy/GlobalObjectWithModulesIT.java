@@ -96,6 +96,12 @@ public class GlobalObjectWithModulesIT {
         return globalObjectDto;
     }
 
+    private GlobalObject createObjectDirect(GlobalObjectForm form) throws IOException {
+        GlobalObject globalObject = globalObjectDao.createScript(userHelper.getAdmin(), form);
+        deleteIds.add(globalObject.getID());
+        return globalObject;
+    }
+
     @Test
     public void shouldWork() throws Exception {
         createObject("tests/go/WithStandardModule");
@@ -299,6 +305,46 @@ public class GlobalObjectWithModulesIT {
 
         result = scriptService.executeScript(null, object2.getName() + ".getAdmin()", ScriptType.CONSOLE, ImmutableMap.of());
 
+        assertNotNull(result);
+    }
+
+    @Test
+    public void circularDependencyShouldFailSafely() throws Exception {
+        GlobalObjectForm form1 = Forms.globalObject("tests/go/WithGoDependency");
+        GlobalObjectForm form2 = Forms.globalObject("tests/go/WithGoDependency");
+
+        String name1 = form1.getName().substring("testObject".length());
+        String name2 = form2.getName().substring("testObject".length());
+
+        form2.setScriptBody(
+            form2.getScriptBody().replaceAll(
+                Pattern.quote("$INJECTED_GO_CLASSNAME$"),
+                "GlobalObject" + name1
+            )
+        );
+        form2.setDependencies("ru.mail.jira.scripts.go.GlobalObject" + name1);
+        form1.setScriptBody(
+            form1.getScriptBody().replaceAll(
+                Pattern.quote("$INJECTED_GO_CLASSNAME$"),
+                "GlobalObject" + name2
+            )
+        );
+        form2.setDependencies("ru.mail.jira.scripts.go.GlobalObject" + name2);
+
+        GlobalObject object1 = createObjectDirect(form1);
+        GlobalObject object2 = createObjectDirect(form2);
+        GlobalObjectDto okObject = createObject(Forms.globalObject("tests/go/GlobalObject"));
+
+        testHelperService.deinitializeGlobalObjects();
+
+        assertNotNull(globalObjectDao.get(okObject.getId()));
+        assertNotNull(bindingProvider.getBindings().get(okObject.getName()));
+        assertNotNull(globalObjectDao.get(object1.getID()));
+        assertNull(bindingProvider.getBindings().get(object1.getName()));
+        assertNotNull(globalObjectDao.get(object2.getID()));
+        assertNull(bindingProvider.getBindings().get(object2.getName()));
+
+        Object result = scriptService.executeScript(null, okObject.getName() + ".getAdmin()", ScriptType.CONSOLE, ImmutableMap.of());
         assertNotNull(result);
     }
 }
