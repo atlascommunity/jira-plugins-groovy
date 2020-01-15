@@ -311,6 +311,7 @@ public class GlobalObjectWithModulesIT {
     @Test
     public void circularDependencyShouldFailSafely() throws Exception {
         GlobalObjectForm form1 = Forms.globalObject("tests/go/WithGoDependency");
+        Thread.sleep(200);
         GlobalObjectForm form2 = Forms.globalObject("tests/go/WithGoDependency");
 
         String name1 = form1.getName().substring("testObject".length());
