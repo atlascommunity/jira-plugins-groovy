@@ -99,6 +99,7 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
     public void invalidateGlobalObjects() {
         clusterMessagingService.sendRemote(GLOBAL_OBJECTS_CHANNEL, "");
         globalObjectsBindingProvider.refresh();
+        moduleManager.resetDelegates();
     }
 
     @Override
@@ -183,6 +184,7 @@ public class ScriptInvalidationServiceImpl implements PluginLifecycleAware, Scri
                 }
             } else if (GLOBAL_OBJECTS_CHANNEL.equals(channel)) {
                 globalObjectsBindingProvider.refresh();
+                moduleManager.resetDelegates();
             } else if (SENTRY_CHANNEL.equals(channel)) {
                 sentryService.invalidateSettings();
             }
