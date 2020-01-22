@@ -29,6 +29,7 @@ import ru.mail.jira.plugins.groovy.impl.jql.function.ScriptedFunctionAdapter;
 import ru.mail.jira.plugins.groovy.impl.jql.function.ValuesFunctionAdapter;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
+import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,6 +50,7 @@ public class ModuleManager {
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final PluginAccessor pluginAccessor;
     private final BundleContext bundleContext;
+    private final ContextAwareClassLoader contextAwareClassLoader;
     private final SingletonFactory singletonFactory;
     private final ScriptService scriptService;
 
@@ -57,12 +59,14 @@ public class ModuleManager {
         @ComponentImport JiraAuthenticationContext jiraAuthenticationContext,
         @ComponentImport PluginAccessor pluginAccessor,
         BundleContext bundleContext,
+        ContextAwareClassLoader contextAwareClassLoader,
         SingletonFactory singletonFactory,
         ScriptService scriptService
     ) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.pluginAccessor = pluginAccessor;
         this.bundleContext = bundleContext;
+        this.contextAwareClassLoader = contextAwareClassLoader;
         this.singletonFactory = singletonFactory;
         this.scriptService = scriptService;
     }
@@ -83,12 +87,14 @@ public class ModuleManager {
                     return new ValuesFunctionAdapter(
                         getScriptModuleKey(script.getId()),
                         script.getName(),
+                        contextAwareClassLoader,
                         supplier
                     );
                 } else if (ScriptedJqlQueryFunction.class.isAssignableFrom(scriptClass)) {
                     return new QueryFunctionAdapter(
                         getScriptModuleKey(script.getId()),
                         script.getName(),
+                        contextAwareClassLoader,
                         supplier
                     );
                 } else {

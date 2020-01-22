@@ -10,14 +10,15 @@ import com.google.common.collect.ImmutableList;
 import ru.mail.jira.plugins.groovy.api.jql.CustomQueryFunction;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlQueryFunction;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
+import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class QueryFunctionAdapter extends ScriptedFunctionAdapter<ScriptedJqlQueryFunction> implements CustomQueryFunction {
-    public QueryFunctionAdapter(String key, String functionName, Supplier<ScriptedJqlQueryFunction> delegateSupplier) {
-        super(key, functionName, delegateSupplier);
+    public QueryFunctionAdapter(String key, String functionName, ContextAwareClassLoader contextAwareClassLoader, Supplier<ScriptedJqlQueryFunction> delegateSupplier) {
+        super(key, functionName, contextAwareClassLoader, delegateSupplier);
     }
 
     @Nonnull
@@ -30,12 +31,17 @@ public class QueryFunctionAdapter extends ScriptedFunctionAdapter<ScriptedJqlQue
     @Override
     public QueryFactoryResult getQuery(@Nonnull QueryCreationContext queryCreationContext, @Nonnull TerminalClause terminalClause) {
         if (terminalClause.getOperand() instanceof FunctionOperand) {
-            return new QueryFactoryResult(
-                ClassLoaderUtil.runInContext(() ->
-                    getDelegate().getQuery(queryCreationContext, ((FunctionOperand) terminalClause.getOperand()))
-                ),
-                terminalClause.getOperator() == Operator.NOT_IN
-            );
+            try {
+                classLoader.startContext();
+                return new QueryFactoryResult(
+                    ClassLoaderUtil.runInContext(() ->
+                        getDelegate().getQuery(queryCreationContext, ((FunctionOperand) terminalClause.getOperand()))
+                    ),
+                    terminalClause.getOperator() == Operator.NOT_IN
+                );
+            } finally {
+                classLoader.exitContext();
+            }
         }
         return QueryFactoryResult.createFalseResult();
     }

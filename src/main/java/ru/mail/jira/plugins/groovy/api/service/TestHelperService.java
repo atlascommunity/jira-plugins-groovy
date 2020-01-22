@@ -17,4 +17,6 @@ public interface TestHelperService {
     Class<?> loadClass(String name) throws ClassNotFoundException;
 
     void deinitializeGlobalObjects();
+
+    void flushJqlModules();
 }

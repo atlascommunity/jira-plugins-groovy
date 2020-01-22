@@ -10,19 +10,28 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
+import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
 public abstract class ScriptedFunctionAdapter<T extends ScriptedJqlFunction> implements CustomFunction {
+    protected final ContextAwareClassLoader classLoader;
+
     private final String key;
     private final String functionName;
     private final Supplier<T> delegateSupplier;
     private volatile T delegateInstance;
 
-    protected ScriptedFunctionAdapter(String key, String functionName, Supplier<T> delegateSupplier) {
+    protected ScriptedFunctionAdapter(
+        String key,
+        String functionName,
+        ContextAwareClassLoader classLoader,
+        Supplier<T> delegateSupplier
+    ) {
         this.key = key;
         this.functionName = functionName;
+        this.classLoader = classLoader;
         this.delegateSupplier = delegateSupplier;
     }
 
@@ -50,18 +59,33 @@ public abstract class ScriptedFunctionAdapter<T extends ScriptedJqlFunction> imp
     @Nonnull
     @Override
     public final JiraDataType getDataType() {
-        return ClassLoaderUtil.runInContext(getDelegate()::getDataType);
+        try {
+            classLoader.startContext();
+            return ClassLoaderUtil.runInContext(getDelegate()::getDataType);
+        } finally {
+            classLoader.exitContext();
+        }
     }
 
     @Nonnull
     @Override
     public final MessageSet validate(ApplicationUser applicationUser, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
-        return ClassLoaderUtil.runInContext(() -> getDelegate().validate(applicationUser, functionOperand, terminalClause));
+        try {
+            classLoader.startContext();
+            return ClassLoaderUtil.runInContext(() -> getDelegate().validate(applicationUser, functionOperand, terminalClause));
+        } finally {
+            classLoader.exitContext();
+        }
     }
 
     @Override
     public final int getMinimumNumberOfExpectedArguments() {
-        return ClassLoaderUtil.runInContext(getDelegate()::getMinimumNumberOfExpectedArguments);
+        try {
+            classLoader.startContext();
+            return ClassLoaderUtil.runInContext(getDelegate()::getMinimumNumberOfExpectedArguments);
+        } finally {
+            classLoader.exitContext();
+        }
     }
 
     public T getDelegate() {
