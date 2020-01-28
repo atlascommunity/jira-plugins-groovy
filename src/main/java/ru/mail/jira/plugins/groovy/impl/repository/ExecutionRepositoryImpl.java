@@ -82,7 +82,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     }
 
     @Override
-    public void trackFromRegistry(int id, long time, boolean successful, Exception exception, Map<String, String> additionalParams) {
+    public void trackFromRegistry(int id, long time, boolean successful, Throwable exception, Map<String, String> additionalParams) {
         //we need these only if we're sending event to sentry
         User currentUser = successful ? null : getCurrentUser();
         HttpInterface httpInterface = successful ? null : getCurrentRequest();
@@ -100,7 +100,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
     }
 
     @Override
-    public void trackInline(String id, long time, boolean successful, Exception exception, Map<String, String> additionalParams) {
+    public void trackInline(String id, long time, boolean successful, Throwable exception, Map<String, String> additionalParams) {
         //we need these only if we're sending event to sentry
         User currentUser = successful ? null : getCurrentUser();
         HttpInterface httpInterface = successful ? null : getCurrentRequest();
@@ -273,7 +273,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         return result;
     }
 
-    private void saveExecution(int id, long time, boolean successful, Exception exception, String additionalParams) {
+    private void saveExecution(int id, long time, boolean successful, Throwable exception, String additionalParams) {
         ao.create(
             ScriptExecution.class,
             new DBParam("SCRIPT_ID", id),
@@ -285,7 +285,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         );
     }
 
-    private void saveExecution(String id, long time, boolean successful, List<LoggingEvent> loggingEvents, Exception exception, String additionalParams) {
+    private void saveExecution(String id, long time, boolean successful, List<LoggingEvent> loggingEvents, Throwable exception, String additionalParams) {
         ao.create(
             ScriptExecution.class,
             new DBParam("INLINE_ID", id),
@@ -300,7 +300,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
 
     private void submitSentryEvent(
         String id,
-        Exception e,
+        Throwable e,
         HttpInterface httpInterface,
         User user,
         Map<String, String> params

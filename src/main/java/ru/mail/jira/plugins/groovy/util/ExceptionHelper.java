@@ -18,7 +18,7 @@ public final class ExceptionHelper {
     private ExceptionHelper() {
     }
 
-    public static String writeExceptionToString(Exception e) {
+    public static String writeExceptionToString(Throwable e) {
         if (e == null) {
             return null;
         }

@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
 public interface ExecutionRepository {
     long WARNING_THRESHOLD = TimeUnit.SECONDS.toMillis(10);
 
-    void trackFromRegistry(int id, long time, boolean successful, Exception e, Map<String, String> additionalParams);
+    void trackFromRegistry(int id, long time, boolean successful, Throwable e, Map<String, String> additionalParams);
 
-    void trackInline(String id, long time, boolean successful, Exception e, Map<String, String> additionalParams);
+    void trackInline(String id, long time, boolean successful, Throwable e, Map<String, String> additionalParams);
 
     void trackInline(String id, ScriptExecutionOutcome outcome, Map<String, String> additionalParams);
 

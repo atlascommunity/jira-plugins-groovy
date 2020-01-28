@@ -1,6 +1,8 @@
 package ru.mail.jira.plugins.groovy.impl.service;
 
 import com.atlassian.plugin.Plugin;
+import groovy.lang.*;
+import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.script.*;
@@ -15,6 +17,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class SingletonFactoryImpl implements SingletonFactory {
@@ -132,8 +135,19 @@ public class SingletonFactoryImpl implements SingletonFactory {
     public <T> T createInstance(CompiledScript<T> compiledScript) {
         try {
             contextAwareClassLoader.startContext();
-            contextAwareClassLoader.addPlugins(injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins()));
-            return findSingleConstructor(compiledScript.getScriptClass()).newInstance(getObjects(doGetConstructorArguments(compiledScript)));
+            Set<Plugin> plugins = injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins());
+            contextAwareClassLoader.addPlugins(plugins);
+
+            Class<?> objClass = compiledScript.getScriptClass();
+
+            DelegatingMetaClass metaClass = new ContextAwareMetaClass(DefaultGroovyMethods.getMetaClass(objClass), plugins);
+            metaClass.initialize();
+
+            DefaultGroovyMethods.setMetaClass(objClass, metaClass);
+
+            T rawObj = findSingleConstructor(compiledScript.getScriptClass()).newInstance(getObjects(doGetConstructorArguments(compiledScript)));
+
+            return rawObj;
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -150,5 +164,76 @@ public class SingletonFactoryImpl implements SingletonFactory {
             .stream(arguments)
             .map(ResolvedConstructorArgument::getObject)
             .toArray();
+    }
+
+    private class ContextAwareMetaClass extends DelegatingMetaClass {
+        private final Set<Plugin> plugins;
+
+        public ContextAwareMetaClass(MetaClass delegate, Set<Plugin> plugins) {
+            super(delegate);
+            this.plugins = plugins;
+        }
+
+        @Override
+        public Object invokeMethod(Object object, String methodName, Object arguments) {
+            try {
+                contextAwareClassLoader.startContext();
+                contextAwareClassLoader.addPlugins(plugins);
+                return super.invokeMethod(object, methodName, arguments);
+            } finally {
+                contextAwareClassLoader.exitContext();
+            }
+        }
+
+        @Override
+        public Object invokeMethod(Object object, String methodName, Object[] arguments) {
+            try {
+                contextAwareClassLoader.startContext();
+                contextAwareClassLoader.addPlugins(plugins);
+                return super.invokeMethod(object, methodName, arguments);
+            } finally {
+                contextAwareClassLoader.exitContext();
+            }
+        }
+
+        @Override
+        public Object invokeStaticMethod(Object object, String methodName, Object[] arguments) {
+            try {
+                contextAwareClassLoader.startContext();
+                contextAwareClassLoader.addPlugins(plugins);
+                return super.invokeStaticMethod(object, methodName, arguments);
+            } finally {
+                contextAwareClassLoader.exitContext();
+            }
+        }
+
+        @Override
+        public Object invokeMethod(
+            Class sender,
+            Object receiver,
+            String methodName,
+            Object[] arguments,
+            boolean isCallToSuper,
+            boolean fromInsideClass
+        ) {
+            try {
+                contextAwareClassLoader.startContext();
+                contextAwareClassLoader.addPlugins(plugins);
+                return super.invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass);
+            } finally {
+                contextAwareClassLoader.exitContext();
+            }
+        }
+
+        @Override
+        public Object invokeMethod(String name, Object args) {
+            try {
+                contextAwareClassLoader.startContext();
+                contextAwareClassLoader.addPlugins(plugins);
+                return super.invokeMethod(name, args);
+            } finally {
+                contextAwareClassLoader.exitContext();
+            }
+        }
     }
 }

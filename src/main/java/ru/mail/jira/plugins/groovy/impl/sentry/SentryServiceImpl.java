@@ -44,7 +44,7 @@ public class SentryServiceImpl implements SentryService, PluginLifecycleAware {
     public void registerException(
         String id,
         User user,
-        Exception e,
+        Throwable e,
         HttpInterface httpInterface,
         Map<String, String> metaData
     ) {

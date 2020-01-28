@@ -6,7 +6,7 @@ import io.sentry.event.interfaces.HttpInterface;
 import java.util.Map;
 
 public interface SentryService {
-    void registerException(String id, User user, Exception e, HttpInterface httpInterface, Map<String, String> metaData);
+    void registerException(String id, User user, Throwable e, HttpInterface httpInterface, Map<String, String> metaData);
 
     void updateSettings(boolean enabled, String dsn);
 

@@ -123,7 +123,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
                             state.objects.put(
                                 globalObject.getName(),
-                                new LazyDocBindingDescriptorImpl(object, object.getClass(), () -> {
+                                new LazyDocBindingDescriptorImpl(object, objectClass, () -> {
                                     try {
                                         return groovyDocService.parseDocs(objectClass.getCanonicalName(), objectClass.getSimpleName(), globalObject.getScriptBody());
                                     } catch (Exception e) {
@@ -149,7 +149,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                             }
 
                             iterator.remove();
-                        } catch (Exception e) {
+                        } catch (Exception | NoClassDefFoundError e) {
                             logger.error("Unable to initialize global object {}", globalObject.getName(), e);
                             executionRepository.trackInline(
                                 globalObject.getUuid(),

@@ -541,7 +541,7 @@
         <ao.version>1.5.0</ao.version>
         <junit.version>5.2.0</junit.version>
         <atlassian.spring.scanner.version>2.1.7</atlassian.spring.scanner.version>
-        <groovy.version>2.5.8</groovy.version>
+        <groovy.version>2.5.9</groovy.version>
 
         <shutdownTimeout>60000</shutdownTimeout>
 
