@@ -119,6 +119,10 @@ public class FindScriptText implements BuiltInScript<String> {
             String name;
             if (type == EntityType.CUSTOM_FIELD) {
                 name = customFieldHelper.getFieldName((long) id);
+
+                if (name == null) {
+                    name = "[deleted field configId=" + id + "]";
+                }
             } else {
                 name = tuple.get(namePath);
             }
