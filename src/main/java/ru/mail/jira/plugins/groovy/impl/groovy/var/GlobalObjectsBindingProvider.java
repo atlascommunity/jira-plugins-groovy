@@ -20,6 +20,7 @@ import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.impl.service.SingletonFactoryImpl;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
+import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
@@ -42,6 +43,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
     private final ExecutionRepository executionRepository;
     private final GroovyDocService groovyDocService;
     private final SingletonFactory singletonFactory;
+    private final ContextAwareClassLoader contextAwareClassLoader;
     //we must keep reference to this object
     private final GlobalObjectClassLoader globalObjectClassLoader;
 
@@ -52,13 +54,15 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         ExecutionRepository executionRepository,
         DelegatingClassLoader delegatingClassLoader,
         GroovyDocService groovyDocService,
-        SingletonFactoryImpl singletonFactory
+        SingletonFactoryImpl singletonFactory,
+        ContextAwareClassLoader contextAwareClassLoader
     ) {
         this.scriptService = scriptService;
         this.globalObjectDao = globalObjectDao;
         this.executionRepository = executionRepository;
         this.groovyDocService = groovyDocService;
         this.singletonFactory = singletonFactory;
+        this.contextAwareClassLoader = contextAwareClassLoader;
         this.globalObjectClassLoader = new GlobalObjectClassLoader(this);
 
         singletonFactory.setGlobalObjectsBindingProvider(this);
@@ -67,13 +71,18 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
     }
 
     public void refresh() {
-        Lock lock = rwLock.writeLock();
-
-        lock.lock();
+        contextAwareClassLoader.getWriteLock().lock();
         try {
-            unsafeLoadCaches();
+            Lock lock = rwLock.writeLock();
+
+            lock.lock();
+            try {
+                unsafeLoadCaches();
+            } finally {
+                lock.unlock();
+            }
         } finally {
-            lock.unlock();
+            contextAwareClassLoader.getWriteLock().unlock();
         }
     }
 
@@ -188,17 +197,22 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
     }
 
     private void initializePrematurely() {
-        Lock wLock = rwLock.writeLock();
-        wLock.lock();
+        contextAwareClassLoader.getWriteLock().lock();
         try {
-            if (state != null) {
-                return;
-            }
+            Lock wLock = rwLock.writeLock();
+            wLock.lock();
+            try {
+                if (state != null) {
+                    return;
+                }
 
-            logger.warn("doing premature initialization");
-            unsafeLoadCaches();
+                logger.warn("doing premature initialization");
+                unsafeLoadCaches();
+            } finally {
+                wLock.unlock();
+            }
         } finally {
-            wLock.unlock();
+            contextAwareClassLoader.getWriteLock().unlock();
         }
     }
 
@@ -243,16 +257,21 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
     @Override
     public void onStart() {
-        if (state == null) {
-            ReentrantReadWriteLock.WriteLock wLock = rwLock.writeLock();
-            wLock.lock();
-            try {
-                if (state == null) {
-                    unsafeLoadCaches();
+        contextAwareClassLoader.getWriteLock().lock();
+        try {
+            if (state == null) {
+                ReentrantReadWriteLock.WriteLock wLock = rwLock.writeLock();
+                wLock.lock();
+                try {
+                    if (state == null) {
+                        unsafeLoadCaches();
+                    }
+                } finally {
+                    wLock.unlock();
                 }
-            } finally {
-                wLock.unlock();
             }
+        } finally {
+            contextAwareClassLoader.getWriteLock().unlock();
         }
     }
 

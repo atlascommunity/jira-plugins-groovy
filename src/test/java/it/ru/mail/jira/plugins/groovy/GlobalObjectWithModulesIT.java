@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.*;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
@@ -37,6 +38,7 @@ import static org.junit.Assert.*;
 @RunWith(Arquillian.class)
 public class GlobalObjectWithModulesIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
+        "tests/go/SlowGlobalObject",
         "tests/go/WithStandardModule",
         "tests/go/WithJswModule",
         "tests/go/WithPluginModule",
@@ -69,6 +71,7 @@ public class GlobalObjectWithModulesIT {
 
     private String globalObjectName;
     private Set<Integer> deleteIds = new HashSet<>();
+    private ScheduledExecutorService executorService = null;
 
     @BeforeDeployment
     public static Archive<?> prepareArchive(Archive<?> archive) {
@@ -84,6 +87,14 @@ public class GlobalObjectWithModulesIT {
                 e.printStackTrace();
             }
         }
+
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdownNow();
+        }
+    }
+
+    ScheduledExecutorService getExecutor() {
+        return executorService != null ? executorService : (executorService = Executors.newScheduledThreadPool(5));
     }
 
     private void createObject(String sourcePath) throws IOException {
@@ -350,5 +361,41 @@ public class GlobalObjectWithModulesIT {
 
         Object result = scriptService.executeScript(null, okObject.getName() + ".getAdmin()", ScriptType.CONSOLE, ImmutableMap.of());
         assertNotNull(result);
+    }
+
+    @Test(timeout = 60_000)
+    public void classLoaderDeadlockShouldNotHappen() throws Exception {
+        GlobalObjectDto object = createObject(Forms.globalObject("tests/go/SlowGlobalObject"));
+        GlobalObjectForm form = Forms.globalObject("tests/go/WithGoDependency");
+        String objectClassName = bindingProvider.getBindings().get(object.getName()).getType().getSimpleName();
+        form.setScriptBody(
+            form.getScriptBody().replaceAll(
+                Pattern.quote("$INJECTED_GO_CLASSNAME$"),
+                objectClassName
+            )
+        );
+        GlobalObjectDto object2 = createObject(form);
+
+        assertNotNull(globalObjectDao.get(object.getId()));
+        assertNotNull(bindingProvider.getBindings().get(object.getName()));
+        assertNotNull(globalObjectDao.get(object2.getId()));
+        assertNotNull(bindingProvider.getBindings().get(object2.getName()));
+
+        Object result = scriptService.executeScript(null, object2.getName() + ".getAdmin()", ScriptType.CONSOLE, ImmutableMap.of());
+        assertNotNull(result);
+
+        ScheduledFuture<Object> outcome = getExecutor().schedule(
+            () -> scriptService.executeScript(
+                null,
+                "import ru.mail.jira.scripts.go." + objectClassName + ";" +
+                    "assert " + objectClassName + " != null;" +
+                    "return " + object2.getName() + ".getAdmin()",
+                ScriptType.CONSOLE, ImmutableMap.of()
+            ),
+            5, TimeUnit.SECONDS
+        );
+        scriptInvalidationService.invalidateGlobalObjects();
+
+        assertNotNull(outcome.get());
     }
 }

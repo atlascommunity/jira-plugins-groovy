@@ -7,11 +7,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
 public class ContextAwareClassLoader extends ClassLoader {
     private final Logger logger = LoggerFactory.getLogger(ContextAwareClassLoader.class);
     private final ThreadLocal<Deque<Set<Plugin>>> currentContext = ThreadLocal.withInitial(LinkedList::new);
+    private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     public void addPlugins(Collection<Plugin> plugins) {
         for (Plugin plugin : plugins) {
@@ -24,6 +28,7 @@ public class ContextAwareClassLoader extends ClassLoader {
     }
 
     public void startContext() {
+        rwLock.readLock().lock();
         logger.trace("creating context");
         currentContext.get().push(new HashSet<>());
     }
@@ -38,6 +43,11 @@ public class ContextAwareClassLoader extends ClassLoader {
             logger.trace("clearing thread local state");
             currentContext.remove();
         }
+        rwLock.readLock().unlock();
+    }
+
+    public Lock getWriteLock() {
+        return rwLock.writeLock();
     }
 
     @Override
