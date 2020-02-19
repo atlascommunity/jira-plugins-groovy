@@ -86,6 +86,7 @@ public class FindScriptText implements BuiltInScript<String> {
                 getAbstractScriptQuery(QueryDslTables.REST, text, ignoreCase, EntityType.REST),
                 getAbstractScriptQuery(QueryDslTables.SCHEDULED_TASK, text, ignoreCase, EntityType.SCHEDULED_TASK),
                 getAbstractScriptQuery(QueryDslTables.REGISTRY_SCRIPT, text, ignoreCase, EntityType.REGISTRY_SCRIPT),
+                getAbstractScriptQuery(QueryDslTables.GLOBAL_OBJECT, text, ignoreCase, EntityType.GLOBAL_OBJECT),
                 SQLExpressions
                     .select(
                         QueryDslTables.FIELD_CONFIG.FIELD_CONFIG_ID.as(idPath),

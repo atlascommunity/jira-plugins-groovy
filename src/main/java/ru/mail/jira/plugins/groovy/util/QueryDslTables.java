@@ -15,6 +15,7 @@ public final class QueryDslTables {
     public static final QAbstractScript REST = new QAbstractScript("REST_SCRIPT");
     public static final QAbstractScript SCHEDULED_TASK = new QAbstractScript("SCHEDULED_TASK");
     public static final QAbstractScript REGISTRY_SCRIPT = new QAbstractScript("SCRIPT");
+    public static final QAbstractScript GLOBAL_OBJECT = new QAbstractScript("GLOBAL_OBJECT");
     public static final QFieldConfig FIELD_CONFIG = new QFieldConfig();
 
     public static final QAbstractChangelog ADMIN_CHANGELOG = new QAbstractChangelog("A_SCRIPT_CHANGELOG");
