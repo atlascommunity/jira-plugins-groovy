@@ -46,7 +46,7 @@ export class FormField extends React.PureComponent<Props> {
                 {() => (
                     <React.Fragment>
                         {children({name, isInvalid, isRequired, isDisabled, isValidationHidden: true})}
-                        {isInvalid && <ErrorMessage>{invalidMessage}</ErrorMessage>}
+                        {isInvalid && <ErrorMessage><div>{invalidMessage}</div></ErrorMessage>}
                     </React.Fragment>
                 )}
             </Field>

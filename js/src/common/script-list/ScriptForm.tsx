@@ -190,7 +190,7 @@ export class ScriptForm<T extends ScriptFormType> extends React.PureComponent<Pr
                 if (error.field === 'scriptBody' && Array.isArray(error.error)) {
                     const errors = error.error.filter(e => e);
                     errorMessage = errors
-                        .map(error => error.messages)
+                        .map(error => error.message)
                         .map(error => <p key={error}>{error}</p>);
                 } else if (error.messages) {
                     errorMessage = error.messages.join('; ');
