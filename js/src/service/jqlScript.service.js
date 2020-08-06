@@ -2,6 +2,7 @@
 import {ajaxDelete, ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
 
 import type {JqlScriptType} from '../app-jql/types';
+import type {ChangelogType} from '../common/script/types';
 
 
 export class JqlScriptService {
@@ -27,5 +28,9 @@ export class JqlScriptService {
 
     restoreScript(id: number): Promise<void> {
         return ajaxPost(`${getPluginBaseUrl()}/jql/${id}/restore`);
+    }
+
+    getChangelogs(id: number): Promise<$ReadOnlyArray<ChangelogType>> {
+        return ajaxGet(`${getPluginBaseUrl()}/jql/${id}/changelogs`);
     }
 }

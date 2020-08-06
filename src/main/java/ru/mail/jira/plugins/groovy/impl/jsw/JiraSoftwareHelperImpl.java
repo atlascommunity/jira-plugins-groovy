@@ -44,10 +44,6 @@ public class JiraSoftwareHelperImpl implements JiraSoftwareHelper {
         this.sprintService = sprintService;
     }
 
-    public boolean isAvailable() {
-        return true;
-    }
-
     @Override
     public CustomField getEpicLinkField() {
         return managedCustomFieldsService.getEpicLinkCustomField().get();
@@ -89,24 +85,24 @@ public class JiraSoftwareHelperImpl implements JiraSoftwareHelper {
     }
 
     @Override
-    public Query getRapidViewQuery(ApplicationUser user, Optional<RapidView> rapidView) {
-        return rapidViewQueryService.getRapidViewQuery(user, rapidView.get()).get();
+    public Query getRapidViewQuery(ApplicationUser user, RapidView rapidView) {
+        return rapidViewQueryService.getRapidViewQuery(user, rapidView).get();
     }
 
     @Override
-    public Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, Optional<RapidView> rapidView) {
+    public Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, RapidView rapidView) {
         return sprintService.getSprints(
-            user, rapidView.get(),
+            user, rapidView,
             PageRequests.all(),
             SprintQuery.builder().states(EnumSet.of(Sprint.State.ACTIVE)).build()
         ).get().getValues();
     }
 
     @Override
-    public Optional<Sprint> findSprint(ApplicationUser user, Optional<RapidView> rapidView, String name) {
+    public Optional<Sprint> findSprint(ApplicationUser user, RapidView rapidView, String name) {
         return sprintService
             .getSprints(
-                user, rapidView.get(),
+                user, rapidView,
                 PageRequests.all(),
                 SprintQuery.builder().build()
             )

@@ -2,6 +2,7 @@
 import {ajaxDelete, ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
 
 import type {AdminScriptType, AdminScriptOutcomeType} from '../app-admin/types';
+import type {ChangelogType} from '../common/script/types';
 
 
 export class AdminScriptService {
@@ -35,5 +36,9 @@ export class AdminScriptService {
 
     runUserScript(id: number, params: any): Promise<AdminScriptOutcomeType> {
         return ajaxPost(`${getPluginBaseUrl()}/adminScript/run/user/${id}`, params);
+    }
+
+    getChangelogs(id: number): Promise<$ReadOnlyArray<ChangelogType>> {
+        return ajaxGet(`${getPluginBaseUrl()}/adminScript/${id}/changelogs`);
     }
 }

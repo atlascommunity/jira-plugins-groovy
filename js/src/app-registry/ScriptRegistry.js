@@ -1,5 +1,5 @@
 //@flow
-import React from 'react';
+import React, {Fragment} from 'react';
 
 import {connect} from 'react-redux';
 import {createSelector} from 'reselect';
@@ -13,6 +13,10 @@ import Button from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {Checkbox} from '@atlaskit/checkbox';
 import Breadcrumbs from '@atlaskit/breadcrumbs';
+import DropdownMenu, {
+    DropdownItemGroupRadio,
+    DropdownItemRadio,
+} from '@atlaskit/dropdown-menu';
 
 import {ScriptDirectory} from './ScriptDirectory';
 import {ScriptDirectoryDialog, type DialogParams} from './ScriptDirectoryDialog';
@@ -22,13 +26,14 @@ import {
 } from './redux';
 import {UsageStatusFlag} from './UsageStatusFlag';
 
-import type {FilterType, RegistryDirectoryType} from './types';
+import type {FilterType, RegistryDirectoryType, WorkflowScriptType} from './types';
+import {scriptTypes} from './types';
 
 import {InfoMessage} from '../common/ak/messages';
 
 import {registryService} from '../service';
 
-import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, PageTitleMessages, FieldMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import './ScriptRegistry.less';
@@ -145,6 +150,8 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
     _toggleUnused = () => this.props.updateFilter({ onlyUnused: !this.props.filter.onlyUnused });
 
+    _setType = (scriptType: ?WorkflowScriptType) => () => this.props.updateFilter({ scriptType });
+
     componentDidUpdate(prevProps: Props) {
         if (prevProps.directories !== this.props.directories) {
             //trigger scroll event when directory list is changed so all visible lazily rendered elements render
@@ -172,7 +179,7 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                                 </Button>
                             }
                             bottomBar={
-                                <div className="flex-row">
+                                <div className="flex-row space-between">
                                     <div>
                                         <FieldTextStateless
                                             isLabelHidden
@@ -183,6 +190,34 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
                                             onChange={this._onFilterChange}
                                         />
                                     </div>
+                                    <DropdownMenu
+                                        trigger={
+                                            <Fragment>
+                                                {FieldMessages.type}{' '}
+                                                {filter.scriptType ? <strong>{'('}{filter.scriptType}{')'}</strong> : `(${CommonMessages.all})`}
+                                            </Fragment>
+                                        }
+                                        triggerType="button"
+                                    >
+                                        <DropdownItemGroupRadio id="categories">
+                                            <DropdownItemRadio
+                                                id="all"
+                                                onClick={this._setType(null)}
+                                                isSelected={filter.scriptType === null}
+                                            >
+                                                All
+                                            </DropdownItemRadio>
+                                            {scriptTypes.map(type =>
+                                                <DropdownItemRadio
+                                                    id={type} key={type}
+                                                    onClick={this._setType(type)}
+                                                    isSelected={filter.scriptType === type}
+                                                >
+                                                    {type}
+                                                </DropdownItemRadio>
+                                            )}
+                                        </DropdownItemGroupRadio>
+                                    </DropdownMenu>
                                     <div className="flex-vertical-middle">
                                         <Checkbox
                                             label={RegistryMessages.onlyUnused}

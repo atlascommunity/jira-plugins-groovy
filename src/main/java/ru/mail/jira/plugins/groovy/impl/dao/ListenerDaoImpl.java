@@ -59,7 +59,7 @@ public class ListenerDaoImpl implements ListenerDao {
             comment = Const.CREATED_COMMENT;
         }
 
-        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), null, user.getKey(), diff, comment);
 
         addAuditLogAndNotify(user, EntityAction.CREATED, listener, diff, comment);
 
@@ -77,7 +77,7 @@ public class ListenerDaoImpl implements ListenerDao {
         String diff = changelogHelper.generateDiff(id, listener.getName(), form.getName(), listener.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
 
-        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(ListenerChangelog.class, "LISTENER_ID", listener.getID(), listener.getUuid(), user.getKey(), diff, comment);
 
         listener.setName(form.getName());
         listener.setDescription(form.getDescription());

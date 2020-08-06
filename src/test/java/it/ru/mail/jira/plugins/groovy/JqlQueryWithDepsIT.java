@@ -119,11 +119,11 @@ public class JqlQueryWithDepsIT {
 
         assertFalse(searchService.validateQuery(user, query).hasAnyErrors());
         SearchResults userResults = searchService.search(user, query, PagerFilter.getUnlimitedFilter());
-        assertEquals(ImmutableList.of(assignedToUser), userResults.getIssues());
+        assertEquals(ImmutableList.of(assignedToUser), userResults.getResults());
 
         assertFalse(searchService.validateQuery(admin, query).hasAnyErrors());
         SearchResults adminResults = searchService.search(admin, query, PagerFilter.getUnlimitedFilter());
-        assertEquals(ImmutableList.of(assignedToAdmin), adminResults.getIssues());
+        assertEquals(ImmutableList.of(assignedToAdmin), adminResults.getResults());
     }
 
     @Test

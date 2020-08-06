@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dao.FieldConfigDao;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScriptDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
@@ -104,12 +105,17 @@ public class FieldConfigRepositoryImpl implements FieldConfigRepository {
             .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ChangelogDto> getChangelogs(long id) {
+        return changelogHelper.collect(fieldConfigDao.getChangelogs(id));
+    }
+
     private Stream<FieldConfigDto> getConfigs(CustomField customField) {
         return customField
             .getConfigurationSchemes()
             .stream()
             .flatMap(fieldConfigScheme -> fieldConfigScheme.getConfigs().values().stream())
-            .map(config -> buildDto(config, fieldConfigDao.findByConfigId(config.getId()), true, true));
+            .map(config -> buildDto(config, fieldConfigDao.findByConfigId(config.getId()), false, true));
     }
 
     @Override

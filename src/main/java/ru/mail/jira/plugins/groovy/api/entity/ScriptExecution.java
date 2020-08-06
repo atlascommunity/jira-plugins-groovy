@@ -32,6 +32,10 @@ public interface ScriptExecution extends Entity {
     String getError();
     void setError(String error);
 
+    @StringLength(StringLength.UNLIMITED)
+    String getLog();
+    void setLog(String log);
+
     @NotNull
     @StringLength(StringLength.UNLIMITED)
     String getExtraParams();

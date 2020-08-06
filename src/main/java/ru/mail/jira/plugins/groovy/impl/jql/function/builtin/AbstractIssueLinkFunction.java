@@ -5,7 +5,6 @@ import com.atlassian.jira.issue.index.indexers.impl.IssueLinkIndexer;
 import com.atlassian.jira.issue.link.Direction;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
-import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.query.Query;
@@ -14,6 +13,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 public abstract class AbstractIssueLinkFunction extends AbstractBuiltInQueryFunction {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -38,7 +38,7 @@ public abstract class AbstractIssueLinkFunction extends AbstractBuiltInQueryFunc
 
         searchHelper.doSearch(jqlQuery, luceneQuery, collector, qcc);
 
-        return new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds()));
+        return QueryUtil.createIssueIdQuery(collector.getIssueIds());
     }
 
     protected void validateLinkType(MessageSet messageSet, String name) {

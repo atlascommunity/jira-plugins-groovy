@@ -12,6 +12,7 @@ import net.java.ao.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionForm;
 import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
@@ -19,6 +20,7 @@ import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
 import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.JqlFunctionRepository;
+import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.impl.AuditService;
@@ -78,6 +80,11 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
     }
 
     @Override
+    public List<ChangelogDto> getChangelogs(int id) {
+        return changelogHelper.collect(ao.find(JqlFunctionScriptChangelog.class, Query.select().where("SCRIPT_ID = ?", id)));
+    }
+
+    @Override
     public JqlFunctionScriptDto getScript(int id) {
         return buildScriptDto(ao.get(JqlFunctionScript.class, id), false, false);
     }
@@ -103,7 +110,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
             comment = Const.CREATED_COMMENT;
         }
 
-        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), null, user.getKey(), diff, comment);
 
         addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
@@ -120,7 +127,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
 
-        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(JqlFunctionScriptChangelog.class, script.getID(), script.getUuid(), user.getKey(), diff, comment);
 
         script.setUuid(UUID.randomUUID().toString());
         script.setName(form.getName());
@@ -178,14 +185,14 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
 
-        Class functionClass = scriptService.parseClassStatic(form.getScriptBody(), false, ImmutableMap.of());
+        CompiledScript compiledScript = scriptService.parseSingleton(form.getScriptBody(), false, ImmutableMap.of());
 
-        if (!ScriptedJqlFunction.class.isAssignableFrom(functionClass)) {
+        if (!ScriptedJqlFunction.class.isAssignableFrom(compiledScript.getScriptClass())) {
             throw new ValidationException("Must implement ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction", "scriptBody");
         }
 
         try {
-            singletonFactory.getConstructorArguments(functionClass);
+            singletonFactory.getConstructorArguments(compiledScript);
         } catch (IllegalArgumentException e) {
             throw new ValidationException(e.getMessage(), "scriptBody");
         }

@@ -1,5 +1,6 @@
 package it.ru.mail.jira.plugins.groovy.crud;
 
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableSet;
 import it.ru.mail.jira.plugins.groovy.util.ArquillianUtil;
@@ -9,6 +10,7 @@ import it.ru.mail.jira.plugins.groovy.util.UserHelper;
 import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import ru.mail.jira.plugins.groovy.api.dto.directory.*;
@@ -20,6 +22,9 @@ import ru.mail.jira.plugins.groovy.api.repository.ScriptRepository;
 import ru.mail.jira.plugins.groovy.util.Const;
 
 import javax.inject.Inject;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -36,16 +41,34 @@ public class RegistryCrudIT {
     @Inject
     private ChangeLogHelper changeLogHelper;
 
+    private Set<Integer> directoryIds = new HashSet<>();
+    private Set<Integer> scriptIds = new HashSet<>();
+
     @BeforeDeployment
     public static Archive<?> prepareArchive(Archive<?> archive) {
         return ArquillianUtil.prepareArchive(archive);
+    }
+
+    @After
+    public void afterEach() {
+        ApplicationUser admin = userHelper.getAdmin();
+
+        for (Integer scriptId : scriptIds) {
+            scriptRepository.deleteScript(admin, scriptId);
+        }
+
+        for (Integer directoryId : directoryIds) {
+            scriptRepository.deleteDirectory(admin, directoryId);
+        }
     }
 
     private ScriptDirectoryDto createDirectory() {
         ScriptDirectoryForm directoryForm = new ScriptDirectoryForm();
         directoryForm.setName("dir"+System.currentTimeMillis());
 
-        return scriptRepository.createDirectory(userHelper.getAdmin(), directoryForm);
+        ScriptDirectoryDto directory = scriptRepository.createDirectory(userHelper.getAdmin(), directoryForm);
+        directoryIds.add(directory.getId());
+        return directory;
     }
 
     private RegistryScriptForm createScriptForm(ScriptDirectoryDto directory) {
@@ -60,13 +83,17 @@ public class RegistryCrudIT {
     private RegistryScriptDto createScript(RegistryScriptForm form) {
         assertNotNull(form);
 
-        return scriptRepository.createScript(userHelper.getAdmin(), form);
+        RegistryScriptDto script = scriptRepository.createScript(userHelper.getAdmin(), form);
+        scriptIds.add(script.getId());
+        return script;
     }
 
     private RegistryScriptDto createScript(ScriptDirectoryDto directory) {
         assertNotNull(directory);
 
-        return scriptRepository.createScript(userHelper.getAdmin(), createScriptForm(directory));
+        RegistryScriptDto script = scriptRepository.createScript(userHelper.getAdmin(), createScriptForm(directory));
+        scriptIds.add(script.getId());
+        return script;
     }
 
     private RegistryScriptDto createScript() {

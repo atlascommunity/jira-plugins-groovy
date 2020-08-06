@@ -9,6 +9,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import it.ru.mail.jira.plugins.groovy.util.ArquillianUtil;
+import org.apache.log4j.Level;
+import org.apache.log4j.spi.LoggingEvent;
 import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -16,10 +18,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.dto.docs.ClassDoc;
 import ru.mail.jira.plugins.groovy.api.dto.docs.MethodDoc;
 import ru.mail.jira.plugins.groovy.api.dto.docs.ParameterDoc;
 import ru.mail.jira.plugins.groovy.api.dto.docs.TypeDoc;
+import ru.mail.jira.plugins.groovy.api.script.ParamType;
+import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
+import ru.mail.jira.plugins.groovy.api.script.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.GroovyDocService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
@@ -27,18 +33,25 @@ import ru.mail.jira.plugins.groovy.impl.FileUtil;
 
 import javax.inject.Inject;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
 @RunWith(Arquillian.class)
 public class ScriptServiceIT {
     private static final Set<String> requiredScripts = ImmutableSet.of(
         "tests/jsonSlurper",
+        "tests/dateExtension",
         "tests/standardModule",
+        "tests/jswModule",
         "tests/pluginModule",
+        "tests/pluginModuleWithScriptParam",
         "tests/containerService",
-        "tests/GroovyDocTest"
+        "tests/GroovyDocTest",
+        "tests/logging"
     );
 
     @ComponentImport
@@ -60,6 +73,10 @@ public class ScriptServiceIT {
     @ComponentImport
     @Inject
     private BuildUtilsInfo buildUtilsInfo;
+
+    @ComponentImport
+    @Inject
+    private ScriptParamFactory scriptParamFactory;
 
     private ApplicationUser oldUser;
 
@@ -115,12 +132,75 @@ public class ScriptServiceIT {
     }
 
     @Test
+    public void jswModuleShouldWork() throws Exception {
+        String script = FileUtil.readArquillianExample("tests/pluginModule");
+
+        Object result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertNotNull(result);
+    }
+
+    @Test
     public void pluginModuleShouldWorkWithPrivateService() throws Exception {
         String script = FileUtil.readArquillianExample("tests/containerService");
 
         Object result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
 
         assertNotNull(result);
+    }
+
+    @Test
+    public void dateExtensionShouldWork() throws Exception {
+        String script = FileUtil.readArquillianExample("tests/dateExtension");
+
+        Object result = scriptService.executeScript(null, script, ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertThat(result, instanceOf(Date.class));
+    }
+
+    @Test
+    public void dateExtensionShouldWorkWithStc() throws Exception {
+        String script = FileUtil.readArquillianExample("tests/dateExtension");
+
+        Object result = scriptService.executeScriptStatic(null, script, ScriptType.CONSOLE, ImmutableMap.of(), ImmutableMap.of());
+
+        assertThat(result, instanceOf(Date.class));
+    }
+
+    @Test
+    public void logShouldWork() throws Exception {
+        String script = FileUtil.readArquillianExample("tests/logging");
+
+        ScriptExecutionOutcome outcome = scriptService.executeScriptWithOutcome(null, script, ScriptType.CONSOLE, ImmutableMap.of());
+
+        assertNotNull(outcome);
+        assertNotNull(outcome.getExecutionContext());
+        assertNotNull(outcome.getExecutionContext().getLogEntries());
+
+        List<LoggingEvent> logEntries = outcome.getExecutionContext().getLogEntries();
+
+        List<String> referenceMessages = ImmutableList.of(
+            "test trace",
+            "test debug",
+            "test info",
+            "test warn",
+            "test error"
+        );
+
+        List<Level> referenceLevels = ImmutableList.of(
+            Level.TRACE,
+            Level.DEBUG,
+            Level.INFO,
+            Level.WARN,
+            Level.ERROR
+        );
+
+        for (int i = 0; i < logEntries.size(); ++i) {
+            LoggingEvent event = logEntries.get(i);
+
+            assertEquals(referenceMessages.get(i), event.getMessage());
+            assertEquals(referenceLevels.get(i), event.getLevel());
+        }
     }
 
     @Test
@@ -174,6 +254,22 @@ public class ScriptServiceIT {
             ),
             generatedDoc
         );
+    }
+
+    @Test
+    public void scriptParamShouldNotBreakClassLoading() throws Exception {
+        Object param = scriptParamFactory.getParamObject(new ScriptParamDto("script", "Script", ParamType.SCRIPT, false), "return \"test ok\"");
+
+        Object result = scriptService.executeScript(
+            null,
+            FileUtil.readArquillianExample("tests/pluginModuleWithScriptParam"),
+            ScriptType.ADMIN_SCRIPT,
+            ImmutableMap.of(
+                "script", param
+            )
+        );
+
+        assertNotNull(result);
     }
 
     private static String buildLink(String url, String className) {

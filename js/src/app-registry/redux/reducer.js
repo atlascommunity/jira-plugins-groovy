@@ -180,7 +180,8 @@ function filterReducer(state: FilterType, action: FilterAction): FilterType {
     if (state === undefined) {
         return {
             name: '',
-            onlyUnused: false
+            onlyUnused: false,
+            scriptType: null
         };
     }
 

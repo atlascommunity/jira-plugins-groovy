@@ -41,7 +41,18 @@ public class ListenerResource {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
-            return listenerRepository.getListeners(true, true);
+            return listenerRepository.getListeners(false, true);
+        }).getResponse();
+    }
+
+    @GET
+    @Path("/{id}/changelogs")
+    @WebSudoRequired
+    public Response getChangelogs(@PathParam("id") int id) {
+        return new RestExecutor<>(() -> {
+            permissionHelper.checkIfAdmin();
+
+            return listenerRepository.getChangelogs(id);
         }).getResponse();
     }
 

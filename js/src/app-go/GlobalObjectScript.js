@@ -53,6 +53,8 @@ export class GlobalObjectScript extends React.PureComponent<Props> {
         })
     );
 
+    _getChangelogs = () => globalObjectService.getChangelogs(this.props.script.id);
+
     render() {
         const {script, collapsible, focused} = this.props;
 
@@ -62,6 +64,7 @@ export class GlobalObjectScript extends React.PureComponent<Props> {
                 entityType="GLOBAL_OBJECT"
 
                 script={this._getScript(script)}
+                changelogsLoader={this._getChangelogs}
                 withChangelog={true}
                 collapsible={collapsible}
                 focused={focused}

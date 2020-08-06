@@ -2,7 +2,7 @@
 import React from 'react';
 
 import {Bindings} from '../common/bindings';
-import {EditorField} from '../common/ak/EditorField';
+import {CheckedEditorField} from '../common/ak';
 import {CommonMessages} from '../i18n/common.i18n';
 
 
@@ -27,23 +27,27 @@ export class FormEditor extends React.Component<FormEditorProps, FormEditorState
     };
 
     render() {
+        const {fieldName} = this.props;
+        const {value} = this.state;
+
         return (
             <div>
-                <EditorField
+                <CheckedEditorField
                     label={CommonMessages.script}
                     isRequired={true}
 
                     bindings={bindings}
 
-                    value={this.state.value}
+                    value={value}
                     onChange={this._setValue}
+                    scriptType="WORKFLOW_GENERIC"
                 />
                 <textarea
                     className="hidden"
 
                     readOnly={true}
-                    value={this.state.value}
-                    name={this.props.fieldName}
+                    value={value}
+                    name={fieldName}
                 />
             </div>
         );

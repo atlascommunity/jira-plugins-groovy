@@ -120,6 +120,7 @@ export class AsyncPicker<T: ValueType> extends React.PureComponent<Props<T>, Asy
         if (prevProps.src !== src) {
             this.setState(
                 { data: {complete: false, options: [] }},
+                //$FlowFixMe: won't need this after refactor to async select
                 () => this._getOptions(value ? value.label : '')
             );
         }

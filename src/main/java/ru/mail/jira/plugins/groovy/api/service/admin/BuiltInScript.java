@@ -1,6 +1,7 @@
 package ru.mail.jira.plugins.groovy.api.service.admin;
 
 import com.atlassian.jira.user.ApplicationUser;
+import com.google.common.collect.ImmutableMap;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 
 import java.util.List;
@@ -20,4 +21,8 @@ public interface BuiltInScript<T> {
     boolean isHtml();
 
     List<ScriptParamDto> getParams();
+
+    default Map<String, Object> getDefaultValues() {
+        return ImmutableMap.of();
+    }
 }

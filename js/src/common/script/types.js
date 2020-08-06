@@ -19,7 +19,9 @@ export type ChangelogType = {
     templateDiff?: string,
     author: JiraUser,
     date: string,
-    issueReferences: Array<IssueReference>
+    issueReferences: Array<IssueReference>,
+    warnings: number,
+    errors: number
 };
 
 export type ExecutionType = {
@@ -30,7 +32,8 @@ export type ExecutionType = {
     slow: boolean,
     date: string,
     extraParams: {[string]: string},
-    error?: string
+    error?: string,
+    log?: string
 };
 
 export type ScriptId = number | string;

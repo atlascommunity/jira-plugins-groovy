@@ -1,18 +1,21 @@
 package ru.mail.jira.plugins.groovy.api.repository;
 
 import ru.mail.jira.plugins.groovy.api.dto.execution.ScriptExecutionDto;
+import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public interface ExecutionRepository {
     long WARNING_THRESHOLD = TimeUnit.SECONDS.toMillis(10);
 
-    void trackFromRegistry(int id, long time, boolean successful, String error, Map<String, String> additionalParams);
+    void trackFromRegistry(int id, long time, boolean successful, Throwable e, Map<String, String> additionalParams);
 
-    void trackInline(String id, long time, boolean successful, String error, Map<String, String> additionalParams);
+    void trackInline(String id, long time, boolean successful, Throwable e, Map<String, String> additionalParams);
+
+    void trackInline(String id, ScriptExecutionOutcome outcome, Map<String, String> additionalParams);
 
     Map<Integer, Long> getRegistryErrorCount();
 
@@ -28,13 +31,17 @@ public interface ExecutionRepository {
 
     void deleteOldExecutions();
 
-    void deleteExecutions(int scriptId, Timestamp until);
+    void deleteAll();
 
     int getErrorCount(int id);
 
     int getErrorCount(String id);
 
+    Map<String, Long> getErrorCount(Set<String> ids);
+
     int getWarningCount(int id);
 
     int getWarningCount(String id);
+
+    Map<String, Long> getWarningCount(Set<String> ids);
 }

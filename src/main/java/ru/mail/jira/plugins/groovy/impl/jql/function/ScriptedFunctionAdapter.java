@@ -8,19 +8,22 @@ import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import ru.mail.jira.plugins.groovy.api.jql.CustomFunction;
-import ru.mail.jira.plugins.groovy.api.jql.ScriptedJqlFunction;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
-public abstract class ScriptedFunctionAdapter<T extends ScriptedJqlFunction> implements CustomFunction {
+public abstract class ScriptedFunctionAdapter implements CustomFunction {
     private final String key;
     private final String functionName;
-    private final Supplier<T> delegateSupplier;
-    private volatile T delegateInstance;
+    private final Supplier<Object> delegateSupplier;
+    private volatile Object delegateInstance;
 
-    protected ScriptedFunctionAdapter(String key, String functionName, Supplier<T> delegateSupplier) {
+    protected ScriptedFunctionAdapter(
+        String key,
+        String functionName,
+        Supplier<Object> delegateSupplier
+    ) {
         this.key = key;
         this.functionName = functionName;
         this.delegateSupplier = delegateSupplier;
@@ -50,36 +53,42 @@ public abstract class ScriptedFunctionAdapter<T extends ScriptedJqlFunction> imp
     @Nonnull
     @Override
     public final JiraDataType getDataType() {
-        return ClassLoaderUtil.runInContext(getDelegate()::getDataType);
+        return (JiraDataType) ClassLoaderUtil.runInContext(() ->
+            InvokerHelper.invokeMethod(getDelegate(), "getDataType", null)
+        );
     }
 
     @Nonnull
     @Override
     public final MessageSet validate(ApplicationUser applicationUser, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
-        return ClassLoaderUtil.runInContext(() -> getDelegate().validate(applicationUser, functionOperand, terminalClause));
+        return (MessageSet) ClassLoaderUtil.runInContext(() ->
+            InvokerHelper.invokeMethod(getDelegate(), "validate", new java.lang.Object[] {applicationUser, functionOperand, terminalClause})
+        );
     }
 
     @Override
     public final int getMinimumNumberOfExpectedArguments() {
-        return ClassLoaderUtil.runInContext(getDelegate()::getMinimumNumberOfExpectedArguments);
+        return (int) ClassLoaderUtil.runInContext(() ->
+            InvokerHelper.invokeMethod(getDelegate(), "getMinimumNumberOfExpectedArguments", null)
+        );
     }
 
-    public T getDelegate() {
-        T result = delegateInstance;
-        if (result == null) {
+    public Object getDelegate() {
+        Object proxy = delegateInstance;
+        if (proxy == null) {
             synchronized (this) {
-                result = delegateInstance;
-                if (result == null) {
-                    result = delegateSupplier.get();
-                    delegateInstance = result;
+                proxy = delegateInstance;
+                if (proxy == null) {
+                    proxy = delegateSupplier.get();
+                    delegateInstance = proxy;
                 }
             }
         }
-        return result;
+        return proxy;
     }
 
     public void reset() {
-        T instance;
+        Object instance;
         synchronized (this) {
             instance = delegateInstance;
             delegateInstance = null;

@@ -1,7 +1,6 @@
 package ru.mail.jira.plugins.groovy.impl.jql;
 
 import com.atlassian.jira.JiraDataTypeImpl;
-import com.atlassian.jira.issue.changehistory.ChangeHistoryManager;
 import com.atlassian.jira.issue.customfields.SingleValueCustomFieldValueProvider;
 import com.atlassian.jira.issue.customfields.searchers.AbstractInitializationCustomFieldSearcher;
 import com.atlassian.jira.issue.customfields.searchers.CustomFieldSearcherClauseHandler;
@@ -11,11 +10,11 @@ import com.atlassian.jira.issue.customfields.searchers.renderer.CustomFieldRende
 import com.atlassian.jira.issue.customfields.searchers.transformer.CustomFieldInputHelper;
 import com.atlassian.jira.issue.customfields.searchers.transformer.ExactTextCustomFieldSearchInputTransformer;
 import com.atlassian.jira.issue.fields.CustomField;
-import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.search.searchers.information.SearcherInformation;
 import com.atlassian.jira.issue.search.searchers.renderer.SearchRenderer;
 import com.atlassian.jira.issue.search.searchers.transformer.SearchInputTransformer;
 import com.atlassian.jira.jql.validator.ExactTextCustomFieldValidator;
+import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -23,7 +22,6 @@ import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ru.mail.jira.plugins.groovy.impl.jql.indexers.LastUpdatedByIndexer;
-import ru.mail.jira.plugins.groovy.impl.jql.indexers.LinksIndexer;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -31,8 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher {
     private final FieldVisibilityManager fieldVisibilityManager;
     private final CustomFieldInputHelper customFieldInputHelper;
-    private final IssueLinkManager issueLinkManager;
-    private final ChangeHistoryManager changeHistoryManager;
+    private final OfBizDelegator ofBizDelegator;
     private final CustomClauseQueryFactory clauseQueryFactory;
 
     private CustomFieldSearcherClauseHandler customFieldSearcherClauseHandler;
@@ -43,14 +40,12 @@ public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher 
     public JqlFieldSearcher(
         @ComponentImport FieldVisibilityManager fieldVisibilityManager,
         @ComponentImport CustomFieldInputHelper customFieldInputHelper,
-        @ComponentImport IssueLinkManager issueLinkManager,
-        @ComponentImport ChangeHistoryManager changeHistoryManager,
+        @ComponentImport OfBizDelegator ofBizDelegator,
         CustomClauseQueryFactory clauseQueryFactory
     ) {
         this.fieldVisibilityManager = fieldVisibilityManager;
         this.customFieldInputHelper = customFieldInputHelper;
-        this.issueLinkManager = issueLinkManager;
-        this.changeHistoryManager = changeHistoryManager;
+        this.ofBizDelegator = ofBizDelegator;
         this.clauseQueryFactory = clauseQueryFactory;
     }
 
@@ -66,8 +61,7 @@ public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher 
         this.searcherInformation = new CustomFieldSearcherInformation(
             field.getId(), field.getNameKey(),
             ImmutableList.of(
-                new LastUpdatedByIndexer(changeHistoryManager),
-                new LinksIndexer(issueLinkManager)
+                new LastUpdatedByIndexer(fieldVisibilityManager, ofBizDelegator)
             ),
             new AtomicReference<>(field)
         );

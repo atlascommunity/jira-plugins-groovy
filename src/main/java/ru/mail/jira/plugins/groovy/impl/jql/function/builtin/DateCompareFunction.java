@@ -11,13 +11,11 @@ import com.atlassian.jira.issue.fields.DateField;
 import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.index.DocumentConstants;
-import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
 import com.atlassian.jira.timezone.TimeZoneManager;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.util.LuceneUtils;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -27,16 +25,11 @@ import com.atlassian.query.operand.FunctionOperand;
 import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.SetBasedFieldSelector;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.index.*;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +39,7 @@ import ru.mail.jira.plugins.groovy.impl.jql.antlr.*;
 import ru.mail.jira.plugins.groovy.util.AntlrUtil;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.FieldUtil;
+import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -127,7 +121,7 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
             timeZoneManager.getTimeZoneforUser(user).toZoneId()
         );
 
-        BooleanQuery luceneQuery = new BooleanQuery();
+        BooleanQuery.Builder luceneQuery = new BooleanQuery.Builder();
         luceneQuery.add(
             new TermQuery(new Term(
                 DocumentConstants.ISSUE_NON_EMPTY_FIELD_IDS, dateCompareQuery.getLeftField()
@@ -141,10 +135,10 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
             BooleanClause.Occur.MUST
         );
 
-        searchHelper.doSearch(query, luceneQuery, collector, queryCreationContext);
+        searchHelper.doSearch(query, luceneQuery.build(), collector, queryCreationContext);
 
         return new QueryFactoryResult(
-            new ConstantScoreQuery(new IssueIdFilter(collector.issueIds)),
+            QueryUtil.createIssueIdQuery(collector.issueIds),
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }
@@ -211,67 +205,55 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
         private final boolean rightDate;
     }
 
-    private static class DateCompareCollector extends Collector {
+    private static class DateCompareCollector extends SimpleCollector {
         private final Set<String> issueIds = new HashSet<>();
         private final DateCompareQuery query;
-        private final FieldSelector fieldSelector;
         private final ZoneId userTz;
-
-        private IndexReader indexReader;
+        private NumericDocValues leftFieldValues;
+        private NumericDocValues rightFieldValues;
+        private SortedDocValues issueIdValues;
 
         private DateCompareCollector(DateCompareQuery query, ZoneId userTz) {
             this.query = query;
             this.userTz = userTz;
-
-            fieldSelector = new SetBasedFieldSelector(ImmutableSet.of(
-                query.getLeftField(),
-                query.getRightField(),
-                DocumentConstants.ISSUE_ID
-            ), ImmutableSet.of());
         }
 
         @Override
-        public void setScorer(Scorer scorer) {
-
+        public void doSetNextReader(LeafReaderContext context) throws IOException {
+            issueIdValues = context.reader().getSortedDocValues(DocumentConstants.ISSUE_ID);
+            leftFieldValues = context.reader().getNumericDocValues(query.getLeftField());
+            rightFieldValues = context.reader().getNumericDocValues(query.getRightField());
         }
 
         @Override
-        public void collect(int i) throws IOException {
-            Document document = indexReader.document(i, fieldSelector);
+        public void collect(int doc) throws IOException {
+            if (leftFieldValues.advanceExact(doc) && rightFieldValues.advanceExact(doc)) {
+                long rawLeftValue = leftFieldValues.longValue();
+                long rawRightValue = rightFieldValues.longValue();
 
-            String rawLeftValue = document.get(query.getLeftField());
-            String rawRightValue = document.get(query.getRightField());
+                Instant leftInstant = (query.isLeftDate() ? parseLocalDate(rawLeftValue) : parseDateTime(rawLeftValue)).plusSeconds(query.leftModifier);
+                Instant rightInstant = (query.isRightDate() ? parseLocalDate(rawRightValue) : parseDateTime(rawRightValue)).plusSeconds(query.rightModifier);
 
-            if (rawLeftValue == null || rawRightValue == null) {
-                return;
-            }
-
-            Instant leftInstant = (query.isLeftDate() ? parseLocalDate(rawLeftValue) : parseDateTime(rawLeftValue)).plusSeconds(query.leftModifier);
-            Instant rightInstant = (query.isRightDate() ? parseLocalDate(rawRightValue) : parseDateTime(rawRightValue)).plusSeconds(query.rightModifier);
-
-            if (compare(leftInstant.compareTo(rightInstant))) {
-                issueIds.add(document.get(DocumentConstants.ISSUE_ID));
+                if (compare(leftInstant.compareTo(rightInstant))) {
+                    if (issueIdValues.advanceExact(doc)) {
+                        issueIds.add(issueIdValues.binaryValue().utf8ToString());
+                    }
+                }
             }
         }
 
-        @Override
-        public void setNextReader(IndexReader indexReader, int i) {
-            this.indexReader = indexReader;
-        }
-
-        @Override
-        public boolean acceptsDocsOutOfOrder() {
-            return true;
-        }
-
-        private Instant parseLocalDate(String rawValue) {
-            LocalDate localDate = LuceneUtils.stringToLocalDate(rawValue);
+        private Instant parseLocalDate(long rawValue) {
+            LocalDate localDate = new LocalDate(rawValue);
 
             return java.time.LocalDate
                 .of(localDate.getYear(), localDate.getMonth(), localDate.getDay())
                 .atTime(LocalTime.MIN)
                 .atZone(userTz)
                 .toInstant();
+        }
+
+        private Instant parseDateTime(long rawValue) {
+            return Instant.ofEpochMilli(rawValue);
         }
 
         private boolean compare(int comparisonResult) {
@@ -291,8 +273,9 @@ public class DateCompareFunction extends AbstractBuiltInQueryFunction {
             return false;
         }
 
-        private Instant parseDateTime(String rawValue) {
-            return LuceneUtils.stringToDate(rawValue).toInstant();
+        @Override
+        public boolean needsScores() {
+            return false;
         }
     }
 

@@ -15,9 +15,9 @@ import ru.mail.jira.plugins.groovy.api.dto.listener.ConditionType;
 import ru.mail.jira.plugins.groovy.api.dto.listener.ScriptedEventListener;
 import ru.mail.jira.plugins.groovy.api.repository.EventListenerRepository;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
+import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
-import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.util.Set;
@@ -110,27 +110,20 @@ public class EventListenerInvoker implements PluginLifecycleAware {
 
     private void executeScript(ScriptedEventListener listener, Object event) {
         String uuid = listener.getUuid();
-        long t = System.currentTimeMillis();
-        boolean successful = true;
-        String error = null;
 
-        try {
-            scriptService.executeScript(
-                uuid,
-                listener.getScript(),
-                ScriptType.LISTENER,
-                ImmutableMap.of("event", event)
-            );
-        } catch (Exception e) {
-            logger.error("Was unable to execute listener {}/{}", listener.getId(), uuid, e);
-            successful = false;
-            error = ExceptionHelper.writeExceptionToString(e);
-        } finally {
-            t = System.currentTimeMillis() - t;
+        ScriptExecutionOutcome outcome = scriptService.executeScriptWithOutcome(
+            uuid,
+            listener.getScript(),
+            ScriptType.LISTENER,
+            ImmutableMap.of("event", event)
+        );
+
+        if (!outcome.isSuccessful()) {
+            logger.error("Was unable to execute listener {}/{}", listener.getId(), uuid, outcome.getError());
         }
 
-        if (listener.isAlwaysTrack() || !successful || t >= ExecutionRepository.WARNING_THRESHOLD) {
-            executionRepository.trackInline(uuid, t, successful, error, ImmutableMap.of(
+        if (listener.isAlwaysTrack() || !outcome.isSuccessful() || outcome.getTime() >= ExecutionRepository.WARNING_THRESHOLD) {
+            executionRepository.trackInline(uuid, outcome, ImmutableMap.of(
                 "event", event.toString(),
                 "type", ScriptType.LISTENER.name()
             ));

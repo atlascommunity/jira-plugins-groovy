@@ -17,6 +17,7 @@ import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.JiraIssueReference;
 import ru.mail.jira.plugins.groovy.api.entity.AbstractChangelog;
 import ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog;
+import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -31,6 +32,7 @@ public final class ChangelogHelper {
     private final DateTimeFormatter dateTimeFormatter;
     private final IssueManager issueManager;
     private final ActiveObjects ao;
+    private final ExecutionRepository executionRepository;
     private final UserMapper userMapper;
 
     @Autowired
@@ -38,11 +40,13 @@ public final class ChangelogHelper {
         @ComponentImport DateTimeFormatter dateTimeFormatter,
         @ComponentImport IssueManager issueManager,
         @ComponentImport ActiveObjects ao,
+        ExecutionRepository executionRepository,
         UserMapper userMapper
     ) {
         this.dateTimeFormatter = dateTimeFormatter;
         this.issueManager = issueManager;
         this.ao = ao;
+        this.executionRepository = executionRepository;
         this.userMapper = userMapper;
     }
 
@@ -72,6 +76,7 @@ public final class ChangelogHelper {
         ChangelogDto result = new ChangelogDto();
 
         result.setId(changelog.getID());
+        result.setUuid(changelog.getUuid());
         result.setAuthor(userMapper.buildUser(changelog.getAuthorKey()));
         result.setComment(changelog.getComment());
         result.setDiff(changelog.getDiff());
@@ -100,27 +105,44 @@ public final class ChangelogHelper {
 
     public List<ChangelogDto> collect(AbstractChangelog[] changelogs) {
         if (changelogs != null) {
+            Set<String> ids = Arrays
+                .stream(changelogs)
+                .map(AbstractChangelog::getUuid)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+            Map<String, Long> errors = executionRepository.getErrorCount(ids);
+            Map<String, Long> warnings = executionRepository.getWarningCount(ids);
+
             return Arrays
                 .stream(changelogs)
                 .sorted(Comparator.comparing(AbstractChangelog::getDate).reversed())
                 .map(this::buildDto)
+                .peek(changelog -> {
+                    String uuid = changelog.getUuid();
+                    if (uuid != null) {
+                        changelog.setErrors(errors.getOrDefault(uuid, 0L));
+                        changelog.setWarnings(warnings.getOrDefault(uuid, 0L));
+                    }
+                })
                 .collect(Collectors.toList());
         }
         return null;
     }
 
-    public void addChangelog(Class<? extends AbstractChangelog> clazz, int scriptId, String userKey, String diff, String comment) {
-        addChangelog(clazz, "SCRIPT_ID", scriptId, userKey, diff, comment);
+    public void addChangelog(Class<? extends AbstractChangelog> clazz, int scriptId, String uuid, String userKey, String diff, String comment) {
+        addChangelog(clazz, "SCRIPT_ID", scriptId, uuid, userKey, diff, comment);
     }
 
-    public void addChangelog(Class<? extends AbstractChangelog> clazz, String fkField, int scriptId, String userKey, String diff, String comment) {
-        addChangelog(clazz, fkField, scriptId, userKey, diff, comment, ImmutableMap.of());
+    public void addChangelog(Class<? extends AbstractChangelog> clazz, String fkField, int scriptId, String uuid, String userKey, String diff, String comment) {
+        addChangelog(clazz, fkField, scriptId, uuid, userKey, diff, comment, ImmutableMap.of());
     }
 
     public void addChangelog(
         Class<? extends AbstractChangelog> clazz,
         String fkField,
         int scriptId,
+        String uuid,
         String userKey,
         String diff,
         String comment,
@@ -132,6 +154,7 @@ public final class ChangelogHelper {
         params.put("DATE", new Timestamp(System.currentTimeMillis()));
         params.put("DIFF", StringUtils.isEmpty(diff) ? "no changes" : diff);
         params.put("COMMENT", comment);
+        params.put("UUID", uuid);
         params.putAll(additionalParams);
 
         ao.create(

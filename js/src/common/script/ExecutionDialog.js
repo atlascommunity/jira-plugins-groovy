@@ -58,6 +58,13 @@ export function ExecutionDialog({onClose, execution}: Props): Node {
                     </pre>
                 </StaticField>
             }
+            {execution.log &&
+                <StaticField label={CommonMessages.log}>
+                    <pre style={{overflowX: 'auto'}}>
+                        {execution.log}
+                    </pre>
+                </StaticField>
+            }
         </div>
     </ModalDialog>);
 }

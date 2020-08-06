@@ -120,7 +120,7 @@ public class RegistryDaoImpl implements RegistryDao {
 
         String diff = changelogHelper.generateDiff(script.getID(), "", script.getName(), "", scriptForm.getScriptBody());
 
-        changelogHelper.addChangelog(Changelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(Changelog.class, script.getID(), null, user.getKey(), diff, comment);
 
         addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
@@ -138,7 +138,7 @@ public class RegistryDaoImpl implements RegistryDao {
         String diff = changelogHelper.generateDiff(id, script.getName(), form.getName(), script.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
 
-        changelogHelper.addChangelog(Changelog.class, script.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(Changelog.class, script.getID(), script.getUuid(), user.getKey(), diff, comment);
 
         script.setName(form.getName());
         script.setUuid(UUID.randomUUID().toString());

@@ -12,7 +12,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -22,10 +21,10 @@ import org.junit.runner.RunWith;
 import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.script.ParamType;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
-import ru.mail.jira.plugins.groovy.api.service.GlobalFunctionManager;
 import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.script.ParseContext;
+import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
 
 import java.io.IOException;
@@ -40,8 +39,8 @@ class ScriptServiceImplTest {
 
     @BeforeEach
     public void setup() {
-        GlobalFunctionManager globalFunctionManager = new GlobalFunctionManagerImpl();
-        DelegatingClassLoader delegatingClassLoader = new DelegatingClassLoader();
+        ContextAwareClassLoader contextAwareClassLoader = new ContextAwareClassLoader();
+        DelegatingClassLoader delegatingClassLoader = new DelegatingClassLoader(contextAwareClassLoader);
         MockPlugin testPlugin = new MockPlugin("Test plugin", "testPLugin", new PluginInformation(), PluginState.ENABLED);
         testPlugin.setClassLoader(Thread.currentThread().getContextClassLoader());
         InjectionResolver injectionResolver = new MockInjectionResolver(
@@ -55,8 +54,8 @@ class ScriptServiceImplTest {
 
         scriptService = new ScriptServiceImpl(
             injectionResolver,
-            globalFunctionManager,
-            delegatingClassLoader
+            delegatingClassLoader,
+            contextAwareClassLoader
         );
     }
 
@@ -202,7 +201,6 @@ class ScriptServiceImplTest {
 
     //JD-318
     @Test
-    @Disabled //todo: enable after JD-203
     public void stcGetAtObjectBugTest() throws Exception {
         scriptService.parseScriptStatic(FileUtil.readExample("tests/stc-getat-object-failure"), ImmutableMap.of());
     }

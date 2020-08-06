@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dao.ListenerDao;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.util.*;
@@ -90,6 +91,11 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
     @Override
     public List<ScriptedEventListener> getAllListeners() {
         return cache.get(VALUE_KEY);
+    }
+
+    @Override
+    public List<ChangelogDto> getChangelogs(int id) {
+        return changelogHelper.collect(ao.find(ListenerChangelog.class, Query.select().where("LISTENER_ID = ?", id)));
     }
 
     @Override
