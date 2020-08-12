@@ -10,6 +10,7 @@ import com.atlassian.jira.issue.customfields.searchers.renderer.CustomFieldRende
 import com.atlassian.jira.issue.customfields.searchers.transformer.CustomFieldInputHelper;
 import com.atlassian.jira.issue.customfields.searchers.transformer.ExactTextCustomFieldSearchInputTransformer;
 import com.atlassian.jira.issue.fields.CustomField;
+import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.issue.search.searchers.information.SearcherInformation;
 import com.atlassian.jira.issue.search.searchers.renderer.SearchRenderer;
 import com.atlassian.jira.issue.search.searchers.transformer.SearchInputTransformer;
@@ -22,6 +23,7 @@ import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ru.mail.jira.plugins.groovy.impl.jql.indexers.LastUpdatedByIndexer;
+import ru.mail.jira.plugins.groovy.impl.jql.indexers.RemoteLinksIndexer;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -31,6 +33,7 @@ public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher 
     private final CustomFieldInputHelper customFieldInputHelper;
     private final OfBizDelegator ofBizDelegator;
     private final CustomClauseQueryFactory clauseQueryFactory;
+    private final RemoteIssueLinkManager remoteIssueLinkManager;
 
     private CustomFieldSearcherClauseHandler customFieldSearcherClauseHandler;
     private SearcherInformation<CustomField> searcherInformation;
@@ -41,12 +44,14 @@ public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher 
         @ComponentImport FieldVisibilityManager fieldVisibilityManager,
         @ComponentImport CustomFieldInputHelper customFieldInputHelper,
         @ComponentImport OfBizDelegator ofBizDelegator,
+        @ComponentImport RemoteIssueLinkManager remoteIssueLinkManager,
         CustomClauseQueryFactory clauseQueryFactory
     ) {
         this.fieldVisibilityManager = fieldVisibilityManager;
         this.customFieldInputHelper = customFieldInputHelper;
         this.ofBizDelegator = ofBizDelegator;
         this.clauseQueryFactory = clauseQueryFactory;
+        this.remoteIssueLinkManager = remoteIssueLinkManager;
     }
 
     @Override
@@ -61,7 +66,8 @@ public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher 
         this.searcherInformation = new CustomFieldSearcherInformation(
             field.getId(), field.getNameKey(),
             ImmutableList.of(
-                new LastUpdatedByIndexer(fieldVisibilityManager, ofBizDelegator)
+                new LastUpdatedByIndexer(fieldVisibilityManager, ofBizDelegator),
+                new RemoteLinksIndexer(remoteIssueLinkManager)
             ),
             new AtomicReference<>(field)
         );
