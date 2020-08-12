@@ -63,7 +63,7 @@ public class JqlModulesIT {
         "issuesInEpics",
 
         "hasRemoteLinks",
-        "linkedIssueOfRemote"
+        "linkedIssuesOfRemote"
 
     );
 
