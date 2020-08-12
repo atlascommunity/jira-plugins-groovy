@@ -60,7 +60,10 @@ public class JqlModulesIT {
         "subTasksOf",
 
         "epicsOf",
-        "issuesInEpics"
+        "issuesInEpics",
+
+        "hasRemoteLinks",
+        "linkedIssueOfRemote"
 
     );
 

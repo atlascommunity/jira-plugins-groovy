@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.groovy.impl.jql.indexers;
 
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.index.indexers.FieldIndexer;
+import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.document.Document;
@@ -11,6 +12,7 @@ import org.apache.lucene.document.TextField;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -46,8 +48,8 @@ public class RemoteLinksIndexer implements FieldIndexer {
 
     @Override
     public void addIndex(Document doc, Issue issue) {
-        remoteIssueLinkManager
-                .getRemoteIssueLinksForIssue(issue)
+        List<RemoteIssueLink> remoteIssueLinksForIssue = remoteIssueLinkManager.getRemoteIssueLinksForIssue(issue);
+        remoteIssueLinksForIssue
                 .forEach(remoteIssueLink -> {
                     Optional.ofNullable(remoteIssueLink.getTitle()).ifPresent(val -> doc.add(new TextField(REMOTE_LINK_FIELD_TITLE, val, Field.Store.NO)));
                     Optional.ofNullable(remoteIssueLink.getApplicationName()).ifPresent(val -> doc.add(new TextField(REMOTE_LINK_FIELD_APP_NAME, val, Field.Store.NO)));
@@ -68,7 +70,7 @@ public class RemoteLinksIndexer implements FieldIndexer {
                         log.error(String.format("Unable to index url=%s field value in remote link", remoteIssueLink.getUrl()), e);
                     }
                 });
-        if (remoteIssueLinkManager.getRemoteIssueLinksForIssue(issue).stream().anyMatch(link -> link.getTitle() != null)) {
+        if (remoteIssueLinksForIssue.stream().anyMatch(link -> link.getTitle() != null)) {
             doc.add(new StringField(REMOTE_LINK_FIELD_HAS_ANY, "true", Field.Store.NO));
         }
     }
