@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public interface ExecutionRepository {
-    long WARNING_THRESHOLD = TimeUnit.SECONDS.toMillis(10);
+    long WARNING_THRESHOLD = TimeUnit.SECONDS.toMillis(2);
 
     void trackFromRegistry(int id, long time, boolean successful, Throwable e, Map<String, String> additionalParams);
 
