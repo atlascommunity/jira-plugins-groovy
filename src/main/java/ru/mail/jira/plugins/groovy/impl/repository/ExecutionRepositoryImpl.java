@@ -4,6 +4,7 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.adapter.jackson.ObjectMapper;
 import com.atlassian.jira.cluster.ClusterInfo;
 import com.atlassian.jira.datetime.DateTimeFormatter;
+import com.atlassian.jira.datetime.DateTimeStyle;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.web.ExecutingHttpRequest;
@@ -260,7 +261,7 @@ public class ExecutionRepositoryImpl implements ExecutionRepository, PluginLifec
         } else {
             result.setScriptId(String.valueOf(execution.getScript().getID()));
         }
-        result.setDate(dateTimeFormatter.forLoggedInUser().format(execution.getDate()));
+        result.setDate(dateTimeFormatter.withStyle(DateTimeStyle.ISO_8601_DATE_TIME).forLoggedInUser().format(execution.getDate()));
 
         result.setTime(execution.getTime());
         result.setSuccess(execution.isSuccessful());
