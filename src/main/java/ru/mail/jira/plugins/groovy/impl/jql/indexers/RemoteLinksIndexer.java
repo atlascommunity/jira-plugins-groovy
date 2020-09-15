@@ -66,8 +66,7 @@ public class RemoteLinksIndexer implements FieldIndexer {
                             // need to check empty string here because URL.getPath() method returns empty string if path is empty
                             Optional.ofNullable(parsedURL.getPath()).filter(value -> !value.isEmpty()).ifPresent(val -> doc.add(new StringField(REMOTE_LINK_FIELD_URL_PATH, val, Field.Store.NO)));
                         }
-                    } catch (MalformedURLException e) {
-                        log.error(String.format("Unable to index url=%s field value in remote link", remoteIssueLink.getUrl()), e);
+                    } catch (MalformedURLException ignored) {
                     }
                 });
         if (remoteIssueLinksForIssue.stream().anyMatch(link -> link.getTitle() != null)) {
