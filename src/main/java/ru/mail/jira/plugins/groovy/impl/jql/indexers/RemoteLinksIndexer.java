@@ -56,8 +56,8 @@ public class RemoteLinksIndexer implements FieldIndexer {
                     Optional.ofNullable(remoteIssueLink.getApplicationType()).ifPresent(val -> doc.add(new StringField(REMOTE_LINK_FIELD_APP_TYPE, val, Field.Store.NO)));
                     Optional.ofNullable(remoteIssueLink.getSummary()).ifPresent(val -> doc.add(new StringField(REMOTE_LINK_FIELD_SUMMARY, val, Field.Store.NO)));
                     Optional.ofNullable(remoteIssueLink.getUrl()).ifPresent(val -> doc.add(new StringField(REMOTE_LINK_FIELD_URL, val, Field.Store.NO)));
-                    Optional.ofNullable(remoteIssueLink.getRelationship()).ifPresent(val -> doc.add(new StringField(REMOTE_LINK_FIELD_URL, val, Field.Store.NO)));
-                    Optional.ofNullable(remoteIssueLink.isResolved()).ifPresent(val -> doc.add(new StringField(REMOTE_LINK_FIELD_URL, val ? "true" : "false", Field.Store.NO)));
+                    Optional.ofNullable(remoteIssueLink.getRelationship()).ifPresent(val -> doc.add(new StringField(REMOTE_LINK_FIELD_RELATIONSHIP, val, Field.Store.NO)));
+                    Optional.ofNullable(remoteIssueLink.isResolved()).ifPresent(val -> doc.add(new StringField(REMOTE_LINK_FIELD_IS_RESOLVED, val ? "true" : "false", Field.Store.NO)));
                     try {
                         if (remoteIssueLink.getUrl() != null) {
                             URL parsedURL = new URL(remoteIssueLink.getUrl());
