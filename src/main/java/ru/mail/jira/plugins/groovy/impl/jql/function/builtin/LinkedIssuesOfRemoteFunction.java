@@ -44,7 +44,7 @@ public class LinkedIssuesOfRemoteFunction extends AbstractBuiltInQueryFunction {
     public QueryFactoryResult getQuery(@Nonnull QueryCreationContext queryCreationContext, @Nonnull TerminalClause terminalClause) {
         Operand operand = terminalClause.getOperand();
         Operator operator = terminalClause.getOperator();
-        if (operator.equals(Operator.IN)) {
+        if (operator.equals(Operator.IN) || operator.equals(Operator.NOT_IN)) {
             if (operand instanceof FunctionOperand) {
                 FunctionOperand functionOperand = (FunctionOperand) operand;
                 if (functionOperand.getArgs().size() == 1) {
@@ -57,7 +57,7 @@ public class LinkedIssuesOfRemoteFunction extends AbstractBuiltInQueryFunction {
                     } catch (MalformedURLException e) {
                         builder.add(new WildcardQuery(new Term(RemoteLinksIndexer.REMOTE_LINK_FIELD_TITLE, firstArg)), BooleanClause.Occur.MUST);
                     }
-                    return new QueryFactoryResult(builder.build());
+                    return new QueryFactoryResult(builder.build(), operator.equals(Operator.NOT_IN));
                 }
                 if (functionOperand.getArgs().size() == 2) {
                     String firstArg = functionOperand.getArgs().get(0);
@@ -94,7 +94,7 @@ public class LinkedIssuesOfRemoteFunction extends AbstractBuiltInQueryFunction {
                         default:
                             return QueryFactoryResult.createFalseResult();
                     }
-                    return new QueryFactoryResult(builder.build());
+                    return new QueryFactoryResult(builder.build(), operator.equals(Operator.NOT_IN));
                 }
             }
             return QueryFactoryResult.createFalseResult();
