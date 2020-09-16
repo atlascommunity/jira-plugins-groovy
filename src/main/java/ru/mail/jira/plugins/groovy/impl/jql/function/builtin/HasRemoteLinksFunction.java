@@ -41,11 +41,11 @@ public class HasRemoteLinksFunction extends AbstractBuiltInQueryFunction {
     public QueryFactoryResult getQuery(@Nonnull QueryCreationContext queryCreationContext, @Nonnull TerminalClause terminalClause) {
         Operand operand = terminalClause.getOperand();
         Operator operator = terminalClause.getOperator();
-        if (operator.equals(Operator.IN)) {
+        if (operator.equals(Operator.IN) || operator.equals(Operator.NOT_IN)) {
             if (operand instanceof FunctionOperand) {
                 BooleanQuery.Builder builder = new BooleanQuery.Builder();
                 builder.add(new TermQuery(new Term(RemoteLinksIndexer.REMOTE_LINK_FIELD_HAS_ANY, "true")), BooleanClause.Occur.MUST);
-                return new QueryFactoryResult(builder.build());
+                return new QueryFactoryResult(builder.build(), operator.equals(Operator.NOT_IN));
             }
         }
         return QueryFactoryResult.createFalseResult();

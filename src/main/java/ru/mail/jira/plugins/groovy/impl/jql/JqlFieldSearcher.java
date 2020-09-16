@@ -59,7 +59,7 @@ public class JqlFieldSearcher extends AbstractInitializationCustomFieldSearcher 
         this.customFieldSearcherClauseHandler = new SimpleCustomFieldSearcherClauseHandler(
             new ExactTextCustomFieldValidator(),
             clauseQueryFactory,
-            ImmutableSet.of(Operator.IN),
+            ImmutableSet.of(Operator.IN, Operator.NOT_IN),
             new JiraDataTypeImpl(JqlFunctionCFType.class)
         );
 
