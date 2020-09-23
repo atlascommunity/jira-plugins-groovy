@@ -53,8 +53,6 @@ public class ScriptServiceImpl implements ScriptService, PluginLifecycleAware {
     private final List<BindingProvider> bindingProviders = new ArrayList<>();
     private final Cache<String, CompiledScript> scriptCache = Caffeine
         .newBuilder()
-        .maximumSize(1000)
-        .expireAfterAccess(1, TimeUnit.HOURS)
         .recordStats()
         .removalListener((String k, CompiledScript v, RemovalCause reason) -> {
             if (v != null) {
