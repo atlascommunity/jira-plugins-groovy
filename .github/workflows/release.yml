@@ -1,0 +1,82 @@
+name: Release on version tag push
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+
+on:
+ workflow_dispatch:
+  inputs:
+    pushToRelease:
+      description: 'Version'     
+      required: true
+      default: false
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - '[0-9]+.[0-9]+*' # Push events to matching v*, i.e. 1.0, 20.15.10
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "release"
+  release:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v1.4.2
+        with:
+          java-version: 8
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v1.4.3
+        
+      - name: Download and install atlassian sdk
+        run: |
+              sudo sh -c 'echo "deb https://packages.atlassian.com/debian/atlassian-sdk-deb/ stable contrib" >> /etc/apt/sources.list'
+              wget https://packages.atlassian.com/api/gpg/key/public
+              sudo apt-key add public
+              sudo apt-get update
+              sudo apt-get install atlassian-plugin-sdk
+              atlas-version
+
+      - name: Build front
+        working-directory: js
+        run: |
+              yarn install
+              yarn build-prod
+              
+      - name: Build atlas package
+        run: atlas-package -P production
+        
+      - name: upload artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: package artifacts
+          path: | 
+              target/*.jar
+              target/*.obr
+          
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          # body: changelog
+          draft: false
+          prerelease: false
+          
+      - name: Upload jar binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/*.jar
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
