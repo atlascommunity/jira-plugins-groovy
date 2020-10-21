@@ -21,6 +21,7 @@ import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
 
 export class RegistryRoute extends React.PureComponent<{}> {
+    dataLoaded: boolean = false;
     //$FlowFixMe ??
     store = createStore(
         reducer,
@@ -28,22 +29,37 @@ export class RegistryRoute extends React.PureComponent<{}> {
     );
 
     componentDidMount() {
-        Promise
-            .all([
-                registryService.getAllDirectories(),
-                registryService.getRegistryScripts(),
-                watcherService.getAllWatches('REGISTRY_SCRIPT'),
-                watcherService.getAllWatches('REGISTRY_DIRECTORY')
-            ])
-            .then(
-                ([dirs, scripts, scriptWatches, directoryWatches]: *) => {
-                    this.store.dispatch(loadState(keyBy(dirs, 'id'), keyBy(scripts, 'id'), scriptWatches, directoryWatches));
-                }
-            );
+        this.loadStateData();
+    }
 
-        registryService
-            .getAllScriptUsage()
-            .then(usage => this.store.dispatch(loadUsage(usage)));
+    componentDidUpdate() {
+        this.loadStateData();
+    }
+
+    loadStateData() {
+        if (!this.dataLoaded) {
+            if(window.location.pathname.indexOf('/registry/script/edit/') == -1) {
+                Promise
+                .all([
+                    registryService.getAllDirectories(),
+                    registryService.getRegistryScripts(),
+                    watcherService.getAllWatches('REGISTRY_SCRIPT'),
+                    watcherService.getAllWatches('REGISTRY_DIRECTORY')
+                ])
+                .then(
+                    ([dirs, scripts, scriptWatches, directoryWatches]: *) => {
+                        this.store.dispatch(loadState(keyBy(dirs, 'id'), keyBy(scripts, 'id'), scriptWatches, directoryWatches));
+                    }
+                );
+    
+            registryService
+                .getAllScriptUsage()
+                .then(usage => this.store.dispatch(loadUsage(usage)));
+                this.dataLoaded = true;
+            } else { 
+                this.store.dispatch(loadState({}, {}, [], []));
+            }
+        }
     }
 
     render() {
