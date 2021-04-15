@@ -95,10 +95,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
         FunctionOperand operand = (FunctionOperand) terminalClause.getOperand();
         List<String> args = operand.getArgs();
 
-        jiraSoftwareHelper.getSprintField();
-
         CustomField sprintField = jiraSoftwareHelper.getSprintField();
-
         Optional<RapidView> optionalRapidView = jiraSoftwareHelper.findRapidViewByName(user, args.get(0));
 
         if (!optionalRapidView.isPresent()) {
@@ -139,7 +136,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
 
                 return QueryFactoryResult.createFalseResult();
             }
-
+            startDates.put(sprint.get().getId(), sprint.get().getStartDate());
             luceneQuery = new TermQuery(new Term(historicFieldId, String.valueOf(sprint.get().getId())));
         }
 
