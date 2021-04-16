@@ -92,7 +92,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response createDirectory(ScriptDirectoryForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdminOrSysAdmin();
+            permissionHelper.checkIfAdmin();
 
             return scriptRepository.createDirectory(authenticationContext.getLoggedInUser(), form);
         }).getResponse();
@@ -103,7 +103,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response updateDirectory(@PathParam("id") int id, ScriptDirectoryForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdminOrSysAdmin();
+            permissionHelper.checkIfAdmin();
 
             return scriptRepository.updateDirectory(authenticationContext.getLoggedInUser(), id, form);
         }).getResponse();
@@ -114,7 +114,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response deleteDirectory(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdminOrSysAdmin();
+            permissionHelper.checkIfAdmin();
 
             scriptRepository.deleteDirectory(authenticationContext.getLoggedInUser(), id);
 
@@ -127,7 +127,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response restoreDirectory(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdminOrSysAdmin();
+            permissionHelper.checkIfAdmin();
 
             scriptRepository.restoreDirectory(authenticationContext.getLoggedInUser(), id);
 
@@ -140,7 +140,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response moveDirectory(@PathParam("id") int id, ParentForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdminOrSysAdmin();
+            permissionHelper.checkIfAdmin();
 
             scriptRepository.moveDirectory(authenticationContext.getLoggedInUser(), id, form);
 
@@ -211,7 +211,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response deleteScript(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdminOrSysAdmin();
+            permissionHelper.checkIfAdmin();
 
             scriptRepository.deleteScript(authenticationContext.getLoggedInUser(), id);
 
@@ -224,7 +224,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response restoreScript(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdminOrSysAdmin();
+            permissionHelper.checkIfAdmin();
 
             scriptRepository.restoreScript(authenticationContext.getLoggedInUser(), id);
 
@@ -237,7 +237,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response moveScript(@PathParam("id") int id, ParentForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdminOrSysAdmin();
+            permissionHelper.checkIfAdmin();
 
             scriptRepository.moveScript(authenticationContext.getLoggedInUser(), id, form);
 
