@@ -48,7 +48,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response getDirectories() {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return scriptRepository.getAllDirectories();
         }).getResponse();
@@ -59,7 +59,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response getAllScripts() {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return scriptRepository.getAllScripts();
         }).getResponse();
@@ -70,7 +70,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response getDirectoriesPicker() {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return scriptRepository.getAllDirectoriesForPicker();
         }).getResponse();
@@ -81,7 +81,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response getDirectory(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return scriptRepository.getDirectory(id);
         }).getResponse();
@@ -92,7 +92,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response createDirectory(ScriptDirectoryForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return scriptRepository.createDirectory(authenticationContext.getLoggedInUser(), form);
         }).getResponse();
@@ -103,7 +103,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response updateDirectory(@PathParam("id") int id, ScriptDirectoryForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return scriptRepository.updateDirectory(authenticationContext.getLoggedInUser(), id, form);
         }).getResponse();
@@ -114,7 +114,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response deleteDirectory(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             scriptRepository.deleteDirectory(authenticationContext.getLoggedInUser(), id);
 
@@ -127,7 +127,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response restoreDirectory(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             scriptRepository.restoreDirectory(authenticationContext.getLoggedInUser(), id);
 
@@ -140,7 +140,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response moveDirectory(@PathParam("id") int id, ParentForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             scriptRepository.moveDirectory(authenticationContext.getLoggedInUser(), id, form);
 
@@ -153,7 +153,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response getAllScripts(@PathParam("type") WorkflowScriptType workflowScriptType) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return scriptRepository.getAllScriptDescriptions(workflowScriptType);
         }).getResponse();
@@ -164,7 +164,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response getScript(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return scriptRepository.getScript(id, true, false, false);
         }).getResponse();
@@ -175,7 +175,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response getScriptChangelogs(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return scriptRepository.getScriptChangelogs(id);
         }).getResponse();
@@ -186,7 +186,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response createScript(RegistryScriptForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return scriptRepository.createScript(authenticationContext.getLoggedInUser(), form);
         })
@@ -199,7 +199,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response updateScript(@PathParam("id") int id, RegistryScriptForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
             return scriptRepository.updateScript(authenticationContext.getLoggedInUser(), id, form);
         })
             .withExceptionMapper(MultipleCompilationErrorsException.class, Response.Status.BAD_REQUEST, e -> ExceptionHelper.mapCompilationException("scriptBody", e))
@@ -211,7 +211,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response deleteScript(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             scriptRepository.deleteScript(authenticationContext.getLoggedInUser(), id);
 
@@ -224,7 +224,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response restoreScript(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             scriptRepository.restoreScript(authenticationContext.getLoggedInUser(), id);
 
@@ -237,7 +237,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response moveScript(@PathParam("id") int id, ParentForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             scriptRepository.moveScript(authenticationContext.getLoggedInUser(), id, form);
 
@@ -250,7 +250,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response findScriptWorkflows(@PathParam("id") int id) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
             return workflowSearchService.search(new ScriptUsageCollector(id)).getResult();
         }).getResponse();
     }
@@ -260,7 +260,7 @@ public class RegistryResource {
     @WebSudoRequired
     public Response getWorkflowUsage() {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return workflowSearchService.search(new AllScriptUsageCollector()).getResult();
         }).getResponse();

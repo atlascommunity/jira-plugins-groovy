@@ -46,7 +46,7 @@ public class StaticCheckResource {
     @POST
     public Response checkStatic(StaticCheckForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             Map<String, String> additionalParams = form.getAdditionalParams();
 

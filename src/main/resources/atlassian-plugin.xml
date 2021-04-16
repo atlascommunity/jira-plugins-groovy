@@ -244,9 +244,15 @@
         <label key="ru.mail.jira.plugins.groovy.link.registry" />
         <link linkId="mailru-groovy-registry-link">/plugins/servlet/my-groovy/registry</link>
 
-        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
-            <param name="permission">SYSTEM_ADMIN</param>
-        </condition>
+        <coditions type="OR">
+            <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+                <param name="permission">SYSTEM_ADMIN</param>
+            </condition>
+            <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+                <param name="permission">ADMIN</param>
+            </condition>
+
+        </coditions>
     </web-item>
 
     <web-item key="groovy-listeners-menu-item" name="Groovy listeners menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
