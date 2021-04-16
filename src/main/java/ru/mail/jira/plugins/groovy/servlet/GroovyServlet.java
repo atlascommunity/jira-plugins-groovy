@@ -52,7 +52,12 @@ public class GroovyServlet extends HttpServlet {
                 return;
             }
 
-            if (!permissionHelper.isAdmin()) {
+            if (path.startsWith("registry") && !permissionHelper.isAdminOrSysAdmin()) {
+                response.sendError(403);
+                return;
+            }
+
+            if (!path.startsWith("registry") && !permissionHelper.isAdmin()) {
                 response.sendError(403);
                 return;
             }

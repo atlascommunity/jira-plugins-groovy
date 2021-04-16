@@ -26,10 +26,20 @@ public class PermissionHelper {
         checkIfAdmin(authenticationContext.getLoggedInUser());
     }
 
+    public void checkIfAdminOrSysAdmin() {
+        if (!isAdminOrSysAdmin())
+            throw new SecurityException("User is not admin");
+    }
+
     public void checkIfAdmin(ApplicationUser user) {
         if (!isAdmin(user)) {
             throw new SecurityException("User is not admin");
         }
+    }
+
+    public boolean isAdminOrSysAdmin() {
+        ApplicationUser user = authenticationContext.getLoggedInUser();
+        return globalPermissionManager.hasPermission(GlobalPermissionKey.SYSTEM_ADMIN, user) || globalPermissionManager.hasPermission(GlobalPermissionKey.ADMINISTER, user);
     }
 
     public boolean isAdmin() {
