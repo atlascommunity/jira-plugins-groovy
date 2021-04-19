@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.RunInfo;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskForm;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskDto;
@@ -102,6 +103,11 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
     }
 
     @Override
+    public List<ChangelogDto> getChangelogs(int id) {
+        return changelogHelper.collect(ao.find(ScheduledTaskChangelog.class, Query.select().where("TASK_ID = ?", id)));
+    }
+
+    @Override
     public ScheduledTaskDto getTaskInfo(int id, boolean includeChangelogs, boolean includeRunInfo) {
         return buildDto(ao.get(ScheduledTask.class, id), includeChangelogs, includeRunInfo);
     }
@@ -134,7 +140,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
             comment = Const.CREATED_COMMENT;
         }
 
-        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), null, user.getKey(), diff, comment);
 
         addAuditLogAndNotify(user, EntityAction.CREATED, task, diff, comment);
 
@@ -150,7 +156,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         String diff = changelogHelper.generateDiff(id, task.getName(), form.getName(), task.getScriptBody(), form.getScriptBody());
         String comment = form.getComment();
 
-        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), user.getKey(), diff, comment);
+        changelogHelper.addChangelog(ScheduledTaskChangelog.class, "TASK_ID", task.getID(), task.getUuid(), user.getKey(), diff, comment);
 
         task.setUuid(UUID.randomUUID().toString());
         task.setName(form.getName());

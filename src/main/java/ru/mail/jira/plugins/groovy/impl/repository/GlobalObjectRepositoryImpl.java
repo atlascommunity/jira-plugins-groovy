@@ -9,11 +9,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.dao.GlobalObjectDao;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectDto;
 import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectForm;
 import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.GlobalObjectRepository;
+import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
+import ru.mail.jira.plugins.groovy.api.script.ResolvedConstructorArgument;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
 import ru.mail.jira.plugins.groovy.api.service.ScriptInvalidationService;
@@ -21,6 +24,7 @@ import ru.mail.jira.plugins.groovy.util.ChangelogHelper;
 import ru.mail.jira.plugins.groovy.util.Const;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -57,7 +61,11 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
 
     @Override
     public List<GlobalObjectDto> getAll() {
-        return globalObjectDao.getAll().stream().map(this::buildDto).collect(Collectors.toList());
+        return globalObjectDao
+            .getAll()
+            .stream()
+            .map(script -> buildDto(script, false))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -68,7 +76,12 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
             return null;
         }
 
-        return buildDto(object);
+        return buildDto(object, true);
+    }
+
+    @Override
+    public List<ChangelogDto> getChangelogs(int id) {
+        return changelogHelper.collect(globalObjectDao.getChangelogs(id));
     }
 
     @Override
@@ -79,7 +92,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
 
         invalidationService.invalidateGlobalObjects();
 
-        return buildDto(result);
+        return buildDto(result, true);
     }
 
     @Override
@@ -90,7 +103,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
 
         invalidationService.invalidateGlobalObjects();
 
-        return buildDto(result);
+        return buildDto(result, true);
     }
 
     @Override
@@ -112,10 +125,22 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
             throw new ValidationException(i18nHelper.getText("ru.mail.jira.plugins.groovy.error.fieldRequired"), "scriptBody");
         }
 
-        Class scriptClass = scriptService.parseClassStatic(form.getScriptBody(), true, ImmutableMap.of());
+        CompiledScript scriptClass = scriptService.parseSingleton(form.getScriptBody(), true, ImmutableMap.of());
 
         try {
-            singletonFactory.getConstructorArguments(scriptClass);
+            ResolvedConstructorArgument[] arguments = singletonFactory.getExtendedConstructorArguments(scriptClass);
+
+            form.setDependencies(
+                StringUtils.trimToNull(
+                    Arrays
+                        .stream(arguments)
+                        .filter(it -> it.getArgumentType() == ResolvedConstructorArgument.ArgumentType.GLOBAL_OBJECT)
+                        .map(ResolvedConstructorArgument::getObject)
+                        .map(Object::getClass)
+                        .map(Class::getCanonicalName)
+                        .collect(Collectors.joining(";"))
+                )
+            );
         } catch (IllegalArgumentException e) {
             throw new ValidationException(e.getMessage(), "scriptBody");
         }
@@ -130,7 +155,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
         }
     }
 
-    private GlobalObjectDto buildDto(GlobalObject script) {
+    private GlobalObjectDto buildDto(GlobalObject script, boolean withChangelogs) {
         GlobalObjectDto result = new GlobalObjectDto();
 
         result.setId(script.getID());
@@ -140,10 +165,12 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
         result.setScriptBody(script.getScriptBody());
         result.setDeleted(script.isDeleted());
 
-        result.setChangelogs(changelogHelper.collect(script.getChangelogs()));
-
         result.setErrorCount(executionRepository.getErrorCount(script.getUuid()));
         result.setWarningCount(executionRepository.getWarningCount(script.getUuid()));
+
+        if (withChangelogs) {
+            result.setChangelogs(changelogHelper.collect(script.getChangelogs()));
+        }
 
         return result;
     }

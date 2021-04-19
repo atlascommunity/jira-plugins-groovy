@@ -39,6 +39,7 @@
         <entity>ru.mail.jira.plugins.groovy.api.entity.Listener</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.ListenerChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.AuditLogEntry</entity>
+        <entity>ru.mail.jira.plugins.groovy.api.entity.AuditLogIssueRelation</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestScript</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.RestChangelog</entity>
         <entity>ru.mail.jira.plugins.groovy.api.entity.FieldScript</entity>
@@ -243,9 +244,15 @@
         <label key="ru.mail.jira.plugins.groovy.link.registry" />
         <link linkId="mailru-groovy-registry-link">/plugins/servlet/my-groovy/registry</link>
 
-        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
-            <param name="permission">SYSTEM_ADMIN</param>
-        </condition>
+        <coditions type="OR">
+            <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+                <param name="permission">SYSTEM_ADMIN</param>
+            </condition>
+            <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+                <param name="permission">ADMIN</param>
+            </condition>
+
+        </coditions>
     </web-item>
 
     <web-item key="groovy-listeners-menu-item" name="Groovy listeners menu item" section="admin_plugins_menu/admin_mailru_groovy_section">
@@ -429,4 +436,18 @@
     >
         <valid-customfield-type package="ru.mail.jira.plugins.groovy" key="groovy-jql-field"/>
     </customfield-searcher>
+
+    <entity-search-extractor
+        key="mygroovy-comment-search-extractor"
+        class="ru.mail.jira.plugins.groovy.impl.jql.indexers.AdditionalFieldsCommentExtractor"
+    />
+
+    <web-panel name="MyGroovy" key="mygroovy-actions" location="atl.jira.view.issue.right.context" weight="1000">
+        <context-provider class="ru.mail.jira.plugins.groovy.servlet.IssuePanelContextProvider"/>
+        <resource name="view" type="velocity" location="ru/mail/jira/plugins/groovy/templates/issue-panel.vm"/>
+        <label>MyGroovy</label>
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">admin</param>
+        </condition>
+    </web-panel>
 </atlassian-plugin>

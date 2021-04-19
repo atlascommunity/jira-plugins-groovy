@@ -5,7 +5,7 @@ import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.index.DocumentConstants;
 import com.atlassian.jira.issue.search.constants.SystemSearchConstants;
-import com.atlassian.jira.issue.search.filters.IssueIdFilter;
+import com.atlassian.jira.issue.statistics.util.FieldDocumentHitCollector;
 import com.atlassian.jira.jql.ClauseInformation;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
@@ -24,9 +24,6 @@ import com.atlassian.query.operator.Operator;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.SetBasedFieldSelector;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
 import org.slf4j.Logger;
@@ -34,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.util.lucene.IssueIdCollector;
+import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -152,7 +150,7 @@ public class IssueFieldMatch extends AbstractBuiltInQueryFunction {
         }
 
         if (entityIds != null) {
-            BooleanQuery booleanQuery = new BooleanQuery();
+            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
 
             for (String entityId : entityIds) {
                 booleanQuery.add(new TermQuery(new Term(indexField, entityId)), BooleanClause.Occur.SHOULD);
@@ -160,10 +158,10 @@ public class IssueFieldMatch extends AbstractBuiltInQueryFunction {
 
             IssueIdCollector collector = new IssueIdCollector();
 
-            searchHelper.doSearch(query, booleanQuery, collector, queryCreationContext);
+            searchHelper.doSearch(query, booleanQuery.build(), collector, queryCreationContext);
 
             return new QueryFactoryResult(
-                new ConstantScoreQuery(new IssueIdFilter(collector.getIssueIds())),
+                QueryUtil.createIssueIdQuery(collector.getIssueIds()),
                 terminalClause.getOperator() == Operator.NOT_IN
             );
         }
@@ -173,40 +171,31 @@ public class IssueFieldMatch extends AbstractBuiltInQueryFunction {
         searchHelper.doSearch(query, new MatchAllDocsQuery(), collector, queryCreationContext);
 
         return new QueryFactoryResult(
-            new ConstantScoreQuery(new IssueIdFilter(collector.issueIds)),
+            QueryUtil.createIssueIdQuery(collector.issueIds),
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }
 
-    private static class PatternCollector extends Collector {
+    private static class PatternCollector extends FieldDocumentHitCollector {
         private final Set<String> issueIds = new HashSet<>();
 
         private final Pattern pattern;
         private final String field;
-        private final FieldSelector fieldSelector;
-
-        private IndexReader indexReader;
+        private final Set<String> fieldsToLoad;
 
         private PatternCollector(Pattern pattern, String field) {
             this.pattern = pattern;
             this.field = field;
-            this.fieldSelector = new SetBasedFieldSelector(
-                ImmutableSet.of(
-                    field, DocumentConstants.ISSUE_ID
-                ),
-                ImmutableSet.of()
-            );
+            this.fieldsToLoad = ImmutableSet.of(DocumentConstants.ISSUE_ID, field);
         }
 
         @Override
-        public void setScorer(Scorer scorer) {
-
+        protected Set<String> getFieldsToLoad() {
+            return fieldsToLoad;
         }
 
         @Override
-        public void collect(int i) throws IOException {
-            Document document = indexReader.document(i, fieldSelector);
-
+        public void collect(Document document) throws IOException {
             for (String value : document.getValues(field)) {
                 if (value != null) {
                     if (pattern.matcher(value).find()) {
@@ -214,16 +203,6 @@ public class IssueFieldMatch extends AbstractBuiltInQueryFunction {
                     }
                 }
             }
-        }
-
-        @Override
-        public void setNextReader(IndexReader indexReader, int i) {
-            this.indexReader = indexReader;
-        }
-
-        @Override
-        public boolean acceptsDocsOutOfOrder() {
-            return true;
         }
     }
 }

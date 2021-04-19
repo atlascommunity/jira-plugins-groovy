@@ -61,6 +61,8 @@ public class ScriptUtil {
                     return pluginBaseUrl + "scheduled/" + id + "/view";
                 case JQL_FUNCTION:
                     return pluginBaseUrl + "jql/" + id + "/view";
+                case GLOBAL_OBJECT:
+                    return pluginBaseUrl + "go/" + id + "/view";
             }
 
             return null;

@@ -73,6 +73,8 @@ export class AdminScript extends React.PureComponent<Props, State> {
         )
     );
 
+    _getChangelogs = () => adminScriptService.getChangelogs(this.props.script.id);
+
     render() {
         const {script, collapsible, focused} = this.props;
         const {isRunning} = this.state;
@@ -132,6 +134,7 @@ export class AdminScript extends React.PureComponent<Props, State> {
                 }
 
                 script={this._getScript(script)}
+                changelogsLoader={this._getChangelogs}
                 withChangelog={true}
                 collapsible={collapsible}
                 focused={focused}

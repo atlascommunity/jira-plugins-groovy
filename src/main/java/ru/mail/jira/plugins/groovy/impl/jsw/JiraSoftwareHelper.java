@@ -11,8 +11,6 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface JiraSoftwareHelper {
-    boolean isAvailable();
-
     CustomField getEpicLinkField();
 
     CustomField getRankField();
@@ -23,9 +21,9 @@ public interface JiraSoftwareHelper {
 
     Optional<RapidView> findRapidViewByName(ApplicationUser user, String name);
 
-    Query getRapidViewQuery(ApplicationUser user, Optional<RapidView> rapidView);
+    Query getRapidViewQuery(ApplicationUser user, RapidView rapidView);
 
-    Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, Optional<RapidView> rapidView);
+    Collection<Sprint> findActiveSprintsByBoard(ApplicationUser user, RapidView rapidView);
 
-    Optional<Sprint> findSprint(ApplicationUser user, Optional<RapidView> rapidView, String name);
+    Optional<Sprint> findSprint(ApplicationUser user, RapidView rapidView, String name);
 }

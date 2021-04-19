@@ -43,6 +43,8 @@ export class RestScript extends React.PureComponent<Props> {
         () => restService.deleteScript(this.props.script.id)
     );
 
+    _getChangelogs = () => restService.getChangelogs(this.props.script.id);
+
     render() {
         const {script, collapsible, focused} = this.props;
 
@@ -63,6 +65,7 @@ export class RestScript extends React.PureComponent<Props> {
                     errorCount: script.errorCount,
                     warningCount: script.warningCount
                 }}
+                changelogsLoader={this._getChangelogs}
 
                 withChangelog={true}
                 collapsible={collapsible}

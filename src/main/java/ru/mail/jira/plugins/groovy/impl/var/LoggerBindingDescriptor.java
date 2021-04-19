@@ -5,19 +5,29 @@ import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.groovy.api.dto.docs.ClassDoc;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
+import ru.mail.jira.plugins.groovy.impl.groovy.ExecutionContextHolder;
+import ru.mail.jira.plugins.groovy.impl.groovy.log.ContextAwareScriptLogger;
 
 import javax.annotation.Nonnull;
 
 public class LoggerBindingDescriptor implements BindingDescriptor<Logger> {
     private final Logger defaultLogger = LoggerFactory.getLogger("ru.mail.jira.plugins.groovy.script.$script$");
 
+    private final ExecutionContextHolder executionContextHolder;
+
+    public LoggerBindingDescriptor(ExecutionContextHolder executionContextHolder) {
+        this.executionContextHolder = executionContextHolder;
+    }
+
     @Override
     public Logger getValue(ScriptType scriptType, String scriptId) {
+        Logger logger;
         if (scriptId != null) {
-            return LoggerFactory.getLogger("ru.mail.jira.plugins.groovy.script." + scriptId);
+            logger = LoggerFactory.getLogger("ru.mail.jira.plugins.groovy.script." + scriptId);
         } else {
-            return defaultLogger;
+            logger = defaultLogger;
         }
+        return new ContextAwareScriptLogger(logger, executionContextHolder.get().getLogEntries());
     }
 
     @Nonnull

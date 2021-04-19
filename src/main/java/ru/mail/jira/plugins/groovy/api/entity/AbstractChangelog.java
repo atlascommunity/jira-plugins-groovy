@@ -25,4 +25,7 @@ public interface AbstractChangelog extends Entity {
     @NotNull
     void setComment(String comment);
     String getComment();
+
+    void setUuid(String uuid);
+    String getUuid();
 }

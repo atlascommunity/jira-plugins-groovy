@@ -11,4 +11,6 @@ public interface ScriptInvalidationService {
     void invalidateAllFields();
 
     void invalidateGlobalObjects();
+
+    void invalidateSentry();
 }

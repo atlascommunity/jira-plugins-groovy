@@ -32,7 +32,7 @@ public class WatcherResource {
         @PathParam("type") EntityType type
     ) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return watcherService.getWatches(type, authenticationContext.getLoggedInUser());
         }).getResponse();
@@ -45,7 +45,7 @@ public class WatcherResource {
         @PathParam("id") int id
     ) {
         return new RestExecutor<Void>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             watcherService.addWatcher(type, id, authenticationContext.getLoggedInUser());
 
@@ -60,7 +60,7 @@ public class WatcherResource {
         @PathParam("id") int id
     ) {
         return new RestExecutor<Void>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
             watcherService.removeWatcher(type, id, authenticationContext.getLoggedInUser());
 
             return null;

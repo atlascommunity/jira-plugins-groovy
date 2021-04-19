@@ -92,6 +92,8 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
 
     _toggleRunNow = () => this.setState( state => ({ showRunDialog: !state.showRunDialog }) );
 
+    _getChangelogs = () => scheduledTaskService.getChangelogs(this.props.script.id);
+
     _getParams = memoizeOne(
         (task: ScheduledTaskType): Array<?ScriptParam> => {
             const params = [
@@ -244,6 +246,7 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                 noCode={isJqlTransition}
 
                 script={scriptObject}
+                changelogsLoader={this._getChangelogs}
                 title={titleEl}
                 onDelete={this._delete}
 

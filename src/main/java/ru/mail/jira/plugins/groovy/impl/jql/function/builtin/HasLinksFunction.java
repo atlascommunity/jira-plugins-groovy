@@ -49,7 +49,7 @@ public class HasLinksFunction extends AbstractIssueLinkFunction {
 
         List<String> args = operand.getArgs();
         if (args.size() == 0) {
-            BooleanQuery booleanQuery = new BooleanQuery();
+            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
 
             for (IssueLinkType issueLinkType : issueLinkTypeManager.getIssueLinkTypes()) {
                 booleanQuery.add(
@@ -61,7 +61,7 @@ public class HasLinksFunction extends AbstractIssueLinkFunction {
             }
 
             return new QueryFactoryResult(
-                booleanQuery,
+                booleanQuery.build(),
                 terminalClause.getOperator() == Operator.NOT_IN
             );
         } else if (args.size() == 1) {
@@ -73,7 +73,7 @@ public class HasLinksFunction extends AbstractIssueLinkFunction {
                 Query query;
 
                 if (linkDirection == LinkDirection.BOTH) {
-                    BooleanQuery booleanQuery = new BooleanQuery();
+                    BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
 
                     booleanQuery.add(
                         new TermQuery(new Term(
@@ -90,7 +90,7 @@ public class HasLinksFunction extends AbstractIssueLinkFunction {
                         BooleanClause.Occur.SHOULD
                     );
 
-                    query = booleanQuery;
+                    query = booleanQuery.build();
                 } else {
                     query = new TermQuery(new Term(
                         DocumentConstants.ISSUE_LINKS,

@@ -7,11 +7,13 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.websudo.WebSudoRequired;
 import com.google.common.collect.ImmutableMap;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
+import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.console.ConsoleResponse;
 import ru.mail.jira.plugins.groovy.api.dto.console.ScriptRequest;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.impl.PermissionHelper;
+import ru.mail.jira.plugins.groovy.impl.groovy.log.LogTransformer;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.RestExecutor;
 
@@ -30,15 +32,18 @@ public class ConsoleResource {
     private final JiraAuthenticationContext authenticationContext;
     private final ScriptService scriptService;
     private final PermissionHelper permissionHelper;
+    private final LogTransformer logTransformer;
 
     public ConsoleResource(
         @ComponentImport JiraAuthenticationContext authenticationContext,
         ScriptService scriptService,
-        PermissionHelper permissionHelper
+        PermissionHelper permissionHelper,
+        LogTransformer logTransformer
     ) {
         this.authenticationContext = authenticationContext;
         this.scriptService = scriptService;
         this.permissionHelper = permissionHelper;
+        this.logTransformer = logTransformer;
     }
 
     @Path("/execute")
@@ -48,11 +53,12 @@ public class ConsoleResource {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
-            long startTime = System.currentTimeMillis();
             ApplicationUser currentUser = authenticationContext.getLoggedInUser();
+            ScriptExecutionOutcome outcome = scriptService.executeScriptWithOutcome(null, request.getScript(), ScriptType.CONSOLE, ImmutableMap.of("currentUser", currentUser));
             return new ConsoleResponse(
-                String.valueOf(scriptService.executeScript(null, request.getScript(), ScriptType.CONSOLE, ImmutableMap.of("currentUser", currentUser))),
-                System.currentTimeMillis() - startTime
+                String.valueOf(outcome.getResult()),
+                logTransformer.formatLog(outcome.getExecutionContext().getLogEntries()),
+                outcome.getTime()
             );
         })
             .withExceptionMapper(MultipleCompilationErrorsException.class, Response.Status.BAD_REQUEST, e -> ExceptionHelper.mapCompilationException("script", e))

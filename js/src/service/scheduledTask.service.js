@@ -2,6 +2,7 @@
 import {ajaxDelete, ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
 
 import type {ScheduledTaskType, RunNowResultType} from '../app-scheduled/types';
+import type {ChangelogType} from '../common/script/types';
 
 
 export class ScheduledTaskService {
@@ -36,4 +37,9 @@ export class ScheduledTaskService {
     runNow(id: number): Promise<RunNowResultType> {
         return ajaxPost(`${getPluginBaseUrl()}/scheduled/${id}/runNow`);
     }
+
+    getChangelogs(id: number): Promise<$ReadOnlyArray<ChangelogType>> {
+        return ajaxGet(`${getPluginBaseUrl()}/scheduled/${id}/changelogs`);
+    }
+
 }

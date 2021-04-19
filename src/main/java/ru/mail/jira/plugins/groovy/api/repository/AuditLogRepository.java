@@ -1,9 +1,11 @@
 package ru.mail.jira.plugins.groovy.api.repository;
 
+import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.jira.user.ApplicationUser;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryDto;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.Page;
+import ru.mail.jira.plugins.groovy.api.entity.AuditLogEntry;
 import ru.mail.jira.plugins.groovy.api.entity.EntityAction;
 import ru.mail.jira.plugins.groovy.api.entity.EntityType;
 
@@ -16,4 +18,9 @@ public interface AuditLogRepository {
     List<AuditLogEntryDto> findAllForEntity(int id, EntityType entityType);
 
     Page<AuditLogEntryDto> getPagedEntries(int offset, int limit, Set<String> users, Set<EntityType> categories, Set<EntityAction> actions);
+
+    @Transactional
+    void createRelations(AuditLogEntry auditLogEntry);
+
+    List<AuditLogEntryDto> getRelated(long issueId);
 }

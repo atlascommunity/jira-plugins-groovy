@@ -1,31 +1,41 @@
 package ru.mail.jira.plugins.groovy.impl.service;
 
 import com.atlassian.plugin.Plugin;
+import groovy.lang.*;
+import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.api.script.PluginModule;
-import ru.mail.jira.plugins.groovy.api.script.StandardModule;
+import ru.mail.jira.plugins.groovy.api.script.*;
+import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
 import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
+import ru.mail.jira.plugins.groovy.impl.groovy.var.GlobalObjectsBindingProvider;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
+import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class SingletonFactoryImpl implements SingletonFactory {
     private final InjectionResolver injectionResolver;
+    private final ContextAwareClassLoader contextAwareClassLoader;
+    private GlobalObjectsBindingProvider globalObjectsBindingProvider;
 
     @Autowired
     public SingletonFactoryImpl(
-        InjectionResolver injectionResolver
+        InjectionResolver injectionResolver,
+        ContextAwareClassLoader contextAwareClassLoader
     ) {
         this.injectionResolver = injectionResolver;
+        this.contextAwareClassLoader = contextAwareClassLoader;
     }
 
-    private <T> Constructor<T> findSingleConstructor(Class<?> type) {
-        Constructor[] constructors = type.getConstructors();
+    private <T> Constructor<T> findSingleConstructor(Class<T> type) {
+        Constructor<?>[] constructors = type.getConstructors();
 
         if (constructors.length == 0) {
             throw new IllegalArgumentException("No public constructors found");
@@ -35,20 +45,19 @@ public class SingletonFactoryImpl implements SingletonFactory {
             throw new IllegalArgumentException("Found more than one public constructor");
         }
 
-        return constructors[0];
+        return (Constructor<T>) constructors[0];
     }
 
-    @Override
-    public <T> Object[] getConstructorArguments(Class<T> type) {
-        Constructor<T> constructor = findSingleConstructor(type);
+    public <T> ResolvedConstructorArgument[] doGetConstructorArguments(CompiledScript<T> compiledScript) {
+        Constructor<T> constructor = findSingleConstructor(compiledScript.getScriptClass());
 
         if (constructor.getParameterCount() == 0) {
-            return new Object[0];
+            return new ResolvedConstructorArgument[0];
         }
 
         Annotation[][] allParameterAnnotations = constructor.getParameterAnnotations();
         Class<?>[] parameterTypes = constructor.getParameterTypes();
-        Object[] result = new Object[parameterTypes.length];
+        ResolvedConstructorArgument[] result = new ResolvedConstructorArgument[parameterTypes.length];
 
         for (int i = 0; i < parameterTypes.length; ++i) {
             Annotation[] parameterAnnotations = allParameterAnnotations[i];
@@ -58,11 +67,38 @@ public class SingletonFactoryImpl implements SingletonFactory {
                 String bundleName = ClassLoaderUtil.getClassBundleName(parameterType);
                 Plugin plugin = injectionResolver.getPlugin(bundleName);
 
-                result[i] = injectionResolver.resolvePluginInjection(plugin, parameterType);
+                result[i] = new ResolvedConstructorArgument(
+                    ResolvedConstructorArgument.ArgumentType.PLUGIN,
+                    injectionResolver.resolvePluginInjection(plugin, parameterType)
+                );
             } else if (Arrays.stream(parameterAnnotations).anyMatch(it -> it.annotationType().equals(StandardModule.class))) {
-                result[i] = injectionResolver.resolveStandardInjection(parameterType);
+                result[i] = new ResolvedConstructorArgument(
+                    ResolvedConstructorArgument.ArgumentType.STANDARD,
+                    injectionResolver.resolveStandardInjection(parameterType)
+                );
             } else {
-                throw new IllegalArgumentException("Parameter at index " + i + " is not annotated");
+                Optional<GlobalObjectModule> globalObjectInjection = Arrays
+                    .stream(parameterAnnotations)
+                    .filter(it -> it instanceof GlobalObjectModule)
+                    .map(it -> (GlobalObjectModule) it)
+                    .findAny();
+
+                if (globalObjectInjection.isPresent()) {
+                    Optional<BindingDescriptor<?>> bindingDescriptor = globalObjectsBindingProvider
+                        .getBindings()
+                        .values()
+                        .stream()
+                        .filter(it -> it.getType() == parameterType)
+                        .findAny();
+                    if (bindingDescriptor.isPresent()) {
+                        result[i] = new ResolvedConstructorArgument(
+                            ResolvedConstructorArgument.ArgumentType.GLOBAL_OBJECT,
+                            bindingDescriptor.get().getValue(null, null)
+                        );
+                    }
+                } else {
+                    throw new IllegalArgumentException("Parameter at index " + i + " is not annotated");
+                }
             }
 
             if (result[i] == null) {
@@ -74,11 +110,130 @@ public class SingletonFactoryImpl implements SingletonFactory {
     }
 
     @Override
-    public <T> T createInstance(Class<T> type) {
+    public <T> Object[] getConstructorArguments(CompiledScript<T> compiledScript) {
         try {
-            return (T) findSingleConstructor(type).newInstance(getConstructorArguments(type));
+            contextAwareClassLoader.startContext();
+            contextAwareClassLoader.addPlugins(injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins()));
+            return getObjects(doGetConstructorArguments(compiledScript));
+        } finally {
+            contextAwareClassLoader.exitContext();
+        }
+    }
+
+    @Override
+    public <T> ResolvedConstructorArgument[] getExtendedConstructorArguments(CompiledScript<T> compiledScript) throws IllegalArgumentException {
+        try {
+            contextAwareClassLoader.startContext();
+            contextAwareClassLoader.addPlugins(injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins()));
+            return doGetConstructorArguments(compiledScript);
+        } finally {
+            contextAwareClassLoader.exitContext();
+        }
+    }
+
+    @Override
+    public <T> T createInstance(CompiledScript<T> compiledScript) {
+        try {
+            contextAwareClassLoader.startContext();
+            Set<Plugin> plugins = injectionResolver.getPlugins(compiledScript.getParseContext().getPlugins());
+            contextAwareClassLoader.addPlugins(plugins);
+
+            Class<?> objClass = compiledScript.getScriptClass();
+
+            DelegatingMetaClass metaClass = new ContextAwareMetaClass(DefaultGroovyMethods.getMetaClass(objClass), plugins);
+            metaClass.initialize();
+
+            DefaultGroovyMethods.setMetaClass(objClass, metaClass);
+
+            T rawObj = findSingleConstructor(compiledScript.getScriptClass()).newInstance(getObjects(doGetConstructorArguments(compiledScript)));
+
+            return rawObj;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            contextAwareClassLoader.exitContext();
+        }
+    }
+
+    public void setGlobalObjectsBindingProvider(GlobalObjectsBindingProvider globalObjectsBindingProvider) {
+        this.globalObjectsBindingProvider = globalObjectsBindingProvider;
+    }
+
+    private Object[] getObjects(ResolvedConstructorArgument[] arguments) {
+        return Arrays
+            .stream(arguments)
+            .map(ResolvedConstructorArgument::getObject)
+            .toArray();
+    }
+
+    private class ContextAwareMetaClass extends DelegatingMetaClass {
+        private final Set<Plugin> plugins;
+
+        public ContextAwareMetaClass(MetaClass delegate, Set<Plugin> plugins) {
+            super(delegate);
+            this.plugins = plugins;
+        }
+
+        @Override
+        public Object invokeMethod(Object object, String methodName, Object arguments) {
+            try {
+                contextAwareClassLoader.startContext();
+                contextAwareClassLoader.addPlugins(plugins);
+                return super.invokeMethod(object, methodName, arguments);
+            } finally {
+                contextAwareClassLoader.exitContext();
+            }
+        }
+
+        @Override
+        public Object invokeMethod(Object object, String methodName, Object[] arguments) {
+            try {
+                contextAwareClassLoader.startContext();
+                contextAwareClassLoader.addPlugins(plugins);
+                return super.invokeMethod(object, methodName, arguments);
+            } finally {
+                contextAwareClassLoader.exitContext();
+            }
+        }
+
+        @Override
+        public Object invokeStaticMethod(Object object, String methodName, Object[] arguments) {
+            try {
+                contextAwareClassLoader.startContext();
+                contextAwareClassLoader.addPlugins(plugins);
+                return super.invokeStaticMethod(object, methodName, arguments);
+            } finally {
+                contextAwareClassLoader.exitContext();
+            }
+        }
+
+        @Override
+        public Object invokeMethod(
+            Class sender,
+            Object receiver,
+            String methodName,
+            Object[] arguments,
+            boolean isCallToSuper,
+            boolean fromInsideClass
+        ) {
+            try {
+                contextAwareClassLoader.startContext();
+                contextAwareClassLoader.addPlugins(plugins);
+                return super.invokeMethod(sender, receiver, methodName, arguments, isCallToSuper, fromInsideClass);
+            } finally {
+                contextAwareClassLoader.exitContext();
+            }
+        }
+
+        @Override
+        public Object invokeMethod(String name, Object args) {
+            try {
+                contextAwareClassLoader.startContext();
+                contextAwareClassLoader.addPlugins(plugins);
+                return super.invokeMethod(name, args);
+            } finally {
+                contextAwareClassLoader.exitContext();
+            }
         }
     }
 }

@@ -7,49 +7,23 @@ import {createStore, applyMiddleware} from 'redux';
 //$FlowFixMe
 import thunk from 'redux-thunk';
 
-import keyBy from 'lodash/keyBy';
-
 import {ScriptRegistry} from './ScriptRegistry';
 import {ScriptForm} from './ScriptForm';
 import {ViewScript} from './ViewScript';
-import {Loader} from './Loader';
-import {reducer, loadState, loadUsage} from './redux';
-
-import {registryService, watcherService} from '../service';
+import {reducer} from './redux';
 
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 
 
 export class RegistryRoute extends React.PureComponent<{}> {
-    //$FlowFixMe ??
     store = createStore(
         reducer,
         applyMiddleware(thunk)
     );
 
-    componentDidMount() {
-        Promise
-            .all([
-                registryService.getAllDirectories(),
-                registryService.getRegistryScripts(),
-                watcherService.getAllWatches('REGISTRY_SCRIPT'),
-                watcherService.getAllWatches('REGISTRY_DIRECTORY')
-            ])
-            .then(
-                ([dirs, scripts, scriptWatches, directoryWatches]: *) => {
-                    this.store.dispatch(loadState(keyBy(dirs, 'id'), keyBy(scripts, 'id'), scriptWatches, directoryWatches));
-                }
-            );
-
-        registryService
-            .getAllScriptUsage()
-            .then(usage => this.store.dispatch(loadUsage(usage)));
-    }
-
     render() {
         return (
             <Provider store={this.store}>
-                <Loader>
                     <Switch>
                         <Route path="/registry" exact={true}>
                             {() => <ScriptRegistry/>}
@@ -76,7 +50,6 @@ export class RegistryRoute extends React.PureComponent<{}> {
                         </Route>
                         <Route component={NotFoundPage}/>
                     </Switch>
-                </Loader>
             </Provider>
         );
     }

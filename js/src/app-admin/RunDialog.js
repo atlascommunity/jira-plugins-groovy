@@ -39,11 +39,22 @@ const selectTypes = ['CUSTOM_FIELD', 'USER', 'GROUP', 'RESOLUTION'];
 
 
 export class RunDialog extends React.PureComponent<Props, State> {
-    state = {
-        stage: 'params',
-        values: Map(),
-        outcome: null
-    };
+    constructor(props: Props) {
+        super(props);
+
+        let values: MapType<string, any>;
+        if (props.script.defaultValues) {
+            values = Map(props.script.defaultValues);
+        } else {
+            values = Map();
+        }
+
+        this.state = {
+            stage: 'params',
+            values: values,
+            outcome: null
+        };
+    }
 
     _run = () => {
         const {script} = this.props;

@@ -46,7 +46,7 @@ public class StaticCheckResource {
     @POST
     public Response checkStatic(StaticCheckForm form) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             Map<String, String> additionalParams = form.getAdditionalParams();
 
@@ -89,7 +89,7 @@ public class StaticCheckResource {
                     parseContext = scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getScheduledTypes(withIssue, isMutableIssue));
                     break;
                 case JQL:
-                    Class<?> functionClass = scriptService.parseClassStatic(form.getScriptBody(), false, ImmutableMap.of());
+                    Class<?> functionClass = scriptService.parseSingleton(form.getScriptBody(), false, ImmutableMap.of()).getScriptClass();
                     InvokerHelper.removeClass(functionClass);
                     if (!ScriptedJqlFunction.class.isAssignableFrom(functionClass)) {
                         return Response
@@ -105,7 +105,7 @@ public class StaticCheckResource {
                     }
                     break;
                 case GLOBAL_OBJECT:
-                    Class<?> objectClass = scriptService.parseClassStatic(form.getScriptBody(), false, ImmutableMap.of());
+                    Class<?> objectClass = scriptService.parseSingleton(form.getScriptBody(), false, ImmutableMap.of()).getScriptClass();
                     //todo: check injections
                     InvokerHelper.removeClass(objectClass);
                     break;

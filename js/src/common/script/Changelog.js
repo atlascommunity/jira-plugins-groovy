@@ -5,6 +5,8 @@ import reactStringReplace from 'react-string-replace';
 
 import Avatar from '@atlaskit/avatar';
 import Tooltip from '@atlaskit/tooltip';
+import Badge from '@atlaskit/badge';
+import {colors} from '@atlaskit/theme';
 
 import type {ChangelogType, IssueReference} from './types';
 
@@ -49,6 +51,15 @@ export function Changelog({changelogs, switchToCurrent, switchToChangelog}: Chan
                                 issueReferences={changelog.issueReferences}
                             />
                         </div>
+                        {(changelog.warnings > 0 || changelog.errors > 0)
+                            ? (
+                                <div className="flex-row">
+                                    {(changelog.warnings > 0) ? <Badge value={changelog.warnings} appearance={{ backgroundColor: colors.Y400, textColor: colors.N0 }}/> : undefined}
+                                    {(changelog.errors > 0) ? <Badge value={changelog.errors} appearance="important"/> : undefined}
+                                </div>
+                            )
+                            : undefined
+                        }
                     </div>
                 </div>
             )}

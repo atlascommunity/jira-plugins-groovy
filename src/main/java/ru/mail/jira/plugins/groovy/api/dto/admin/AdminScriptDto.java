@@ -8,6 +8,7 @@ import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
+import java.util.Map;
 
 @XmlRootElement
 @Getter @Setter
@@ -20,6 +21,8 @@ public class AdminScriptDto extends AdminScriptForm {
     private String resultWidth;
     @XmlElement
     private List<ScriptParamDto> params;
+    @XmlElement
+    private Map<String, Object> defaultValues;
     @XmlElement
     private Integer id;
     @XmlElement

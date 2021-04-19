@@ -42,7 +42,7 @@ export const filteredSelector = createSelector(
     ): * => {
         const nameFilter = filter.name.toLocaleLowerCase();
 
-        if (nameFilter.length < 2 && !filter.onlyUnused) {
+        if (nameFilter.length < 2 && !filter.onlyUnused && !filter.scriptType) {
             return {scripts, directories, isForceOpen: false};
         }
         const scriptsResult = {};
@@ -52,6 +52,13 @@ export const filteredSelector = createSelector(
         const allScripts: $ReadOnlyArray<RegistryScriptType> = Object.values(scripts);
         allScripts
             .filter((script: RegistryScriptType): boolean => {
+                if (!filter.scriptType) {
+                    return true;
+                }
+
+                return script.types.some(type => type === filter.scriptType);
+            })
+            .filter((script: RegistryScriptType): boolean => {
                 let matchesUnused: boolean = true;
                 let matchesFilter: boolean = true;
                 if (filter.onlyUnused && scriptUsage.ready) {
@@ -59,6 +66,10 @@ export const filteredSelector = createSelector(
                 }
                 if (nameFilter.length >= 2) {
                     matchesFilter = script.name.toLocaleLowerCase().includes(nameFilter);
+
+                    if (!matchesFilter && script.description) {
+                        matchesFilter = script.description.toLocaleLowerCase().includes(nameFilter);
+                    }
                 }
                 return matchesUnused && matchesFilter;
             })
@@ -79,9 +90,10 @@ export const filteredSelector = createSelector(
                 }
             });
 
-        if (!filter.onlyUnused && nameFilter) {
+        if (nameFilter) {
             //$FlowFixMe: Object.values returns mixed type, consider using es6 Map or immutablejs map
             const allDirectories: $ReadOnlyArray<RegistryDirectoryType> = Object.values(directories);
+
             allDirectories
                 .filter((script: RegistryDirectoryType): boolean => {
                     let matchesFilter: boolean = true;

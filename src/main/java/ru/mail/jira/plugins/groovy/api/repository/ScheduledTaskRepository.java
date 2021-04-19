@@ -2,6 +2,7 @@ package ru.mail.jira.plugins.groovy.api.repository;
 
 import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.jira.user.ApplicationUser;
+import ru.mail.jira.plugins.groovy.api.dto.ChangelogDto;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskForm;
 import ru.mail.jira.plugins.groovy.api.dto.scheduled.ScheduledTaskDto;
 
@@ -9,6 +10,8 @@ import java.util.List;
 
 public interface ScheduledTaskRepository {
     List<ScheduledTaskDto> getAllTasks(boolean includeChangelogs, boolean includeRunInfo);
+
+    List<ChangelogDto> getChangelogs(int id);
 
     ScheduledTaskDto getTaskInfo(int id, boolean includeChangelogs, boolean includeRunInfo);
 

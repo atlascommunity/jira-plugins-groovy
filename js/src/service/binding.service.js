@@ -1,7 +1,7 @@
 //@flow
 import {ajaxGet, getPluginBaseUrl} from './ajaxHelper';
 
-import type {ClassDoc} from '../common/editor';
+import type {ClassDoc} from '../common/editor/types';
 
 
 export class BindingService {

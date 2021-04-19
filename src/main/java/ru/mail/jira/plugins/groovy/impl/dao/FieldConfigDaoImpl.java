@@ -14,10 +14,7 @@ import ru.mail.jira.plugins.groovy.api.dao.FieldConfigDao;
 import ru.mail.jira.plugins.groovy.api.dto.audit.AuditLogEntryForm;
 import ru.mail.jira.plugins.groovy.api.dto.cf.FieldConfigForm;
 import ru.mail.jira.plugins.groovy.api.dto.notification.NotificationDto;
-import ru.mail.jira.plugins.groovy.api.entity.EntityAction;
-import ru.mail.jira.plugins.groovy.api.entity.EntityType;
-import ru.mail.jira.plugins.groovy.api.entity.FieldScript;
-import ru.mail.jira.plugins.groovy.api.entity.FieldConfigChangelog;
+import ru.mail.jira.plugins.groovy.api.entity.*;
 import ru.mail.jira.plugins.groovy.api.repository.AuditLogRepository;
 import ru.mail.jira.plugins.groovy.api.service.NotificationService;
 import ru.mail.jira.plugins.groovy.api.service.WatcherService;
@@ -58,6 +55,20 @@ public class FieldConfigDaoImpl implements FieldConfigDao {
     }
 
     @Override
+    public FieldConfigChangelog[] getChangelogs(long id) {
+        return ao.find(
+            FieldConfigChangelog.class,
+            Query
+                .select()
+                .alias(FieldScript.class, "FS")
+                .alias(FieldConfigChangelog.class, "FCC")
+                .from(FieldConfigChangelog.class)
+                .join(FieldScript.class, "FS.ID = FCC.FIELD_CONFIG_ID")
+                .where("FS.FIELD_CONFIG_ID = ?", id)
+        );
+    }
+
+    @Override
     public FieldScript createConfig(ApplicationUser user, FieldConfig jiraFieldConfig, FieldConfigForm form) {
         long configId = jiraFieldConfig.getId();
 
@@ -87,7 +98,7 @@ public class FieldConfigDaoImpl implements FieldConfigDao {
             comment = Const.CREATED_COMMENT;
         }
 
-        changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldScript.getID(), user.getKey(), diff, comment, additionalParams);
+        changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldScript.getID(), null, user.getKey(), diff, comment, additionalParams);
 
         CustomField cf = jiraFieldConfig.getCustomField();
         addAuditLogAndNotify(user, EntityAction.CREATED, fieldScript, (int) configId, cf != null ? cf.getName() : "undefined", diff, templateDiff, comment);
@@ -111,7 +122,7 @@ public class FieldConfigDaoImpl implements FieldConfigDao {
             additionalParams.put("TEMPLATE_DIFF", StringUtils.isEmpty(templateDiff) ? "no changes" : templateDiff);
         }
 
-        changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldScript.getID(), user.getKey(), diff, form.getComment(), additionalParams);
+        changelogHelper.addChangelog(FieldConfigChangelog.class, "FIELD_CONFIG_ID", fieldScript.getID(), fieldScript.getUuid(), user.getKey(), diff, form.getComment(), additionalParams);
 
         fieldScript.setCacheable(form.isCacheable());
         fieldScript.setScriptBody(form.getScriptBody());

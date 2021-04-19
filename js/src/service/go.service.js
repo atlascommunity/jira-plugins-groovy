@@ -2,6 +2,7 @@
 import {ajaxDelete, ajaxGet, ajaxPost, ajaxPut, getPluginBaseUrl} from './ajaxHelper';
 
 import type {GlobalObjectScriptType} from '../app-go/types';
+import type {ChangelogType} from '../common/script/types';
 
 
 export class GlobalObjectService {
@@ -27,5 +28,9 @@ export class GlobalObjectService {
 
     restoreScript(id: number): Promise<void> {
         return ajaxPost(`${getPluginBaseUrl()}/go/${id}/restore`);
+    }
+
+    getChangelogs(id: number): Promise<$ReadOnlyArray<ChangelogType>> {
+        return ajaxGet(`${getPluginBaseUrl()}/go/${id}/changelogs`);
     }
 }

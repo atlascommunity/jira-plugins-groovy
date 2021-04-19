@@ -4,6 +4,7 @@ import ru.mail.jira.plugins.groovy.api.dto.global.GlobalObjectForm;
 import ru.mail.jira.plugins.groovy.impl.FileUtil;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 public final class Forms {
     private Forms() {}
@@ -18,7 +19,7 @@ public final class Forms {
 
         GlobalObjectForm form = new GlobalObjectForm();
         form.setName(globalObjectName);
-        form.setScriptBody(source);
+        form.setScriptBody(source.replaceAll(Pattern.quote("$TS$"), String.valueOf(ts)));
 
         return form;
     }

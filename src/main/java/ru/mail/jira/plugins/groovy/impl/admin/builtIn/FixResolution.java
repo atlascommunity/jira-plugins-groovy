@@ -51,11 +51,11 @@ public class FixResolution implements BuiltInScript<String> {
             throw new ValidationException(parseResult.getErrors().toString());
         }
 
-        SearchResults searchResult = searchService.search(
+        SearchResults<Issue> searchResult = searchService.search(
             currentUser, parseResult.getQuery(), PagerFilter.newPageAlignedFilter(0, 1000)
         );
 
-        for (Issue docIssue : searchResult.getIssues()) {
+        for (Issue docIssue : searchResult.getResults()) {
             MutableIssue issue = issueManager.getIssueObject(docIssue.getId());
             issue.setResolution(resolution);
             issueManager.updateIssue(
@@ -63,7 +63,7 @@ public class FixResolution implements BuiltInScript<String> {
             );
         }
 
-        return "Completed for " + searchResult.getIssues().size() + " issues";
+        return "Completed for " + searchResult.getResults().size() + " issues";
     }
 
     @Override

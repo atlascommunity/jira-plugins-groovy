@@ -16,7 +16,8 @@ export type ItemType = {
 };
 
 export type NamedItemType = ItemType & {
-    name: string
+    name: string,
+    description?: string
 };
 
 export type ItemListType = $ReadOnlyArray<ItemType>;

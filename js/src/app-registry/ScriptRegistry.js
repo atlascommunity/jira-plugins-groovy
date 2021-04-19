@@ -1,5 +1,5 @@
 //@flow
-import React from 'react';
+import React, {Fragment} from 'react';
 
 import {connect} from 'react-redux';
 import {createSelector} from 'reselect';
@@ -13,22 +13,31 @@ import Button from '@atlaskit/button';
 import {FieldTextStateless} from '@atlaskit/field-text';
 import {Checkbox} from '@atlaskit/checkbox';
 import Breadcrumbs from '@atlaskit/breadcrumbs';
+import DropdownMenu, {
+    DropdownItemGroupRadio,
+    DropdownItemRadio,
+} from '@atlaskit/dropdown-menu';
+
+import keyBy from 'lodash/keyBy';
 
 import {ScriptDirectory} from './ScriptDirectory';
 import {ScriptDirectoryDialog, type DialogParams} from './ScriptDirectoryDialog';
 import {
     filteredSelector, filterSelector, groupedDirsSelector,
-    deleteDirectory, deleteScript, moveScript, UpdateActionCreators as FilterActionCreators
+    loadState, loadUsage, deleteDirectory, deleteScript, moveScript,
+    UpdateActionCreators as FilterActionCreators
 } from './redux';
 import {UsageStatusFlag} from './UsageStatusFlag';
 
-import type {FilterType, RegistryDirectoryType} from './types';
+import type {FilterType, RegistryDirectoryType, WorkflowScriptType} from './types';
+import {scriptTypes} from './types';
+import {Loader} from './Loader';
 
 import {InfoMessage} from '../common/ak/messages';
 
-import {registryService} from '../service';
+import {registryService, watcherService} from '../service';
 
-import {CommonMessages, PageTitleMessages} from '../i18n/common.i18n';
+import {CommonMessages, PageTitleMessages, FieldMessages} from '../i18n/common.i18n';
 import {RegistryMessages} from '../i18n/registry.i18n';
 
 import './ScriptRegistry.less';
@@ -44,10 +53,13 @@ type Props = {
     isScriptUsageReady: boolean,
     isForceOpen: boolean,
     filter: FilterType,
+    storeLoaded: boolean,
     deleteDirectory: typeof deleteDirectory,
     deleteScript: typeof deleteScript,
     moveScript: typeof moveScript,
-    updateFilter: typeof FilterActionCreators.updateFilter
+    updateFilter: typeof FilterActionCreators.updateFilter,
+    loadState: typeof loadState,
+    loadUsage: typeof loadUsage,
 };
 
 type State = {
@@ -145,10 +157,34 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
 
     _toggleUnused = () => this.props.updateFilter({ onlyUnused: !this.props.filter.onlyUnused });
 
+    _setType = (scriptType: ?WorkflowScriptType) => () => this.props.updateFilter({ scriptType });
+
     componentDidUpdate(prevProps: Props) {
         if (prevProps.directories !== this.props.directories) {
             //trigger scroll event when directory list is changed so all visible lazily rendered elements render
             window.dispatchEvent(new Event('scroll'));
+        }
+    }
+
+    componentDidMount() {
+        const {loadState, loadUsage, storeLoaded} = this.props;
+        if (!storeLoaded) {
+            Promise
+                .all([
+                    registryService.getAllDirectories(),
+                    registryService.getRegistryScripts(),
+                    watcherService.getAllWatches('REGISTRY_SCRIPT'),
+                    watcherService.getAllWatches('REGISTRY_DIRECTORY')
+                ])
+                .then(
+                    ([dirs, scripts, scriptWatches, directoryWatches]: *) => {
+                        loadState(keyBy(dirs, 'id'), keyBy(scripts, 'id'), scriptWatches, directoryWatches);
+                    }
+                );
+
+        registryService
+            .getAllScriptUsage()
+            .then(usage => loadUsage(usage));
         }
     }
 
@@ -159,97 +195,127 @@ export class ScriptRegistryInternal extends React.PureComponent<Props, State> {
         let directories: * = this.props.directories;
 
         return (
-            <LazilyRenderedContext>
-                <DragDropContext onDragStart={this._onDragStart} onDragEnd={this._onDragEnd}>
-                    <Page>
-                        <PageHeader
-                            actions={
-                                <Button
-                                    appearance="primary"
-                                    onClick={this._createDirectory}
-                                >
-                                    {RegistryMessages.addDirectory}
-                                </Button>
-                            }
-                            bottomBar={
-                                <div className="flex-row">
-                                    <div>
-                                        <FieldTextStateless
-                                            isLabelHidden
-                                            compact
-                                            label="hidden"
-                                            placeholder="Filter"
-                                            value={filter.name}
-                                            onChange={this._onFilterChange}
-                                        />
+            <Loader>
+                <LazilyRenderedContext>
+                    <DragDropContext onDragStart={this._onDragStart} onDragEnd={this._onDragEnd}>
+                        <Page>
+                            <PageHeader
+                                actions={
+                                    <Button
+                                        appearance="primary"
+                                        onClick={this._createDirectory}
+                                    >
+                                        {RegistryMessages.addDirectory}
+                                    </Button>
+                                }
+                                bottomBar={
+                                    <div className="flex-row space-between">
+                                        <div>
+                                            <FieldTextStateless
+                                                isLabelHidden
+                                                compact
+                                                label="hidden"
+                                                placeholder="Filter"
+                                                value={filter.name}
+                                                onChange={this._onFilterChange}
+                                            />
+                                        </div>
+                                        <DropdownMenu
+                                            trigger={
+                                                <Fragment>
+                                                    {FieldMessages.type}{' '}
+                                                    {filter.scriptType ? <strong>{'('}{filter.scriptType}{')'}</strong> : `(${CommonMessages.all})`}
+                                                </Fragment>
+                                            }
+                                            triggerType="button"
+                                        >
+                                            <DropdownItemGroupRadio id="categories">
+                                                <DropdownItemRadio
+                                                    id="all"
+                                                    onClick={this._setType(null)}
+                                                    isSelected={filter.scriptType === null}
+                                                >
+                                                    All
+                                                </DropdownItemRadio>
+                                                {scriptTypes.map(type =>
+                                                    <DropdownItemRadio
+                                                        id={type} key={type}
+                                                        onClick={this._setType(type)}
+                                                        isSelected={filter.scriptType === type}
+                                                    >
+                                                        {type}
+                                                    </DropdownItemRadio>
+                                                )}
+                                            </DropdownItemGroupRadio>
+                                        </DropdownMenu>
+                                        <div className="flex-vertical-middle">
+                                            <Checkbox
+                                                label={RegistryMessages.onlyUnused}
+                                                isDisabled={!isScriptUsageReady}
+
+                                                isChecked={filter.onlyUnused}
+                                                onChange={this._toggleUnused}
+
+                                                value="true"
+                                                name="onlyUnused"
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="flex-vertical-middle">
-                                        <Checkbox
-                                            label={RegistryMessages.onlyUnused}
-                                            isDisabled={!isScriptUsageReady}
+                                }
+                                breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
+                            >
+                                {PageTitleMessages.registry}
+                            </PageHeader>
 
-                                            isChecked={filter.onlyUnused}
-                                            onChange={this._toggleUnused}
+                            <div className={`page-content ScriptList ${this.state.isDragging ? 'dragging' : ''}`}>
+                                {directories.map(directory =>
+                                    <ScriptDirectory
+                                        directory={directory}
+                                        key={directory.id}
 
-                                            value="true"
-                                            name="onlyUnused"
-                                        />
-                                    </div>
-                                </div>
-                            }
-                            breadcrumbs={<Breadcrumbs>{withRoot([])}</Breadcrumbs>}
-                        >
-                            {PageTitleMessages.registry}
-                        </PageHeader>
+                                        forceOpen={isForceOpen}
 
-                        <div className={`page-content ScriptList ${this.state.isDragging ? 'dragging' : ''}`}>
-                            {directories.map(directory =>
-                                <ScriptDirectory
-                                    directory={directory}
-                                    key={directory.id}
+                                        onCreate={this._activateCreateDialog}
+                                        onEdit={this._activateEditDialog}
+                                        onDelete={this._activateDeleteDialog}
+                                    />
+                                )}
 
-                                    forceOpen={isForceOpen}
+                                {!directories.length ? <InfoMessage title={RegistryMessages.noScripts}/> : null}
+                                {directoryDialogProps && <ScriptDirectoryDialog {...directoryDialogProps} onClose={this._closeDirectoryDialog}/>}
+                                {deleteDirectoryProps &&
+                                    <DeleteDialog
+                                        deleteItem={deleteDirectory}
+                                        onClose={this._closeDeleteDirectoryDialog}
+                                        i18n={{
+                                            heading: RegistryMessages.deleteDirectory,
+                                            areYouSure: CommonMessages.confirmDelete
+                                        }}
 
-                                    onCreate={this._activateCreateDialog}
-                                    onEdit={this._activateEditDialog}
-                                    onDelete={this._activateDeleteDialog}
-                                />
-                            )}
+                                        {...deleteDirectoryProps}
+                                    />
+                                }
+                                {deleteScriptProps &&
+                                    <DeleteDialog
+                                        deleteItem={deleteScript}
+                                        onClose={this._closeDeleteScriptDialog}
+                                        i18n={{
+                                            heading: RegistryMessages.deleteScript,
+                                            areYouSure: CommonMessages.confirmDelete
+                                        }}
 
-                            {!directories.length ? <InfoMessage title={RegistryMessages.noScripts}/> : null}
-                            {directoryDialogProps && <ScriptDirectoryDialog {...directoryDialogProps} onClose={this._closeDirectoryDialog}/>}
-                            {deleteDirectoryProps &&
-                                <DeleteDialog
-                                    deleteItem={deleteDirectory}
-                                    onClose={this._closeDeleteDirectoryDialog}
-                                    i18n={{
-                                        heading: RegistryMessages.deleteDirectory,
-                                        areYouSure: CommonMessages.confirmDelete
-                                    }}
+                                        {...deleteScriptProps}
+                                    />
+                                }
 
-                                    {...deleteDirectoryProps}
-                                />
-                            }
-                            {deleteScriptProps &&
-                                <DeleteDialog
-                                    deleteItem={deleteScript}
-                                    onClose={this._closeDeleteScriptDialog}
-                                    i18n={{
-                                        heading: RegistryMessages.deleteScript,
-                                        areYouSure: CommonMessages.confirmDelete
-                                    }}
+                                {waiting && <Blanket isTinted={true}/>}
+                            </div>
 
-                                    {...deleteScriptProps}
-                                />
-                            }
-
-                            {waiting && <Blanket isTinted={true}/>}
-                        </div>
-
-                        <UsageStatusFlag/>
-                    </Page>
-                </DragDropContext>
-            </LazilyRenderedContext>
+                            <UsageStatusFlag/>
+                        </Page>
+                    </DragDropContext>
+                </LazilyRenderedContext>
+            </Loader>
         );
     }
 }
@@ -269,10 +335,12 @@ export const ScriptRegistry = connect(
         directories: rootSelector(state),
         isForceOpen: isForceOpenSelector(state),
         filter: filterSelector(state),
-        isScriptUsageReady: state.scriptUsage.ready
+        isScriptUsageReady: state.scriptUsage.ready,
+        storeLoaded: state.ready
     }),
     {
         deleteDirectory, deleteScript, moveScript,
-        updateFilter: FilterActionCreators.updateFilter
+        updateFilter: FilterActionCreators.updateFilter,
+        loadState, loadUsage
     }
 )(ScriptRegistryInternal);

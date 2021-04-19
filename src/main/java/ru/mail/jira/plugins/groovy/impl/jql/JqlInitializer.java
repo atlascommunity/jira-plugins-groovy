@@ -38,7 +38,7 @@ public class JqlInitializer implements PluginLifecycleAware {
         boolean fieldExists = customFieldManager
             .getCustomFieldObjects()
             .stream()
-            .anyMatch(it -> it.getCustomFieldType() instanceof JqlFunctionCFType);
+            .anyMatch(it -> it.getCustomFieldType().getClass().getCanonicalName().equals(JqlFunctionCFType.class.getCanonicalName()));
 
         if (!fieldExists) {
             logger.warn("JqlFunctionCFType field doesn't exist, creating one");

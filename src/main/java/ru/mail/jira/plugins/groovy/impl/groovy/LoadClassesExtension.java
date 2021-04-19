@@ -10,16 +10,16 @@ import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 import ru.mail.jira.plugins.groovy.api.e.UnableToLoadPluginException;
 import ru.mail.jira.plugins.groovy.api.script.ParseContext;
 import ru.mail.jira.plugins.groovy.api.service.InjectionResolver;
-import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
+import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 
 import java.util.stream.Collectors;
 
 public class LoadClassesExtension extends CompilationCustomizer {
     private final ParseContextHolder parseContextHolder;
     private final InjectionResolver injectionResolver;
-    private final DelegatingClassLoader classLoader;
+    private final ContextAwareClassLoader classLoader;
 
-    public LoadClassesExtension(ParseContextHolder parseContextHolder, InjectionResolver injectionResolver, DelegatingClassLoader classLoader) {
+    public LoadClassesExtension(ParseContextHolder parseContextHolder, InjectionResolver injectionResolver, ContextAwareClassLoader classLoader) {
         super(CompilePhase.CONVERSION);
         this.parseContextHolder = parseContextHolder;
         this.injectionResolver = injectionResolver;
@@ -34,7 +34,7 @@ public class LoadClassesExtension extends CompilationCustomizer {
         }
 
         //make sure we load all plugins before class resolution happens
-        classLoader.ensureAvailability(
+        classLoader.addPlugins(
             parseContext
                 .getPlugins()
                 .stream()

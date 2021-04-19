@@ -6,6 +6,7 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.resolution.Resolution;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsDevService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Doubles;
@@ -23,7 +24,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
-public class ScriptParamFactory {
+@ExportAsDevService
+public class ScriptParamFactoryImpl implements ru.mail.jira.plugins.groovy.api.script.ScriptParamFactory {
     private final UserManager userManager;
     private final CustomFieldManager customFieldManager;
     private final GroupManager groupManager;
@@ -32,7 +34,7 @@ public class ScriptParamFactory {
     private final ScriptService scriptService;
 
     @Autowired
-    public ScriptParamFactory(
+    public ScriptParamFactoryImpl(
         @ComponentImport UserManager userManager,
         @ComponentImport CustomFieldManager customFieldManager,
         @ComponentImport GroupManager groupManager,
@@ -48,6 +50,7 @@ public class ScriptParamFactory {
         this.scriptService = scriptService;
     }
 
+    @Override
     public Object getParamObject(ScriptParamDto paramDto, String value) {
         if (value == null) {
             return null;
@@ -80,6 +83,7 @@ public class ScriptParamFactory {
         return null;
     }
 
+    @Override
     public Object getParamFormValue(ScriptParamDto paramDto, String value) {
         switch (paramDto.getParamType()) {
             case BOOLEAN:

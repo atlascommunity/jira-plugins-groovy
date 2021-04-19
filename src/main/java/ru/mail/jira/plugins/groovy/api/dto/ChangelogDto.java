@@ -13,6 +13,8 @@ public class ChangelogDto {
     @XmlElement
     private int id;
     @XmlElement
+    String uuid;
+    @XmlElement
     private String comment;
     @XmlElement
     private String diff;
@@ -24,4 +26,9 @@ public class ChangelogDto {
     private String date;
     @XmlElement
     private Set<JiraIssueReference> issueReferences;
+
+    @XmlElement
+    private long warnings;
+    @XmlElement
+    private long errors;
 }

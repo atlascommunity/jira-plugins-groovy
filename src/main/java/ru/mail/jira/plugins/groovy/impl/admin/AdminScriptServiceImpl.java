@@ -11,12 +11,12 @@ import ru.mail.jira.plugins.groovy.api.dto.ScriptParamDto;
 import ru.mail.jira.plugins.groovy.api.dto.admin.AdminScriptDto;
 import ru.mail.jira.plugins.groovy.api.dto.admin.AdminScriptOutcome;
 import ru.mail.jira.plugins.groovy.api.repository.AdminScriptRepository;
+import ru.mail.jira.plugins.groovy.api.script.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.service.admin.AdminScriptService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.admin.BuiltInScript;
 import ru.mail.jira.plugins.groovy.api.service.admin.BuiltInScriptManager;
-import ru.mail.jira.plugins.groovy.impl.param.ScriptParamFactory;
 import ru.mail.jira.plugins.groovy.util.ExceptionHelper;
 import ru.mail.jira.plugins.groovy.util.ValidationException;
 

@@ -1,5 +1,6 @@
 package it.ru.mail.jira.plugins.groovy.crud;
 
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import it.ru.mail.jira.plugins.groovy.util.ArquillianUtil;
 import it.ru.mail.jira.plugins.groovy.util.AuditLogHelper;
@@ -8,6 +9,7 @@ import it.ru.mail.jira.plugins.groovy.util.UserHelper;
 import org.jboss.arquillian.container.test.api.BeforeDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import ru.mail.jira.plugins.groovy.api.dto.listener.ConditionDescriptor;
@@ -37,9 +39,20 @@ public class ListenerCrudIT {
     @Inject
     private ChangeLogHelper changeLogHelper;
 
+    private Integer listenerId;
+
     @BeforeDeployment
     public static Archive<?> prepareArchive(Archive<?> archive) {
         return ArquillianUtil.prepareArchive(archive);
+    }
+
+    @After
+    public void afterEach() {
+        ApplicationUser admin = userHelper.getAdmin();
+
+        if (listenerId != null) {
+            listenerRepository.deleteEventListener(admin, listenerId);
+        }
     }
 
     private EventListenerForm createScriptForm() {
@@ -71,9 +84,13 @@ public class ListenerCrudIT {
     public void shouldCreateScript() {
         EventListenerForm form = createScriptForm();
         EventListenerDto script = createScript(form);
+
+        listenerId = script.getId();
+
         assertNotNull(script);
         assertTrue(form.matches(script));
         assertTrue(isScriptExists(script.getId()));
+
         auditLogHelper.assertAuditLogCreated(script.getId(), EntityType.LISTENER, EntityAction.CREATED);
         changeLogHelper.assertChangeLogCreated(ListenerChangelog.class, "LISTENER_ID = ?", script.getId(), Const.CREATED_COMMENT, userHelper.getAdmin());
     }
@@ -83,6 +100,8 @@ public class ListenerCrudIT {
         String comment = "comment" + System.currentTimeMillis();
 
         EventListenerDto script = createScript();
+
+        listenerId = script.getId();
 
         EventListenerForm form = new EventListenerForm();
         form.setName(script.getName());
@@ -101,6 +120,8 @@ public class ListenerCrudIT {
     public void shouldDeleteScript() {
         EventListenerDto script = createScript();
 
+        listenerId = script.getId();
+
         assertTrue(isScriptExists(script.getId()));
         listenerRepository.deleteEventListener(userHelper.getAdmin(), script.getId());
 
@@ -111,6 +132,8 @@ public class ListenerCrudIT {
     @Test
     public void shouldRestoreScript() {
         EventListenerDto script = createScript();
+
+        listenerId = script.getId();
 
         assertTrue(isScriptExists(script.getId()));
 

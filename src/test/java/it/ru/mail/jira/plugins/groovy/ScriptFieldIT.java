@@ -25,8 +25,7 @@ import javax.inject.Inject;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @RunWith(Arquillian.class)
 public class ScriptFieldIT {
@@ -105,6 +104,29 @@ public class ScriptFieldIT {
             (double) (issue.getCreated().getTime() - TimeUnit.MINUTES.toMillis(10L)),
             issue.getCustomFieldValue(field)
         );
+    }
+
+    @Test
+    public void nullValuesFieldShouldWork() throws Exception {
+        this.field = fieldHelper.createNumberField();
+        this.issue = issueHelper.createIssue(userHelper.getAdmin(), project);
+
+        FieldConfig fieldConfig = fieldHelper.getFirstConfig(field);
+
+        assertNotNull(fieldConfig);
+
+        String script = "return null";
+
+        FieldConfigForm form = new FieldConfigForm();
+        form.setCacheable(true);
+        form.setScriptBody(script);
+        form.setVelocityParamsEnabled(false);
+
+        fieldConfigRepository.updateConfig(userHelper.getAdmin(), fieldConfig.getId(), form);
+
+        MutableIssue issue = issueManager.getIssueObject(this.issue.getId());
+
+        assertNull(issue.getCustomFieldValue(field));
     }
 
     private boolean isIssueReIndexed(ApplicationUser expectedAssignee) throws Exception {

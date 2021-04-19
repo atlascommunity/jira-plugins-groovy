@@ -48,15 +48,15 @@ public class IssueHelper {
         return search(user, query);
     }
 
-    public SearchResults search(ApplicationUser user, Query query) throws SearchException {
+    public SearchResults<Issue> search(ApplicationUser user, Query query) throws SearchException {
         return searchService.searchOverrideSecurity(user, query, PagerFilter.getUnlimitedFilter());
     }
 
     public Issue getIssueFromIndex(ApplicationUser user, String key) throws SearchException {
-        SearchResults searchResult = search(user, JqlQueryBuilder.newBuilder().where().field("key").eq(key).buildQuery());
+        SearchResults<Issue> searchResult = search(user, JqlQueryBuilder.newBuilder().where().field("key").eq(key).buildQuery());
 
         assertEquals(1, searchResult.getTotal());
-        return searchResult.getIssues().get(0);
+        return searchResult.getResults().get(0);
     }
 
     public void assignIssue(MutableIssue issue, ApplicationUser user, ApplicationUser assignee) {

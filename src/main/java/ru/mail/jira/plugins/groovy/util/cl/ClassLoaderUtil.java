@@ -3,6 +3,7 @@ package ru.mail.jira.plugins.groovy.util.cl;
 import com.atlassian.jira.util.JiraUtils;
 import com.atlassian.plugin.util.ClassLoaderStack;
 import org.apache.felix.framework.BundleWiringImpl;
+import org.osgi.framework.Bundle;
 
 import java.util.function.Supplier;
 
@@ -32,7 +33,7 @@ public final class ClassLoaderUtil {
         if (typeClassLoader instanceof BundleWiringImpl.BundleClassLoader) {
             BundleWiringImpl.BundleClassLoader castedClassLoader = (BundleWiringImpl.BundleClassLoader) typeClassLoader;
 
-            return castedClassLoader.getBundle().getSymbolicName();
+            return ((Bundle) castedClassLoader.getBundle()).getSymbolicName();
         } else {
             throw new IllegalArgumentException("Class is not from osgi bundle");
         }

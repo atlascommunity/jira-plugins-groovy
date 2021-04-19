@@ -3,7 +3,6 @@ package ru.mail.jira.plugins.groovy.impl.jql.function.builtin.jsw;
 import com.atlassian.greenhopper.model.rapid.RapidView;
 import com.atlassian.greenhopper.service.sprint.Sprint;
 import com.atlassian.jira.issue.fields.CustomField;
-import com.atlassian.jira.issue.search.filters.IssueIdFilter;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
@@ -22,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.AbstractBuiltInQueryFunction;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.SearchHelper;
 import ru.mail.jira.plugins.groovy.impl.jsw.JiraSoftwareHelper;
+import ru.mail.jira.plugins.groovy.impl.jsw.JiraSoftwareHelperFactory;
+import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -29,27 +30,30 @@ import java.util.*;
 public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQueryFunction {
     private final Logger logger = LoggerFactory.getLogger(AbstractSprintHistoryFunction.class);
 
-    private final JiraSoftwareHelper jiraSoftwareHelper;
+    private final JiraSoftwareHelperFactory jiraSoftwareHelperFactory;
     private final SearchHelper searchHelper;
     private final boolean added;
 
     public AbstractSprintHistoryFunction(
-        JiraSoftwareHelper jiraSoftwareHelper,
+        JiraSoftwareHelperFactory jiraSoftwareHelperFactory,
         SearchHelper searchHelper,
         String functionName, boolean added
     ) {
         super(functionName, 1);
-        this.jiraSoftwareHelper = jiraSoftwareHelper;
+        this.jiraSoftwareHelperFactory = jiraSoftwareHelperFactory;
         this.searchHelper = searchHelper;
         this.added = added;
     }
 
     @Override
     protected void validate(MessageSet messageSet, ApplicationUser user, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
-        if (!jiraSoftwareHelper.isAvailable()) {
+        Optional<JiraSoftwareHelper> optionalJiraSoftwareHelper = jiraSoftwareHelperFactory.get();
+        if (!optionalJiraSoftwareHelper.isPresent()) {
             messageSet.addErrorMessage("Jira Software is not available");
             return;
         }
+
+        JiraSoftwareHelper jiraSoftwareHelper = optionalJiraSoftwareHelper.get();
 
         List<String> args = functionOperand.getArgs();
 
@@ -69,7 +73,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
         if (args.size() == 2) {
             String sprintName = args.get(1);
 
-            Optional<Sprint> sprint = jiraSoftwareHelper.findSprint(user, rapidView, sprintName);
+            Optional<Sprint> sprint = jiraSoftwareHelper.findSprint(user, rapidView.get(), sprintName);
 
             if (!sprint.isPresent()) {
                 messageSet.addErrorMessage("Can't find sprint with name \"" + sprintName + "\" in board \"" + rapidView.get().getName() + "\"");
@@ -80,25 +84,27 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
     @Nonnull
     @Override
     public QueryFactoryResult getQuery(@Nonnull QueryCreationContext queryCreationContext, @Nonnull TerminalClause terminalClause) {
-        if (!jiraSoftwareHelper.isAvailable()) {
+        Optional<JiraSoftwareHelper> optionalJiraSoftwareHelper = jiraSoftwareHelperFactory.get();
+        if (!optionalJiraSoftwareHelper.isPresent()) {
             return QueryFactoryResult.createFalseResult();
         }
+
+        JiraSoftwareHelper jiraSoftwareHelper = optionalJiraSoftwareHelper.get();
 
         ApplicationUser user = queryCreationContext.getApplicationUser();
         FunctionOperand operand = (FunctionOperand) terminalClause.getOperand();
         List<String> args = operand.getArgs();
 
-        jiraSoftwareHelper.getSprintField();
-
         CustomField sprintField = jiraSoftwareHelper.getSprintField();
+        Optional<RapidView> optionalRapidView = jiraSoftwareHelper.findRapidViewByName(user, args.get(0));
 
-        Optional<RapidView> rapidView = jiraSoftwareHelper.findRapidViewByName(user, args.get(0));
-
-        if (!rapidView.isPresent()) {
+        if (!optionalRapidView.isPresent()) {
             logger.warn("Unable to find rapid view for name \"{}\"", args.get(0));
 
             return QueryFactoryResult.createFalseResult();
         }
+
+        RapidView rapidView = optionalRapidView.get();
 
         com.atlassian.query.Query rapidViewQuery = JqlQueryBuilder
             .newBuilder(jiraSoftwareHelper.getRapidViewQuery(user, rapidView))
@@ -111,7 +117,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
         Query luceneQuery = null;
 
         if (args.size() == 1) {
-            BooleanQuery sprintsQuery = new BooleanQuery();
+            BooleanQuery.Builder sprintsQuery = new BooleanQuery.Builder();
 
             for (Sprint sprint : jiraSoftwareHelper.findActiveSprintsByBoard(user, rapidView)) {
                 if (sprint.getStartDate() != null) {
@@ -121,7 +127,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
                 }
             }
 
-            luceneQuery = sprintsQuery;
+            luceneQuery = sprintsQuery.build();
         } else if (args.size() == 2) {
             Optional<Sprint> sprint = jiraSoftwareHelper.findSprint(user, rapidView, args.get(1));
 
@@ -130,7 +136,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
 
                 return QueryFactoryResult.createFalseResult();
             }
-
+            startDates.put(sprint.get().getId(), sprint.get().getStartDate());
             luceneQuery = new TermQuery(new Term(historicFieldId, String.valueOf(sprint.get().getId())));
         }
 
@@ -139,7 +145,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
         searchHelper.doSearch(rapidViewQuery, luceneQuery, collector, queryCreationContext);
 
         return new QueryFactoryResult(
-            new ConstantScoreQuery(new IssueIdFilter(collector.getIssues())),
+            QueryUtil.createIssueIdQuery(collector.getIssues()),
             terminalClause.getOperator() == Operator.NOT_IN
         );
     }

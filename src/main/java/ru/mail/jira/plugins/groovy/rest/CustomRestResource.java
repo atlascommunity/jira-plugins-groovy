@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.repository.RestRepository;
+import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.dto.rest.HttpMethod;
 import ru.mail.jira.plugins.groovy.api.dto.rest.Script;
@@ -108,12 +109,6 @@ public class CustomRestResource {
             }
         }
 
-        long t = System.currentTimeMillis();
-
-        boolean successful = true;
-        String error = null;
-        Exception exception = null;
-
         HashMap<String, Object> bindings = new HashMap<>();
         bindings.put("method", method);
         bindings.put("uriInfo", uriInfo);
@@ -122,25 +117,22 @@ public class CustomRestResource {
         bindings.put("currentUser", user);
 
         Response response = null;
-        try {
-            response = (Response) scriptService.executeScript(
-                script.getId(),
-                script.getScript(),
-                ScriptType.REST,
-                bindings
-            );
-        } catch (Exception e) {
-            successful = false;
-            exception = e;
-            logger.error("Error for rest script {}", key, exception);
-            error = ExceptionHelper.writeExceptionToString(e);
+
+        ScriptExecutionOutcome outcome = scriptService.executeScriptWithOutcome(
+            script.getId(),
+            script.getScript(),
+            ScriptType.REST,
+            bindings
+        );
+
+        if (outcome.isSuccessful()) {
+            response = (Response) outcome.getResult();
+        } else {
+            logger.error("Error for rest script {}", key, outcome.getError());
         }
 
         executionRepository.trackInline(
-            script.getId(),
-            System.currentTimeMillis() - t,
-            successful,
-            error,
+            script.getId(), outcome,
             ImmutableMap.<String, String>builder()
                 .put("method", method.name())
                 .put("queryParameters", Objects.toString(uriInfo.getQueryParameters()))
@@ -151,8 +143,8 @@ public class CustomRestResource {
                 .build()
         );
 
-        if (exception != null) {
-            return Response.status(500).entity(ExceptionHelper.getMessageOrClassName(exception)).build();
+        if (!outcome.isSuccessful()) {
+            return Response.status(500).entity(ExceptionHelper.getMessageOrClassName(outcome.getError())).build();
         }
 
         if (response == null) {

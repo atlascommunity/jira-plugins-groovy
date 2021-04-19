@@ -29,7 +29,7 @@ public class ExecutionResource {
     @Path("/forRegistry/{scriptId}")
     public Response getExecutions(@PathParam("scriptId") int scriptId) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return executionRepository.getRegistryExecutions(scriptId);
         }).getResponse();
@@ -39,7 +39,7 @@ public class ExecutionResource {
     @Path("/forRegistry/{scriptId}/last")
     public Response getLastExecutions(@PathParam("scriptId") int scriptId) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return executionRepository.getLastRegistryExecutions(scriptId);
         }).getResponse();
@@ -49,7 +49,7 @@ public class ExecutionResource {
     @Path("/forInline/{scriptId}")
     public Response getExecutions(@PathParam("scriptId") String scriptId) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return executionRepository.getInlineExecutions(scriptId);
         }).getResponse();
@@ -59,7 +59,7 @@ public class ExecutionResource {
     @Path("/forInline/{scriptId}/last")
     public Response getLastExecutions(@PathParam("scriptId") String scriptId) {
         return new RestExecutor<>(() -> {
-            permissionHelper.checkIfAdmin();
+            permissionHelper.checkIfAdminOrSysAdmin();
 
             return executionRepository.getLastInlineExecutions(scriptId);
         }).getResponse();

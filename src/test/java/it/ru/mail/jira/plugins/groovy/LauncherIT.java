@@ -36,6 +36,7 @@ public class LauncherIT {
     @Test
     public void initializationListShouldBeCorrect() {
         ImmutableList<String> classNames = ImmutableList.of(
+            "ru.mail.jira.plugins.groovy.impl.sentry.SentryServiceImpl",
             "ru.mail.jira.plugins.groovy.impl.jsw.DelegatingJiraSoftwareHelper",
             "ru.mail.jira.plugins.groovy.impl.ScriptServiceImpl",
             "ru.mail.jira.plugins.groovy.impl.groovy.var.GlobalObjectsBindingProvider",
