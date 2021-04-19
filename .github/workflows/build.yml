@@ -35,4 +35,3 @@ jobs:
           name: package artifacts
           path: | 
               target/*.jar
-              target/*.obr
