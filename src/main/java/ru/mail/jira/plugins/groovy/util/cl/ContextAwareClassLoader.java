@@ -34,16 +34,19 @@ public class ContextAwareClassLoader extends ClassLoader {
     }
 
     public void exitContext() {
-        logger.trace("exiting context");
+        try {
+            logger.trace("exiting context");
 
-        Queue<Set<Plugin>> queue = getQueue();
-        queue.remove();
+            Queue<Set<Plugin>> queue = getQueue();
+            queue.remove();
 
-        if (queue.isEmpty()) {
-            logger.trace("clearing thread local state");
-            currentContext.remove();
+            if (queue.isEmpty()) {
+                logger.trace("clearing thread local state");
+                currentContext.remove();
+            }
+        } finally {
+            rwLock.readLock().unlock();
         }
-        rwLock.readLock().unlock();
     }
 
     public Lock getWriteLock() {
