@@ -8,7 +8,7 @@ import Page from '@atlaskit/page';
 import PageHeader from '@atlaskit/page-header';
 import Breadcrumbs, {BreadcrumbsItem} from '@atlaskit/breadcrumbs';
 
-import {addScript, updateScript, deleteScript, scriptWithParentSelectorFactory} from './redux';
+import { deleteScript } from './redux';
 import type {RegistryScriptType} from './types';
 import {RegistryScript} from './RegistryScript';
 
@@ -19,22 +19,24 @@ import {registryService} from '../service';
 import {DeleteDialog} from '../common/script-list/DeleteDialog';
 import {NotFoundPage} from '../common/script-list/NotFoundPage';
 import {withRoot} from '../common/script-list/breadcrumbs';
+import { LoadingSpinner } from '../common/ak';
 
 
 type Props = {
     id: number,
-    script?: RegistryScriptType,
-    deleteScript: typeof deleteScript,
     history: RouterHistory
 };
 
 type State = {
-    isDeleting: boolean
+    isDeleting: boolean,
+    isLoading: boolean,
+    script?: RegistryScriptType
 };
 
 class ViewScriptInternal extends React.PureComponent<Props, State> {
     state = {
-        isDeleting: false
+        isDeleting: false,
+        script: undefined,
     };
 
     _toggleDelete = () => this.setState(state => ({ isDeleting: !state.isDeleting }));
@@ -43,10 +45,21 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
         .deleteScript(this.props.id)
         .then(() => this.props.history.push('/registry/'));
 
-    render() {
-        const {script} = this.props;
-        const {isDeleting} = this.state;
+    componentDidMount() {
+      registryService
+        .getScript(this.props.id)
+        .then((script) => this.setState(state => ({...state, script: script })))
+    }
 
+    render() {
+        const {isDeleting, script} = this.state;
+
+        if (!script) {
+          return <LoadingSpinner/>;
+        }
+        if (script.deleted) {
+          return <NotFoundPage/>;
+        }
         return (
             <Page>
                 <PageHeader
@@ -73,7 +86,6 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
                     <DeleteDialog
                         id={script.id}
                         name={script.name}
-
                         deleteItem={this.props.deleteScript}
                         onConfirm={this._doDelete}
                         onClose={this._toggleDelete}
@@ -91,13 +103,7 @@ class ViewScriptInternal extends React.PureComponent<Props, State> {
 
 export const ViewScript = withRouter(
     connect(
-        (): * => {
-            const scriptSelector = scriptWithParentSelectorFactory();
-            //$FlowFixMe
-            return (state, props) => ({
-                script: scriptSelector(state, props) //todo: modify selector to get parent names
-            });
-        },
-        { addScript, updateScript, deleteScript }
+      null,
+      { deleteScript }
     )(ViewScriptInternal)
 );

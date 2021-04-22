@@ -152,36 +152,3 @@ export const groupedDirsSelector = createSelector(
     groupedSelector('parentId')
 );
 
-export const scriptSelectorFactory = (
-    () => createSelector(
-        [
-            state => state.scripts,
-            (_state, props) => props.id
-        ],
-        (scripts: KeyedEntities<RegistryScriptType>, id: number) => scripts[id]
-    )
-);
-
-
-function getParentName(directories: KeyedEntities<RegistryDirectoryType>, parentId: number): string {
-    const parent = directories[parentId];
-
-    if (!parent) {
-        return 'Unknown';
-    }
-    const parentName = parent.name;
-    return parent.parentId ? `${getParentName(directories, parent.parentId)} / ${parentName}` : parentName;
-}
-
-export const scriptWithParentSelectorFactory = (
-    () => createSelector(
-        [
-            scriptSelectorFactory(),
-            state => state.directories
-        ],
-        (script: RegistryScriptType, directories: KeyedEntities<RegistryDirectoryType>) => ({
-            ...script,
-            parentName: getParentName(directories, script.directoryId)
-        })
-    )
-);

@@ -22,7 +22,7 @@ export type DeleteDialogProps = {|
 
 type Props = {|
     ...DeleteDialogProps,
-    deleteItem: typeof deleteItem,
+    deleteItem?: typeof deleteItem,
     onClose: VoidCallback,
     i18n: DeleteI18n,
     closeAfterDelete: boolean
@@ -47,7 +47,9 @@ export class DeleteDialog extends React.PureComponent<Props, State> {
         this.setState({ waiting: true });
         onConfirm().then(() => {
             this.setState({ waiting: false });
-            deleteItem(id);
+            if (deleteItem != null) {
+                deleteItem(id);
+            }
             if (closeAfterDelete) {
                 onClose();
             }

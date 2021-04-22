@@ -6,6 +6,7 @@ import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.websudo.WebSudoRequired;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import ru.mail.jira.plugins.groovy.api.script.ScriptExecutionOutcome;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
@@ -56,7 +57,7 @@ public class ConsoleResource {
             ApplicationUser currentUser = authenticationContext.getLoggedInUser();
             ScriptExecutionOutcome outcome = scriptService.executeScriptWithOutcome(null, request.getScript(), ScriptType.CONSOLE, ImmutableMap.of("currentUser", currentUser));
             return new ConsoleResponse(
-                String.valueOf(outcome.getResult()),
+                String.valueOf(outcome.isSuccessful() ? outcome.getResult() : ExceptionUtils.getStackTrace(outcome.getError())),
                 logTransformer.formatLog(outcome.getExecutionContext().getLogEntries()),
                 outcome.getTime()
             );
