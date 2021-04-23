@@ -333,6 +333,9 @@
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <Atlassian-Scan-Folders>META-INF/plugin-descriptors</Atlassian-Scan-Folders>
                         <Export-Package>ru.mail.jira.plugins.groovy.api.*,</Export-Package>
+                        <Require-Capability>
+                            <![CDATA[osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"]]>
+                        </Require-Capability>
                         <Import-Package>
                             <!-- imports -->
                             org.springframework.osgi.*;resolution:="optional",
@@ -530,13 +533,13 @@
     </dependencyManagement>
 
     <properties>
-        <jira.version>8.2.1</jira.version>
+        <jira.version>8.13.1</jira.version>
         <jira.oldest.version>8.0.0</jira.oldest.version>
         <jira.latest.version>8.16.0</jira.latest.version>
         <jira.lts.version>8.13.1</jira.lts.version>
         <quick.reload.version>3.0.0</quick.reload.version>
 
-        <gh.version>8.0.0-DAILY20190122023019</gh.version>
+        <gh.version>8.13.1</gh.version>
         <amps.version>8.0.1</amps.version>
         <ao.version>1.5.0</ao.version>
         <junit.version>5.2.0</junit.version>
