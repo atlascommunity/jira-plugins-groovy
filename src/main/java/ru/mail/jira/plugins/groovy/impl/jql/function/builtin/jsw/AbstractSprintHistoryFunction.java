@@ -121,8 +121,7 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
 
             for (Sprint sprint : jiraSoftwareHelper.findActiveSprintsByBoard(user, rapidView)) {
                 if (sprint.getStartDate() != null) {
-                    startDates.put(sprint.getId(), sprint.getStartDate());
-
+                    startDates.put(sprint.getId(), sprint.getActivatedDate());
                     sprintsQuery.add(new TermQuery(new Term(historicFieldId, String.valueOf(sprint.getId()))), BooleanClause.Occur.SHOULD);
                 }
             }
@@ -133,10 +132,9 @@ public abstract class AbstractSprintHistoryFunction extends AbstractBuiltInQuery
 
             if (!sprint.isPresent()) {
                 logger.warn("Unable to find sprint with name \"{}\" in board \"{}\"", args.get(1), args.get(0));
-
                 return QueryFactoryResult.createFalseResult();
             }
-            startDates.put(sprint.get().getId(), sprint.get().getStartDate());
+            startDates.put(sprint.get().getId(), sprint.get().getActivatedDate());
             luceneQuery = new TermQuery(new Term(historicFieldId, String.valueOf(sprint.get().getId())));
         }
 
