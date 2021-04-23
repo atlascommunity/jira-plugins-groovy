@@ -20,6 +20,7 @@ export type RegistryScriptType = {|
     types: $ReadOnlyArray<WorkflowScriptType>,
     directoryId: number,
     parentName?: string,
+    deleted: boolean
 |};
 
 export type RegistryDirectoryType = {
