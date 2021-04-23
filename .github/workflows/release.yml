@@ -6,7 +6,7 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-      - '[0-9]+.[0-9]+*' # Push events to matching v*, i.e. 1.0, 20.15.10
+      - 'groovy-[0-9]+.[0-9]+*' # Push events to matching v*, i.e. 1.0, 20.15.10
   workflow_dispatch:
     inputs:
       version:
@@ -40,6 +40,9 @@ jobs:
               yarn install
               yarn build-prod
               
+      - name: Run atlas-integration-test
+        run: atlas-integration-test
+
       - name: Build atlas package
         run: atlas-package -P production
         
@@ -49,7 +52,6 @@ jobs:
           name: package artifacts
           path: | 
               target/*.jar
-              target/*.obr
           
       - name: Create Release
         id: create_release
