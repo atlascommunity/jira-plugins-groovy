@@ -70,17 +70,21 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
     }
 
     public void refresh() {
-        contextAwareClassLoader.getWriteLock().lock();
         try {
-            Lock lock = rwLock.writeLock();
-            lock.lock();
+            contextAwareClassLoader.getWriteLock().lockInterruptibly();
             try {
-                unsafeLoadCaches();
+                Lock lock = rwLock.writeLock();
+                lock.lock();
+                try {
+                    unsafeLoadCaches();
+                } finally {
+                    lock.unlock();
+                }
             } finally {
-                lock.unlock();
+                contextAwareClassLoader.getWriteLock().unlock();
             }
-        } finally {
-            contextAwareClassLoader.getWriteLock().unlock();
+        } catch (InterruptedException e) {
+            logger.error("waiting refreshing interrupted", e);
         }
     }
 
