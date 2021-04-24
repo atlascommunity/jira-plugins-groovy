@@ -11,18 +11,18 @@ import ru.mail.jira.plugins.groovy.api.dao.GlobalObjectDao;
 import ru.mail.jira.plugins.groovy.api.entity.GlobalObject;
 import ru.mail.jira.plugins.groovy.api.repository.ExecutionRepository;
 import ru.mail.jira.plugins.groovy.api.script.CompiledScript;
+import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingDescriptor;
 import ru.mail.jira.plugins.groovy.api.script.binding.BindingProvider;
-import ru.mail.jira.plugins.groovy.api.script.ScriptType;
 import ru.mail.jira.plugins.groovy.api.script.binding.LazyDocBindingDescriptorImpl;
 import ru.mail.jira.plugins.groovy.api.service.GroovyDocService;
 import ru.mail.jira.plugins.groovy.api.service.ScriptService;
 import ru.mail.jira.plugins.groovy.api.service.SingletonFactory;
+import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 import ru.mail.jira.plugins.groovy.impl.service.SingletonFactoryImpl;
 import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 import ru.mail.jira.plugins.groovy.util.cl.ContextAwareClassLoader;
 import ru.mail.jira.plugins.groovy.util.cl.DelegatingClassLoader;
-import ru.mail.jira.plugins.groovy.api.util.PluginLifecycleAware;
 
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -36,8 +36,6 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final ThreadLocal<GlobalObjectsState> tempState = new ThreadLocal<>();
-    private volatile GlobalObjectsState state = null;
-
     private final ScriptService scriptService;
     private final GlobalObjectDao globalObjectDao;
     private final ExecutionRepository executionRepository;
@@ -46,16 +44,17 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
     private final ContextAwareClassLoader contextAwareClassLoader;
     //we must keep reference to this object
     private final GlobalObjectClassLoader globalObjectClassLoader;
+    private volatile GlobalObjectsState state = null;
 
     @Autowired
     public GlobalObjectsBindingProvider(
-        ScriptService scriptService,
-        GlobalObjectDao globalObjectDao,
-        ExecutionRepository executionRepository,
-        DelegatingClassLoader delegatingClassLoader,
-        GroovyDocService groovyDocService,
-        SingletonFactoryImpl singletonFactory,
-        ContextAwareClassLoader contextAwareClassLoader
+            ScriptService scriptService,
+            GlobalObjectDao globalObjectDao,
+            ExecutionRepository executionRepository,
+            DelegatingClassLoader delegatingClassLoader,
+            GroovyDocService groovyDocService,
+            SingletonFactoryImpl singletonFactory,
+            ContextAwareClassLoader contextAwareClassLoader
     ) {
         this.scriptService = scriptService;
         this.globalObjectDao = globalObjectDao;
@@ -74,7 +73,6 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         contextAwareClassLoader.getWriteLock().lock();
         try {
             Lock lock = rwLock.writeLock();
-
             lock.lock();
             try {
                 unsafeLoadCaches();
@@ -94,12 +92,11 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
             ClassLoaderUtil.runInContext(() -> {
                 logger.info("loading cache");
 
-                state
-                    .objects
-                    .values()
-                    .stream()
-                    .map(BindingDescriptor::getType)
-                    .forEach(InvokerHelper::removeClass);
+                state.objects
+                        .values()
+                        .stream()
+                        .map(BindingDescriptor::getType)
+                        .forEach(InvokerHelper::removeClass);
 
                 boolean incomplete = false;
                 List<GlobalObject> allObjects = new LinkedList<>(globalObjectDao.getAll());
@@ -131,15 +128,15 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                             Object object = singletonFactory.createInstance(compiledScript);
 
                             state.objects.put(
-                                globalObject.getName(),
-                                new LazyDocBindingDescriptorImpl(object, objectClass, () -> {
-                                    try {
-                                        return groovyDocService.parseDocs(objectClass.getCanonicalName(), objectClass.getSimpleName(), globalObject.getScriptBody());
-                                    } catch (Exception e) {
-                                        logger.error("Unable to parse doc for global object {}", globalObject.getName(), e);
-                                        return null;
-                                    }
-                                })
+                                    globalObject.getName(),
+                                    new LazyDocBindingDescriptorImpl(object, objectClass, () -> {
+                                        try {
+                                            return groovyDocService.parseDocs(objectClass.getCanonicalName(), objectClass.getSimpleName(), globalObject.getScriptBody());
+                                        } catch (Exception e) {
+                                            logger.error("Unable to parse doc for global object {}", globalObject.getName(), e);
+                                            return null;
+                                        }
+                                    })
                             );
                             state.types.put(objectClass.getName(), objectClass);
 
@@ -147,13 +144,13 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
                             if (t >= ExecutionRepository.WARNING_THRESHOLD) {
                                 executionRepository.trackInline(
-                                    globalObject.getUuid(),
-                                    t,
-                                    true,
-                                    null,
-                                    ImmutableMap.of(
-                                        "type", ScriptType.GLOBAL_OBJECT.name()
-                                    )
+                                        globalObject.getUuid(),
+                                        t,
+                                        true,
+                                        null,
+                                        ImmutableMap.of(
+                                                "type", ScriptType.GLOBAL_OBJECT.name()
+                                        )
                                 );
                             }
 
@@ -161,13 +158,13 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                         } catch (Exception | NoClassDefFoundError e) {
                             logger.error("Unable to initialize global object {}", globalObject.getName(), e);
                             executionRepository.trackInline(
-                                globalObject.getUuid(),
-                                0L,
-                                false,
-                                e,
-                                ImmutableMap.of(
-                                    "type", ScriptType.GLOBAL_OBJECT.name()
-                                )
+                                    globalObject.getUuid(),
+                                    0L,
+                                    false,
+                                    e,
+                                    ImmutableMap.of(
+                                            "type", ScriptType.GLOBAL_OBJECT.name()
+                                    )
                             );
                         }
                     }
@@ -176,8 +173,8 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
                     if (prevRemaining == allObjects.size()) {
                         if (allObjects.size() > 0) {
                             logger.error(
-                                "Failed to initialize objects: {}",
-                                allObjects.stream().map(GlobalObject::getName).collect(Collectors.joining(";"))
+                                    "Failed to initialize objects: {}",
+                                    allObjects.stream().map(GlobalObject::getName).collect(Collectors.joining(";"))
                             );
                         }
                         break;
@@ -196,26 +193,6 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         }
     }
 
-    private void initializePrematurely() {
-        contextAwareClassLoader.getWriteLock().lock();
-        try {
-            Lock wLock = rwLock.writeLock();
-            wLock.lock();
-            try {
-                if (state != null) {
-                    return;
-                }
-
-                logger.warn("doing premature initialization");
-                unsafeLoadCaches();
-            } finally {
-                wLock.unlock();
-            }
-        } finally {
-            contextAwareClassLoader.getWriteLock().unlock();
-        }
-    }
-
     @Override
     public Map<String, BindingDescriptor<?>> getBindings() {
         GlobalObjectsState tempState = this.tempState.get();
@@ -224,7 +201,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         }
 
         if (state == null) {
-            initializePrematurely();
+            throw new IllegalStateException("ContextAwareClassLoader is not initialized");
         }
 
         Lock rLock = rwLock.readLock();
@@ -243,7 +220,7 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         }
 
         if (state == null) {
-            initializePrematurely();
+            throw new IllegalStateException("ContextAwareClassLoader is not initialized");
         }
 
         Lock rLock = rwLock.readLock();
@@ -257,21 +234,8 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
 
     @Override
     public void onStart() {
-        contextAwareClassLoader.getWriteLock().lock();
-        try {
-            if (state == null) {
-                ReentrantReadWriteLock.WriteLock wLock = rwLock.writeLock();
-                wLock.lock();
-                try {
-                    if (state == null) {
-                        unsafeLoadCaches();
-                    }
-                } finally {
-                    wLock.unlock();
-                }
-            }
-        } finally {
-            contextAwareClassLoader.getWriteLock().unlock();
+        if (state == null) {
+            refresh();
         }
     }
 
@@ -281,11 +245,11 @@ public class GlobalObjectsBindingProvider implements BindingProvider, PluginLife
         wLock.lock();
         try {
             this.state
-                .objects
-                .values()
-                .stream()
-                .map(BindingDescriptor::getType)
-                .forEach(InvokerHelper::removeClass);
+                    .objects
+                    .values()
+                    .stream()
+                    .map(BindingDescriptor::getType)
+                    .forEach(InvokerHelper::removeClass);
         } finally {
             wLock.unlock();
         }
