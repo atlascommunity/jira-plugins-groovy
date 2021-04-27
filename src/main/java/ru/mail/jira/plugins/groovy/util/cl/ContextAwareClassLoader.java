@@ -28,9 +28,12 @@ public class ContextAwareClassLoader extends ClassLoader {
     }
 
     public void startContext() {
-        rwLock.readLock().lock();
-        logger.trace("creating context");
-        currentContext.get().push(new HashSet<>());
+        if (rwLock.readLock().tryLock()) {
+            logger.trace("creating context");
+            currentContext.get().push(new HashSet<>());
+        } else {
+            throw new IllegalStateException("contextAwareClassLoader in initialization state");
+        }
     }
 
     public void exitContext() {
