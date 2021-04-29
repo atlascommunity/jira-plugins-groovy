@@ -94,6 +94,8 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
 
     _getChangelogs = () => scheduledTaskService.getChangelogs(this.props.script.id);
 
+    _getScript = () => scheduledTaskService.get(this.props.script.id);
+
     _getParams = memoizeOne(
         (task: ScheduledTaskType): Array<?ScriptParam> => {
             const params = [
@@ -246,7 +248,10 @@ export class ScheduledTaskInternal extends React.Component<Props, State> {
                 noCode={isJqlTransition}
 
                 script={scriptObject}
+
                 changelogsLoader={this._getChangelogs}
+                loadScript={this._getScript}
+
                 title={titleEl}
                 onDelete={this._delete}
 

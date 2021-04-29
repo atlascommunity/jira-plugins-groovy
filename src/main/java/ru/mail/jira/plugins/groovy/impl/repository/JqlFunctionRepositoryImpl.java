@@ -75,7 +75,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
     public List<JqlFunctionScriptDto> getAllScripts(boolean includeChangelogs, boolean includeErrorCount) {
         return Arrays
             .stream(ao.find(JqlFunctionScript.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(it -> buildScriptDto(it, includeChangelogs, includeErrorCount))
+            .map(it -> buildScriptDto(it, includeChangelogs, includeErrorCount, false))
             .collect(Collectors.toList());
     }
 
@@ -86,7 +86,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
 
     @Override
     public JqlFunctionScriptDto getScript(int id) {
-        return buildScriptDto(ao.get(JqlFunctionScript.class, id), false, false);
+        return buildScriptDto(ao.get(JqlFunctionScript.class, id), false, false, true);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
 
         addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
-        return buildScriptDto(script, true, false);
+        return buildScriptDto(script, true, false, true);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
 
         addAuditLogAndNotify(user, EntityAction.UPDATED, script, diff, comment);
 
-        return buildScriptDto(script, true, true);
+        return buildScriptDto(script, true, true, true);
     }
 
     @Override
@@ -198,14 +198,16 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
         }
     }
 
-    private JqlFunctionScriptDto buildScriptDto(JqlFunctionScript script, boolean includeChangelogs, boolean includeErrorCount) {
+    private JqlFunctionScriptDto buildScriptDto(JqlFunctionScript script, boolean includeChangelogs, boolean includeErrorCount, boolean includeScriptBody) {
         JqlFunctionScriptDto result = new JqlFunctionScriptDto();
 
         result.setId(script.getID());
         result.setUuid(script.getUuid());
         result.setName(script.getName());
         result.setDescription(script.getDescription());
-        result.setScriptBody(script.getScriptBody());
+        if(includeScriptBody) {
+            result.setScriptBody(script.getScriptBody());
+        }
         result.setDeleted(script.isDeleted());
 
         if (includeChangelogs) {

@@ -92,7 +92,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
 
         List<RegistryScriptDto> scripts = Arrays
             .stream(ao.find(Script.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(script -> buildScriptDto(script, false, false, false, false))
+            .map(script -> buildScriptDto(script, false, false, false, false, false))
             .collect(Collectors.toList());
 
         for (RegistryScriptDto scriptDto : scripts) {
@@ -175,7 +175,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     //todo: cache result, maybe add new method for workflow functions
     @Override
     public RegistryScriptDto getScript(int id, boolean includeChangelogs, boolean expandName, boolean includeErrorCount) {
-        return buildScriptDto(ao.get(Script.class, id), includeChangelogs, expandName, true, includeErrorCount);
+        return buildScriptDto(ao.get(Script.class, id), includeChangelogs, expandName, true, includeErrorCount, true);
     }
 
     @Override
@@ -187,7 +187,7 @@ public class ScriptRepositoryImpl implements ScriptRepository {
         ParseContext parseContext = validateScriptForm(true, scriptForm);
         String parameters = parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null;
 
-        return buildScriptDto(registryDao.createScript(user, scriptForm, parameters), true, false, true, true);
+        return buildScriptDto(registryDao.createScript(user, scriptForm, parameters), true, false, true, true,  true);
     }
 
     @Override
@@ -243,17 +243,19 @@ public class ScriptRepositoryImpl implements ScriptRepository {
     private RegistryScriptDto doUpdateScript(ApplicationUser user, int id, RegistryScriptForm form, ParseContext parseContext) {
         String parameters = parseContext.getParameters().size() > 0 ? jsonMapper.write(parseContext.getParameters()) : null;
 
-        return buildScriptDto(registryDao.updateScript(user, id, form, parameters), true, false, true, true);
+        return buildScriptDto(registryDao.updateScript(user, id, form, parameters), true, false, true, true, true);
     }
 
-    private RegistryScriptDto buildScriptDto(Script script, boolean includeChangelogs, boolean expandName, boolean includeParentName, boolean includeErrorCount) {
+    private RegistryScriptDto buildScriptDto(Script script, boolean includeChangelogs, boolean expandName, boolean includeParentName, boolean includeErrorCount, boolean includeScriptBody) {
         RegistryScriptDto result = new RegistryScriptDto();
 
         result.setId(script.getID());
         result.setUuid(script.getUuid());
         result.setDescription(script.getDescription());
         result.setDirectoryId(script.getDirectory().getID());
-        result.setScriptBody(script.getScriptBody());
+        if (includeScriptBody) {
+            result.setScriptBody(script.getScriptBody());
+        }
         result.setDeleted(script.isDeleted());
 
         if (includeParentName) {

@@ -64,7 +64,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
         return globalObjectDao
             .getAll()
             .stream()
-            .map(script -> buildDto(script, false))
+            .map(script -> buildDto(script, false, false))
             .collect(Collectors.toList());
     }
 
@@ -76,7 +76,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
             return null;
         }
 
-        return buildDto(object, true);
+        return buildDto(object, true, true);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
 
         invalidationService.invalidateGlobalObjects();
 
-        return buildDto(result, true);
+        return buildDto(result, true, true);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
 
         invalidationService.invalidateGlobalObjects();
 
-        return buildDto(result, true);
+        return buildDto(result, true, true);
     }
 
     @Override
@@ -155,14 +155,16 @@ public class GlobalObjectRepositoryImpl implements GlobalObjectRepository {
         }
     }
 
-    private GlobalObjectDto buildDto(GlobalObject script, boolean withChangelogs) {
+    private GlobalObjectDto buildDto(GlobalObject script, boolean withChangelogs, boolean includeScriptBody) {
         GlobalObjectDto result = new GlobalObjectDto();
 
         result.setId(script.getID());
         result.setUuid(script.getUuid());
         result.setName(script.getName());
         result.setDescription(script.getDescription());
-        result.setScriptBody(script.getScriptBody());
+        if (includeScriptBody) {
+            result.setScriptBody(script.getScriptBody());
+        }
         result.setDeleted(script.isDeleted());
 
         result.setErrorCount(executionRepository.getErrorCount(script.getUuid()));

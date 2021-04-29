@@ -105,6 +105,8 @@ class ListenerInternal extends React.PureComponent<Props> {
 
     _getChangelogs = () => listenerService.getChangelogs(this.props.script.id);
 
+    _getScript = () => listenerService.getListener(this.props.script.id);
+
     render() {
         const {script, collapsible, focused, projects, eventTypes} = this.props;
 
@@ -124,6 +126,7 @@ class ListenerInternal extends React.PureComponent<Props> {
                     warningCount: script.warningCount
                 }}
                 changelogsLoader={this._getChangelogs}
+                loadScript={this._getScript}
 
                 withChangelog={true}
                 collapsible={collapsible}

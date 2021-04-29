@@ -98,7 +98,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
     public List<ScheduledTaskDto> getAllTasks(boolean includeChangelogs, boolean includeRunInfo) {
         return Arrays
             .stream(ao.find(ScheduledTask.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(task -> buildDto(task, includeChangelogs, includeRunInfo))
+            .map(task -> buildDto(task, includeChangelogs, includeRunInfo, false))
             .collect(Collectors.toList());
     }
 
@@ -109,7 +109,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
 
     @Override
     public ScheduledTaskDto getTaskInfo(int id, boolean includeChangelogs, boolean includeRunInfo) {
-        return buildDto(ao.get(ScheduledTask.class, id), includeChangelogs, includeRunInfo);
+        return buildDto(ao.get(ScheduledTask.class, id), includeChangelogs, includeRunInfo, true);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
 
         addAuditLogAndNotify(user, EntityAction.CREATED, task, diff, comment);
 
-        return buildDto(task, true, true);
+        return buildDto(task, true, true, true);
     }
 
     @Override
@@ -173,7 +173,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
 
         addAuditLogAndNotify(user, EntityAction.UPDATED, task, diff, comment);
 
-        return buildDto(task, true, true);
+        return buildDto(task, true, true, true);
     }
 
     @Override
@@ -205,7 +205,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
 
         addAuditLogAndNotify(user, EntityAction.RESTORED, task, null, task.getID() + " - " + task.getName());
 
-        return buildDto(task, true, true);
+        return buildDto(task, true, true, true);
     }
 
     private void addAuditLogAndNotify(ApplicationUser user, EntityAction action, ScheduledTask task, String diff, String description) {
@@ -307,7 +307,7 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         }
     }
 
-    private ScheduledTaskDto buildDto(ScheduledTask task, boolean includeChangelogs, boolean includeRunInfo) {
+    private ScheduledTaskDto buildDto(ScheduledTask task, boolean includeChangelogs, boolean includeRunInfo, boolean includeScriptBody) {
         ScheduledTaskDto result = new ScheduledTaskDto();
 
         result.setId(task.getID());
@@ -316,7 +316,9 @@ public class ScheduledTaskRepositoryImpl implements ScheduledTaskRepository {
         result.setDescription(task.getDescription());
         result.setScheduleExpression(task.getScheduleExpression());
         result.setType(task.getType());
-        result.setScriptBody(task.getScriptBody());
+        if (includeScriptBody) {
+            result.setScriptBody(task.getScriptBody());
+        }
         result.setUserKey(task.getUserKey());
         result.setIssueJql(task.getJql());
         result.setIssueWorkflowActionId(task.getWorkflowAction());

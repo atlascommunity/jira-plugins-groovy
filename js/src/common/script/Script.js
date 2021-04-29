@@ -30,6 +30,7 @@ import {LoadingSpinner} from '../ak';
 import {CommonMessages} from '../../i18n/common.i18n';
 
 import {executionService} from '../../service';
+import type {RestScriptType} from '../app-rest/types';
 
 
 type DropdownItemType = {|
@@ -47,7 +48,9 @@ export type ScriptProps = {|
     noCode: boolean,
 
     script: ?ScriptType,
+
     changelogsLoader?: () => Promise<$ReadOnlyArray<ChangelogType>>,
+    loadScript?: ScriptLoadFuncType,
 
     template?: {
         body: string
@@ -67,6 +70,7 @@ export type ScriptProps = {|
 
 type ScriptState = {
     showCode: boolean,
+    scriptBody: string,
     activeSource: {
         type: string,
         id: number | string,
@@ -99,8 +103,17 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         changelogs: [],
         onlyLastExecutions: true,
         executionsReady: false,
-        changelogsReady: false
+        changelogsReady: false,
+        scriptBodyReady: false
     };
+
+    constructor(props: ScriptProps) {
+        super(props)
+        const { script } = this.props;
+        if (script && script.scriptBody) {
+            this.state.scriptBody = script.scriptBody;
+        }
+    }
 
     componentDidMount() {
         if (!this.props.collapsible) {
@@ -116,6 +129,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             if (this.state.showCode) {
                 this._fetchExecutions();
                 this._fetchChangelogs();
+                this._fetchSourceCode();
             }
         });
     };
@@ -151,6 +165,18 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                 }));
         }
     };
+
+    _fetchSourceCode = () => {
+        this.setState({ scriptBodyReady: false });
+        const {script, loadScript} = this.props;
+
+        if (script && loadScript) {
+            loadScript()
+                .then((script: RestScriptType) => {
+                    this.setState({scriptBody: script.scriptBody});
+                });
+        }
+    }
 
     _switchToCurrent = () => {
         this.setState({
@@ -232,7 +258,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                             <Editor
                                 readOnly={true}
                                 mode={activeSource.id === 'current' ? 'groovy' : 'diff'}
-                                value={activeSource.id === 'current' ? script && script.scriptBody : activeSource.source}
+                                value={activeSource.id === 'current' ? this.state.scriptBody : activeSource.source}
                                 {...context}
                             />
                         }

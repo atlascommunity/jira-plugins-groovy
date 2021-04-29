@@ -92,6 +92,8 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
 
     _getChangelogs = () => registryService.getScriptChangelogs(this.props.script.id);
 
+    _getScript = () => registryService.getScript(this.props.script.id);
+
     _onDelete = () => this.props.onDelete(this.props.script.id, 'script', this.props.script.name);
 
     render() {
@@ -116,6 +118,8 @@ class RegistryScriptInternal extends React.PureComponent<RegistryScriptProps, Re
                         ...(script.uuid ? { inline: true, id: script.uuid } : {})
                     }}
                     changelogsLoader={this._getChangelogs}
+
+                    loadScript={this._getScript}
 
                     withChangelog={true}
 
