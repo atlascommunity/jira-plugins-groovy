@@ -30,6 +30,7 @@ import {LoadingSpinner} from '../ak';
 import {CommonMessages} from '../../i18n/common.i18n';
 
 import {executionService} from '../../service';
+import type {RestScriptType} from '../app-rest/types';
 
 
 type DropdownItemType = {|
@@ -47,7 +48,9 @@ export type ScriptProps = {|
     noCode: boolean,
 
     script: ?ScriptType,
+
     changelogsLoader?: () => Promise<$ReadOnlyArray<ChangelogType>>,
+    loadScript?: ScriptLoadFuncType,
 
     template?: {
         body: string
@@ -67,6 +70,7 @@ export type ScriptProps = {|
 
 type ScriptState = {
     showCode: boolean,
+    scriptBody: string,
     activeSource: {
         type: string,
         id: number | string,
@@ -76,6 +80,7 @@ type ScriptState = {
     changelogs: $ReadOnlyArray<ChangelogType>,
     executions: $ReadOnlyArray<ExecutionType>,
     onlyLastExecutions: boolean,
+    scriptBodyReady: boolean,
     executionsReady: boolean,
     changelogsReady: boolean
 };
@@ -99,8 +104,17 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         changelogs: [],
         onlyLastExecutions: true,
         executionsReady: false,
-        changelogsReady: false
+        changelogsReady: false,
+        scriptBodyReady: false
     };
+
+    constructor(props: ScriptProps) {
+        super(props)
+        const { script } = this.props;
+        if (script && script.scriptBody) {
+            this.state.scriptBody = script.scriptBody;
+        }
+    }
 
     componentDidMount() {
         if (!this.props.collapsible) {
@@ -116,6 +130,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             if (this.state.showCode) {
                 this._fetchExecutions();
                 this._fetchChangelogs();
+                this._fetchSourceCode();
             }
         });
     };
@@ -152,6 +167,20 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         }
     };
 
+    _fetchSourceCode = () => {
+        const {script, loadScript} = this.props;
+
+        if (script && loadScript) {
+            this.setState({ scriptBodyReady: false });
+            loadScript()
+                .then((script: RestScriptType) => {
+                    this.setState({
+                        scriptBody: script.scriptBody,
+                        scriptBodyReady: true });
+                });
+        }
+    }
+
     _switchToCurrent = () => {
         this.setState({
             activeSource: {
@@ -177,7 +206,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
             script, template, title, scriptName, children, collapsible, withChangelog, onEdit, onDelete,
             additionalButtons, additionalPrimaryButtons, additionalParameters, dropdownItems, headerless, focused, noCode
         } = this.props;
-        const {activeSource, showCode, changelogsReady, changelogs, executions, executionsReady, onlyLastExecutions} = this.state;
+        const {activeSource, showCode, scriptBodyReady, changelogsReady, changelogs, executions, executionsReady, onlyLastExecutions} = this.state;
 
         let codeBlock: Node = null;
         let templateBlock: Node = null;
@@ -229,12 +258,13 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
                 editorEl = (
                     <EditorThemeContextConsumer>
                         {context =>
+                            scriptBodyReady ?
                             <Editor
                                 readOnly={true}
                                 mode={activeSource.id === 'current' ? 'groovy' : 'diff'}
-                                value={activeSource.id === 'current' ? script && script.scriptBody : activeSource.source}
+                                value={activeSource.id === 'current' ? this.state.scriptBody : activeSource.source}
                                 {...context}
-                            />
+                            /> : <LoadingSpinner/>
                         }
                     </EditorThemeContextConsumer>
                 );

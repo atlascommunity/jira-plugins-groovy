@@ -42,6 +42,8 @@ export class JqlScript extends React.PureComponent<Props> {
 
     _getChangelogs = () => jqlScriptService.getChangelogs(this.props.script.id);
 
+    _getScript = () => jqlScriptService.getScript(this.props.script.id);
+
     render() {
         const {script, collapsible, focused} = this.props;
 
@@ -70,7 +72,9 @@ export class JqlScript extends React.PureComponent<Props> {
                     changelogs: script.changelogs,
                     errorCount: script.errorCount
                 }}
+
                 changelogsLoader={this._getChangelogs}
+                loadScript={this._getScript}
 
                 withChangelog={true}
                 collapsible={collapsible}

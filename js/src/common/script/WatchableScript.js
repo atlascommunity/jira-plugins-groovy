@@ -16,6 +16,9 @@ import {WatchActionCreators} from '../redux';
 
 import type {EntityType} from '../types';
 
+import type {ScriptLoadFuncType} from '../script-list/types';
+
+
 import Script from '.';
 
 
@@ -26,7 +29,8 @@ type Props = {|
     addWatch: typeof WatchActionCreators.addWatch,
     removeWatch: typeof WatchActionCreators.removeWatch,
     watches: Array<number>,
-    isUnwatchable?: boolean
+    isUnwatchable?: boolean,
+    loadScript?: ScriptLoadFuncType
 |};
 
 type State = {

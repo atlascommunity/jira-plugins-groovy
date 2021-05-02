@@ -107,14 +107,14 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
             .map(listener -> buildDto(
                 listener,
                 cachedListeners.stream().anyMatch(cached -> Objects.equals(cached.getUuid(), listener.getUuid())),
-                includeChangelogs, includeErrorCount)
+                includeChangelogs, includeErrorCount, false)
             )
             .collect(Collectors.toList());
     }
 
     @Override
     public EventListenerDto getEventListener(int id) {
-        return buildDto(ao.get(Listener.class, id), true, true, true);
+        return buildDto(ao.get(Listener.class, id), true, true, true, true);
     }
 
     @Override
@@ -125,7 +125,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         cache.remove(VALUE_KEY);
 
-        return buildDto(listener, true, true, true);
+        return buildDto(listener, true, true, true, true);
     }
 
     @Override
@@ -136,7 +136,7 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
 
         cache.remove(VALUE_KEY);
 
-        return buildDto(listener, true, true, true);
+        return buildDto(listener, true, true, true, true);
     }
 
     @Override
@@ -158,12 +158,14 @@ public class EventListenerRepositoryImpl implements EventListenerRepository {
         cache.removeAll();
     }
 
-    private EventListenerDto buildDto(Listener listener, boolean initialized, boolean includeChangelogs, boolean includeErrorCount) {
+    private EventListenerDto buildDto(Listener listener, boolean initialized, boolean includeChangelogs, boolean includeErrorCount, boolean includeSourceCode) {
         EventListenerDto result = new EventListenerDto();
         result.setId(listener.getID());
         result.setName(listener.getName());
         result.setDescription(listener.getDescription());
-        result.setScriptBody(listener.getScriptBody());
+        if (includeSourceCode) {
+            result.setScriptBody(listener.getScriptBody());
+        }
         result.setUuid(listener.getUuid());
         result.setCondition(jsonMapper.read(listener.getCondition(), ConditionDescriptor.class));
         result.setInitialized(initialized);

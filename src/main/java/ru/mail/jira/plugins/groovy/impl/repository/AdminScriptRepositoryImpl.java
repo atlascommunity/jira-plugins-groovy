@@ -58,7 +58,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
     public List<AdminScriptDto> getAllScripts() {
         return Arrays
             .stream(ao.find(AdminScript.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(script -> buildScriptDto(script, false, true))
+            .map(script -> buildScriptDto(script, false, true, false))
             .collect(Collectors.toList());
     }
 
@@ -93,12 +93,12 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
 
         addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
-        return buildScriptDto(script, true, true);
+        return buildScriptDto(script, true, true, true);
     }
 
     @Override
     public AdminScriptDto getScript(int id, boolean includeChangelogs, boolean includeErrorCount) {
-        return buildScriptDto(ao.get(AdminScript.class, id), includeChangelogs, includeErrorCount);
+        return buildScriptDto(ao.get(AdminScript.class, id), includeChangelogs, includeErrorCount, true);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
 
         addAuditLogAndNotify(user, EntityAction.UPDATED, script, diff, comment);
 
-        return buildScriptDto(script, true, true);
+        return buildScriptDto(script, true, true, true);
     }
 
     @Override
@@ -160,7 +160,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
         return scriptService.parseScript(form.getScriptBody());
     }
 
-    private AdminScriptDto buildScriptDto(AdminScript script, boolean includeChangelogs, boolean includeErrorCount) {
+    private AdminScriptDto buildScriptDto(AdminScript script, boolean includeChangelogs, boolean includeErrorCount, boolean includeScriptBody) {
         AdminScriptDto result = new AdminScriptDto();
 
         result.setBuiltIn(false);
@@ -168,7 +168,7 @@ public class AdminScriptRepositoryImpl implements AdminScriptRepository {
         result.setUuid(script.getUuid());
         result.setName(script.getName());
         result.setDescription(script.getDescription());
-        result.setScriptBody(script.getScriptBody());
+        if (includeScriptBody) result.setScriptBody(script.getScriptBody());
         result.setHtml(script.isHtml());
         result.setDeleted(script.isDeleted());
         result.setParams(script.getParameters() != null ? jsonMapper.read(script.getParameters(), Const.PARAM_LIST_TYPE_REF) : null);

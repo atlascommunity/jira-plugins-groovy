@@ -61,14 +61,14 @@ public class RestRepositoryImpl implements RestRepository {
 
     @Override
     public RestScriptDto getScript(int id, boolean includeChangelogs, boolean includeErrorCount) {
-        return buildScriptDto(ao.get(RestScript.class, id), includeChangelogs, includeErrorCount);
+        return buildScriptDto(ao.get(RestScript.class, id), includeChangelogs, includeErrorCount, true);
     }
 
     @Override
     public List<RestScriptDto> getAllScripts() {
         return Arrays
             .stream(ao.find(RestScript.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(script -> buildScriptDto(script, false, true))
+            .map(script -> buildScriptDto(script, false, true, false))
             .collect(Collectors.toList());
     }
 
@@ -98,7 +98,7 @@ public class RestRepositoryImpl implements RestRepository {
 
         addAuditLogAndNotify(user, EntityAction.CREATED, script, diff, comment);
 
-        return buildScriptDto(script, true, true);
+        return buildScriptDto(script, true, true, true);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class RestRepositoryImpl implements RestRepository {
 
         addAuditLogAndNotify(user, EntityAction.UPDATED, script, diff, comment);
 
-        return buildScriptDto(script, true, true);
+        return buildScriptDto(script, true, true, true);
     }
 
     @Override
@@ -224,7 +224,7 @@ public class RestRepositoryImpl implements RestRepository {
         return ao.count(RestScript.class, Query.select().where("NAME = ?", name)) == 0;
     }
 
-    private RestScriptDto buildScriptDto(RestScript script, boolean includeChangelogs, boolean includeErrorCount) {
+    private RestScriptDto buildScriptDto(RestScript script, boolean includeChangelogs, boolean includeErrorCount, boolean includeScriptBody) {
         RestScriptDto result = new RestScriptDto();
 
         result.setId(script.getID());
@@ -233,7 +233,9 @@ public class RestRepositoryImpl implements RestRepository {
         result.setDescription(script.getDescription());
         result.setMethods(parseMethods(script.getMethods()));
         result.setGroups(parseGroups(script.getGroups()));
-        result.setScriptBody(script.getScriptBody());
+        if (includeScriptBody) {
+            result.setScriptBody(script.getScriptBody());
+        }
         result.setDeleted(script.isDeleted());
 
         if (includeChangelogs) {
