@@ -53,10 +53,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -92,11 +94,12 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
         // TODO bindings for jql functions calls and dates short values like: wd, 2w, 3d etc...
         groovyShell = new GroovyShell(groovyClassLoader, new Binding());
 
-        // TODO
+        // TODO it looks very arguable to do this on spring bean creation stage
+        // we need to execute this script before execution in case to add to standard groovy classes some arithmetic operations overloading
         InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("AdditionalArithmeticOperators.groovy");
         if (resourceAsStream == null) {
             log.error("AdditionalArithmeticOperators.groovy script not found in resources folder" +
-                      "This may lead to some arithmetic operators inside expressions clause not working");
+                              "This may lead to some arithmetic operators inside expressions clause not working");
         } else {
             Script additionalOperatorsScript = groovyShell.parse(new InputStreamReader(resourceAsStream));
             additionalOperatorsScript.run();
@@ -142,27 +145,36 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
         }
 
         Query subQuery = searchHelper.getQuery(user, args.get(0));
-        String expressionsQueryStr = args.get(1);
+        String expressionQueryStr = args.get(1);
 
-        groovyClassLoader.parseClass(expressionsQueryStr);
-        Set<String> allUsedFieldNames = visitor.getFields();
-        // String fieldName -> ClauseInformation mapping
+        // parse expressionQueryStr as a script class and remembering all found fields
+        groovyClassLoader.parseClass(expressionQueryStr);
+        Set<String> allUsedFieldNames = new HashSet<>(visitor.getFields().size(), 1);
+        allUsedFieldNames.addAll(visitor.getFields());
+        visitor.clear();
+
+        // getting all found fields clause information
         Map<String, ClauseInformation> allFieldsClauseInfos = findAllClauseInfos(allUsedFieldNames);
+        // building first lucene query with all found in expression query fields non empty
         Query nonEmptyFieldsQuery = buildNonEmptyFieldsQuery(subQuery, allFieldsClauseInfos.values());
-
-        // set of fields to load in lucene document
+        // set of index fields to load in lucene document during non-empty fields lucene query
         Set<String> fieldsToLoadFromIndex = allFieldsClauseInfos.values().stream().map(ClauseInformation::getIndexField).collect(Collectors.toSet());
+        // we must to add issue_id field here, because we will remember it in collector
         fieldsToLoadFromIndex.add(SystemSearchConstants.forIssueId().getIndexField());
+
+        // building lucene document fields value extractors map
         Map<String, LuceneFieldValueExtractor> extractorMap = new HashMap<>(allFieldsClauseInfos.size(), 1);
         allFieldsClauseInfos.forEach((fieldName, clauseInformation) -> {
             extractorMap.put(fieldName, retrieveFieldValueExtractor(clauseInformation));
         });
 
-        Script parsedScript = groovyShell.parse(expressionsQueryStr);
+        // parsing expression query in runnable script in case to evaluate the expression inside collector
+        Script parsedScript = groovyShell.parse(expressionQueryStr);
         ExpressionIssueIdCollector expressionIssueIdCollector = new ExpressionIssueIdCollector(fieldsToLoadFromIndex, parsedScript, extractorMap);
         searchHelper.doSearch(nonEmptyFieldsQuery, null, expressionIssueIdCollector, queryCreationContext);
 
-        visitor.clear();
+
+        // returning the result query with all collected issue ids in it
         return new QueryFactoryResult(
                 QueryUtil.createIssueIdQuery(expressionIssueIdCollector.getIssueIds()),
                 terminalClause.getOperator() == Operator.NOT_IN
@@ -170,6 +182,12 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
     }
 
 
+    /**
+     * Builds all fields non empty query like: field1 is not empty and field2 is not empty etc...
+     * @param query - a jql subquery mostly used to decrease amount of returned issues
+     * @param clauseInfoList - all searched fields clause
+     * @return built query
+     */
     private Query buildNonEmptyFieldsQuery(Query query, Collection<ClauseInformation> clauseInfoList) {
         JqlClauseBuilder jqlClauseBuilder = JqlQueryBuilder.newClauseBuilder(query.getWhereClause()).defaultAnd();
         clauseInfoList.forEach(clauseInformation -> {
@@ -184,6 +202,11 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
         return jqlClauseBuilder.buildQuery();
     }
 
+    /**
+     *
+     * @param fieldNames - all field names
+     * @return a map of all field names mapped to it's field ClauseInfo
+     */
     public Map<String, ClauseInformation> findAllClauseInfos(Set<String> fieldNames) {
         List<CustomField> customFieldObjects = customFieldManager.getCustomFieldObjects();
         Map<String, ClauseInformation> result = new HashMap<>(fieldNames.size(), 1);
@@ -222,6 +245,11 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
                 customFieldSearcher instanceof DateRangeSearcher;
     }
 
+
+    /**
+     * @param clauseInfo - of some field which needs to be extracted
+     * @return LuceneFieldValueExtractor associated with this clauseInfo
+     */
     @Nullable
     public LuceneFieldValueExtractor retrieveFieldValueExtractor(ClauseInformation clauseInfo) {
         String fieldId = clauseInfo.getFieldId();
@@ -249,12 +277,10 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
         switch (fieldId) {
             case IssueFieldConstants.DUE_DATE:
                 return new DateExtractor(clauseInfo.getIndexField());
-            //ourRetriever = new LocalDateRetriever(this, IssueFieldConstants.DUE_DATE)
             case IssueFieldConstants.CREATED:
             case IssueFieldConstants.UPDATED:
             case IssueFieldConstants.RESOLUTION_DATE:
                 //2
-                //ourRetriever = new DatetimeRetriever(this, clause.indexField)
                 return new DateTimeExtractor(clauseInfo.getIndexField());
             case IssueFieldConstants.TIME_SPENT:
             case IssueFieldConstants.TIME_ESTIMATE:
@@ -262,24 +288,19 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
             case IssueFieldConstants.AGGREGATE_TIME_SPENT:
             case IssueFieldConstants.AGGREGATE_TIME_ESTIMATE:
             case IssueFieldConstants.AGGREGATE_TIME_ORIGINAL_ESTIMATE:
-                //3
-                // def retriever = new MillisecondRetriever(this, clause.fieldId)
                 return new MillisecondsExtractor(clauseInfo.getIndexField());
             case IssueFieldConstants.CREATOR:
             case IssueFieldConstants.REPORTER:
             case IssueFieldConstants.ASSIGNEE:
             case IssueFieldConstants.WATCHERS:
-                //4
                 if (clauseInfo instanceof UserFieldSearchConstantsWithEmpty) {
                     String emptyIndexValue = ((UserFieldSearchConstantsWithEmpty) clauseInfo).getEmptyIndexValue();
                     return new UserExtractor(clauseInfo.getIndexField(), emptyIndexValue);
                 }
                 return new UserExtractor(clauseInfo.getIndexField(), null);
             case IssueFieldConstants.VOTES:
-                //5
                 return new DoubleExtractor(clauseInfo.getIndexField());
             case IssueFieldConstants.WORKRATIO:
-                //6
                 return new WorkRatioExtractor(clauseInfo.getIndexField());
         }
         return null;

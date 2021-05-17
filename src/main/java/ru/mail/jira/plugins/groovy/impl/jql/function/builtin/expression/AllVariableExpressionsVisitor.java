@@ -9,6 +9,10 @@ import org.codehaus.groovy.control.SourceUnit;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Note: This class is stateful!
+ * Fields collection must be cleared with {@link AllVariableExpressionsVisitor#clear()} method between GroovyClassLoader.parseClass() executions
+ */
 public class AllVariableExpressionsVisitor extends ClassCodeVisitorSupport {
     @Getter
     private final Set<String> fields = new HashSet<>();
