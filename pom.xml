@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.mail.jira.plugins</groupId>
     <artifactId>groovy</artifactId>
-    <version>1.21.11-jira8</version>
+    <version>1.21.12-jira8</version>
     <organization>
         <name>AtlasTeam</name>
         <url>https://atlasteam.ru/</url>
@@ -205,7 +205,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
-            <version>4.7.1</version>
+            <version>${antlr.version}</version>
         </dependency>
 
         <dependency>
@@ -508,7 +508,10 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.7.1</version>
+                <version>${antlr.version}</version>
+                <configuration>
+                    <visitor>true</visitor>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -545,6 +548,7 @@
         <junit.version>5.2.0</junit.version>
         <atlassian.spring.scanner.version>2.1.7</atlassian.spring.scanner.version>
         <groovy.version>2.5.9</groovy.version>
+        <antlr.version>4.9.2</antlr.version>
 
         <shutdownTimeout>60000</shutdownTimeout>
 

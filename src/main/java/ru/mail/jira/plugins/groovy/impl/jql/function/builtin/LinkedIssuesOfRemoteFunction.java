@@ -34,7 +34,7 @@ public class LinkedIssuesOfRemoteFunction extends AbstractBuiltInQueryFunction {
 
     @Override
     protected void validate(MessageSet messageSet, ApplicationUser applicationUser, @Nonnull FunctionOperand functionOperand, @Nonnull TerminalClause terminalClause) {
-        if (functionOperand.getArgs().size() > 2 || functionOperand.getArgs().size() < 1) {
+        if (functionOperand.getArgs().size() != 1 || functionOperand.getArgs().size() != 2) {
             messageSet.addWarningMessage("Usage: linkedIssuesOfRemote(\"seacthType\", \"searchParam\") or linkedIssuesOfRemote(\"remoteLinkUrl\") or linkedIssuesOfRemote(\"remoteLinkTitleWildcard\")");
         }
     }

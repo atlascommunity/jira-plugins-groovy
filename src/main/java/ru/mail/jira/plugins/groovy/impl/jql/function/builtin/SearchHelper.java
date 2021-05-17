@@ -64,12 +64,16 @@ public class SearchHelper {
         }
     }
 
+
     public void validateJql(MessageSet messageSet, ApplicationUser user, String query) {
         SearchService.ParseResult parseResult = searchService.parseQuery(user, query);
 
+        searchService.validateQuery(user, parseResult.getQuery());
         if (!parseResult.isValid()) {
             messageSet.addMessageSet(parseResult.getErrors());
+            return;
         }
+        messageSet.addMessageSet(searchService.validateQuery(user, parseResult.getQuery()));
     }
 
     public Query getQuery(ApplicationUser user, String queryString) {
