@@ -36,11 +36,20 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.customizers.ImportCustomizer;
+import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.mail.jira.plugins.groovy.impl.groovy.InjectionExtension;
+import ru.mail.jira.plugins.groovy.impl.groovy.LoadClassesExtension;
+import ru.mail.jira.plugins.groovy.impl.groovy.PackageCustomizer;
+import ru.mail.jira.plugins.groovy.impl.groovy.ParamExtension;
+import ru.mail.jira.plugins.groovy.impl.groovy.WithPluginExtension;
+import ru.mail.jira.plugins.groovy.impl.groovy.statik.CompileStaticExtension;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.AbstractBuiltInQueryFunction;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.DateCompareFunction;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.SearchHelper;
@@ -49,6 +58,7 @@ import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
@@ -70,9 +80,9 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
     private final JqlQueryParser jqlQueryParser;
     private final SearchHandlerManager searchHandlerManager;
     private final CustomFieldManager customFieldManager;
-    private final GroovyClassLoader groovyClassLoader;
-    private final GroovyShell groovyShell;
-    private final AllVariableExpressionsVisitor visitor = new AllVariableExpressionsVisitor();
+    //private final GroovyClassLoader groovyClassLoader;
+    // private final GroovyShell groovyShell;
+    //private final AllVariableExpressionsVisitor visitor = new AllVariableExpressionsVisitor();
     private final DoubleConverter doubleConverter;
 
     @Autowired
@@ -84,26 +94,6 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
         this.searchHandlerManager = searchHandlerManager;
         this.customFieldManager = customFieldManager;
         this.doubleConverter = doubleConverter;
-
-
-        CompilerConfiguration compilerConfiguration = new CompilerConfiguration();
-        compilerConfiguration.addCompilationCustomizers(new AllVariablesMemorizerExtension(visitor));
-
-        groovyClassLoader = new GroovyClassLoader(ClassLoaderUtil.getCurrentPluginClassLoader(), compilerConfiguration);
-
-        // TODO bindings for jql functions calls and dates short values like: wd, 2w, 3d etc...
-        groovyShell = new GroovyShell(groovyClassLoader, new Binding());
-
-        // TODO it looks very arguable to do this on spring bean creation stage
-        // we need to execute this script before execution in case to add to standard groovy classes some arithmetic operations overloading
-        InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("AdditionalArithmeticOperators.groovy");
-        if (resourceAsStream == null) {
-            log.error("AdditionalArithmeticOperators.groovy script not found in resources folder" +
-                              "This may lead to some arithmetic operators inside expressions clause not working");
-        } else {
-            Script additionalOperatorsScript = groovyShell.parse(new InputStreamReader(resourceAsStream));
-            additionalOperatorsScript.run();
-        }
     }
 
 
@@ -146,6 +136,28 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
 
         Query subQuery = searchHelper.getQuery(user, args.get(0));
         String expressionQueryStr = args.get(1);
+
+        // initializing groovy class loader and groovy shell
+        AllVariableExpressionsVisitor visitor = new AllVariableExpressionsVisitor();
+        GroovyClassLoader groovyClassLoader = ShellUtils.createSecureClassLoader(new AllVariablesMemorizerExtension(visitor));
+
+        // TODO bindings for jql functions calls and dates short values like: wd, 2w, 3d etc...
+        GroovyShell groovyShell = new GroovyShell(groovyClassLoader, new Binding());
+
+        // we need to execute this script before execution in case to add to standard groovy classes some arithmetic operations overloading
+        InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("AdditionalArithmeticOperators.groovy");
+        if (resourceAsStream == null) {
+            log.error("AdditionalArithmeticOperators.groovy script not found in resources folder" +
+                              "This may force some wrong arithmetic operators behavior inside expressions query");
+        } else {
+            try (final InputStreamReader inputStreamReader = new InputStreamReader(resourceAsStream)) {
+                Script additionalOperatorsScript = groovyShell.parse(inputStreamReader);
+                additionalOperatorsScript.run();
+            } catch (IOException ioException) {
+                log.error("Error during closing AdditionalArithmeticOperators.groovy script file input steam");
+            }
+        }
+
 
         // parse expressionQueryStr as a script class and remembering all found fields
         groovyClassLoader.parseClass(expressionQueryStr);
@@ -193,7 +205,7 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
         clauseInfoList.forEach(clauseInformation -> {
             String fieldId = clauseInformation.getFieldId();
             if (fieldId != null && fieldId.startsWith("customfield_")) {
-                String cfId = fieldId.replaceAll("customfield_", "");
+                String cfId = StringUtils.substringAfter(fieldId, "customfield_");
                 jqlClauseBuilder.addClause(JqlQueryBuilder.newClauseBuilder().customField(Long.valueOf(cfId)).isNotEmpty().buildClause());
             } else {
                 jqlClauseBuilder.addClause(JqlQueryBuilder.newClauseBuilder().field(clauseInformation.getJqlClauseNames().getPrimaryName()).isNotEmpty().buildClause());
@@ -208,7 +220,7 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
      * @return a map of all field names mapped to it's field ClauseInfo
      */
     public Map<String, ClauseInformation> findAllClauseInfos(Set<String> fieldNames) {
-        List<CustomField> customFieldObjects = customFieldManager.getCustomFieldObjects();
+
         Map<String, ClauseInformation> result = new HashMap<>(fieldNames.size(), 1);
         for (String fieldName : fieldNames) {
             Collection<ClauseHandler> clauseHandler = searchHandlerManager.getClauseHandler(fieldName);
@@ -218,23 +230,18 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
             }
 
             // if field is a customfield
-            Optional<CustomField> cfOptional = customFieldObjects.stream().filter(cf -> isFieldEqualsCf(fieldName, cf)).findFirst();
-            if (!cfOptional.isPresent())
+            Collection<CustomField> foundCfList = customFieldManager.getCustomFieldObjectsByName(fieldName);
+            if (foundCfList.size() == 0) {
                 // TODO correctly show the reason
                 throw new RuntimeException("SOMETHING REALLY BAD HAPPENED");
-            CustomField foundField = cfOptional.get();
-            if (!searcherIsSupported(foundField))
+            }
+            CustomField cf = foundCfList.iterator().next();
+            if (!searcherIsSupported(cf))
                 // TODO correctly show the reason
                 throw new RuntimeException("SOMETHING REALLY BAD HAPPENED");
-            result.put(fieldName, new SimpleFieldSearchConstants(foundField.getId(), OperatorClasses.EQUALITY_OPERATORS, JiraDataTypes.ALL));
+            result.put(fieldName, new SimpleFieldSearchConstants(cf.getId(), OperatorClasses.EQUALITY_OPERATORS, JiraDataTypes.ALL));
         }
         return result;
-    }
-
-    private boolean isFieldEqualsCf(String fieldName, CustomField customField) {
-        String lowerCasedFieldName = fieldName.toLowerCase();
-        String lowerCasedCFName = customField.getName().replaceAll("\\s+", "").toLowerCase();
-        return lowerCasedFieldName.equals(lowerCasedCFName) || lowerCasedCFName.equals(customField.getId());
     }
 
     private boolean searcherIsSupported(CustomField cf) {
