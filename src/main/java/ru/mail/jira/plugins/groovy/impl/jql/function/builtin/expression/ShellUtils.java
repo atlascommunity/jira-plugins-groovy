@@ -30,7 +30,7 @@ public class ShellUtils {
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer();
         secureASTCustomizer.setClosuresAllowed(false);
         secureASTCustomizer.setMethodDefinitionAllowed(false);
-        secureASTCustomizer.setIndirectImportCheckEnabled(true);
+        secureASTCustomizer.setIndirectImportCheckEnabled(false);
         secureASTCustomizer.setImportsWhitelist(Collections.emptyList());
         secureASTCustomizer.setStaticImportsWhitelist(Collections.emptyList());
 
@@ -71,7 +71,7 @@ public class ShellUtils {
                                                        Timestamp.class)
                                                    .collect(Collectors.toList());
 
-        List<Class> receiversWhiteList = Stream.of(List.class,
+        List<Class> receiversWhiteList = Stream.of(Object.class,
                                                    Math.class,
                                                    Integer.class,
                                                    Float.class,
