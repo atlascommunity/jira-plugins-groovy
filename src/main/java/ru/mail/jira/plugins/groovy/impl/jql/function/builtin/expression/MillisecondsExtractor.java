@@ -12,7 +12,7 @@ public class MillisecondsExtractor implements LuceneFieldValueExtractor {
     }
 
     @Override
-    public Long apply(Document document) {
+    public Long extract(Document document) {
         String fieldValue = document.getField(indexFieldName).stringValue();
         if (fieldValue == null || FieldIndexer.NO_VALUE_INDEX_VALUE.equals(fieldValue)) {
             return 0L;
