@@ -9,7 +9,7 @@ public class DoubleExtractor implements LuceneFieldValueExtractor {
         this.indexFieldName = indexFieldName;
     }
     @Override
-    public Long apply(Document document) {
+    public Long extract(Document document) {
         String fieldValue = document.getField(indexFieldName).stringValue();
         return fieldValue != null ? NumberTools.stringToLong(fieldValue) : 0L;
     }

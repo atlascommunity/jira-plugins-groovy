@@ -1,6 +1,8 @@
 package ru.mail.jira.plugins.groovy.impl.jql.function.builtin.expression;
 
 import com.atlassian.jira.JiraDataTypes;
+import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.customfields.CustomFieldSearcher;
@@ -18,12 +20,14 @@ import com.atlassian.jira.jql.ClauseHandler;
 import com.atlassian.jira.jql.ClauseInformation;
 import com.atlassian.jira.jql.builder.JqlClauseBuilder;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
+import com.atlassian.jira.jql.operand.FunctionOperandHandler;
 import com.atlassian.jira.jql.operand.JqlOperandResolver;
 import com.atlassian.jira.jql.operand.QueryLiteral;
+import com.atlassian.jira.jql.operand.registry.JqlFunctionHandlerRegistry;
 import com.atlassian.jira.jql.operator.OperatorClasses;
-import com.atlassian.jira.jql.parser.JqlQueryParser;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.jql.query.QueryFactoryResult;
+import com.atlassian.jira.plugin.jql.function.JqlFunction;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -33,27 +37,19 @@ import com.atlassian.query.operand.FunctionOperand;
 import com.atlassian.query.operand.Operand;
 import com.atlassian.query.operator.Operator;
 import groovy.lang.Binding;
+import groovy.lang.Closure;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.groovy.control.CompilerConfiguration;
-import org.codehaus.groovy.control.customizers.ImportCustomizer;
-import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
+import org.codehaus.groovy.runtime.typehandling.BigDecimalMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.mail.jira.plugins.groovy.impl.groovy.InjectionExtension;
-import ru.mail.jira.plugins.groovy.impl.groovy.LoadClassesExtension;
-import ru.mail.jira.plugins.groovy.impl.groovy.PackageCustomizer;
-import ru.mail.jira.plugins.groovy.impl.groovy.ParamExtension;
-import ru.mail.jira.plugins.groovy.impl.groovy.WithPluginExtension;
-import ru.mail.jira.plugins.groovy.impl.groovy.statik.CompileStaticExtension;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.AbstractBuiltInQueryFunction;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.DateCompareFunction;
 import ru.mail.jira.plugins.groovy.impl.jql.function.builtin.SearchHelper;
-import ru.mail.jira.plugins.groovy.util.cl.ClassLoaderUtil;
 import ru.mail.jira.plugins.groovy.util.lucene.QueryUtil;
 
 import javax.annotation.Nonnull;
@@ -61,13 +57,16 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -77,23 +76,24 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
 
     private final SearchHelper searchHelper;
     private final JqlOperandResolver jqlOperandResolver;
-    private final JqlQueryParser jqlQueryParser;
     private final SearchHandlerManager searchHandlerManager;
     private final CustomFieldManager customFieldManager;
-    //private final GroovyClassLoader groovyClassLoader;
-    // private final GroovyShell groovyShell;
-    //private final AllVariableExpressionsVisitor visitor = new AllVariableExpressionsVisitor();
     private final DoubleConverter doubleConverter;
+    private final TimeTrackingConfiguration timeTrackingConfiguration;
+    private final JqlFunctionHandlerRegistry jqlFunctionHandlerRegistry;
+
 
     @Autowired
-    public ExpressionFunction(SearchHelper searchHelper, @ComponentImport JqlOperandResolver jqlOperandResolver, @ComponentImport JqlQueryParser jqlQueryParser, @ComponentImport CustomFieldManager customFieldManager, @ComponentImport SearchHandlerManager searchHandlerManager, @ComponentImport DoubleConverter doubleConverter) {
+    public ExpressionFunction(SearchHelper searchHelper, @ComponentImport JqlOperandResolver jqlOperandResolver, @ComponentImport CustomFieldManager customFieldManager, @ComponentImport SearchHandlerManager searchHandlerManager, @ComponentImport DoubleConverter doubleConverter, @ComponentImport TimeTrackingConfiguration timeTrackingConfiguration) {
         super("expression", 2);
         this.searchHelper = searchHelper;
         this.jqlOperandResolver = jqlOperandResolver;
-        this.jqlQueryParser = jqlQueryParser;
         this.searchHandlerManager = searchHandlerManager;
         this.customFieldManager = customFieldManager;
         this.doubleConverter = doubleConverter;
+        this.timeTrackingConfiguration = timeTrackingConfiguration;
+        // TODO black magic prevents this Bean from autowiring via @ComponentImport during plugin start,this should be fixed in future
+        this.jqlFunctionHandlerRegistry = ComponentAccessor.getComponent(JqlFunctionHandlerRegistry.class);
     }
 
 
@@ -142,28 +142,16 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
         GroovyClassLoader groovyClassLoader = ShellUtils.createSecureClassLoader(new AllVariablesMemorizerExtension(visitor));
 
         // TODO bindings for jql functions calls and dates short values like: wd, 2w, 3d etc...
-        GroovyShell groovyShell = new GroovyShell(groovyClassLoader, new Binding());
-
-        // we need to execute this script before execution in case to add to standard groovy classes some arithmetic operations overloading
-        InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("AdditionalArithmeticOperators.groovy");
-        if (resourceAsStream == null) {
-            log.error("AdditionalArithmeticOperators.groovy script not found in resources folder" +
-                              "This may force some wrong arithmetic operators behavior inside expressions query");
-        } else {
-            try (final InputStreamReader inputStreamReader = new InputStreamReader(resourceAsStream)) {
-                Script additionalOperatorsScript = groovyShell.parse(inputStreamReader);
-                additionalOperatorsScript.run();
-            } catch (IOException ioException) {
-                log.error("Error during closing AdditionalArithmeticOperators.groovy script file input steam");
-            }
-        }
-
+        Map<String, Object> bindingMap = createBindingMap(queryCreationContext);
+        GroovyShell groovyShell = new GroovyShell(groovyClassLoader, new Binding(bindingMap));
+        addGroovyClassesOperatorsOverloading(groovyShell);
 
         // parse expressionQueryStr as a script class and remembering all found fields
         groovyClassLoader.parseClass(expressionQueryStr);
+        // remove all defined with bindings variables
         Set<String> allUsedFieldNames = new HashSet<>(visitor.getFields().size(), 1);
         allUsedFieldNames.addAll(visitor.getFields());
-        visitor.clear();
+        allUsedFieldNames.removeAll(bindingMap.keySet());
 
         // getting all found fields clause information
         Map<String, ClauseInformation> allFieldsClauseInfos = findAllClauseInfos(allUsedFieldNames);
@@ -195,8 +183,30 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
 
 
     /**
+     * Expand some standard groovy classes with additional arithmetic operators overloading
+     *
+     * @param groovyShell - script shell executor
+     */
+    private void addGroovyClassesOperatorsOverloading(GroovyShell groovyShell) {
+        InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("AdditionalArithmeticOperators.groovy");
+        if (resourceAsStream == null) {
+            log.error("AdditionalArithmeticOperators.groovy script not found in resources folder." +
+                              "This may force some wrong arithmetic operators behavior inside expressions query");
+            return;
+        }
+        try (final InputStreamReader inputStreamReader = new InputStreamReader(resourceAsStream)) {
+            Script additionalOperatorsScript = groovyShell.parse(inputStreamReader);
+            additionalOperatorsScript.run();
+        } catch (IOException ioException) {
+            log.error("Error during closing AdditionalArithmeticOperators.groovy script file input steam");
+        }
+    }
+
+
+    /**
      * Builds all fields non empty query like: field1 is not empty and field2 is not empty etc...
-     * @param query - a jql subquery mostly used to decrease amount of returned issues
+     *
+     * @param query          - a jql subquery mostly used to decrease amount of returned issues
      * @param clauseInfoList - all searched fields clause
      * @return built query
      */
@@ -215,7 +225,6 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
     }
 
     /**
-     *
      * @param fieldNames - all field names
      * @return a map of all field names mapped to it's field ClauseInfo
      */
@@ -311,6 +320,105 @@ public class ExpressionFunction extends AbstractBuiltInQueryFunction {
                 return new WorkRatioExtractor(clauseInfo.getIndexField());
         }
         return null;
+    }
+
+    /**
+     * Creates a Binding map for groovy shell with all the predefined binding objects
+     * @param queryCreationContext - a context of jql search invocation
+     * @return Binding map
+     */
+    Map<String, Object> createBindingMap(QueryCreationContext queryCreationContext) {
+        Map<String, Object> bindingsMap = new HashMap<>();
+
+        BigDecimal hoursPerDayMultiplier = new BigDecimal(1);
+        BigDecimal daysPerWeekMultiplier = new BigDecimal(1);
+        if (timeTrackingConfiguration.enabled()) {
+            hoursPerDayMultiplier = (BigDecimal) BigDecimalMath.divide(timeTrackingConfiguration.getHoursPerDay(), 24);
+            daysPerWeekMultiplier = (BigDecimal) BigDecimalMath.divide(timeTrackingConfiguration.getDaysPerWeek(), 7);
+        }
+
+        BigDecimal millisInWorkingDay = (BigDecimal) BigDecimalMath.multiply(TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS), hoursPerDayMultiplier);
+        bindingsMap.put("h", TimeUnit.MILLISECONDS.convert(1L, TimeUnit.HOURS));
+        bindingsMap.put("d", TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS));
+        bindingsMap.put("w", 7 * TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS));
+        bindingsMap.put("wd", millisInWorkingDay.longValue());
+        bindingsMap.put("ww", millisInWorkingDay.multiply(daysPerWeekMultiplier).longValue());
+
+        bindingsMap.putAll(createJqlBindings(queryCreationContext));
+        return bindingsMap;
+    }
+
+    /**
+     * Creates a jql functions bindings for all date-s and user-s jql functions
+     * @param queryCreationContext - a context of jql search invocation
+     * @return jql functions bindings map
+     */
+    private Map<String, Closure> createJqlBindings(QueryCreationContext queryCreationContext) {
+        List<String> allFunctionNames = jqlFunctionHandlerRegistry.getAllFunctionNames();
+        Map<String, Closure> jqlFunctionClosuresMap = new HashMap<>(allFunctionNames.size(), 1);
+        allFunctionNames.forEach((functionName) -> {
+            FunctionOperandHandler operandHandler = jqlFunctionHandlerRegistry.getOperandHandler(new FunctionOperand(functionName));
+            JqlFunction jqlFunction = operandHandler.getJqlFunction();
+            if (jqlFunction.getDataType().matches(JiraDataTypes.DATE)) {
+                jqlFunctionClosuresMap.put(functionName, new MappingClosure<>(operandHandler, queryCreationContext, ExpressionFunction.this::mapJQLResultToTimestamp));
+            }
+            if (jqlFunction.getDataType().matches(JiraDataTypes.USER)) {
+                jqlFunctionClosuresMap.put(functionName, new MappingClosure<>(operandHandler, queryCreationContext, ExpressionFunction.this::mapJQLResultToUserStr));
+            }
+        });
+        return jqlFunctionClosuresMap;
+    }
+
+    /**
+     * Maps JQL function first invocation result to Timestamp object
+     * @param literals - some JQL function invocation result
+     * @return {@link Timestamp class}
+     */
+    @Nullable
+    private Timestamp mapJQLResultToTimestamp(List<QueryLiteral> literals) {
+        if (literals.size() == 0)
+            return null;
+        return new Timestamp(literals.get(0).getLongValue());
+    }
+
+    /**
+     * Maps JQL function first invocation result to User representation String object
+     * @param literals - some JQL function invocation result
+     * @return {@link String class}
+     */
+    @Nullable
+    private String mapJQLResultToUserStr(List<QueryLiteral> literals) {
+        if (literals.size() == 0)
+            return null;
+        return literals.get(0).getStringValue();
+    }
+
+    /**
+     * An extended version of groovy {@link Closure} class, it's used mostly to implement jql function call inside groovy shell
+     * @param <V> - Closure return value type
+     */
+    private class MappingClosure<V> extends Closure<V> {
+        private final FunctionOperandHandler operandHandler;
+        private final QueryCreationContext queryCreationContext;
+        private final Function<List<QueryLiteral>, V> mapperFunction;
+
+        public MappingClosure(FunctionOperandHandler functionOperandHandler, QueryCreationContext queryCreationContext, Function<List<QueryLiteral>, V> mapperFunction) {
+            super(null);
+            this.operandHandler = functionOperandHandler;
+            this.queryCreationContext = queryCreationContext;
+            this.mapperFunction = mapperFunction;
+        }
+
+        @Override
+        public V call(Object... args) {
+            List<String> argsList = Arrays.stream(args).map(Object::toString).collect(Collectors.toList());
+            FunctionOperand jqlFunctionOperand = new FunctionOperand(operandHandler.getJqlFunction().getFunctionName(), argsList);
+            MessageSet messageSet = operandHandler.validate(queryCreationContext.getApplicationUser(), jqlFunctionOperand, null);
+            if (messageSet.hasAnyErrors())
+                throw new JqlFunctionValidationException(messageSet);
+            List<QueryLiteral> values = operandHandler.getValues(queryCreationContext, jqlFunctionOperand, null);
+            return mapperFunction.apply(values);
+        }
     }
 }
 

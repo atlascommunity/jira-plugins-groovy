@@ -12,7 +12,7 @@ public class UserExtractor implements LuceneFieldValueExtractor {
     }
 
     @Override
-    public String apply(Document document) {
+    public String extract(Document document) {
         String fieldValue = document.getField(indexFieldName).stringValue();
         if (fieldValue == null)
             return null;

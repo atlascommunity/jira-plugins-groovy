@@ -13,7 +13,7 @@ public class DateExtractor implements LuceneFieldValueExtractor {
     }
 
     @Override
-    public Timestamp apply(Document document) {
+    public Timestamp extract(Document document) {
         LocalDate localDate = LocalDate.ofEpochDay(document.getField(indexFieldName).numericValue().longValue());
         return Timestamp.valueOf(localDate.atStartOfDay());
     }

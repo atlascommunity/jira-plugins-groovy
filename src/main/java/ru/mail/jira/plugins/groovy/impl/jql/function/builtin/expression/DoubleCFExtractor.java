@@ -13,7 +13,7 @@ public class DoubleCFExtractor implements LuceneFieldValueExtractor {
     }
 
     @Override
-    public Object apply(Document document) {
+    public Object extract(Document document) {
         String fieldValue = document.getField(indexFieldName).stringValue();
         return doubleConverter.getDouble(fieldValue);
     }

@@ -12,7 +12,7 @@ public class DateTimeExtractor implements LuceneFieldValueExtractor {
     }
 
     @Override
-    public Timestamp apply(Document document) {
+    public Timestamp extract(Document document) {
         return new Timestamp(document.getField(indexFieldName).numericValue().longValue());
     }
 }

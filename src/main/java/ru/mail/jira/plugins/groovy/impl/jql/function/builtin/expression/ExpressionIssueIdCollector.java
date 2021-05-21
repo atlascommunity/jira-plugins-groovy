@@ -36,7 +36,7 @@ public class ExpressionIssueIdCollector extends FieldDocumentHitCollector {
         extractorMap.keySet().forEach(indexFieldName -> {
             LuceneFieldValueExtractor extractor = extractorMap.get(indexFieldName);
             if (extractor != null)
-                script.setProperty(indexFieldName, extractor.apply(document));
+                script.setProperty(indexFieldName, extractor.extract(document));
         });
         Object result = script.run();
 

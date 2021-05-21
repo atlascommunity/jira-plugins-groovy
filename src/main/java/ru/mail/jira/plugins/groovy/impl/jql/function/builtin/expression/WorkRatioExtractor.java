@@ -9,7 +9,7 @@ public class WorkRatioExtractor implements LuceneFieldValueExtractor {
         this.indexFieldName = indexFieldName;
     }
     @Override
-    public Double apply(Document document) {
+    public Double extract(Document document) {
         String fieldValue = document.getField(indexFieldName).stringValue();
         return Double.parseDouble(fieldValue != null ? fieldValue : "0") / 100;
     }
