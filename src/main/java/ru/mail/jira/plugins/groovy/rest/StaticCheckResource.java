@@ -111,32 +111,6 @@ public class StaticCheckResource {
                     break;
                 case LISTENER:
                     Map<String, Class> types = ImmutableMap.of();
-
-                    if (additionalParams.containsKey("className")) {
-                        String className = additionalParams.get("className");
-
-                        Class type;
-                        try {
-                            type = classLoader.loadClass(className);
-                        } catch (ClassNotFoundException e) {
-                            PositionedCompilationMessage error = new PositionedCompilationMessage();
-                            error.setStartLine(0);
-                            error.setEndLine(0);
-                            error.setStartColumn(0);
-                            error.setEndColumn(0);
-                            error.setMessage("Can't load class \"" + className + "\"");
-                            error.setType("error");
-
-                            return ImmutableList.of(error);
-                        }
-
-                        if (type != null) {
-                            types = ImmutableMap.of(
-                                "event", type
-                            );
-                        }
-                    }
-
                     parseContext = scriptService.parseScriptStatic(form.getScriptBody(), types);
                     break;
                 default:
