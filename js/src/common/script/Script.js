@@ -113,6 +113,7 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         const { script } = this.props;
         if (script && script.scriptBody) {
             this.state.scriptBody = script.scriptBody;
+            this.state.scriptBodyReady = true;
         }
     }
 
@@ -120,6 +121,9 @@ export class Script extends React.Component<ScriptProps, ScriptState> {
         if (!this.props.collapsible) {
             this._fetchExecutions();
             this._fetchChangelogs();
+            if (!this.state.scriptBodyReady) {
+                this._fetchSourceCode();
+            }
         }
     }
 

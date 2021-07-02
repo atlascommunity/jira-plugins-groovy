@@ -39,8 +39,7 @@ public class BuiltInScriptManagerImpl implements BuiltInScriptManager {
 
         List<AdminScriptDto> list = new ArrayList<>();
         for (String key : builtInScripts.keySet()) {
-            BuiltInScript script = builtInScripts.get(key);
-            AdminScriptDto adminScriptDto = buildScriptDto(key, script.isHtml(), id--);
+            AdminScriptDto adminScriptDto = buildScriptDto(key, id--);
             list.add(adminScriptDto);
         }
         return list;
@@ -51,14 +50,14 @@ public class BuiltInScriptManagerImpl implements BuiltInScriptManager {
         return builtInScripts.get(key);
     }
 
-    private AdminScriptDto buildScriptDto(String key, boolean isHtml, int id) {
+    private AdminScriptDto buildScriptDto(String key, int id) {
         BuiltInScript script = builtInScripts.get(key);
 
         AdminScriptDto result = new AdminScriptDto();
         result.setId(id);
         result.setBuiltIn(true);
         result.setBuiltInKey(key);
-        result.setHtml(isHtml);
+        result.setHtml(script.isHtml());
         result.setName(i18nHelper.getText(script.getI18nKey()));
         result.setParams(script.getParams());
         result.setDefaultValues(script.getDefaultValues());
