@@ -374,6 +374,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                     >
                         <div>
                             <Checkbox
+                                className="fit-content-width"
                                 isChecked={types.includes('CONDITION')}
                                 onChange={this._toggleType}
                                 label={CommonMessages.condition}
@@ -381,6 +382,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                                 name="script-type-options"
                             />
                             <Checkbox
+                                className="fit-content-width"
                                 isChecked={types.includes('VALIDATOR')}
                                 onChange={this._toggleType}
                                 label={CommonMessages.validator}
@@ -388,6 +390,7 @@ export class ScriptFormInternal extends React.PureComponent<Props, State> {
                                 name="script-type-options"
                             />
                             <Checkbox
+                                className="fit-content-width"
                                 isChecked={types.includes('FUNCTION')}
                                 onChange={this._toggleType}
                                 label={CommonMessages.function}
