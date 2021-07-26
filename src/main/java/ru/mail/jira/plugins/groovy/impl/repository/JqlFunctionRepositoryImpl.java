@@ -72,10 +72,10 @@ public class JqlFunctionRepositoryImpl implements JqlFunctionRepository {
     }
 
     @Override
-    public List<JqlFunctionScriptDto> getAllScripts(boolean includeChangelogs, boolean includeErrorCount) {
+    public List<JqlFunctionScriptDto> getAllScripts(boolean includeScriptBody, boolean includeChangelogs, boolean includeErrorCount) {
         return Arrays
             .stream(ao.find(JqlFunctionScript.class, Query.select().where("DELETED = ?", Boolean.FALSE)))
-            .map(it -> buildScriptDto(it, includeChangelogs, includeErrorCount, false))
+            .map(it -> buildScriptDto(it, includeChangelogs, includeErrorCount, includeScriptBody))
             .collect(Collectors.toList());
     }
 

@@ -45,7 +45,7 @@ public class JqlFunctionResource {
         return new RestExecutor<>(() -> {
             permissionHelper.checkIfAdmin();
 
-            return functionRepository.getAllScripts(false, true);
+            return functionRepository.getAllScripts(false, false, true);
         }).getResponse();
     }
 
