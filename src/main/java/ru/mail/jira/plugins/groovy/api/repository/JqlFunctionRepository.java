@@ -9,7 +9,7 @@ import ru.mail.jira.plugins.groovy.api.dto.jql.JqlFunctionScriptDto;
 import java.util.List;
 
 public interface JqlFunctionRepository {
-    List<JqlFunctionScriptDto> getAllScripts(boolean includeChangelogs, boolean includeErrorCount);
+    List<JqlFunctionScriptDto> getAllScripts(boolean includeScriptBody, boolean includeChangelogs, boolean includeErrorCount);
 
     List<ChangelogDto> getChangelogs(int id);
 

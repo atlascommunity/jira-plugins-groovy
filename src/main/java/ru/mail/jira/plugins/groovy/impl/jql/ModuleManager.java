@@ -129,7 +129,7 @@ public class ModuleManager {
     }
 
     private void registerDescriptor(String functionName, ModuleDescriptor descriptor) {
-        logger.debug("registering function with name: {}", functionName);
+        logger.info("registering function with name: {}", functionName);
         Lock lock = this.lock.writeLock();
 
         lock.lock();
@@ -160,14 +160,14 @@ public class ModuleManager {
 
                     String functionName = moduleKeyToFunction.remove(moduleKey);
 
-                    logger.debug("unregistering function with name: {}", functionName);
+                    logger.info("unregistering function with name: {}", functionName);
 
                     CustomFunction function = allFunctions.remove(functionName.toLowerCase());
                     if (function instanceof ScriptedFunctionAdapter) {
                         ((ScriptedFunctionAdapter) function).reset();
                     }
                 } catch (IllegalStateException e) {
-                    logger.debug("already unregistered", e);
+                    logger.info("already unregistered", e);
                 }
             }
         } finally {

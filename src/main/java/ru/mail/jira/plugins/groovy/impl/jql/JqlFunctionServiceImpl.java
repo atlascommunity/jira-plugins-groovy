@@ -53,7 +53,7 @@ public class JqlFunctionServiceImpl implements JqlFunctionService, PluginLifecyc
                 moduleManager.registerBuiltInFunction(function);
             }
 
-            for (JqlFunctionScriptDto script : repository.getAllScripts(false, false)) {
+            for (JqlFunctionScriptDto script : repository.getAllScripts(true, false, false)) {
                 moduleManager.registerScript(script);
             }
         } finally {
