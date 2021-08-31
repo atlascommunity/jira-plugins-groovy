@@ -48,7 +48,11 @@ public class ContextAwareClassLoader extends ClassLoader {
                 currentContext.remove();
             }
         } finally {
-            rwLock.readLock().unlock();
+            try {
+                rwLock.readLock().unlock();
+            } catch (Exception ignored) {
+                //ignore unlock errors
+            }
         }
     }
 
