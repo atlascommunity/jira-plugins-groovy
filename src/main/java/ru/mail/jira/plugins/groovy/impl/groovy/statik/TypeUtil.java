@@ -45,6 +45,9 @@ public final class TypeUtil {
     private static final Map<String, Class> SCHEDULED_MUTABLE = ImmutableMap.of(
         "issue", MutableIssue.class
     );
+    private static final Map<String, Class> LISTENER = ImmutableMap.of(
+        "issue", MutableIssue.class
+    );
 
     private TypeUtil() {}
 
@@ -82,5 +85,9 @@ public final class TypeUtil {
         }
 
         return isMutableIssue ? SCHEDULED_MUTABLE : SCHEDULED;
+    }
+
+    public static Map<String, Class> getListenerTypes() {
+        return LISTENER;
     }
 }
