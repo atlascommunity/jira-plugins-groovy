@@ -110,8 +110,7 @@ public class StaticCheckResource {
                     InvokerHelper.removeClass(objectClass);
                     break;
                 case LISTENER:
-                    Map<String, Class> types = ImmutableMap.of();
-                    parseContext = scriptService.parseScriptStatic(form.getScriptBody(), types);
+                    parseContext = scriptService.parseScriptStatic(form.getScriptBody(), TypeUtil.getListenerTypes());
                     break;
                 default:
                     throw new IllegalArgumentException("Unsupported script type");
