@@ -320,7 +320,11 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
         result.setAction(EntityAction.valueOf(row.get(AUDIT_LOG_ENTRY.ACTION)));
         result.setCategory(category);
         result.setDescription(row.get(AUDIT_LOG_ENTRY.DESCRIPTION));
-        result.setUrl(ScriptUtil.getPermalink(category, entityId));
+        if (category.toString().equals("CUSTOM_FIELD")) {
+            result.setUrl(ScriptUtil.getPermalink(category, activeObjects.get(FieldScript.class, entityId).getFieldConfigId().intValue()));
+        } else {
+            result.setUrl(ScriptUtil.getPermalink(category, entityId));
+        }
 
         fillEntityData(result, category, entityId);
 
