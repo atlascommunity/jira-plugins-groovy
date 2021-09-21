@@ -13,6 +13,8 @@ import com.atlassian.pocketknife.api.querydsl.util.OnRollback;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import net.java.ao.DBParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.entity.*;
@@ -37,6 +39,7 @@ import static ru.mail.jira.plugins.groovy.util.QueryDslTables.AUDIT_LOG_ISSUE_RE
 @Component
 @ExportAsDevService(AuditLogRepository.class)
 public class AuditLogRepositoryImpl implements AuditLogRepository {
+    private final Logger log = LoggerFactory.getLogger(AuditLogRepositoryImpl.class);
     private final IssueManager issueManager;
     private final ActiveObjects activeObjects;
     private final DateTimeFormatter dateTimeFormatter;
@@ -176,8 +179,7 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
                     break;
                 }
                 case CUSTOM_FIELD: {
-                    Long fieldConfigId = activeObjects.get(FieldScript.class, entityId).getFieldConfigId();
-                    name = customFieldHelper.getFieldName(fieldConfigId);
+                    name = customFieldHelper.getFieldName(getScriptIdByEntityId(entityId));
                     break;
                 }
                 case SCHEDULED_TASK: {
@@ -279,9 +281,10 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
                     break;
                 }
                 case CUSTOM_FIELD: {
-                    Long fieldConfigId = activeObjects.get(FieldScript.class, entityId).getFieldConfigId();
-                    result.setScriptId((int) (long) fieldConfigId);
-                    name = customFieldHelper.getFieldName(fieldConfigId);
+                    Long scriptId = getScriptIdByEntityId(entityId);
+                    if(scriptId != null)
+                        result.setScriptId(scriptId.intValue());
+                    name = customFieldHelper.getFieldName(scriptId);
                     deleted = false;
                     break;
                 }
@@ -308,6 +311,14 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
         }
     }
 
+    private Long getScriptIdByEntityId(Integer entityId){
+        FieldScript fieldScript = activeObjects.get(FieldScript.class, entityId);
+        if(fieldScript != null && fieldScript.getFieldConfigId() != null)
+            return fieldScript.getFieldConfigId();
+        log.error("Unable to search the fieldScript with entityId=" + entityId);
+        return null;
+    }
+
     private AuditLogEntryDto buildDto(Tuple row) {
         AuditLogEntryDto result = new AuditLogEntryDto();
 
@@ -320,8 +331,9 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
         result.setAction(EntityAction.valueOf(row.get(AUDIT_LOG_ENTRY.ACTION)));
         result.setCategory(category);
         result.setDescription(row.get(AUDIT_LOG_ENTRY.DESCRIPTION));
-        if (category.toString().equals("CUSTOM_FIELD")) {
-            result.setUrl(ScriptUtil.getPermalink(category, activeObjects.get(FieldScript.class, entityId).getFieldConfigId().intValue()));
+        Long scriptId = getScriptIdByEntityId(entityId);
+        if (category.equals(EntityType.CUSTOM_FIELD) && scriptId != null) {
+            result.setUrl(ScriptUtil.getPermalink(category, scriptId.intValue()));
         } else {
             result.setUrl(ScriptUtil.getPermalink(category, entityId));
         }
