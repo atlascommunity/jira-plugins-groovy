@@ -305,6 +305,7 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
             result.setScriptName(name);
             result.setParentName(parentName);
             result.setDeleted(deleted);
+            result.setUrl(ScriptUtil.getPermalink(category, result.getScriptId()));
         }
     }
 
@@ -320,7 +321,6 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
         result.setAction(EntityAction.valueOf(row.get(AUDIT_LOG_ENTRY.ACTION)));
         result.setCategory(category);
         result.setDescription(row.get(AUDIT_LOG_ENTRY.DESCRIPTION));
-        result.setUrl(ScriptUtil.getPermalink(category, entityId));
 
         fillEntityData(result, category, entityId);
 
