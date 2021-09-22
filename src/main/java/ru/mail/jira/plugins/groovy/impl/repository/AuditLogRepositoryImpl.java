@@ -13,8 +13,6 @@ import com.atlassian.pocketknife.api.querydsl.util.OnRollback;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
 import net.java.ao.DBParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.mail.jira.plugins.groovy.api.entity.*;
@@ -39,7 +37,6 @@ import static ru.mail.jira.plugins.groovy.util.QueryDslTables.AUDIT_LOG_ISSUE_RE
 @Component
 @ExportAsDevService(AuditLogRepository.class)
 public class AuditLogRepositoryImpl implements AuditLogRepository {
-    private final Logger log = LoggerFactory.getLogger(AuditLogRepositoryImpl.class);
     private final IssueManager issueManager;
     private final ActiveObjects activeObjects;
     private final DateTimeFormatter dateTimeFormatter;
