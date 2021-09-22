@@ -179,7 +179,8 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
                     break;
                 }
                 case CUSTOM_FIELD: {
-                    name = customFieldHelper.getFieldName(getScriptIdByEntityId(entityId));
+                    Long fieldConfigId = activeObjects.get(FieldScript.class, entityId).getFieldConfigId();
+                    name = customFieldHelper.getFieldName(fieldConfigId);
                     break;
                 }
                 case SCHEDULED_TASK: {
@@ -281,10 +282,10 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
                     break;
                 }
                 case CUSTOM_FIELD: {
-                    Long scriptId = getScriptIdByEntityId(entityId);
-                    if(scriptId != null)
-                        result.setScriptId(scriptId.intValue());
-                    name = customFieldHelper.getFieldName(scriptId);
+                    Long fieldConfigId = activeObjects.get(FieldScript.class, entityId).getFieldConfigId();
+                    result.setScriptId((int) (long) fieldConfigId);
+                    name = customFieldHelper.getFieldName(fieldConfigId);
+                    result.setUrl(ScriptUtil.getPermalink(category, fieldConfigId.intValue()));
                     deleted = false;
                     break;
                 }
@@ -311,14 +312,6 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
         }
     }
 
-    private Long getScriptIdByEntityId(Integer entityId){
-        FieldScript fieldScript = activeObjects.get(FieldScript.class, entityId);
-        if(fieldScript != null && fieldScript.getFieldConfigId() != null)
-            return fieldScript.getFieldConfigId();
-        log.error("Unable to search the fieldScript with entityId=" + entityId);
-        return null;
-    }
-
     private AuditLogEntryDto buildDto(Tuple row) {
         AuditLogEntryDto result = new AuditLogEntryDto();
 
@@ -331,10 +324,7 @@ public class AuditLogRepositoryImpl implements AuditLogRepository {
         result.setAction(EntityAction.valueOf(row.get(AUDIT_LOG_ENTRY.ACTION)));
         result.setCategory(category);
         result.setDescription(row.get(AUDIT_LOG_ENTRY.DESCRIPTION));
-        Long scriptId = getScriptIdByEntityId(entityId);
-        if (category.equals(EntityType.CUSTOM_FIELD) && scriptId != null) {
-            result.setUrl(ScriptUtil.getPermalink(category, scriptId.intValue()));
-        } else {
+        if (!category.equals(EntityType.CUSTOM_FIELD)) {
             result.setUrl(ScriptUtil.getPermalink(category, entityId));
         }
 
