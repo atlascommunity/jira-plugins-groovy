@@ -27,6 +27,16 @@ import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+/**
+ * Usage example:  groovyFunction in my_memberOfRole("assignee", "Administrators")
+ *
+ * Function supports 4 fields: "watchers", "assignee", "author", "creator"
+ *
+ * Can be used with multiple roles as multiple arguments:
+ *
+ * groovyFunction in my_memberOfRole("assignee", "Administrators", "Developers", "Users")
+ */
 @Component
 public class MemberOfRoleFunction extends AbstractBuiltInQueryFunction {
 
