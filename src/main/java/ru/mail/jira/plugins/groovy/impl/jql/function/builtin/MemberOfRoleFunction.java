@@ -30,11 +30,11 @@ import java.util.stream.Collectors;
 
 /**
  * Usage example:  groovyFunction in my_memberOfRole("assignee", "Administrators")
- *
+ * <p>
  * Function supports 4 fields: "watchers", "assignee", "author", "creator"
- *
+ * <p>
  * Can be used with multiple roles as multiple arguments:
- *
+ * <p>
  * groovyFunction in my_memberOfRole("assignee", "Administrators", "Developers", "Users")
  */
 @Component
@@ -91,29 +91,39 @@ public class MemberOfRoleFunction extends AbstractBuiltInQueryFunction {
     FunctionOperand operand = (FunctionOperand) terminalClause.getOperand();
     String field = operand.getArgs().get(0);
 
-    BooleanQuery.Builder builder = new BooleanQuery.Builder();
+
+    HashSet<ApplicationUser> users = new HashSet<>();
 
     for (ProjectRole role : roles) {
       if (!projects.isEmpty()) {
         for (String key : projects) {
           Project project = projectManager.getProjectObjByKey(key);
-          handleFields(builder, field, projectRoleManager.getProjectRoleActors(role, project).getApplicationUsers());
+          if (project != null) {
+            users.addAll(projectRoleManager.getProjectRoleActors(role, project).getApplicationUsers());
+          }
+
         }
       } else {
-        handleFields(builder, field, projectRoleManager.getDefaultRoleActors(role).getApplicationUsers());
+        users.addAll(projectRoleManager.getDefaultRoleActors(role).getApplicationUsers());
       }
     }
+    BooleanQuery.Builder builder = new BooleanQuery.Builder();
 
-    return new QueryFactoryResult(builder.build(), terminalClause.getOperator().equals(Operator.NOT_IN));
+    handleFields(builder, field, users);
+    
+    return new QueryFactoryResult(builder.build(), terminalClause.getOperator().equals(Operator.IN));
   }
 
   private void handleFields(BooleanQuery.Builder builder, String field, Set<ApplicationUser> users) {
     Optional<String> selectedField = fields.keySet().stream().filter(f -> f.equals(field.toLowerCase(Locale.ROOT))).findFirst();
     if (!selectedField.isPresent()) return;
 
+    BooleanQuery.Builder userQuery = new BooleanQuery.Builder();
     for (ApplicationUser user : users) {
-      builder.add(new TermQuery(new Term(fields.get(selectedField.get()), user.getKey())), BooleanClause.Occur.MUST);
+      userQuery.add(new BooleanClause(new TermQuery(new Term(fields.get(selectedField.get()), user.getUsername())), BooleanClause.Occur.SHOULD));
     }
+    userQuery.setMinimumNumberShouldMatch(1);
+    builder.add(userQuery.build(), BooleanClause.Occur.MUST);
   }
 
   private Set<ProjectRole> getProjectRoles(TerminalClause terminalClause) {
