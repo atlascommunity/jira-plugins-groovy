@@ -30,11 +30,11 @@ import java.util.stream.Collectors;
 
 /**
  * Usage example:  groovyFunction in my_memberOfRole("assignee", "Administrators")
- *
+ * <p>
  * Function supports 4 fields: "watchers", "assignee", "author", "creator"
- *
+ * <p>
  * Can be used with multiple roles as multiple arguments:
- *
+ * <p>
  * groovyFunction in my_memberOfRole("assignee", "Administrators", "Developers", "Users")
  */
 @Component
@@ -104,16 +104,19 @@ public class MemberOfRoleFunction extends AbstractBuiltInQueryFunction {
       }
     }
 
-    return new QueryFactoryResult(builder.build(), terminalClause.getOperator().equals(Operator.NOT_IN));
+    return new QueryFactoryResult(builder.build(), terminalClause.getOperator().equals(Operator.IN));
   }
 
   private void handleFields(BooleanQuery.Builder builder, String field, Set<ApplicationUser> users) {
     Optional<String> selectedField = fields.keySet().stream().filter(f -> f.equals(field.toLowerCase(Locale.ROOT))).findFirst();
     if (!selectedField.isPresent()) return;
 
+    BooleanQuery.Builder userQuery = new BooleanQuery.Builder();
     for (ApplicationUser user : users) {
-      builder.add(new TermQuery(new Term(fields.get(selectedField.get()), user.getKey())), BooleanClause.Occur.MUST);
+      userQuery.add(new BooleanClause(new TermQuery(new Term(fields.get(selectedField.get()), user.getUsername())), BooleanClause.Occur.SHOULD));
     }
+    userQuery.setMinimumNumberShouldMatch(1);
+    builder.add(userQuery.build(), BooleanClause.Occur.MUST);
   }
 
   private Set<ProjectRole> getProjectRoles(TerminalClause terminalClause) {
