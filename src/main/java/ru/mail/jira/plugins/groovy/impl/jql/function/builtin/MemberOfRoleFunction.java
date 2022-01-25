@@ -91,19 +91,26 @@ public class MemberOfRoleFunction extends AbstractBuiltInQueryFunction {
     FunctionOperand operand = (FunctionOperand) terminalClause.getOperand();
     String field = operand.getArgs().get(0);
 
-    BooleanQuery.Builder builder = new BooleanQuery.Builder();
+
+    HashSet<ApplicationUser> users = new HashSet<>();
 
     for (ProjectRole role : roles) {
       if (!projects.isEmpty()) {
         for (String key : projects) {
           Project project = projectManager.getProjectObjByKey(key);
-          handleFields(builder, field, projectRoleManager.getProjectRoleActors(role, project).getApplicationUsers());
+          if (project != null) {
+            users.addAll(projectRoleManager.getProjectRoleActors(role, project).getApplicationUsers());
+          }
+
         }
       } else {
-        handleFields(builder, field, projectRoleManager.getDefaultRoleActors(role).getApplicationUsers());
+        users.addAll(projectRoleManager.getDefaultRoleActors(role).getApplicationUsers());
       }
     }
+    BooleanQuery.Builder builder = new BooleanQuery.Builder();
 
+    handleFields(builder, field, users);
+    
     return new QueryFactoryResult(builder.build(), terminalClause.getOperator().equals(Operator.IN));
   }
 
