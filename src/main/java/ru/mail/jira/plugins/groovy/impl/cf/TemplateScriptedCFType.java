@@ -15,6 +15,7 @@ import ru.mail.jira.plugins.groovy.api.dto.cf.FieldScriptDto;
 import ru.mail.jira.plugins.groovy.util.CustomFieldHelper;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Map;
 
 @Scanned
@@ -60,7 +61,7 @@ public class TemplateScriptedCFType extends ScriptedCFType<Object, Object> {
     }
 
     @Override
-    public FieldJsonRepresentation getJsonFromIssue(CustomField customField, Issue issue, boolean b, @Nullable FieldLayoutItem fieldLayoutItem) {
-        return new FieldJsonRepresentation(new JsonData(null));
+    public FieldJsonRepresentation getJsonFromIssue(CustomField field, Issue issue, boolean b, @Nullable FieldLayoutItem fieldLayoutItem) {
+        return new FieldJsonRepresentation(new JsonData(field.getColumnViewHtml(fieldLayoutItem, new HashMap<>(), issue)));
     }
 }
